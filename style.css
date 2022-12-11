@@ -1,0 +1,60 @@
+body {
+	background-color:black;
+}
+
+.std-text {
+	font-family: monospace;
+	color: white;
+	margin: 20px 0px 20px 0px;
+}
+
+h1 {
+	font-size: 72px; 
+	text-align: center;
+}
+
+h2 {
+	font-size: 32px; 
+	text-align: center;
+}
+
+h3 {
+	font-size: 24px; 
+	text-align: center;
+}
+
+p {
+	font-size: 14px; 
+	text-align: left;
+}
+
+.center-div {
+	width: 50%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.btn-group {
+	margin: 0 auto;
+	display: flex;
+	justify-content: center;
+}
+
+.btn-group button {
+	background-color: #00ff00; /* Green background */
+	color: black; /* White text */
+	padding: 10px; /* Some padding */
+	margin: 0px 5px 0px 5px;
+	cursor: pointer; /* Pointer/hand icon */
+	border: none;
+}
+
+.btn-group:after {
+	content: "";
+	clear: both;
+	display: table;
+}
+
+.btn-group button:hover {
+	background-color: #008800;
+}
