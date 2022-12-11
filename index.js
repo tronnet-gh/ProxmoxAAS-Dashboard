@@ -17,5 +17,9 @@ async function init () {
 		let newNode = document.createElement("node-card");
 		newNode.data = nodes.data[i];
 		nodeContainer.append(newNode);
+		let qemu = await request(`/nodes/${nodes.data[i].node}/qemu`, "GET", null);
+		let lxc = await request(`/nodes/${nodes.data[i].node}/lxc`, "GET", null);
+		console.log(`${nodes.data[i].node} quemu: ${qemu}`);
+		console.log(`${nodes.data[i].node} lxc: ${lxc}`);
 	}
 }
