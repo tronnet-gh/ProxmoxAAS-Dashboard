@@ -49,5 +49,5 @@ async function request (path, method, body) {
 function setTicket (ticket) {
 	let d = new Date();
 	d.setTime(d.getTime() + (2*60*60*1000));
-	document.cookie = `PVEAuthCookie=${ticket}; path=/; expires=${d.toUTCString()};`;
+	document.cookie = `PVEAuthCookie=${ticket}; path=/; expires=${d.toUTCString()}; domain=.tronnet.net`;
 }
