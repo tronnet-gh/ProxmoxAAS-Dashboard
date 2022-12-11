@@ -19,7 +19,9 @@ async function init () {
 		nodeContainer.append(newNode);
 		let qemu = await request(`/nodes/${nodes.data[i].node}/qemu`, "GET", null);
 		let lxc = await request(`/nodes/${nodes.data[i].node}/lxc`, "GET", null);
-		console.log(`${nodes.data[i].node} quemu: ${qemu}`);
-		console.log(`${nodes.data[i].node} lxc: ${lxc}`);
+		console.log(`${nodes.data[i].node} quemu:`);
+		console.log(qemu);
+		console.log(`${nodes.data[i].node} lxc:`);
+		console.log(lxc);
 	}
 }
