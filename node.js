@@ -27,6 +27,30 @@ class Node extends HTMLElement {
 		onlineLabel.style.color = data.status === "online" ? "#00ff00" : "#ff0000";
 		articleElement.append(onlineLabel);
 	}
+
+	set qemu (qemu) {
+		let articleElement = this.shadowElement.querySelector("article");
+
+		let qemuDiv = document.createElement("div");
+		for (let i = 0; i < qemu.length; i++) {
+			let instanceParagraph = document.createElement("p");
+			instanceParagraph.innerText = `${qemu[i].vmid}: ${qemu[i].name}`;
+			qemuDiv.append(instanceParagraph);
+		}
+		articleElement.append(qemuDiv);
+	}
+
+	set lxc (lxc) {
+		let articleElement = this.shadowElement.querySelector("article");
+
+		let lxcDiv = document.createElement("div");
+		for (let i = 0; i < lxc.length; i++) {
+			let instanceParagraph = document.createElement("p");
+			instanceParagraph.innerText = `${lxc[i].vmid}: ${lxc[i].name}`;
+			lxcDiv.append(instanceParagraph);
+		}
+		articleElement.append(lxcDiv);
+	}
 }
 
 customElements.define("node-card", Node);
