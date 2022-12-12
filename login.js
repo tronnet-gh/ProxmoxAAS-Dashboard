@@ -11,7 +11,7 @@ async function loginFormSubmitHandler () {
 	let form = document.querySelector("form");
 	let formData = new FormData(form);
 	try {
-		let ticket = await requestTicket(formData.username, formData.password);
+		let ticket = await requestTicket(formData.get("username"), formData.get("password"));
 		await setTicket(ticket);
 		window.location.href = "index.html";
 	}
