@@ -5,10 +5,7 @@ window.addEventListener("DOMContentLoaded", init);
 async function init () {
 	let cookie = document.cookie;
 	if (cookie === '') {
-		let username = prompt("username: ");
-		let password = prompt("password: ")
-		let ticket = await requestTicket(username, password);
-		setTicket(ticket.data.ticket);
+		window.location.href = "login.html";
 	}
 
 	let nodes = await request("/nodes", "GET", null);

@@ -1,0 +1,25 @@
+.center-div {
+	display: flex;
+	justify-content: center;
+}
+
+fieldset {
+	border: solid white 1px;
+	border-radius: 5px;
+	width: fit-content;
+}
+
+input, label, legend {
+	font-family: monospace;
+	color: white;
+	font-size: 14px;
+	background-color: black;
+}
+
+input {
+	border: solid white 1px;
+}
+
+button {
+	margin-top: 10px;
+}
