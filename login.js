@@ -10,7 +10,7 @@ function init (){
 		let formData = new FormData(form);
 		try {
 			let ticket = await requestTicket(formData.get("username"), formData.get("password"));
-			await setTicket(ticket);
+			await setTicket(ticket.data.ticket);
 			window.location.href = "index.html";
 		}
 		catch (error) {
