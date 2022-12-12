@@ -34,7 +34,8 @@ class Node extends HTMLElement {
 		let qemuDiv = document.createElement("div");
 		for (let i = 0; i < qemu.length; i++) {
 			let instanceParagraph = document.createElement("p");
-			instanceParagraph.innerText = `VM | ${qemu[i].vmid} | ${qemu[i].name}`;
+			instanceParagraph.innerText = `VM | ${qemu[i].vmid} | ${qemu[i].name} | ${qemu[i].status}`;
+			instanceParagraph.style.color = qemu[i].status == "running" ? "#00ff00" : "#ff0000";
 			qemuDiv.append(instanceParagraph);
 		}
 		articleElement.append(qemuDiv);
@@ -46,7 +47,8 @@ class Node extends HTMLElement {
 		let lxcDiv = document.createElement("div");
 		for (let i = 0; i < lxc.length; i++) {
 			let instanceParagraph = document.createElement("p");
-			instanceParagraph.innerText = `CT | ${lxc[i].vmid} | ${lxc[i].name}`;
+			instanceParagraph.innerText = `CT | ${lxc[i].vmid} | ${lxc[i].name} | ${qemu[i].status}`;
+			instanceParagraph.style.color = lxc[i].status == "running" ? "#00ff00" : "#ff0000";
 			lxcDiv.append(instanceParagraph);
 		}
 		articleElement.append(lxcDiv);
