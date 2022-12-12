@@ -4,10 +4,11 @@ window.addEventListener("DOMContentLoaded", init);
 
 function init (){
 	let formSubmitButton = document.querySelector("#submit");
-	formSubmitButton.addEventListener("click", loginFormSubmitHandler);
+	formSubmitButton.addEventListener("click", loginFormSubmitHandler(e));
 }
 
-async function loginFormSubmitHandler () {
+async function loginFormSubmitHandler (e) {
+	e.preventDefault();
 	let form = document.querySelector("form");
 	let formData = new FormData(form);
 	try {
