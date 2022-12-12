@@ -33,10 +33,8 @@ class Node extends HTMLElement {
 
 		let qemuDiv = document.createElement("div");
 		for (let i = 0; i < qemu.length; i++) {
-			let instanceParagraph = document.createElement("p");
-			instanceParagraph.innerText = `VM | ${qemu[i].vmid} | ${qemu[i].name} | ${qemu[i].status}`;
-			instanceParagraph.style.color = qemu[i].status == "running" ? "#00ff00" : "#ff0000";
-			qemuDiv.append(instanceParagraph);
+			let newInstance = document.createElement("instance-div");
+			newInstance.data = qemu[i];
 		}
 		articleElement.append(qemuDiv);
 	}
@@ -46,13 +44,39 @@ class Node extends HTMLElement {
 
 		let lxcDiv = document.createElement("div");
 		for (let i = 0; i < lxc.length; i++) {
-			let instanceParagraph = document.createElement("p");
-			instanceParagraph.innerText = `CT | ${lxc[i].vmid} | ${lxc[i].name} | ${lxc[i].status}`;
-			instanceParagraph.style.color = lxc[i].status == "running" ? "#00ff00" : "#ff0000";
-			lxcDiv.append(instanceParagraph);
+			let newInstance = document.createElement("instance-div");
+			newInstance.data = lxc[i];
 		}
 		articleElement.append(lxcDiv);
 	}
 }
 
-customElements.define("node-card", Node);
+class Instance extends HTMLElement {
+	constructor () {
+		super();
+		let shadowRoot = this.attachShadow({mode: "open"});
+
+		let instanceDiv = document.createElement("div");
+		shadowRoot.append(instanceDiv);
+
+		let styleLink = document.createElement("link");
+		styleLink.rel = "stylesheet";
+		styleLink.href = "style.css";
+		styleLink.type = "text/css";
+		shadowRoot.append(styleLink);
+
+		this.shadowElement = shadowRoot;
+	}
+
+	set data (data) {
+		let instanceDiv = this.shadowElement.querySelector("div");
+
+		let instanceParagraph = document.createElement("p");
+		instanceParagraph.innerText = `CT | ${data.vmid} | ${data.name} | ${data.status}`;
+		instanceParagraph.style.color = data.status == "running" ? "#00ff00" : "#ff0000";
+		instanceDiv.append(instanceParagraph);
+	}
+}
+
+customElements.define("node-article", Node);
+customElements.define("instance-div", Instance);
