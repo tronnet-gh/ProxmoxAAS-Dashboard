@@ -35,6 +35,7 @@ class Node extends HTMLElement {
 		for (let i = 0; i < qemu.length; i++) {
 			let newInstance = document.createElement("instance-div");
 			newInstance.data = qemu[i];
+			qemuDiv.append(newInstance);
 		}
 		articleElement.append(qemuDiv);
 	}
@@ -46,6 +47,7 @@ class Node extends HTMLElement {
 		for (let i = 0; i < lxc.length; i++) {
 			let newInstance = document.createElement("instance-div");
 			newInstance.data = lxc[i];
+			lxcDiv.append(newInstance);
 		}
 		articleElement.append(lxcDiv);
 	}
