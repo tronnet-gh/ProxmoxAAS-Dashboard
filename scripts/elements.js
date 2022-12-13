@@ -8,7 +8,7 @@ class Node extends HTMLElement {
 
 		let styleLink = document.createElement("link");
 		styleLink.rel = "stylesheet";
-		styleLink.href = "style.css";
+		styleLink.href = "css/style.css";
 		styleLink.type = "text/css";
 		shadowRoot.append(styleLink);
 
@@ -63,7 +63,7 @@ class Instance extends HTMLElement {
 
 		let styleLink = document.createElement("link");
 		styleLink.rel = "stylesheet";
-		styleLink.href = "style.css";
+		styleLink.href = "css/style.css";
 		styleLink.type = "text/css";
 		shadowRoot.append(styleLink);
 
