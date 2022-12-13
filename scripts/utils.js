@@ -1,11 +1,11 @@
-class ResponseError extends Error {
+export class ResponseError extends Error {
 	constructor(message) {
 		super(message);
 		this.name = "ResponseError";
 	}
 }
 
-class NetworkError extends Error {
+export class NetworkError extends Error {
 	constructor(message) {
 		super(message);
 		this.name = "NetworkError";
