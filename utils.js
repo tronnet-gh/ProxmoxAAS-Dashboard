@@ -1,3 +1,17 @@
+class ResponseError extends Error {
+	constructor(message) {
+		super(message);
+		this.name = "ValidationError";
+	}
+}
+
+class NetworkError extends Error {
+	constructor(message) {
+		super(message);
+		this.name = "ValidationError";
+	}
+}
+
 export async function requestTicket (username, password) {
 	let prms = new URLSearchParams({username: `${username}@pve`, password: password});
 
@@ -14,14 +28,17 @@ export async function requestTicket (username, password) {
 	let response = await fetch("https://pve.tronnet.net/api2/json/access/ticket", content)
 	.then((response) => {
 		if (!response.ok) {
-			throw new Error('Network response was not OK');
+			throw new ResponseError(`recieved response status code ${response.status}`);
 		}
 		return response;
 	})
 	.catch((error) => {
-		console.error('There has been a problem with your fetch operation:', error);
+		if (error instanceof AuthenticationError) {
+			throw error;
+		}
+		throw new NetworkError(error);
 	});
-	
+
 	let data = await response.json();
 	return data;
 }
@@ -51,12 +68,15 @@ export async function request (path, method, body) {
 	let response = await fetch(`https://pve.tronnet.net/api2/json${path}`, content)
 	.then((response) => {
 		if (!response.ok) {
-			throw new Error('Network response was not OK');
+			throw new ResponseError(`recieved response status code ${response.status}`);
 		}
 		return response;
 	})
 	.catch((error) => {
-		console.error('There has been a problem with your fetch operation:', error);
+		if (error instanceof AuthenticationError) {
+			throw error;
+		}
+		throw new NetworkError(error);
 	});
 
 	let data = await response.json();
