@@ -75,7 +75,7 @@ class Instance extends HTMLElement {
 
 		let instanceParagraph = document.createElement("p");
 		instanceParagraph.innerText = `CT | ${data.vmid} | ${data.name} | ${data.status}`;
-		instanceParagraph.style.color = data.status == "running" ? "#00ff00" : "#ff0000";
+		instanceParagraph.style.color = data.status === "running" ? "#00ff00" : "#ff0000";
 		instanceDiv.append(instanceParagraph);
 	}
 }

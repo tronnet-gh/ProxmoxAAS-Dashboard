@@ -13,31 +13,7 @@ class NetworkError extends Error {
 }
 
 export async function requestTicket (username, password) {
-	let prms = new URLSearchParams({username: `${username}@pve`, password: password});
-
-	let content = {
-		method: "POST",
-		mode: "cors",
-		credentials: "include",
-		headers: {
-			"Content-Type": "application/x-www-form-urlencoded"
-		},
-		body: prms.toString()
-	}
-
-	let response = await fetch("https://pve.tronnet.net/api2/json/access/ticket", content)
-	.then((response) => {
-		if (!response.ok) {
-			throw new ResponseError(`recieved response status code ${response.status}`);
-		}
-		return response;
-	})
-	.catch((error) => {
-		if (error instanceof ResponseError) {
-			throw error;
-		}
-		throw new NetworkError(error);
-	});
+	let response = await request("/access/ticket", "POST", {username: `${username}@pve`, password: password}, auth = false);
 
 	let data = await response.json();
 	return data;
@@ -49,7 +25,7 @@ export function setTicket (ticket) {
 	document.cookie = `PVEAuthCookie=${ticket}; path=/; expires=${d.toUTCString()}; domain=.tronnet.net`;
 }
 
-export async function request (path, method, body) {
+export async function request (path, method, body, auth = true) {
 	let prms = new URLSearchParams(body);
 
 	let content = {
@@ -57,12 +33,14 @@ export async function request (path, method, body) {
 		mode: "cors",
 		credentials: "include",
 		headers: {
-			"Content-Type": "application/x-www-form-urlencoded",
-			"Cookie": document.cookie
+			"Content-Type": "application/x-www-form-urlencoded"
 		}
 	}
-	if(method == "POST") {
+	if(method === "POST") {
 		content.body = prms.toString();
+	}
+	if(auth) {
+		content.headers.Cookie = document.cookie;
 	}
 
 	let response = await fetch(`https://pve.tronnet.net/api2/json${path}`, content)
