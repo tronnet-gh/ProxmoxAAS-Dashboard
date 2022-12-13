@@ -1,14 +1,14 @@
 class ResponseError extends Error {
 	constructor(message) {
 		super(message);
-		this.name = "ValidationError";
+		this.name = "ResponseError";
 	}
 }
 
 class NetworkError extends Error {
 	constructor(message) {
 		super(message);
-		this.name = "ValidationError";
+		this.name = "NetworkError";
 	}
 }
 
