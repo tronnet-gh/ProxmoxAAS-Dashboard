@@ -24,7 +24,7 @@ export function setTicket (ticket) {
 	document.cookie = `PVEAuthCookie=${ticket}; path=/; expires=${d.toUTCString()}; domain=.tronnet.net`;
 }
 
-export async function request (path, method, body, auth = true) {
+export async function request (path, method, body = null, auth = true) {
 	let prms = new URLSearchParams(body);
 
 	let content = {

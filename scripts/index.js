@@ -16,9 +16,9 @@ async function init () {
 		let newNode = document.createElement("node-article");
 		newNode.data = nodes.data[i];
 		
-		let qemu = await request(`/nodes/${nodes.data[i].node}/qemu`, "GET", null);
+		let qemu = await request(`/nodes/${nodes.data[i].node}/qemu`, "GET");
 		qemu.data.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
-		let lxc = await request(`/nodes/${nodes.data[i].node}/lxc`, "GET", null);
+		let lxc = await request(`/nodes/${nodes.data[i].node}/lxc`, "GET");
 		lxc.data.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
 		newNode.qemu = qemu.data;
 		newNode.lxc = lxc.data;
