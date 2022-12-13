@@ -1,6 +1,7 @@
 export async function requestTicket (username, password) {
 	let prms = new URLSearchParams({username: `${username}@pve`, password: password});
-	let response = await fetch("https://pve.tronnet.net/api2/json/access/ticket", {
+
+	let content = {
 		method: "POST",
 		mode: "cors",
 		credentials: "include",
@@ -8,7 +9,9 @@ export async function requestTicket (username, password) {
 			"Content-Type": "application/x-www-form-urlencoded"
 		},
 		body: prms.toString()
-	})
+	}
+
+	let response = await fetch("https://pve.tronnet.net/api2/json/access/ticket", content)
 	.then((response) => {
 		if (!response.ok) {
 			throw new Error('Network response was not OK');
@@ -18,6 +21,7 @@ export async function requestTicket (username, password) {
 	.catch((error) => {
 		console.error('There has been a problem with your fetch operation:', error);
 	});
+	
 	let data = await response.json();
 	return data;
 }
@@ -30,7 +34,8 @@ export function setTicket (ticket) {
 
 export async function request (path, method, body) {
 	let prms = new URLSearchParams(body);
-	let response = await fetch(`https://pve.tronnet.net/api2/json${path}`, {
+
+	let content = {
 		method: method,
 		mode: "cors",
 		credentials: "include",
@@ -38,10 +43,22 @@ export async function request (path, method, body) {
 			"Content-Type": "application/x-www-form-urlencoded",
 			"Cookie": document.cookie
 		}
-	});
-	if(method == "POST") {
-		response.body = prms.toString();
 	}
+	if(method == "POST") {
+		content.body = prms.toString();
+	}
+
+	let response = await fetch(`https://pve.tronnet.net/api2/json${path}`, content)
+	.then((response) => {
+		if (!response.ok) {
+			throw new Error('Network response was not OK');
+		}
+		return response;
+	})
+	.catch((error) => {
+		console.error('There has been a problem with your fetch operation:', error);
+	});
+
 	let data = await response.json();
 	return data;
 }
