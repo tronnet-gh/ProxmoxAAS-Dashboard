@@ -13,7 +13,7 @@ class NetworkError extends Error {
 }
 
 export async function requestTicket (username, password) {
-	let response = await request("/access/ticket", "POST", {username: `${username}@pve`, password: password}, auth = false);
+	let response = await request("/access/ticket", "POST", {username: `${username}@pve`, password: password}, false);
 
 	let data = await response.json();
 	return data;
