@@ -33,7 +33,7 @@ export async function requestTicket (username, password) {
 		return response;
 	})
 	.catch((error) => {
-		if (error instanceof AuthenticationError) {
+		if (error instanceof ResponseError) {
 			throw error;
 		}
 		throw new NetworkError(error);
@@ -73,7 +73,7 @@ export async function request (path, method, body) {
 		return response;
 	})
 	.catch((error) => {
-		if (error instanceof AuthenticationError) {
+		if (error instanceof ResponseError) {
 			throw error;
 		}
 		throw new NetworkError(error);
