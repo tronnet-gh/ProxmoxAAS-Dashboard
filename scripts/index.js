@@ -18,17 +18,9 @@ async function init () {
 		let nodeStatus = nodes.data[i].status;
 
 		let qemu = await request(`/nodes/${nodeName}/qemu`, "GET");
-		qemu.data.forEach((item) => {
-			item.node = {};
-			item.node.name = nodeName;
-			item.node.status = nodeStatus;
-		});
+		qemu.data.forEach((item) => {item.node = {name: nodeName, status: nodeStatus}});
 		let lxc = await request(`/nodes/${nodeName}/lxc`, "GET");
-		lxc.data.forEach((item) => {
-			item.node = {};
-			item.node.name = nodeName;
-			item.node.status = nodeStatus;
-		});
+		lxc.data.forEach((item) => {item.node = {name: nodeName, status: nodeStatus}});
 		instances = instances.concat(qemu.data, lxc.data);
 	}
 
