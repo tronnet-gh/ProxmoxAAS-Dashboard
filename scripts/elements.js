@@ -37,7 +37,7 @@ class Instance extends HTMLElement {
 		instanceArticle.append(nameParagraph);
 
 		let nodeImg = document.createElement("img");
-		nodeImg.src = `images/nodes/${data.node.status}`;
+		nodeImg.src = `images/nodes/${data.node.status}.svg`;
 		instanceArticle.append(nodeImg);
 
 		let nodeParagraph = document.createElement("p");
