@@ -58,8 +58,8 @@ class Instance extends HTMLElement {
 		super();
 		let shadowRoot = this.attachShadow({mode: "open"});
 
-		let instanceDiv = document.createElement("div");
-		shadowRoot.append(instanceDiv);
+		let instanceArticle = document.createElement("article");
+		shadowRoot.append(instanceArticle);
 
 		let styleLink = document.createElement("link");
 		styleLink.rel = "stylesheet";
@@ -71,10 +71,10 @@ class Instance extends HTMLElement {
 	}
 
 	set data (data) {
-		let instanceDiv = this.shadowElement.querySelector("div");
+		let instanceArticle = this.shadowElement.querySelector("article");
 
 		let instanceParagraph = document.createElement("p");
-		instanceParagraph.innerText = `CT | ${data.vmid} | ${data.name} | ${data.status}`;
+		instanceParagraph.innerText = `${data.type} | ${data.vmid} | ${data.name} | ${data.status}`;
 		instanceParagraph.style.color = data.status === "running" ? "#00ff00" : "#ff0000";
 		instanceDiv.append(instanceParagraph);
 	}
