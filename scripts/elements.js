@@ -12,6 +12,12 @@ class Instance extends HTMLElement {
 		styleLink.type = "text/css";
 		shadowRoot.append(styleLink);
 
+		let instanceLink = document.createElement("link");
+		instanceLink.rel = "stylesheet";
+		instanceLink.href = "css/instance.css";
+		instanceLink.type = "text/css";
+		shadowRoot.append(instanceLink);
+
 		this.shadowElement = shadowRoot;
 	}
 
