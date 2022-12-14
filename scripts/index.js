@@ -15,9 +15,8 @@ async function init () {
 
 	for (let i = 0; i < nodes.data.length; i++) {		
 		let qemu = await request(`/nodes/${nodes.data[i].node}/qemu`, "GET");
-		instances.concat(qemu.data);
 		let lxc = await request(`/nodes/${nodes.data[i].node}/lxc`, "GET");
-		instances.concat(lxc.data);
+		instances = instances.concat(qemu.data, lxc.data);
 	}
 
 	instances.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
