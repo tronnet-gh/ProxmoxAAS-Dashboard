@@ -4,6 +4,12 @@ article {
 	margin: 0px;
 }
 
-.instance-top-div {
+.instance-div {
 	display: flex;
+	column-gap: 10px;
+	align-items: center;
+}
+
+.instance-div img {
+	height: 16px;
 }
