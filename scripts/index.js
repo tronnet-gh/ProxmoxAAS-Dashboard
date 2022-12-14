@@ -9,20 +9,22 @@ async function init () {
 	}
 
 	let nodes = await request("/nodes", "GET", null);
-	nodes.data.sort((a, b) => (a.node > b.node) ? 1 : -1);
+	let instances = [];
 
-	let nodeContainer = document.getElementById("node-container")
-	for (let i = 0; i < nodes.data.length; i++) {
-		let newNode = document.createElement("node-article");
-		newNode.data = nodes.data[i];
-		
+	let instanceContainer = document.getElementById("instance-container")
+
+	for (let i = 0; i < nodes.data.length; i++) {		
 		let qemu = await request(`/nodes/${nodes.data[i].node}/qemu`, "GET");
-		qemu.data.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
+		instances.concat(qemu.data);
 		let lxc = await request(`/nodes/${nodes.data[i].node}/lxc`, "GET");
-		lxc.data.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
-		newNode.qemu = qemu.data;
-		newNode.lxc = lxc.data;
+		instances.concat(lxc.data);
+	}
 
-		nodeContainer.append(newNode);
+	instances.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
+
+	for(let i = 0; i < instances.length; i++) {
+		let newInstance = document.createElement("instance-article");
+		newInstance.data = instances[i];
+		instanceContainer.append(newInstance);
 	}
 }
