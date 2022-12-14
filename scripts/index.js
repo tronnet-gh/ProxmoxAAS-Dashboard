@@ -13,9 +13,20 @@ async function init () {
 
 	let instanceContainer = document.getElementById("instance-container")
 
-	for (let i = 0; i < nodes.data.length; i++) {		
-		let qemu = await request(`/nodes/${nodes.data[i].node}/qemu`, "GET");
-		let lxc = await request(`/nodes/${nodes.data[i].node}/lxc`, "GET");
+	for (let i = 0; i < nodes.data.length; i++) {	
+		let nodeName = nodes.data[i].node;
+		let nodeStatus = nodes.data[i].status;
+
+		let qemu = await request(`/nodes/${nodeName}/qemu`, "GET");
+		qemu.data.forEach((item) => {
+			item.node.name = nodeName;
+			item.node.status = nodeStatus;
+		});
+		let lxc = await request(`/nodes/${nodeName}/lxc`, "GET");
+		lxc.data.forEach((item) => {
+			item.node.name = nodeName;
+			item.node.status = nodeStatus;
+		});
 		instances = instances.concat(qemu.data, lxc.data);
 	}
 
