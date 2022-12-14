@@ -24,31 +24,25 @@ class Instance extends HTMLElement {
 	set data (data) {
 		let instanceArticle = this.shadowElement.querySelector("article");
 
-		let type = document.createElement("img");
-		type.src = `images/${data.type}.svg`;
-		instanceArticle.append(type);
+		let typeImg = document.createElement("img");
+		typeImg.src = `images/instances/${data.type}/${data.status}.svg`;
+		instanceArticle.append(typeImg);
 
-		let vmid = document.createElement("p");
-		vmid.innerText = data.vmid;
-		instanceArticle.append(vmid);
+		let vmidParagraph = document.createElement("p");
+		vmidParagraph.innerText = data.vmid;
+		instanceArticle.append(vmidParagraph);
 
-		let name = document.createElement("p");
-		name.innerText = data.name;
-		instanceArticle.append(name);
+		let nameParagraph = document.createElement("p");
+		nameParagraph.innerText = data.name;
+		instanceArticle.append(nameParagraph);
 
-		let status = document.createElement("p");
-		status.innerText = data.status;
-		status.style.color = data.status === "running" ? "#00ff00" : "#ff0000";
-		instanceArticle.append(status);
+		let nodeImg = document.createElement("img");
+		nodeImg.src = `images/nodes/${data.node.status}`;
+		instanceArticle.append(nodeImg);
 
-		let nodeName = document.createElement("p");
-		nodeName.innerText = data.node.name;
-		instanceArticle.append(nodeName);
-
-		let nodeStatus = document.createElement("p");
-		nodeStatus.innerText = data.node.status;
-		nodeStatus.style.color = data.node.status === "online" ? "#00ff00" : "#ff0000";
-		instanceArticle.append(nodeStatus);
+		let nodeParagraph = document.createElement("p");
+		nodeParagraph.innerText = data.node.name;
+		instanceArticle.append(nodeParagraph);
 	}
 }
 
