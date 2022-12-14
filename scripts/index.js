@@ -19,11 +19,13 @@ async function init () {
 
 		let qemu = await request(`/nodes/${nodeName}/qemu`, "GET");
 		qemu.data.forEach((item) => {
+			item.node = {};
 			item.node.name = nodeName;
 			item.node.status = nodeStatus;
 		});
 		let lxc = await request(`/nodes/${nodeName}/lxc`, "GET");
 		lxc.data.forEach((item) => {
+			item.node = {};
 			item.node.name = nodeName;
 			item.node.status = nodeStatus;
 		});
