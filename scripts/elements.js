@@ -24,17 +24,22 @@ class Instance extends HTMLElement {
 	set data (data) {
 		let instanceArticle = this.shadowElement.querySelector("article");
 
+		let topDiv = document.createElement("div");
+		topDiv.classList.add("instance-top-div");
+
 		let typeImg = document.createElement("img");
 		typeImg.src = `images/instances/${data.type}/${data.status}.svg`;
-		instanceArticle.append(typeImg);
+		topDiv.append(typeImg);
 
 		let vmidParagraph = document.createElement("p");
 		vmidParagraph.innerText = data.vmid;
-		instanceArticle.append(vmidParagraph);
+		topDiv.append(vmidParagraph);
 
 		let nameParagraph = document.createElement("p");
 		nameParagraph.innerText = data.name;
-		instanceArticle.append(nameParagraph);
+		topDiv.append(nameParagraph);
+
+		instanceArticle.append(topDiv);
 
 		let nodeImg = document.createElement("img");
 		nodeImg.src = `images/nodes/${data.node.status}.svg`;

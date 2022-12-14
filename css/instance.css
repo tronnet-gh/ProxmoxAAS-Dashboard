@@ -3,3 +3,7 @@ article {
 	border-bottom: solid white 1px;
 	margin: 0px;
 }
+
+.instance-top-div {
+	display: flex;
+}
