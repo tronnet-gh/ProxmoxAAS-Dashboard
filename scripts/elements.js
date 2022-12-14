@@ -24,35 +24,40 @@ class Instance extends HTMLElement {
 	set data (data) {
 		let instanceArticle = this.shadowElement.querySelector("article");
 
-		let detailDiv = document.createElement("div");
-		detailDiv.classList.add("instance-div");
+		let summaryDiv = document.createElement("div");
+		summaryDiv.classList.add("instance-div");
+
+		let instanceSubDiv = document.createElement("div");
+		instanceSubDiv.classList.add("summary-sub-div");
 
 		let typeImg = document.createElement("img");
 		typeImg.src = `images/instances/${data.type}/${data.status}.svg`;
-		detailDiv.append(typeImg);
+		instanceSubDiv.append(typeImg);
 
 		let vmidParagraph = document.createElement("p");
 		vmidParagraph.innerText = data.vmid;
-		detailDiv.append(vmidParagraph);
+		instanceSubDiv.append(vmidParagraph);
 
 		let nameParagraph = document.createElement("p");
 		nameParagraph.innerText = data.name;
-		detailDiv.append(nameParagraph);
+		instanceSubDiv.append(nameParagraph);
 
-		instanceArticle.append(detailDiv);
+		summaryDiv.append(instanceSubDiv);
 
-		let nodeDiv = document.createElement("div");
-		nodeDiv.classList.add("instance-div");
+		let nodeSubDiv = document.createElement("div");
+		nodeSubDiv.classList.add("summary-sub-div");
 
 		let nodeImg = document.createElement("img");
 		nodeImg.src = `images/nodes/${data.node.status}.svg`;
-		nodeDiv.append(nodeImg);
+		nodeSubDiv.append(nodeImg);
 
 		let nodeParagraph = document.createElement("p");
 		nodeParagraph.innerText = data.node.name;
-		nodeDiv.append(nodeParagraph);
+		nodeSubDiv.append(nodeParagraph);
 
-		instanceArticle.append(nodeDiv);
+		summaryDiv.append(nodeSubDiv);
+
+		instanceArticle.append(summaryDiv);
 	}
 }
 
