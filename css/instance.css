@@ -7,14 +7,13 @@ article {
 .summary-div {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
 }
 
 .summary-div div {
 	display: flex;
 	column-gap: 10px;
 	align-items: center;
-	width: fit-content;
+	width: 50%;
 }
 
 .summary-div div img {
