@@ -48,7 +48,7 @@ class Instance extends HTMLElement {
 		resourceSWAP.innerText = (data.maxswap / 1073741824).toFixed(3);
 
 		let resourceDISK = this.shadowElement.querySelector("#resource-disk");
-		resourceRAM.innerText = (data.maxdisk / 1073741824).toFixed(3);
+		resourceDISK.innerText = (data.maxdisk / 1073741824).toFixed(3);
 	}
 }
 
