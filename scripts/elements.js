@@ -25,19 +25,19 @@ class Instance extends HTMLElement {
 	set data (data) {
 		let instanceArticle = this.shadowElement.querySelector("article");
 
-		let typeImg = document.querySelector("#instance-type");
+		let typeImg = this.shadowElement.querySelector("#instance-type");
 		typeImg.src = `images/instances/${data.type}/${data.status}.svg`;
 
-		let vmidParagraph = document.querySelector("#instance-id");
+		let vmidParagraph = this.shadowElement.querySelector("#instance-id");
 		vmidParagraph.innerText = data.vmid;
 
-		let nameParagraph = document.querySelector("#instance-name");
+		let nameParagraph = this.shadowElement.querySelector("#instance-name");
 		nameParagraph.innerText = data.name;
 
-		let nodeImg = document.querySelector("#node-status");
+		let nodeImg = this.shadowElement.querySelector("#node-status");
 		nodeImg.src = `images/nodes/${data.node.status}.svg`;
 
-		let nodeParagraph = document.querySelector("#node-name");
+		let nodeParagraph = this.shadowElement.querySelector("#node-name");
 		nodeParagraph.innerText = data.node.name;
 	}
 }
