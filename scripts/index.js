@@ -20,6 +20,7 @@ async function init () {
 		let qemu = await request(`/nodes/${nodeName}/qemu`, "GET");
 		qemu.data.forEach((item) => {
 			item.node = {name: nodeName, status: nodeStatus}; 
+			item.maxswap = 0;
 			item.type = "qemu";
 		});
 		let lxc = await request(`/nodes/${nodeName}/lxc`, "GET");
