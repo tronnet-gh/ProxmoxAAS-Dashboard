@@ -36,3 +36,9 @@ article {
 .resource-div div img {
 	height: 16px;
 }
+
+hr {
+	border: none;
+	border-top: solid white 1px;
+	margin: 0px;
+}
