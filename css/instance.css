@@ -25,7 +25,6 @@ article {
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
-	column-gap: 20px;
 }
 .resource-div div {
 	display: flex;
