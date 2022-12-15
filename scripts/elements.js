@@ -3,8 +3,9 @@ class Instance extends HTMLElement {
 		super();
 		let shadowRoot = this.attachShadow({mode: "open"});
 
-		let instanceArticle = document.createElement("article");
-		shadowRoot.append(instanceArticle);
+		let instanceTemplate = document.querySelector("#instance-template");
+		let instanceTemplateContent = instanceTemplate.textContent;
+		shadowRoot.append(instanceTemplateContent.cloneNode(true));
 
 		let styleLink = document.createElement("link");
 		styleLink.rel = "stylesheet";
@@ -24,40 +25,20 @@ class Instance extends HTMLElement {
 	set data (data) {
 		let instanceArticle = this.shadowElement.querySelector("article");
 
-		let summaryDiv = document.createElement("div");
-		summaryDiv.classList.add("instance-div");
-
-		let instanceSubDiv = document.createElement("div");
-		instanceSubDiv.classList.add("summary-sub-div");
-
-		let typeImg = document.createElement("img");
+		let typeImg = document.querySelector("#instance-type");
 		typeImg.src = `images/instances/${data.type}/${data.status}.svg`;
-		instanceSubDiv.append(typeImg);
 
-		let vmidParagraph = document.createElement("p");
+		let vmidParagraph = document.querySelector("#instance-id");
 		vmidParagraph.innerText = data.vmid;
-		instanceSubDiv.append(vmidParagraph);
 
-		let nameParagraph = document.createElement("p");
+		let nameParagraph = document.querySelector("#instance-name");
 		nameParagraph.innerText = data.name;
-		instanceSubDiv.append(nameParagraph);
 
-		summaryDiv.append(instanceSubDiv);
-
-		let nodeSubDiv = document.createElement("div");
-		nodeSubDiv.classList.add("summary-sub-div");
-
-		let nodeImg = document.createElement("img");
+		let nodeImg = document.querySelector("#node-status");
 		nodeImg.src = `images/nodes/${data.node.status}.svg`;
-		nodeSubDiv.append(nodeImg);
 
-		let nodeParagraph = document.createElement("p");
+		let nodeParagraph = document.querySelector("#node-name");
 		nodeParagraph.innerText = data.node.name;
-		nodeSubDiv.append(nodeParagraph);
-
-		summaryDiv.append(nodeSubDiv);
-
-		instanceArticle.append(summaryDiv);
 	}
 }
 
