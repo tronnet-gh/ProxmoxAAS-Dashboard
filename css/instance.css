@@ -10,13 +10,29 @@ article {
 	justify-content: space-between;
 }
 
-.summary-sub-div {
+.summary-div div {
 	display: flex;
 	column-gap: 10px;
 	align-items: center;
 	width: fit-content;
 }
 
-.summary-sub-div img {
+.summary-div div img {
+	height: 16px;
+}
+
+.resource-div {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+}
+.resource-div div {
+	display: flex;
+	column-gap: 10px;
+	align-items: center;
+	width: fit-content;
+}
+
+.resource-div div img {
 	height: 16px;
 }

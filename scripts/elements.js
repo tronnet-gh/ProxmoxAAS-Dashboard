@@ -23,8 +23,6 @@ class Instance extends HTMLElement {
 	}
 
 	set data (data) {
-		let instanceArticle = this.shadowElement.querySelector("article");
-
 		let typeImg = this.shadowElement.querySelector("#instance-type");
 		typeImg.src = `images/instances/${data.type}/${data.status}.svg`;
 
@@ -39,6 +37,18 @@ class Instance extends HTMLElement {
 
 		let nodeParagraph = this.shadowElement.querySelector("#node-name");
 		nodeParagraph.innerText = data.node.name;
+
+		let resourceCPU = this.shadowElement.querySelector("#resource-cpu");
+		resourceCPU.innerText = data.cpus;
+
+		let resourceRAM = this.shadowElement.querySelector("#resource-ram");
+		resourceRAM.innerText = (data.maxmem / 1073741824).toFixed(3);
+
+		let resourceSWAP = this.shadowElement.querySelector("#resource-swap");
+		resourceSWAP.innerText = (data.maxswap / 1073741824).toFixed(3);
+
+		let resourceDISK = this.shadowElement.querySelector("#resource-disk");
+		resourceRAM.innerText = (data.maxdisk / 1073741824).toFixed(3);
 	}
 }
 
