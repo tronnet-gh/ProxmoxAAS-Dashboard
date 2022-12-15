@@ -31,7 +31,7 @@ article {
 	display: flex;
 	column-gap: 10px;
 	align-items: center;
-	width: fit-content;
+	width: 25%;
 }
 
 .resource-div div img {
