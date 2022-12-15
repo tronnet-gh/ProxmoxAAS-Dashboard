@@ -4,7 +4,7 @@ class Instance extends HTMLElement {
 		let shadowRoot = this.attachShadow({mode: "open"});
 
 		let instanceTemplate = document.querySelector("#instance-template");
-		let instanceTemplateContent = instanceTemplate.textContent;
+		let instanceTemplateContent = instanceTemplate.content;
 		shadowRoot.append(instanceTemplateContent.cloneNode(true));
 
 		let styleLink = document.createElement("link");
