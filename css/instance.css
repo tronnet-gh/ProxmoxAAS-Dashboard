@@ -1,7 +1,8 @@
 article {
-	border-top: solid white 1px;
-	border-bottom: solid white 1px;
-	margin: 0px;
+	border: solid white 1px;
+	border-radius: 5px;
+	padding: 0px 1em 0px 1em;
+	margin: 20px 0px 20px 0px;
 }
 
 .summary-div {
