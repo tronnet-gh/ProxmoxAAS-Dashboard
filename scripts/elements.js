@@ -51,7 +51,10 @@ class Instance extends HTMLElement {
 		resourceDISK.innerText = (data.maxdisk / 1073741824).toFixed(3);
 
 		let powerButton = this.shadowElement.querySelector("#power-btn");
-		powerButton.innerText = data.status === "running" ? "Shutdown" : "Start"
+		powerButton.src = data.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
+	
+		let configButton = this.shadowElement.querySelector("#configure-btn");
+		configButton.src = data.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
 	}
 }
 
