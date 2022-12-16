@@ -31,3 +31,7 @@ hr {
 .btn-group {
 	margin: 14px 0px 14px 0px;
 }
+
+.btn-group img {
+	height: 16px;
+}
