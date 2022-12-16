@@ -57,7 +57,7 @@ export async function request (path, method, body = null, auth = true) {
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
 	if(auth) {
-		content.headers.Cookie = document.cookie;
+		content.headers.Cookie = `PVEAuthCookie=${getCookie("PVEAuthCookie")}`;
 	}
 
 	let response = await fetch(`https://pve.tronnet.net/api2/json${path}`, content)
