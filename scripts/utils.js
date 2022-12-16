@@ -12,6 +12,22 @@ export class NetworkError extends Error {
 	}
 }
 
+function getCookie(cname) {
+	let name = cname + "=";
+	let decodedCookie = decodeURIComponent(document.cookie);
+	let ca = decodedCookie.split(';');
+	for(let i = 0; i <ca.length; i++) {
+		let c = ca[i];
+		while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
+	}
+	return "";
+}
+
 export async function requestTicket (username, password) {
 	let response = await request("/access/ticket", "POST", {username: `${username}@pve`, password: password}, false);
 
@@ -41,6 +57,7 @@ export async function request (path, method, body = null, auth = true) {
 	}
 	if(auth) {
 		content.headers.Cookie = document.cookie;
+		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
 
 	let response = await fetch(`https://pve.tronnet.net/api2/json${path}`, content)
