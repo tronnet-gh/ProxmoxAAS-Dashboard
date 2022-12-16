@@ -5,35 +5,20 @@ article {
 	margin: 20px 0px 20px 0px;
 }
 
-.summary-div {
+article > div {
 	display: flex;
 	align-items: center;
 }
 
-.summary-div div {
-	display: flex;
-	column-gap: 10px;
-	align-items: center;
-	width: 50%;
-}
-
-.summary-div div img {
-	height: 16px;
-}
-
-.resource-div {
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-}
-.resource-div div {
+article > div > div {
 	display: flex;
 	column-gap: 10px;
 	align-items: center;
-	width: 25%;
+	flex-grow: 1;
+	flex-basis: 0;
 }
 
-.resource-div div img {
+article > div > div > img {
 	height: 16px;
 }
 
