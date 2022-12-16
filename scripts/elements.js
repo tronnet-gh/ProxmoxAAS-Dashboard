@@ -1,3 +1,5 @@
+import { request } from "./utils";
+
 class Instance extends HTMLElement {
 	constructor () {
 		super();
@@ -25,9 +27,12 @@ class Instance extends HTMLElement {
 	set data (data) {
 		let typeImg = this.shadowElement.querySelector("#instance-type");
 		typeImg.src = `images/instances/${data.type}/${data.status}.svg`;
+		this.type = data.type;
+		this.status = data.status;
 
 		let vmidParagraph = this.shadowElement.querySelector("#instance-id");
 		vmidParagraph.innerText = data.vmid;
+		this.vmid = data.vmid;
 
 		let nameParagraph = this.shadowElement.querySelector("#instance-name");
 		nameParagraph.innerText = data.name;
@@ -37,6 +42,7 @@ class Instance extends HTMLElement {
 
 		let nodeParagraph = this.shadowElement.querySelector("#node-name");
 		nodeParagraph.innerText = data.node.name;
+		this.node = data.node.name;
 
 		let resourceCPU = this.shadowElement.querySelector("#resource-cpu");
 		resourceCPU.innerText = data.cpus;
@@ -52,6 +58,12 @@ class Instance extends HTMLElement {
 
 		let powerButton = this.shadowElement.querySelector("#power-btn");
 		powerButton.src = data.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
+		powerButton.addEventListener("click", () => {
+			let targetState = this.status == "running" ? "shutdown" : "start";
+			let data = request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetState}`);
+			console.log(data);
+			this.status = this.status === "running" ? "stopped" : "running";
+		});
 	
 		let configButton = this.shadowElement.querySelector("#configure-btn");
 		configButton.src = data.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
