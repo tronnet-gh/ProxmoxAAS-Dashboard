@@ -60,7 +60,7 @@ class Instance extends HTMLElement {
 		powerButton.src = data.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
 		powerButton.addEventListener("click", () => {
 			let targetState = this.status == "running" ? "shutdown" : "start";
-			let data = request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetState}`);
+			let data = request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetState}`, "POST", {node: this.node, vmid: this.vmid});
 			console.log(data);
 			this.status = this.status === "running" ? "stopped" : "running";
 		});
