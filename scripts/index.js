@@ -4,7 +4,7 @@ window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
 	await populateInstances();
-	setInterval(populateInstances, 1000);
+	//setInterval(populateInstances, 1000);
 }
 
 async function populateInstances () {
