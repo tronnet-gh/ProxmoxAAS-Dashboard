@@ -59,10 +59,8 @@ class Instance extends HTMLElement {
 		let powerButton = this.shadowElement.querySelector("#power-btn");
 		powerButton.src = data.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
 		powerButton.addEventListener("click", () => {
-			let targetState = this.status == "running" ? "shutdown" : "start";
-			let data = request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetState}`, "POST", {node: this.node, vmid: this.vmid});
-			console.log(data);
-			this.status = this.status === "running" ? "stopped" : "running";
+			let targetAction = this.status === "running" ? "shutdown" : "start";
+			request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
 		});
 	
 		let configButton = this.shadowElement.querySelector("#configure-btn");

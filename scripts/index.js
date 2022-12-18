@@ -3,8 +3,13 @@ import {requestTicket, setTicket, request} from "./utils.js";
 window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
+	await populateInstances();
+	setInterval(populateInstances, 1000);
+}
+
+async function populateInstances () {
 	let cookie = document.cookie;
-	if (cookie === '') {
+	if (cookie === "") {
 		window.location.href = "login.html";
 	}
 
@@ -33,6 +38,7 @@ async function init () {
 
 	instances.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
 
+	instanceContainer.innerText = "";
 	for(let i = 0; i < instances.length; i++) {
 		let newInstance = document.createElement("instance-article");
 		newInstance.data = instances[i];
