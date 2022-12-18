@@ -70,7 +70,7 @@ class Instance extends HTMLElement {
 				if(data.data.status === targetStatus) {
 					break;
 				}
-				waitFor(1000);
+				await waitFor(1000);
 			}
 			this.status = targetStatus;
 			let typeImg = this.shadowElement.querySelector("#instance-type");
