@@ -68,7 +68,6 @@ class Instance extends HTMLElement {
 
 			while (true) {
 				let data = await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/current`);
-				console.log(data);
 				if(data.data.status === targetStatus) {
 					break;
 				}
