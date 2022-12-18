@@ -29,6 +29,7 @@ class Instance extends HTMLElement {
 	set data (data) {
 		let typeImg = this.shadowElement.querySelector("#instance-type");
 		typeImg.src = `images/instances/${data.type}/${data.status}.svg`;
+		typeImg.alt = `${data.status} instance`;
 		this.type = data.type;
 		this.status = data.status;
 
@@ -60,6 +61,7 @@ class Instance extends HTMLElement {
 
 		let powerButton = this.shadowElement.querySelector("#power-btn");
 		powerButton.src = data.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
+		powerButton.alt = data.status === "running" ? "shutdown instance" : "start instance";
 		powerButton.addEventListener("click", async () => {
 			let targetAction = this.status === "running" ? "shutdown" : "start";
 			let targetStatus = this.status === "running" ? "stopped" : "running";
@@ -81,6 +83,7 @@ class Instance extends HTMLElement {
 
 			let powerButton = this.shadowElement.querySelector("#power-btn");
 			powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
+			powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
 		});
 	
 		let configButton = this.shadowElement.querySelector("#configure-btn");
