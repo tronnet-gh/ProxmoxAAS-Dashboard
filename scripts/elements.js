@@ -66,11 +66,17 @@ class Instance extends HTMLElement {
 		powerButton.addEventListener("click", async () => {
 			if (!this.actionLock) {
 				this.actionLock = true;
+
 				let targetAction = this.status === "running" ? "shutdown" : "start";
+				let targetActionDesc = targetAction === "start" ? "starting" : "shutting down";
 				let targetStatus = this.status === "running" ? "stopped" : "running";
 
 				let typeImg = this.shadowElement.querySelector("#instance-type");
 				typeImg.src = "images/actions/loading.svg";
+				typeImg.alt = `instance is ${targetActionDesc}`;
+				let powerButton = this.shadowElement.querySelector("#power-btn");
+				powerButton.src = "images/actions/loading.svg";
+				powerButton.alt = `instance is ${targetActionDesc}`;
 
 				await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
 
@@ -85,10 +91,11 @@ class Instance extends HTMLElement {
 				this.status = targetStatus;
 
 				typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
+				typeImg.alt = `${this.status} instance`;
 
-				let powerButton = this.shadowElement.querySelector("#power-btn");
 				powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
 				powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
+
 				this.actionLock = false;
 			}
 		});
