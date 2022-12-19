@@ -14,7 +14,7 @@ function init (){
 			status.innerText = "Authenticating...";
 			let ticket = await requestTicket(formData.get("username"), formData.get("password"));
 			setTicket(ticket.data.ticket, ticket.data.CSRFPreventionToken);
-			goToPage("https://client.tronnet.net/index.html");
+			goToPage("index.html");
 		}
 		catch (error) {
 			if(error instanceof ResponseError) { // response error is usually 401 auth failed

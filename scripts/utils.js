@@ -79,7 +79,7 @@ export async function request (path, method, body = null, auth = true) {
 }
 
 export function goToPage (page, data={}) {
-	let url = new URL(url);
+	let url = new URL(`https://client.tronnet.net/${page}`);
 	for(let k in data) {
 		url.searchParams.append(k, data[k]);
 	}

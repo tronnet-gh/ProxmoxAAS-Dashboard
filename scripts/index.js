@@ -9,7 +9,7 @@ async function init () {
 async function populateInstances () {
 	let cookie = document.cookie;
 	if (cookie === "") {
-		goToPage("https://client.tronnet.net/login.html");
+		goToPage("login.html");
 	}
 
 	let nodes = await request("/nodes", "GET", null);
