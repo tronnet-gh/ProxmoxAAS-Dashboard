@@ -1,4 +1,4 @@
-import {requestTicket, setTicket, ResponseError, NetworkError} from "./utils.js";
+import {request, goToPage} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
