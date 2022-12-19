@@ -93,7 +93,7 @@ class Instance extends HTMLElement {
 						powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
 						powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
 
-						configButton.src = data.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
+						configButton.src = this.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
 
 						this.actionLock = false;
 
@@ -106,7 +106,7 @@ class Instance extends HTMLElement {
 						powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
 						powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
 
-						configButton.src = data.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
+						configButton.src = this.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
 
 						this.actionLock = false;
 
