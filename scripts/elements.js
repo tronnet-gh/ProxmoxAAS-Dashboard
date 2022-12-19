@@ -77,6 +77,8 @@ class Instance extends HTMLElement {
 				let powerButton = this.shadowElement.querySelector("#power-btn");
 				powerButton.src = "images/actions/loading.svg";
 				powerButton.alt = `instance is ${targetActionDesc}`;
+				let configButton = this.shadowElement.querySelector("#configure-btn");
+				configButton.src = "images/actions/config-inactive.svg";
 
 				let task = await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
 
@@ -91,6 +93,8 @@ class Instance extends HTMLElement {
 						powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
 						powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
 
+						configButton.src = data.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
+
 						this.actionLock = false;
 
 						break;
@@ -101,6 +105,8 @@ class Instance extends HTMLElement {
 
 						powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
 						powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
+
+						configButton.src = data.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
 
 						this.actionLock = false;
 
@@ -117,6 +123,7 @@ class Instance extends HTMLElement {
 	
 		let configButton = this.shadowElement.querySelector("#configure-btn");
 		configButton.src = data.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
+		configButton
 	}
 }
 
