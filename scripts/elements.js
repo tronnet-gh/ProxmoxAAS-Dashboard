@@ -78,25 +78,40 @@ class Instance extends HTMLElement {
 				powerButton.src = "images/actions/loading.svg";
 				powerButton.alt = `instance is ${targetActionDesc}`;
 
-				await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
+				let task = await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
 
 				while (true) {
-					let data = await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/current`);
-					if(data.data.status === targetStatus) {
+					let taskStatus = await request(`/nodes/${this.node}/tasks/${task.data}/status`);
+					if(taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") {
+						this.status = targetStatus;
+
+						typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
+						typeImg.alt = `${this.status} instance`;
+
+						powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
+						powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
+
+						this.actionLock = false;
+
 						break;
 					}
-					await waitFor(1000);
-				}
+					else if (taskStatus.data.status === "stopped") { // stopped but not OK -> instance did not change state
+						typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
+						typeImg.alt = `${this.status} instance`;
 
-				this.status = targetStatus;
+						powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
+						powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
 
-				typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
-				typeImg.alt = `${this.status} instance`;
+						this.actionLock = false;
 
-				powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
-				powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
+						console.error(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${taskStatus.data.exitstatus}`);
 
-				this.actionLock = false;
+						break;
+					}
+					else{
+						await waitFor(1000);
+					}
+				}		
 			}
 		});
 	
