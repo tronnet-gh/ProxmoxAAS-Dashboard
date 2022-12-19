@@ -85,3 +85,8 @@ export function goToPage (page, data={}) {
 	}
 	window.location.href = url.toString();
 }
+
+export function getURIData () {
+	let url = new URL(window.location.href);
+	return Object.fromEntries(url.searchParams);
+}
