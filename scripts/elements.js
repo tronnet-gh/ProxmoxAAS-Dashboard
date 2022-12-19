@@ -64,10 +64,7 @@ class Instance extends HTMLElement {
 		powerButton.src = data.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
 		powerButton.alt = data.status === "running" ? "shutdown instance" : "start instance";
 		powerButton.addEventListener("click", async () => {
-			if (this.actionLock) {
-				console.log("already doing an action");
-			}
-			else {
+			if (!this.actionLock) {
 				this.actionLock = true;
 				let targetAction = this.status === "running" ? "shutdown" : "start";
 				let targetStatus = this.status === "running" ? "stopped" : "running";
