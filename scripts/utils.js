@@ -77,3 +77,11 @@ export async function request (path, method, body = null, auth = true) {
 	let data = await response.json();
 	return data;
 }
+
+export function goToPage (page, data={}) {
+	let url = new URL(url);
+	for(let k in data) {
+		url.searchParams.append(k, data[k]);
+	}
+	window.location.href = url.toString();
+}

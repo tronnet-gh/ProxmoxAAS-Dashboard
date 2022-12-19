@@ -1,4 +1,4 @@
-import { request } from "./utils.js";
+import {request, goToPage} from "./utils.js";
 
 const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
 
@@ -123,7 +123,11 @@ class Instance extends HTMLElement {
 	
 		let configButton = this.shadowElement.querySelector("#configure-btn");
 		configButton.src = data.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
-		configButton
+		configButton.addEventListener("click", () => {
+			if (!this.actionLock && this.status !== "running") {
+				goToPage("https://client.tronnet.net/config.html", {type: this.type, vmid: this.vmid});
+			}
+		})
 	}
 }
 

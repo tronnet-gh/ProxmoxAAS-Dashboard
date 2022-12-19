@@ -1,4 +1,4 @@
-import {requestTicket, setTicket, request} from "./utils.js";
+import {request, goToPage} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -9,7 +9,7 @@ async function init () {
 async function populateInstances () {
 	let cookie = document.cookie;
 	if (cookie === "") {
-		window.location.href = "login.html";
+		goToPage("https://client.tronnet.net/login.html");
 	}
 
 	let nodes = await request("/nodes", "GET", null);
