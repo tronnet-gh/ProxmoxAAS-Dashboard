@@ -24,6 +24,7 @@ class Instance extends HTMLElement {
 		shadowRoot.append(instanceLink);
 
 		this.shadowElement = shadowRoot;
+		this.actionLock = false;
 	}
 
 	set data (data) {
@@ -63,27 +64,34 @@ class Instance extends HTMLElement {
 		powerButton.src = data.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
 		powerButton.alt = data.status === "running" ? "shutdown instance" : "start instance";
 		powerButton.addEventListener("click", async () => {
-			let targetAction = this.status === "running" ? "shutdown" : "start";
-			let targetStatus = this.status === "running" ? "stopped" : "running";
-
-			await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
-
-			while (true) {
-				let data = await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/current`);
-				if(data.data.status === targetStatus) {
-					break;
-				}
-				await waitFor(1000);
+			if (this.actionLock) {
+				console.log("already doing an action");
 			}
+			else {
+				this.actionLock = true;
+				let targetAction = this.status === "running" ? "shutdown" : "start";
+				let targetStatus = this.status === "running" ? "stopped" : "running";
 
-			this.status = targetStatus;
+				await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
 
-			let typeImg = this.shadowElement.querySelector("#instance-type");
-			typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
+				while (true) {
+					let data = await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/current`);
+					if(data.data.status === targetStatus) {
+						break;
+					}
+					await waitFor(1000);
+				}
 
-			let powerButton = this.shadowElement.querySelector("#power-btn");
-			powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
-			powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
+				this.status = targetStatus;
+
+				let typeImg = this.shadowElement.querySelector("#instance-type");
+				typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
+
+				let powerButton = this.shadowElement.querySelector("#power-btn");
+				powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
+				powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
+				this.actionLock = false;
+			}
 		});
 	
 		let configButton = this.shadowElement.querySelector("#configure-btn");
