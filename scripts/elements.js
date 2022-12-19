@@ -69,6 +69,9 @@ class Instance extends HTMLElement {
 				let targetAction = this.status === "running" ? "shutdown" : "start";
 				let targetStatus = this.status === "running" ? "stopped" : "running";
 
+				let typeImg = this.shadowElement.querySelector("#instance-type");
+				typeImg.src = "images/actions/loading.svg";
+
 				await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
 
 				while (true) {
@@ -81,7 +84,6 @@ class Instance extends HTMLElement {
 
 				this.status = targetStatus;
 
-				let typeImg = this.shadowElement.querySelector("#instance-type");
 				typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
 
 				let powerButton = this.shadowElement.querySelector("#power-btn");
