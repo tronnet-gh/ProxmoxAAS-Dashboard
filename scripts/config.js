@@ -14,17 +14,15 @@ async function populateForm (node, type, vmid) {
 	let config = await request(`/nodes/${node}/${type}/${vmid}/config`);
 	console.log(config);
 
-	addFormLine("cores", {label: "Cores:"}, {type: "number", value: config.data.cores, min: 1, max: 8192});
-	addFormLine("memory", {label: "Memory"}, {type: "number", value: config.data.memory, min: 16});
+	addFormLine("cores", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192});
+	addFormLine("memory", "Memory", {type: "number", value: config.data.memory, min: 16});
 }
 
-function addFormLine (id, labelAttr, inputAttr) {
+function addFormLine (id, labelName, inputAttr) {
 	let labelWrapperDiv = document.createElement("div");
 	let label = document.createElement("label");
 	label.for = id;
-	for (let k in labelAttr) {
-		label.setAttribute(k, labelAttr[k])
-	}
+	label.innerHTML = labelName;
 	labelWrapperDiv.append(label);
 	let labelContainer = document.querySelector("#labels");
 	labelContainer.append(labelWrapperDiv);
