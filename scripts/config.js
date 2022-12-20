@@ -13,6 +13,11 @@ async function init () {
 	let type = uriData.type;
 	let vmid = uriData.vmid;
 	await populateForm(node, type, vmid);
+
+	let cancelButton = document.querySelector("#cancel");
+	cancelButton.addEventListener("click", () => {
+		goToPage("index.html");
+	});
 }
 
 async function populateForm (node, type, vmid) {
