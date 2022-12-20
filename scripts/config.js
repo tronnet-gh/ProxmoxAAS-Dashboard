@@ -14,8 +14,8 @@ async function populateForm (node, type, vmid) {
 	let config = await request(`/nodes/${node}/${type}/${vmid}/config`);
 	console.log(config);
 
-	addFormLine("cores", {innerText: "Cores:"}, {type: "number", value: config.data.cores, min: 1, max: 8192});
-	addFormLine("memory", {innerText: "Memory"}, {type: "number", value: config.data.memory, min: 16});
+	addFormLine("cores", {innerHTML: "Cores:"}, {type: "number", value: config.data.cores, min: 1, max: 8192});
+	addFormLine("memory", {innerHTML: "Memory"}, {type: "number", value: config.data.memory, min: 16});
 }
 
 function addFormLine (id, labelAttr, inputAttr) {
