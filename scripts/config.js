@@ -21,6 +21,11 @@ async function populateForm (node, type, vmid) {
 
 	addFormLine("cores", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192});
 	addFormLine("memory", "Memory", {type: "number", value: config.data.memory, min: 16});
+
+	let i = 0;
+	while(Object.hasOwn(config.data, `sata${i}`)){
+		addFormLine(`sata${i}`, `SATA ${i}`, {type: "text", value: config.data[`sata${i}`]});
+	}
 }
 
 function addFormLine (id, labelName, inputAttr) {
