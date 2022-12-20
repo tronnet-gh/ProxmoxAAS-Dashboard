@@ -125,7 +125,7 @@ class Instance extends HTMLElement {
 		configButton.src = data.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
 		configButton.addEventListener("click", () => {
 			if (!this.actionLock && this.status !== "running") {
-				goToPage("config.html", {type: this.type, vmid: this.vmid});
+				goToPage("config.html", {node: this.node, type: this.type, vmid: this.vmid});
 			}
 		})
 	}
