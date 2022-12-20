@@ -23,7 +23,8 @@ function addFormLine (id, labelAttr, inputAttr) {
 	let label = document.createElement("label");
 	label.for = id;
 	for (let k in labelAttr) {
-		label.k = labelAttr.k;
+		label.setAttribute(k, labelAttr[k])
+		label[k] = labelAttr.k;
 	}
 	labelWrapperDiv.append(label);
 	let labelContainer = document.querySelector("#labels");
@@ -34,7 +35,7 @@ function addFormLine (id, labelAttr, inputAttr) {
 	input.id = id;
 	input.name = id;
 	for (let k in inputAttr) {
-		input.k = inputAttr.k;
+		input.setAttribute(k, inputAttr[k])
 	}
 	inputWrapperDiv.append(input);
 	let inputContainer = document.querySelector("#inputs");
