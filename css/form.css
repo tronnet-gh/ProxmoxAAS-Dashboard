@@ -32,3 +32,11 @@ button {
 .labels-inputs > div {
 	width: max-content;
 }
+
+.labels-inputs > div > div {
+	display: flex;
+}
+
+.labels-inputs > div > div > input {
+	width: 100%;
+}
