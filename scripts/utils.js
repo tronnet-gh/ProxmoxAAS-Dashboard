@@ -80,7 +80,7 @@ export function goToPage (page, data={}) {
 	for(let k in data) {
 		url.searchParams.append(k, data[k]);
 	}
-	window.location.href = url.toString();
+	window.location.assign(url.toString());
 }
 
 export function getURIData () {
