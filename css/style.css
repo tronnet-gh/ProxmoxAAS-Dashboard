@@ -60,12 +60,6 @@ p {
 	border: none;
 }
 
-.btn-group:after {
-	content: "";
-	clear: both;
-	display: table;
-}
-
 .btn-group button:hover {
 	background-color: #008800;
 }
