@@ -19,22 +19,18 @@ async function populateForm (node, type, vmid) {
 }
 
 function addFormLine (id, labelName, inputAttr) {
-	let labelWrapperDiv = document.createElement("div");
+	let form = document.querySelector("#user-configurable");
+
 	let label = document.createElement("label");
 	label.for = id;
 	label.innerHTML = labelName;
-	labelWrapperDiv.append(label);
-	let labelContainer = document.querySelector("#labels");
-	labelContainer.append(labelWrapperDiv);
+	form.append(label);
 
-	let inputWrapperDiv = document.createElement("div");
 	let input = document.createElement("input");
 	input.id = id;
 	input.name = id;
 	for (let k in inputAttr) {
 		input.setAttribute(k, inputAttr[k])
 	}
-	inputWrapperDiv.append(input);
-	let inputContainer = document.querySelector("#inputs");
-	inputContainer.append(inputWrapperDiv);
+	form.append(input);
 }

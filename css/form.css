@@ -25,10 +25,7 @@ button {
 }
 
 .labels-inputs {
-	display: flex;
+	display: grid;
+	grid-template-columns: auto auto;
 	column-gap: 10px;
-}
-
-.labels-inputs > div {
-	width: max-content;
 }

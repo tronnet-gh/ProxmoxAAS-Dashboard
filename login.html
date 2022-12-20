@@ -14,14 +14,10 @@
 				<fieldset>
 					<legend>Proxmox VE Login</legend>
 					<div class="labels-inputs">
-						<div>
-							<div><label for="username">Username:</label></div>
-							<div><label for="username">Password:</label></div>
-						</div>
-						<div>
-							<div><input type="text" id="username" name="username"></div>
-							<div><input type="password" id="password" name="password"></div>
-						</div>
+						<label for="username">Username:</label>
+						<input type="number" min="1" max="10" id="username" name="username">
+						<label for="username">Password:</label>
+						<input type="password" id="password" name="password">
 					</div>
 					<div class="btn-group">
 						<button id="submit">LOGIN</button>
