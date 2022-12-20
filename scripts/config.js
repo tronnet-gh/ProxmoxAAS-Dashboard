@@ -25,6 +25,7 @@ async function populateForm (node, type, vmid) {
 	let i = 0;
 	while(Object.hasOwn(config.data, `sata${i}`)){
 		addFormLine(`sata${i}`, `SATA ${i}`, {type: "text", value: config.data[`sata${i}`]});
+		i++;
 	}
 }
 
