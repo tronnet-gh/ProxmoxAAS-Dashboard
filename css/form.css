@@ -23,3 +23,12 @@ input {
 button {
 	margin-top: 10px;
 }
+
+.labels-inputs {
+	display: flex;
+	column-gap: 10px;
+}
+
+.labels-inputs > div {
+	width: min-content;
+}
