@@ -24,7 +24,6 @@ function addFormLine (id, labelAttr, inputAttr) {
 	label.for = id;
 	for (let k in labelAttr) {
 		label.setAttribute(k, labelAttr[k])
-		label[k] = labelAttr.k;
 	}
 	labelWrapperDiv.append(label);
 	let labelContainer = document.querySelector("#labels");
