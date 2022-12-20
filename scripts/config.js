@@ -3,6 +3,11 @@ import {request, goToPage, getURIData} from "./utils.js";
 window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
+	let cookie = document.cookie;
+	if (cookie === "") {
+		goToPage("login.html");
+	}
+	
 	let uriData = getURIData();
 	let node = uriData.node;
 	let type = uriData.type;
