@@ -30,5 +30,5 @@ button {
 }
 
 .labels-inputs > div {
-	width: min-content;
+	width: max-content;
 }
