@@ -24,19 +24,30 @@ async function populateForm (node, type, vmid) {
 	let config = await request(`/nodes/${node}/${type}/${vmid}/config`);
 	console.log(config);
 
-	addFormLine("name", "Name", {type: "text", value: config.data.name});
+	let name = type === "qemu" ? "hostname" : "name";
+	addFormLine("name", "Name", {type: "text", value: config.data[name]});
 	addFormLine("resources", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads");
 	addFormLine("resources", "Memory", {type: "number", value: config.data.memory / 1024, min: 16}, "GiB");
 
-	let i = 0;
-	while(Object.hasOwn(config.data, `sata${i}`)){
-		let sata = config.data[`sata${i}`];
-		sata = `{"${sata.replaceAll(":", '":"').replaceAll("=", '":"').replaceAll(",", '","')}"}`;
-		sata = JSON.parse(sata);
-		let sizeNum = +(sata.size.replaceAll("G", "").replaceAll("M", ""));
-		let sizeUnit = sata.size.includes("G") ? "GiB" : "MiB";
-		addFormLine("resources", `SATA ${i}`, {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 0.016}, "GiB");
-		i++;
+	if (type === "qemu") {
+		let i = 0;
+		while(Object.hasOwn(config.data, `sata${i}`)){
+			let sata = config.data[`sata${i}`];
+			sata = `{"${sata.replaceAll(":", '":"').replaceAll("=", '":"').replaceAll(",", '","')}"}`;
+			sata = JSON.parse(sata);
+			let sizeNum = +(sata.size.replaceAll("G", "").replaceAll("M", ""));
+			let sizeUnit = sata.size.includes("G") ? "GiB" : "MiB";
+			addFormLine("resources", `SATA ${i}`, {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 0.016}, "GiB");
+			i++;
+		}
+	}
+	else {
+		let rootfs = config.data.rootfs;
+		rootfs = `{"${rootfs.replaceAll(":", '":"').replaceAll("=", '":"').replaceAll(",", '","')}"}`;
+		rootfs = JSON.parse(rootfs);
+		let sizeNum = +(rootfs.size.replaceAll("G", "").replaceAll("M", ""));
+		let sizeUnit = rootfs.size.includes("G") ? "GiB" : "MiB";
+		addFormLine("resources", "rootfs", {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 0.016}, "GiB");
 	}
 }
 
