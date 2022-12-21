@@ -47,7 +47,7 @@ async function populateForm (node, type, vmid) {
 		rootfs = JSON.parse(rootfs);
 		let sizeNum = +(rootfs.size.replaceAll("G", "").replaceAll("M", ""));
 		let sizeUnit = rootfs.size.includes("G") ? "GiB" : "MiB";
-		addFormLine("resources", "rootfs", {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 0.016}, "GiB");
+		addFormLine("resources", "Root FS", {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 0.016}, "GiB");
 	}
 }
 
