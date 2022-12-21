@@ -24,7 +24,7 @@ async function populateForm (node, type, vmid) {
 	let config = await request(`/nodes/${node}/${type}/${vmid}/config`);
 	console.log(config);
 
-	let name = type === "qemu" ? "hostname" : "name";
+	let name = type === "lxc" ? "hostname" : "name";
 	addFormLine("name", "Name", {type: "text", value: config.data[name]});
 	addFormLine("resources", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads");
 	addFormLine("resources", "Memory", {type: "number", value: config.data.memory / 1024, min: 16}, "GiB");
