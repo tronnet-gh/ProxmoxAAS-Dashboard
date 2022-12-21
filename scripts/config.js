@@ -24,17 +24,17 @@ async function populateForm (node, type, vmid) {
 	let config = await request(`/nodes/${node}/${type}/${vmid}/config`);
 	console.log(config);
 
-	addFormLine("name", "name", "Name:", {type: "text", value: config.data.name});
+	addFormLine("name", "name", "Name", {type: "text", value: config.data.name});
 
-	addFormLine("resources", "cores", "Cores:", {type: "number", value: config.data.cores, min: 1, max: 8192});
-	addFormLine("resources", "memory", "Memory:", {type: "number", value: config.data.memory, min: 16});
+	addFormLine("resources", "cores", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192});
+	addFormLine("resources", "memory", "Memory", {type: "number", value: config.data.memory, min: 16});
 
 	let i = 0;
 	while(Object.hasOwn(config.data, `sata${i}`)){
 		let sata = config.data[`sata${i}`];
 		sata = `{"${sata.replaceAll(":", '":"').replaceAll("=", '":"').replaceAll(",", '","')}"}`;
 		sata = JSON.parse(sata);
-		addFormLine("resources", `sata${i}`, `SATA ${i}:`, {type: "text", value: sata.size});
+		addFormLine("resources", `sata${i}`, `SATA ${i}`, {type: "text", value: sata.size});
 		i++;
 	}
 }
