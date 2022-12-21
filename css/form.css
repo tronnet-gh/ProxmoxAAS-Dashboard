@@ -40,3 +40,7 @@ legend {
 	position: relative;
 	height: 0;
 }
+
+form > img {
+	width: 16px;
+}

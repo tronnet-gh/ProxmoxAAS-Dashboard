@@ -25,7 +25,7 @@ async function populateForm (node, type, vmid) {
 	console.log(config);
 
 	let name = type === "qemu" ? "name" : "hostname";
-	addFormLine("name", "Name", {type: "text", value: config.data[name]});
+	addFormLine("name", null, "Name", {type: "text", value: config.data[name]});
 	addFormLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads");
 	addFormLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data.memory / 1024, min: 0, step: 0.001}, "GiB");
 	if (type === "lxc") {
@@ -57,9 +57,11 @@ async function populateForm (node, type, vmid) {
 function addFormLine (fieldset, iconHref, labelText, inputAttr, unitText=null) {
 	let field = document.querySelector(`#${fieldset}`);
 
-	let icon = document.createElement("img");
-	icon.src = iconHref;
-	field.append(icon);
+	if (icon) {
+		let icon = document.createElement("img");
+		icon.src = iconHref;
+		field.append(icon);
+	}
 
 	let label = document.createElement("label");
 	label.innerHTML = labelText;
