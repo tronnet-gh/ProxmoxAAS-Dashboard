@@ -1,15 +1,17 @@
 .center-div {
-	display: flex;
+	display: grid;
 	justify-content: center;
 }
 
-.fieldset-no-border {
-	border: none;
+p {
+	text-align: center;
 }
 
 fieldset {
 	border: solid white 1px;
+	border-radius: 5px;
 	padding: 10px;
+	margin: 10px;
 }
 
 input, label, legend {
