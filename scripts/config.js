@@ -28,6 +28,9 @@ async function populateForm (node, type, vmid) {
 	addFormLine("name", "Name", {type: "text", value: config.data[name]});
 	addFormLine("resources", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads");
 	addFormLine("resources", "Memory", {type: "number", value: config.data.memory / 1024, min: 0, step: 0.001}, "GiB");
+	if (type === "lxc") {
+		addFormLine("resources", "Swap", {type: "number", value: config.data.swap / 1024, min: 0, step: 0.001}, "GiB");
+	}
 
 	if (type === "qemu") {
 		let i = 0;
