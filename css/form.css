@@ -30,17 +30,18 @@ button {
 	margin-top: 0px;
 }
 
-.labels-inputs {
+.label-input {
 	display: grid;
 	grid-template-columns: auto auto;
 	column-gap: 10px;
 }
 
-.labels-inputs-units {
+.label-input-unit {
 	display: grid;
 	grid-template-columns: auto auto auto;
 	column-gap: 10px;
 }
+
 
 legend {
 	top: -0.6em;
