@@ -27,7 +27,7 @@ async function populateForm (node, type, vmid) {
 	let name = type === "qemu" ? "name" : "hostname";
 	addFormLine("name", "Name", {type: "text", value: config.data[name]});
 	addFormLine("resources", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads");
-	addFormLine("resources", "Memory", {type: "number", value: config.data.memory / 1024, min: 16}, "GiB");
+	addFormLine("resources", "Memory", {type: "number", value: config.data.memory / 1024, min: 1}, "GiB");
 
 	if (type === "qemu") {
 		let i = 0;
@@ -37,7 +37,7 @@ async function populateForm (node, type, vmid) {
 			sata = JSON.parse(sata);
 			let sizeNum = +(sata.size.replaceAll("G", "").replaceAll("M", ""));
 			let sizeUnit = sata.size.includes("G") ? "GiB" : "MiB";
-			addFormLine("resources", `SATA ${i}`, {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 0.016}, "GiB");
+			addFormLine("resources", `SATA ${i}`, {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 1}, "GiB");
 			i++;
 		}
 	}
@@ -47,7 +47,7 @@ async function populateForm (node, type, vmid) {
 		rootfs = JSON.parse(rootfs);
 		let sizeNum = +(rootfs.size.replaceAll("G", "").replaceAll("M", ""));
 		let sizeUnit = rootfs.size.includes("G") ? "GiB" : "MiB";
-		addFormLine("resources", "Root FS", {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 0.016}, "GiB");
+		addFormLine("resources", "Root FS", {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 1}, "GiB");
 	}
 }
 
