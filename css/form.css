@@ -29,9 +29,9 @@ button {
 	margin-top: 0px;
 }
 
-.labels-inputs {
+.labels-inputs-units {
 	display: grid;
-	grid-template-columns: auto auto;
+	grid-template-columns: auto auto auto;
 	column-gap: 10px;
 }
 

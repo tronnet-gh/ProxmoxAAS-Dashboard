@@ -26,26 +26,26 @@ async function populateForm (node, type, vmid) {
 
 	addFormLine("name", "name", "Name", {type: "text", value: config.data.name});
 
-	addFormLine("resources", "cores", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192});
-	addFormLine("resources", "memory", "Memory", {type: "number", value: config.data.memory, min: 16});
+	addFormLine("resources", "cores", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads");
+	addFormLine("resources", "memory", "Memory", {type: "number", value: config.data.memory / 1024, min: 16}, "GiB");
 
 	let i = 0;
 	while(Object.hasOwn(config.data, `sata${i}`)){
 		let sata = config.data[`sata${i}`];
 		sata = `{"${sata.replaceAll(":", '":"').replaceAll("=", '":"').replaceAll(",", '","')}"}`;
 		sata = JSON.parse(sata);
-		addFormLine("resources", `sata${i}`, `SATA ${i}`, {type: "text", value: sata.size});
+		addFormLine("resources", `sata${i}`, `SATA ${i}`, {type: "text", value: sata.size.slice(0, sata.size.length - 1)}, sata.size.includes("G") ? "GiB" : "MiB");
 		i++;
 	}
 }
 
-function addFormLine (fieldset, id, labelName, inputAttr) {
-	let form = document.querySelector(`#${fieldset}`);
+function addFormLine (fieldset, id, labelValue, inputAttr, unitValue="") {
+	let field = document.querySelector(`#${fieldset}`);
 
 	let label = document.createElement("label");
 	label.for = id;
-	label.innerHTML = labelName;
-	form.append(label);
+	label.innerHTML = labelValue;
+	field.append(label);
 
 	let input = document.createElement("input");
 	input.id = id;
@@ -53,5 +53,9 @@ function addFormLine (fieldset, id, labelName, inputAttr) {
 	for (let k in inputAttr) {
 		input.setAttribute(k, inputAttr[k])
 	}
-	form.append(input);
+	field.append(input);
+
+	let unit = document.createElement("p");
+	unit.innerText = unitValue;
+	field.append(unit)
 }
