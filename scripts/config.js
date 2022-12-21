@@ -34,7 +34,7 @@ async function populateForm (node, type, vmid) {
 		sata = `{"${sata.replaceAll(":", '":"').replaceAll("=", '":"').replaceAll(",", '","')}"}`;
 		sata = JSON.parse(sata);
 		let sizeUnit = sata.size.includes("G") ? "GiB" : "MiB";
-		addFormLine("resources", `SATA ${i}`, {type: "number", value: sizeUnit === "GiB" ? (sata.size).toFixed(3) : (sata.size / 1024).toFixed(3), min: 0.016}, "GiB");
+		addFormLine("resources", `SATA ${i}`, {type: "number", value: sizeUnit === "GiB" ? +(sata.size).toFixed(3) : +(sata.size / 1024).toFixed(3), min: 0.016}, "GiB");
 		i++;
 	}
 }
