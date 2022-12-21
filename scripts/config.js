@@ -29,7 +29,10 @@ async function populateForm (node, type, vmid) {
 
 	let i = 0;
 	while(Object.hasOwn(config.data, `sata${i}`)){
-		addFormLine(`sata${i}`, `SATA ${i}`, {type: "text", value: config.data[`sata${i}`]});
+		let sata = config.data[`sata${i}`];
+		sata = `{"${sata.replaceAll(":", '":"').replaceAll("=", '":"').replaceAll(",", '","')}"}`;
+		sata = JSON.parse(sata);
+		addFormLine(`sata${i}`, `SATA ${i}`, {type: "text", value: sata.size});
 		i++;
 	}
 }
