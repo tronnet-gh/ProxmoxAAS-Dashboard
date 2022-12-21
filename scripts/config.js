@@ -34,7 +34,7 @@ async function populateForm (node, type, vmid) {
 		let sata = config.data[`sata${i}`];
 		sata = `{"${sata.replaceAll(":", '":"').replaceAll("=", '":"').replaceAll(",", '","')}"}`;
 		sata = JSON.parse(sata);
-		addFormLine("resources", `sata${i}`, `SATA ${i}`, {type: "text", value: sata.size});
+		addFormLine("resources", `sata${i}`, `SATA ${i}:`, {type: "text", value: sata.size});
 		i++;
 	}
 }
