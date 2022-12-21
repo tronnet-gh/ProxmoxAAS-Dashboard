@@ -34,3 +34,9 @@ button {
 	grid-template-columns: auto auto;
 	column-gap: 10px;
 }
+
+legend {
+	top: -0.6em;
+	position: relative;
+	height: 0;
+}
