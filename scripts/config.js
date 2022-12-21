@@ -26,10 +26,10 @@ async function populateForm (node, type, vmid) {
 
 	let name = type === "qemu" ? "name" : "hostname";
 	addFormLine("name", "Name", {type: "text", value: config.data[name]});
-	addFormLine("resources", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads");
-	addFormLine("resources", "Memory", {type: "number", value: config.data.memory / 1024, min: 0, step: 0.001}, "GiB");
+	addFormLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads");
+	addFormLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data.memory / 1024, min: 0, step: 0.001}, "GiB");
 	if (type === "lxc") {
-		addFormLine("resources", "Swap", {type: "number", value: config.data.swap / 1024, min: 0, step: 0.001}, "GiB");
+		addFormLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap / 1024, min: 0, step: 0.001}, "GiB");
 	}
 
 	if (type === "qemu") {
@@ -40,7 +40,7 @@ async function populateForm (node, type, vmid) {
 			sata = JSON.parse(sata);
 			let sizeNum = +(sata.size.replaceAll("G", "").replaceAll("M", ""));
 			let sizeUnit = sata.size.includes("G") ? "GiB" : "MiB";
-			addFormLine("resources", `SATA ${i}`, {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 0, step: 0.001}, "GiB");
+			addFormLine("resources", "images/resources/disk.svg", `SATA ${i}`, {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 0, step: 0.001}, "GiB");
 			i++;
 		}
 	}
@@ -50,12 +50,16 @@ async function populateForm (node, type, vmid) {
 		rootfs = JSON.parse(rootfs);
 		let sizeNum = +(rootfs.size.replaceAll("G", "").replaceAll("M", ""));
 		let sizeUnit = rootfs.size.includes("G") ? "GiB" : "MiB";
-		addFormLine("resources", "Root FS", {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 0, step: 0.001}, "GiB");
+		addFormLine("resources", "images/resources/disk.svg", "Root FS", {type: "number", value: sizeUnit === "GiB" ? sizeNum.toFixed(3) : (sizeNum / 1024).toFixed(3), min: 0, step: 0.001}, "GiB");
 	}
 }
 
-function addFormLine (fieldset, labelText, inputAttr, unitText=null) {
+function addFormLine (fieldset, iconHref, labelText, inputAttr, unitText=null) {
 	let field = document.querySelector(`#${fieldset}`);
+
+	let icon = document.createElement("img");
+	icon.src = iconHref;
+	field.append(icon);
 
 	let label = document.createElement("label");
 	label.innerHTML = labelText;
