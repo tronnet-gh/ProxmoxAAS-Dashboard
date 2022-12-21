@@ -4,7 +4,8 @@
 }
 
 p {
-	text-align: center;
+	text-align: left;
+	margin: 0px;
 }
 
 fieldset {
@@ -27,6 +28,12 @@ input {
 
 button {
 	margin-top: 0px;
+}
+
+.labels-inputs {
+	display: grid;
+	grid-template-columns: auto auto;
+	column-gap: 10px;
 }
 
 .labels-inputs-units {
