@@ -48,18 +48,6 @@ class Instance extends HTMLElement {
 		nodeParagraph.innerText = data.node.name;
 		this.node = data.node.name;
 
-		let resourceCPU = this.shadowElement.querySelector("#resource-cpu");
-		resourceCPU.innerText = data.cpus;
-
-		let resourceRAM = this.shadowElement.querySelector("#resource-ram");
-		resourceRAM.innerText = (data.maxmem / 1073741824).toFixed(3);
-
-		let resourceSWAP = this.shadowElement.querySelector("#resource-swap");
-		resourceSWAP.innerText = (data.maxswap / 1073741824).toFixed(3);
-
-		let resourceDISK = this.shadowElement.querySelector("#resource-disk");
-		resourceDISK.innerText = (data.maxdisk / 1073741824).toFixed(3);
-
 		let powerButton = this.shadowElement.querySelector("#power-btn");
 		powerButton.src = data.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
 		powerButton.alt = data.status === "running" ? "shutdown instance" : "start instance";
