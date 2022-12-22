@@ -57,7 +57,7 @@ async function populateForm (node, type, vmid) {
 function addFormLine (fieldset, iconHref, labelText, inputAttr, unitText=null) {
 	let field = document.querySelector(`#${fieldset}`);
 
-	if (icon) {
+	if (iconHref) {
 		let icon = document.createElement("img");
 		icon.src = iconHref;
 		field.append(icon);
