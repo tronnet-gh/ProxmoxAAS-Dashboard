@@ -5,16 +5,18 @@
 		<meta name="viewport" content="width=device-width">
 		<title>tronnet - client</title>
 		<link rel="stylesheet" href="css/style.css" type="text/css">
-		<script src="scripts/index.js" type="module"></script>
+		
 		<script src="scripts/elements.js" type="module"></script>
 	</head>
-	<header>
-		<nav>
-			<a class="active" href="index.html">Instances</a>
-			<a>Logout</a>
-		</nav>
-	</header>
 	<body>
+		<header>
+			<div class="nav-container">
+				<nav>
+					<a class="active" href="index.html">Instances</a>
+					<a>Logout</a>
+				</nav>
+			</div>
+		</header>
 		<div id="instance-container" class="center-div"></div>
 	</body>
 	<template id="instance-template">

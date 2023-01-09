@@ -64,15 +64,17 @@ p {
 	background-color: #008800;
 }
 
-nav {
-	background-color: black;
+.nav-container {
+	background-color: #00ff00;
 }
 
 nav a {
+	background-color: #00ff00;
 	float: left;
-	color: #00ff00;
+	color: black;
 	text-align: center;
 	padding: 8px;
+	text-decoration: none;
 }
 
 nav a:hover {
@@ -80,6 +82,6 @@ nav a:hover {
 }
 
 nav a.active {
-	background-color: black;
+	background-color: #008800;
 	color: white;
 }
