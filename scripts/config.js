@@ -46,12 +46,14 @@ function addMetaLine (fieldset, labelText, inputAttr) {
 
 	let label = document.createElement("label");
 	label.innerHTML = labelText;
+	label.htmlFor = labelText;
 	field.append(label);
 
 	let input = document.createElement("input");
 	for (let k in inputAttr) {
 		input.setAttribute(k, inputAttr[k])
 	}
+	input.id = labelText;
 	field.append(input);
 }
 
