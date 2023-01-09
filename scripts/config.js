@@ -30,12 +30,12 @@ async function populateForm (node, type, vmid) {
 	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data, min: 16, step: 1}, "MiB"); // TODO add max from quota API
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "GiB"); // TODO add max from quota API
-		addDiskLine("disks", "images/resources/disk.svg", "Root FS", config.data.rootfs);
+		addDiskLine("disks", "rootfs", "images/resources/disk.svg", "Root FS", config.data.rootfs);
 	}
 	else { // qemu
 		let i = 0;
 		while(Object.hasOwn(config.data, `sata${i}`)){
-			addDiskLine("disks", "images/resources/disk.svg", `SATA ${i}`, config.data[`sata${i}`]);
+			addDiskLine("disks", `sata${i}`, "images/resources/disk.svg", `SATA ${i}`, config.data[`sata${i}`]);
 			i++;
 		}
 	}
