@@ -65,7 +65,7 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 	}
 }
 
-function addDiskLine (fieldset, id, iconHref, labelText, value) {
+function addDiskLine (fieldset, id, iconHref, labelText, valueText) {
 	let field = document.querySelector(`#${fieldset}`);
 
 	let icon = document.createElement("img");
@@ -77,6 +77,6 @@ function addDiskLine (fieldset, id, iconHref, labelText, value) {
 	field.append(label);
 
 	let value = document.createElement("p");
-	value.innerText = value;
+	value.innerText = valueText;
 	field.append(value);
 }
