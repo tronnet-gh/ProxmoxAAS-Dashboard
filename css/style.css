@@ -64,7 +64,7 @@ p {
 	background-color: #008800;
 }
 
-.nav-container {
+.nav {
 	background-color: #00ff00;
 }
 
@@ -79,6 +79,7 @@ nav a {
 
 nav a:hover {
 	background-color: #008800;
+	color: white;
 }
 
 nav a.active {
