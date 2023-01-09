@@ -63,3 +63,23 @@ p {
 .btn-group button:hover {
 	background-color: #008800;
 }
+
+nav {
+	background-color: black;
+}
+
+nav a {
+	float: left;
+	color: #00ff00;
+	text-align: center;
+	padding: 8px;
+}
+
+nav a:hover {
+	background-color: #008800;
+}
+
+nav a.active {
+	background-color: black;
+	color: white;
+}
