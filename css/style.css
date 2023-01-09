@@ -68,11 +68,3 @@ p {
 	background-color: black;
 	color: white;
 }
-
-nav {
-	background-color: #00ff00;
-	overflow: hidden;
-	margin-left: auto;
-	margin-right: auto;
-	width: fit-content;
-}
