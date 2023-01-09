@@ -15,6 +15,8 @@ function init (){
 			status.innerText = "Authenticating...";
 			let ticket = await requestTicket(formData.get("username"), formData.get("password"));
 			setTicket(ticket.data.ticket, ticket.data.CSRFPreventionToken);
+			status.innerText = "Authentication successful!"
+			status.style.color = "#00ff00";
 			goToPage("index.html");
 		}
 		catch (error) {
