@@ -60,16 +60,19 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 
 	let icon = document.createElement("img");
 	icon.src = iconHref;
+	icon.alt = labelText;
 	field.append(icon);
 
 	let label = document.createElement("label");
 	label.innerHTML = labelText;
+	label.for = labelText;
 	field.append(label);
 
 	let input = document.createElement("input");
 	for (let k in inputAttr) {
 		input.setAttribute(k, inputAttr[k])
 	}
+	input.id = labelText;
 	field.append(input);
 
 	if (unitText) {
@@ -96,5 +99,6 @@ function addDiskLine (fieldset, id, iconHref, labelText, valueText) {
 
 	let config = document.createElement("img");
 	config.src = "images/actions/config-active.svg";
+	config.alt = `Config disk ${labelText}`;
 	field.append(config);
 }
