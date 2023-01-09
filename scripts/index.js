@@ -1,9 +1,20 @@
-import {request, goToPage} from "./utils.js";
+import {request, goToPage, deleteAllCookies} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
 	await populateInstances();
+
+	let instances = document.querySelector("nav #instances");
+	instances.addEventListener("click", () => {
+		goToPage("index.html");
+	});
+
+	let logout = document.querySelector("nav #logout");
+	logout.addEventListener("click", () => {
+		deleteAllCookies();
+		goToPage("login.html");
+	});
 }
 
 async function populateInstances () {

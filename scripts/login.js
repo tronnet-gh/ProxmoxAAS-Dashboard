@@ -1,8 +1,9 @@
-import {requestTicket, setTicket, ResponseError, NetworkError, goToPage} from "./utils.js";
+import {requestTicket, setTicket, ResponseError, NetworkError, goToPage, deleteAllCookies} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
 function init (){
+	deleteAllCookies();
 	let formSubmitButton = document.querySelector("#submit");
 	let status = document.querySelector("#status");
 	formSubmitButton.addEventListener("click", async (e) => {
