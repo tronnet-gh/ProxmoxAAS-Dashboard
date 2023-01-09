@@ -27,7 +27,7 @@ async function populateForm (node, type, vmid) {
 	let name = type === "qemu" ? "name" : "hostname";
 	addMetaLine("name", "Name", {type: "text", value: config.data[name]});
 	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads"); // TODO add max from quota API
-	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data, min: 16, step: 1}, "MiB"); // TODO add max from quota API
+	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data.memory, min: 16, step: 1}, "MiB"); // TODO add max from quota API
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "GiB"); // TODO add max from quota API
 		addDiskLine("disks", "rootfs", "images/resources/disk.svg", "Root FS", config.data.rootfs);
