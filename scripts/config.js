@@ -25,7 +25,7 @@ async function populateForm (node, type, vmid) {
 	console.log(config);
 
 	let name = type === "qemu" ? "name" : "hostname";
-	addResourceLine("name", null, "Name", {type: "text", value: config.data[name]});
+	addMetaLine("name", "Name", {type: "text", value: config.data[name]});
 	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads"); // TODO add max from quota API
 	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data, min: 16, step: 1}, "MiB"); // TODO add max from quota API
 	if (type === "lxc") {
@@ -39,6 +39,20 @@ async function populateForm (node, type, vmid) {
 			i++;
 		}
 	}
+}
+
+function addMetaLine (fieldset, labelText, inputAttr) {
+	let field = document.querySelector(`#${fieldset}`);
+
+	let label = document.createElement("label");
+	label.innerHTML = labelText;
+	field.append(label);
+
+	let input = document.createElement("input");
+	for (let k in inputAttr) {
+		input.setAttribute(k, inputAttr[k])
+	}
+	field.append(input);
 }
 
 function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=null) {
