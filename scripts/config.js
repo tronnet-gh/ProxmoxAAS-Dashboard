@@ -65,7 +65,7 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 
 	let label = document.createElement("label");
 	label.innerHTML = labelText;
-	label.for = labelText;
+	label.htmlFor = labelText;
 	field.append(label);
 
 	let input = document.createElement("input");
@@ -87,6 +87,7 @@ function addDiskLine (fieldset, id, iconHref, labelText, valueText) {
 
 	let icon = document.createElement("img");
 	icon.src = iconHref;
+	icon.alt = labelText;
 	field.append(icon);
 
 	let label = document.createElement("label");
