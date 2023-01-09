@@ -64,29 +64,15 @@ p {
 	background-color: #008800;
 }
 
+.btn-group button.active {
+	background-color: black;
+	color: white;
+}
+
 nav {
 	background-color: #00ff00;
 	overflow: hidden;
 	margin-left: auto;
 	margin-right: auto;
 	width: fit-content;
-}
-
-nav a {
-	background-color: #00ff00;
-	float: left;
-	color: black;
-	text-align: center;
-	padding: 8px;
-	text-decoration: none;
-}
-
-nav a:hover {
-	background-color: #008800;
-	color: white;
-}
-
-nav a.active {
-	background-color: #008800;
-	color: white;
 }
