@@ -67,4 +67,5 @@ p {
 .btn-group button.active {
 	background-color: black;
 	color: white;
+	border: solid white 1px;
 }
