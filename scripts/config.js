@@ -96,4 +96,5 @@ function addDiskLine (fieldset, id, iconHref, labelText, valueText) {
 
 	let config = document.createElement("img");
 	config.src = "images/actions/config-active.svg";
+	field.append(config);
 }
