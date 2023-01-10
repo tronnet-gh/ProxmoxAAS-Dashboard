@@ -18,6 +18,11 @@ async function init () {
 	cancelButton.addEventListener("click", () => {
 		goToPage("index.html");
 	});
+
+	/**
+	 * Add disk qemu: POST config with sata4:"cephpl:4"
+	 * Add disk lxc POST config with mp2:"cephpl:8,mp=/test/,backup=1"
+	 */
 }
 
 async function populateForm (node, type, vmid) {
@@ -41,21 +46,19 @@ async function populateForm (node, type, vmid) {
 		diskTypes = ["IDE", "SATA"];
 	}
 
-	for(let j = 0; j < diskPrefixes.length; j++){
-		let prefix = diskPrefixes[j];
-		let type = diskTypes[j];
-
+	for(let i = 0; i < diskPrefixes.length; i++){
+		let prefix = diskPrefixes[i];
+		let type = diskTypes[i];
+		let disks = {};
 		Object.keys(config.data).forEach(element => {
 			if (element.startsWith(prefix)) {
-				addDiskLine("disks", element, config.data[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${type} ${element.replace(prefix, "")}`, config.data[element]);
+				element.replace(prefix, "") = config.data[element];
 			}
-		})
-
-		let i = 0;
-		while(Object.hasOwn(config.data, `${prefix}${i}`)){
-			
-			i++;
-		}
+		});
+		let ordered_keys = Object.keys(disks).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
+		ordered_keys.forEach(element => {
+			addDiskLine("disks", `${prefix}${element}`, disks[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${type} ${element}`, disks[element]);
+		});
 	}
 }
 
