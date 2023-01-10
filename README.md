@@ -113,4 +113,4 @@ server {
 ```
 3. Restart nginx with the new configurations by running `systemctl restart nginx`
 
-After this step, the Proxmox web UI will be avaliable at pve.<FQDN> and the PAAS Client will be avaliable at client.<FQDN>
+After this step, the Proxmox web UI will be avaliable at pve.\<FQDN\> and the PAAS Client will be avaliable at client.\<FQDN\>
