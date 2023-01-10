@@ -52,7 +52,7 @@ async function populateForm (node, type, vmid) {
 		let disks = {};
 		Object.keys(config.data).forEach(element => {
 			if (element.startsWith(prefix)) {
-				element.replace(prefix, "") = config.data[element];
+				disks[element.replace(prefix, "")] = config.data[element];
 			}
 		});
 		let ordered_keys = Object.keys(disks).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
