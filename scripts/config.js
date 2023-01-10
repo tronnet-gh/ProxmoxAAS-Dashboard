@@ -44,9 +44,16 @@ async function populateForm (node, type, vmid) {
 	for(let j = 0; j < diskPrefixes.length; j++){
 		let prefix = diskPrefixes[j];
 		let type = diskTypes[j];
+
+		Object.keys(config.data).forEach(element => {
+			if (element.startsWith(prefix)) {
+				addDiskLine("disks", element, "images/resources/disk.svg", `${type} ${element.replace(prefix, "")}`, config.data[element]);
+			}
+		})
+
 		let i = 0;
 		while(Object.hasOwn(config.data, `${prefix}${i}`)){
-			addDiskLine("disks", `${prefix}${i}`, "images/resources/disk.svg", `${type} ${i}`, config.data[`${prefix}${i}`]);
+			
 			i++;
 		}
 	}
