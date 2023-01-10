@@ -31,7 +31,7 @@ p {
 .center-div {
 	min-width: 480px;
 	max-width: 50%;
-	width: min-content;
+	width: fit-content;
 	margin-left: auto;
 	margin-right: auto;
 }
