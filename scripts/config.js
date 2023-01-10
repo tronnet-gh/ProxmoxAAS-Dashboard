@@ -28,14 +28,25 @@ async function populateForm (node, type, vmid) {
 	addMetaLine("name", "Name", {type: "text", value: config.data[name]});
 	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads"); // TODO add max from quota API
 	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data.memory, min: 16, step: 1}, "MiB"); // TODO add max from quota API
+	let diskPrefixes;
+	let diskTypes;
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "GiB"); // TODO add max from quota API
 		addDiskLine("disks", "rootfs", "images/resources/disk.svg", "Root FS", config.data.rootfs);
+		diskPrefixes = ["mp"];
+		diskTypes = ["MP"];
 	}
 	else { // qemu
+		diskPrefixes = ["ide", "sata"];
+		diskTypes = ["IDE", "SATA"];
+	}
+
+	for(let j = 0; j < diskPrefixes.length; j++){
+		let prefix = diskPrefixes[j];
+		let type = diskTypes[j];
 		let i = 0;
-		while(Object.hasOwn(config.data, `sata${i}`)){
-			addDiskLine("disks", `sata${i}`, "images/resources/disk.svg", `SATA ${i}`, config.data[`sata${i}`]);
+		while(Object.hasOwn(config.data, `${prefix}${i}`)){
+			addDiskLine("disks", `${prefix}${i}`, "images/resources/disk.svg", `${type} ${i}`, config.data[`${prefix}${i}`]);
 			i++;
 		}
 	}
