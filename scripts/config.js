@@ -32,7 +32,7 @@ async function populateForm (node, type, vmid) {
 	let diskTypes;
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "GiB"); // TODO add max from quota API
-		addDiskLine("disks", "rootfs", "images/resources/disk.svg", "Root FS", config.data.rootfs);
+		addDiskLine("disks", "rootfs", "images/resources/drive.svg", "Root FS", config.data.rootfs);
 		diskPrefixes = ["mp"];
 		diskTypes = ["MP"];
 	}
@@ -47,7 +47,7 @@ async function populateForm (node, type, vmid) {
 
 		Object.keys(config.data).forEach(element => {
 			if (element.startsWith(prefix)) {
-				addDiskLine("disks", element, "images/resources/disk.svg", `${type} ${element.replace(prefix, "")}`, config.data[element]);
+				addDiskLine("disks", element, config.data[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${type} ${element.replace(prefix, "")}`, config.data[element]);
 			}
 		})
 
