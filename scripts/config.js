@@ -2,6 +2,22 @@ import {request, goToPage, getURIData} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
+let diskConfig = {
+	lxc: {
+		prefixOrder: ["mp"],
+		mp: {name: "MP", limit: 255, used: {}}
+	},
+	qemu: {
+		prefixOrder: ["sata", "ide"],
+		ide: {name: "IDE", limit: 3, used: {}},
+		sata: {name: "SATA", limit: 5, used: {}}
+	}
+}
+
+let node;
+let type;
+let vmid;
+
 async function init () {
 	let cookie = document.cookie;
 	if (cookie === "") {
@@ -9,9 +25,9 @@ async function init () {
 	}
 	
 	let uriData = getURIData();
-	let node = uriData.node;
-	let type = uriData.type;
-	let vmid = uriData.vmid;
+	node = uriData.node;
+	type = uriData.type;
+	vmid = uriData.vmid;
 	await populateForm(node, type, vmid);
 
 	let cancelButton = document.querySelector("#cancel");
@@ -28,18 +44,6 @@ async function init () {
 async function populateForm (node, type, vmid) {
 	let config = await request(`/nodes/${node}/${type}/${vmid}/config`);
 	console.log(config);
-
-	let diskConfig = {
-		lxc: {
-			prefixOrder: ["mp"],
-			mp: {name: "MP", limit: 255, used: {}}
-		},
-		qemu: {
-			prefixOrder: ["sata", "ide"],
-			ide: {name: "IDE", limit: 3, used: {}},
-			sata: {name: "SATA", limit: 5, used: {}}
-		}
-	}
 
 	let name = type === "qemu" ? "name" : "hostname";
 	addMetaLine("name", "Name", {type: "text", value: config.data[name]});
@@ -73,10 +77,10 @@ async function populateForm (node, type, vmid) {
 	addDiskBus.value = def;
 	handleDiskBusChange(diskConfig);
 
-	addDiskBus.addEventListener("change", handleDiskBusChange({c: diskConfig, t: type}));
+	addDiskBus.addEventListener("change", handleDiskBusChange());
 
-	addDiskDevice.addEventListener("input", handleDiskDeviceChange({c: diskConfig, t: type}));
-	addDiskDevice.addEventListener("focus", handleDiskDeviceChange({c: diskConfig, t: type}));
+	addDiskDevice.addEventListener("input", handleDiskDeviceChange());
+	addDiskDevice.addEventListener("focus", handleDiskDeviceChange());
 
 	let addDiskStorage = document.querySelector("#add-disk #storage");
 	let addDiskSize = document.querySelector("#add-disk #size");
@@ -100,9 +104,7 @@ function getNextAvaliable(entry){
 	return nextAvaliable;
 }
 
-function handleDiskBusChange (data) {
-	let diskConfig = data.c;
-	let type = data.t;
+function handleDiskBusChange () {
 	let bus = document.querySelector("#add-disk #bus").value;
 	let entry = diskConfig[type][bus];
 	let limit = entry.limit;
@@ -118,9 +120,7 @@ function handleDiskBusChange (data) {
 	handleDiskDeviceChange();
 }
 
-function handleDiskDeviceChange (data) {
-	let diskConfig = data.diskConfig;
-	let type = data.type;
+function handleDiskDeviceChange () {
 	let value = document.querySelector("#add-disk #device").value;
 	let bus = document.querySelector("#add-disk #bus").value;
 	let entry = diskConfig[type][bus];
