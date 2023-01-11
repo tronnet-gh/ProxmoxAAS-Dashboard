@@ -114,7 +114,7 @@ async function populateForm (node, type, vmid) {
 		}
 	});
 
-	addDiskDevice.addEventListener("hover", () => {
+	addDiskDevice.addEventListener("focus", () => {
 		let value = document.querySelector("#add-disk #device").value;
 		let bus = document.querySelector("#add-disk #bus").value;
 		let entry = diskConfig[type][bus];
