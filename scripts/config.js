@@ -35,7 +35,7 @@ async function populateForm (node, type, vmid) {
 			mp: {name: "MP", limit: 255, used: {}}
 		},
 		qemu: {
-			prefixOrder: ["ide", "sata"],
+			prefixOrder: ["sata", "ide"],
 			ide: {name: "IDE", limit: 3, used: {}},
 			sata: {name: "SATA", limit: 5, used: {}}
 		}
