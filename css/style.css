@@ -73,3 +73,7 @@ p {
 nav {
 	margin: 20px 0px 20px 0px;
 }
+
+.btn-group img:hover {
+	cursor: pointer;
+}
