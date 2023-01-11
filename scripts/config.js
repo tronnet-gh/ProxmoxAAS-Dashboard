@@ -147,5 +147,6 @@ function addDiskLine (fieldset, id, iconHref, labelText, valueText) {
 	let config = document.createElement("img");
 	config.src = "images/actions/config-active.svg";
 	config.alt = `Config disk ${labelText}`;
+	config.classList.add("clickable");
 	field.append(config);
 }

@@ -77,3 +77,7 @@ nav {
 .btn-group img:hover {
 	cursor: pointer;
 }
+
+img.clickable {
+	cursor: pointer;
+}
