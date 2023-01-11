@@ -60,6 +60,32 @@ async function populateForm (node, type, vmid) {
 			addDiskLine("disks", `${prefix}${element}`, disks[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${type} ${element}`, disks[element]);
 		});
 	}
+
+	let options = {
+		lxc: {
+			mp: {name: "MP", limit: 255}
+		},
+		qemu: {
+			sata: {name: "SATA", limit: 5}
+		}
+	}
+
+	let addDiskBus = document.querySelector("#add-disk #bus");
+	Object.keys(options[type]).forEach(element => {
+		addDiskBus.add(new Option(options[type][element].name, element));
+	});
+	let def = Object.keys(options[type])[0];
+	addDiskBus.value = def;
+	let addDiskDevice = document.querySelector("#add-disk #device");
+	addDiskDevice.max = options[type][def].limit;
+
+	addDiskBus.addEventListener("change", () => {
+		let value = document.querySelector("#add-disk #bus").value;
+		document.querySelector("#add-disk #device").max =  options[type][value].limit
+	});
+
+	let addDiskStorage = document.querySelector("#add-disk #storage");
+	let addDiskSize = document.querySelector("#add-disk #size");
 }
 
 function addMetaLine (fieldset, labelText, inputAttr) {
