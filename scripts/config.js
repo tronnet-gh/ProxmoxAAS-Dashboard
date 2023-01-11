@@ -75,11 +75,11 @@ async function populateForm (node, type, vmid) {
 	});
 	addDiskBus.value = diskConfig[type].prefixOrder[0];
 	handleDiskBusChange(diskConfig);
-	addDiskBus.addEventListener("change", handleDiskBusChange());
+	addDiskBus.addEventListener("change", handleDiskBusChange);
 
 	let addDiskDevice = document.querySelector("#add-disk #device");
-	addDiskDevice.addEventListener("input", handleDiskDeviceChange());
-	addDiskDevice.addEventListener("focus", handleDiskDeviceChange());
+	addDiskDevice.addEventListener("input", handleDiskDeviceChange);
+	addDiskDevice.addEventListener("focus", handleDiskDeviceChange);
 
 	let addDiskStorage = document.querySelector("#add-disk #storage");
 	let addDiskSize = document.querySelector("#add-disk #size");
