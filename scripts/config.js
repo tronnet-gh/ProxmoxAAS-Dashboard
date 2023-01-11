@@ -66,17 +66,17 @@ async function populateForm (node, type, vmid) {
 	}
 
 	let addDiskBus = document.querySelector("#add-disk #bus");
-	Object.keys(diskConfig[type]).forEach(element => {
+	diskConfig[type].prefixOrder.forEach(element => {
 		addDiskBus.add(new Option(diskConfig[type][element].name, element));
 	});
-	let def = Object.keys(diskConfig[type])[0];
+	let def = diskConfig[type].prefixOrder[0];
 	addDiskBus.value = def;
 	let addDiskDevice = document.querySelector("#add-disk #device");
 	addDiskDevice.max = diskConfig[type][def].limit;
 
 	addDiskBus.addEventListener("change", () => {
 		let value = document.querySelector("#add-disk #bus").value;
-		document.querySelector("#add-disk #device").max =  diskConfig[type][value].limit
+		document.querySelector("#add-disk #device").max = diskConfig[type][value].limit
 	});
 
 	let addDiskStorage = document.querySelector("#add-disk #storage");
