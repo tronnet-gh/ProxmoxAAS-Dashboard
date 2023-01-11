@@ -73,10 +73,10 @@ async function populateForm (node, type, vmid) {
 	addDiskBus.value = def;
 	handleDiskBusChange(diskConfig);
 
-	addDiskBus.addEventListener("change", handleDiskBusChange(diskConfig));
-	
-	addDiskDevice.addEventListener("input", handleDiskDeviceChange(diskConfig));
-	addDiskDevice.addEventListener("focus", handleDiskDeviceChange(diskConfig));
+	addDiskBus.addEventListener("change", handleDiskBusChange(diskConfig, type));
+
+	addDiskDevice.addEventListener("input", handleDiskDeviceChange(diskConfig, type));
+	addDiskDevice.addEventListener("focus", handleDiskDeviceChange(diskConfig, type));
 
 	let addDiskStorage = document.querySelector("#add-disk #storage");
 	let addDiskSize = document.querySelector("#add-disk #size");
@@ -100,7 +100,7 @@ function getNextAvaliable(entry){
 	return nextAvaliable;
 }
 
-function handleDiskBusChange (diskConfig) {
+function handleDiskBusChange (diskConfig, type) {
 	let bus = document.querySelector("#add-disk #bus").value;
 	let entry = diskConfig[type][bus];
 	let limit = entry.limit;
@@ -116,7 +116,7 @@ function handleDiskBusChange (diskConfig) {
 	handleDiskDeviceChange();
 }
 
-function handleDiskDeviceChange (diskConfig) {
+function handleDiskDeviceChange (diskConfig, type) {
 	let value = document.querySelector("#add-disk #device").value;
 	let bus = document.querySelector("#add-disk #bus").value;
 	let entry = diskConfig[type][bus];
