@@ -73,12 +73,11 @@ async function populateForm (node, type, vmid) {
 	diskConfig[type].prefixOrder.forEach(element => {
 		addDiskBus.add(new Option(diskConfig[type][element].name, element));
 	});
-	let def = diskConfig[type].prefixOrder[0];
-	addDiskBus.value = def;
+	addDiskBus.value = diskConfig[type].prefixOrder[0];
 	handleDiskBusChange(diskConfig);
-
 	addDiskBus.addEventListener("change", handleDiskBusChange());
 
+	let addDiskDevice = document.querySelector("#add-disk #device");
 	addDiskDevice.addEventListener("input", handleDiskDeviceChange());
 	addDiskDevice.addEventListener("focus", handleDiskDeviceChange());
 
