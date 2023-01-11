@@ -60,7 +60,7 @@ async function populateForm (node, type, vmid) {
 		});
 		let ordered_keys = Object.keys(entry.used).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
 		ordered_keys.forEach(element => {
-			addDiskLine("disks", `${prefix}${element}`, entry.used[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${entry} ${element}`, entry.used[element]);
+			addDiskLine("disks", `${prefix}${element}`, entry.used[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${prefix} ${element}`, entry.used[element]);
 		});
 	}
 
