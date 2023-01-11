@@ -29,63 +29,59 @@ async function populateForm (node, type, vmid) {
 	let config = await request(`/nodes/${node}/${type}/${vmid}/config`);
 	console.log(config);
 
+	let diskConfig = {
+		lxc: {
+			prefixOrder: ["mp"],
+			mp: {name: "MP", limit: 255, used: {}}
+		},
+		qemu: {
+			prefixOrder: ["ide", "sata"],
+			ide: {name: "IDE", limit: 3, used: {}},
+			sata: {name: "SATA", limit: 5, used: {}}
+		}
+	}
+
 	let name = type === "qemu" ? "name" : "hostname";
 	addMetaLine("name", "Name", {type: "text", value: config.data[name]});
 	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads"); // TODO add max from quota API
 	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data.memory, min: 16, step: 1}, "MiB"); // TODO add max from quota API
-	let diskPrefixes;
-	let diskTypes;
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "GiB"); // TODO add max from quota API
 		addDiskLine("disks", "rootfs", "images/resources/drive.svg", "Root FS", config.data.rootfs);
-		diskPrefixes = ["mp"];
-		diskTypes = ["MP"];
-	}
-	else { // qemu
-		diskPrefixes = ["ide", "sata"];
-		diskTypes = ["IDE", "SATA"];
 	}
 
-	for(let i = 0; i < diskPrefixes.length; i++){
-		let prefix = diskPrefixes[i];
-		let type = diskTypes[i];
-		let disks = {};
+	for(let i = 0; i < diskConfig[type].prefixOrder.length; i++){
+		let prefix = diskConfig[type].prefixOrder[i];
+		let type = diskConfig[type][prefix];
 		Object.keys(config.data).forEach(element => {
 			if (element.startsWith(prefix)) {
-				disks[element.replace(prefix, "")] = config.data[element];
+				type.used[element.replace(prefix, "")] = config.data[element];
 			}
 		});
 		let ordered_keys = Object.keys(disks).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
 		ordered_keys.forEach(element => {
-			addDiskLine("disks", `${prefix}${element}`, disks[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${type} ${element}`, disks[element]);
+			addDiskLine("disks", `${prefix}${element}`, disks[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${type} ${element}`, type.used[element]);
 		});
 	}
 
-	let options = {
-		lxc: {
-			mp: {name: "MP", limit: 255}
-		},
-		qemu: {
-			sata: {name: "SATA", limit: 5}
-		}
-	}
-
 	let addDiskBus = document.querySelector("#add-disk #bus");
-	Object.keys(options[type]).forEach(element => {
-		addDiskBus.add(new Option(options[type][element].name, element));
+	Object.keys(diskConfig[type]).forEach(element => {
+		addDiskBus.add(new Option(diskConfig[type][element].name, element));
 	});
-	let def = Object.keys(options[type])[0];
+	let def = Object.keys(diskConfig[type])[0];
 	addDiskBus.value = def;
 	let addDiskDevice = document.querySelector("#add-disk #device");
-	addDiskDevice.max = options[type][def].limit;
+	addDiskDevice.max = diskConfig[type][def].limit;
 
 	addDiskBus.addEventListener("change", () => {
 		let value = document.querySelector("#add-disk #bus").value;
-		document.querySelector("#add-disk #device").max =  options[type][value].limit
+		document.querySelector("#add-disk #device").max =  diskConfig[type][value].limit
 	});
 
 	let addDiskStorage = document.querySelector("#add-disk #storage");
 	let addDiskSize = document.querySelector("#add-disk #size");
+
+	console.log(diskConfig);
 }
 
 function addMetaLine (fieldset, labelText, inputAttr) {
