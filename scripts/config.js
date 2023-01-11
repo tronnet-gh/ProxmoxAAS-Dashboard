@@ -52,15 +52,15 @@ async function populateForm (node, type, vmid) {
 
 	for(let i = 0; i < diskConfig[type].prefixOrder.length; i++){
 		let prefix = diskConfig[type].prefixOrder[i];
-		let type = diskConfig[type][prefix];
+		let entry = diskConfig[type][prefix];
 		Object.keys(config.data).forEach(element => {
 			if (element.startsWith(prefix)) {
-				type.used[element.replace(prefix, "")] = config.data[element];
+				entry.used[element.replace(prefix, "")] = config.data[element];
 			}
 		});
 		let ordered_keys = Object.keys(disks).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
 		ordered_keys.forEach(element => {
-			addDiskLine("disks", `${prefix}${element}`, disks[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${type} ${element}`, type.used[element]);
+			addDiskLine("disks", `${prefix}${element}`, disks[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${entry} ${element}`, emtry.used[element]);
 		});
 	}
 
