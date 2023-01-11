@@ -53,6 +53,10 @@ form img {
 	width: 16px;
 }
 
+form img:hover {
+	cursor: pointer;
+}
+
 form > * {
 	margin-top: 10px;
 }

@@ -35,3 +35,7 @@ hr {
 .btn-group img {
 	height: 16px;
 }
+
+.btn-group img:hover {
+	cursor: pointer;
+}
