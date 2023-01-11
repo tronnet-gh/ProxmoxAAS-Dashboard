@@ -26,6 +26,12 @@ input {
 	border: solid white 1px;
 }
 
+select {
+	border: solid white 1px;
+	background-color: black;
+	color: white;
+}
+
 button {
 	margin-top: 0px;
 }
@@ -45,4 +51,14 @@ legend {
 
 form img {
 	width: 16px;
+}
+
+form > * {
+	margin-top: 10px;
+}
+
+hr {
+	width: 100%;
+	border: none;
+	border-top: solid white 1px;
 }
