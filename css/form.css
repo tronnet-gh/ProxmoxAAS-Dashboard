@@ -26,6 +26,10 @@ input {
 	border: solid white 1px;
 }
 
+input:focus {
+	outline: none;
+}
+
 select {
 	border: solid white 1px;
 	background-color: black;
