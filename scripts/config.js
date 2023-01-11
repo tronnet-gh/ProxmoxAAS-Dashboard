@@ -53,6 +53,7 @@ async function populateForm (node, type, vmid) {
 	for(let i = 0; i < diskConfig[type].prefixOrder.length; i++){
 		let prefix = diskConfig[type].prefixOrder[i];
 		let entry = diskConfig[type][prefix];
+		let name = entry.name;
 		Object.keys(config.data).forEach(element => {
 			if (element.startsWith(prefix)) {
 				entry.used[element.replace(prefix, "")] = config.data[element];
@@ -60,7 +61,7 @@ async function populateForm (node, type, vmid) {
 		});
 		let ordered_keys = Object.keys(entry.used).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
 		ordered_keys.forEach(element => {
-			addDiskLine("disks", `${prefix}${element}`, entry.used[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${prefix} ${element}`, entry.used[element]);
+			addDiskLine("disks", `${prefix}${element}`, entry.used[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${name} ${element}`, entry.used[element]);
 		});
 	}
 
