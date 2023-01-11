@@ -58,7 +58,7 @@ async function populateForm (node, type, vmid) {
 				entry.used[element.replace(prefix, "")] = config.data[element];
 			}
 		});
-		let ordered_keys = Object.keys(disks).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
+		let ordered_keys = Object.keys(entry.used).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
 		ordered_keys.forEach(element => {
 			addDiskLine("disks", `${prefix}${element}`, disks[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${entry} ${element}`, entry.used[element]);
 		});
