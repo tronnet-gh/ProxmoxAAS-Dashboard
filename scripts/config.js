@@ -114,6 +114,18 @@ async function populateForm (node, type, vmid) {
 		}
 	});
 
+	addDiskDevice.addEventListener("hover", () => {
+		let value = document.querySelector("#add-disk #device").value;
+		let bus = document.querySelector("#add-disk #bus").value;
+		let entry = diskConfig[type][bus];
+		if(value in entry.used){
+			addDiskDevice.style.border = "solid red 1px";
+		}
+		else {
+			addDiskDevice.style.border = "solid white 1px";
+		}
+	});
+
 	let addDiskStorage = document.querySelector("#add-disk #storage");
 	let addDiskSize = document.querySelector("#add-disk #size");
 
