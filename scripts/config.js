@@ -59,7 +59,7 @@ async function populateForm (node, type, vmid) {
 				entry.used[element.replace(prefix, "")] = config.data[element];
 			}
 		});
-		let ordered_keys = Object.keys(entry.used).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
+		let ordered_keys = getOrderedUsed(entry);
 		ordered_keys.forEach(element => {
 			addDiskLine("disks", `${prefix}${element}`, entry.used[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${name} ${element}`, entry.used[element]);
 		});
@@ -71,18 +71,69 @@ async function populateForm (node, type, vmid) {
 	});
 	let def = diskConfig[type].prefixOrder[0];
 	addDiskBus.value = def;
+	let entry = diskConfig[type][def];
+	let limit = entry.limit;
 	let addDiskDevice = document.querySelector("#add-disk #device");
-	addDiskDevice.max = diskConfig[type][def].limit;
+	addDiskDevice.max = limit;
+	let nextAvaliable = getNextAvaliable(entry);
+	if (nextAvaliable > limit) {
+		addDiskDevice.value = 0;
+		addDiskDevice.style.border = "solid red 1px";
+	}
+	else {
+		addDiskDevice.value = nextAvaliable;
+		addDiskDevice.style.border = "solid white 1px";
+	}
 
 	addDiskBus.addEventListener("change", () => {
 		let value = document.querySelector("#add-disk #bus").value;
-		document.querySelector("#add-disk #device").max = diskConfig[type][value].limit
+		let entry = diskConfig[type][value];
+		let limit = entry.limit;
+		let addDiskDevice = document.querySelector("#add-disk #device");
+		addDiskDevice.max = limit;
+		let nextAvaliable = getNextAvaliable(entry);
+		if (nextAvaliable > limit) {
+			addDiskDevice.value = 0;
+			addDiskDevice.style.border = "solid red 1px";
+		}
+		else {
+			addDiskDevice.value = nextAvaliable;
+			addDiskDevice.style.border = "solid white 1px";
+		}
+	});
+
+	addDiskDevice.addEventListener("input", () => {
+		let value = document.querySelector("#add-disk #device").value;
+		let bus = document.querySelector("#add-disk #bus").value;
+		let entry = diskConfig[type][bus];
+		if(value in entry.used){
+			addDiskDevice.style.border = "solid red 1px";
+		}
+		else {
+			addDiskDevice.style.border = "solid white 1px";
+		}
 	});
 
 	let addDiskStorage = document.querySelector("#add-disk #storage");
 	let addDiskSize = document.querySelector("#add-disk #size");
 
 	console.log(diskConfig);
+}
+
+function getOrderedUsed(entry){
+	let ordered_keys = Object.keys(entry.used).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
+	return ordered_keys;
+}
+
+function getNextAvaliable(entry){
+	let ordered_keys = getOrderedUsed(entry);
+	let nextAvaliable = 0;
+	ordered_keys.forEach(element => {
+		if (parseInt(element) === nextAvaliable) {
+			nextAvaliable++;
+		}
+	});
+	return nextAvaliable;
 }
 
 function addMetaLine (fieldset, labelText, inputAttr) {
