@@ -124,6 +124,7 @@ function handleDiskDeviceChange () {
 	let value = document.querySelector("#add-disk #device").value;
 	let bus = document.querySelector("#add-disk #bus").value;
 	let entry = diskConfig[type][bus];
+	let addDiskDevice = document.querySelector("#add-disk #device");
 	if(value in entry.used){
 		addDiskDevice.style.border = "solid red 1px";
 	}
