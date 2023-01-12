@@ -30,10 +30,18 @@ input:focus {
 	outline: none;
 }
 
+input:disabled {
+	background-color: #606060;
+}
+
 select {
 	border: solid white 1px;
 	background-color: black;
 	color: white;
+}
+
+select:disabled {
+	background-color: #606060;
 }
 
 button {
