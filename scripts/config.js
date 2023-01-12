@@ -28,7 +28,8 @@ async function init () {
 	node = uriData.node;
 	type = uriData.type;
 	vmid = uriData.vmid;
-	await populateForm(node, type, vmid);
+	await populateResources(node, type, vmid);
+	await populateAddDisk();
 
 	let cancelButton = document.querySelector("#cancel");
 	cancelButton.addEventListener("click", () => {
@@ -41,7 +42,7 @@ async function init () {
 	 */
 }
 
-async function populateForm (node, type, vmid) {
+async function populateResources (node, type, vmid) {
 	let config = await request(`/nodes/${node}/${type}/${vmid}/config`);
 	console.log(config);
 
@@ -67,68 +68,6 @@ async function populateForm (node, type, vmid) {
 		ordered_keys.forEach(element => {
 			addDiskLine("disks", `${prefix}${element}`, entry.used[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${name} ${element}`, entry.used[element]);
 		});
-	}
-
-	let addDiskBus = document.querySelector("#add-disk #bus");
-	diskConfig[type].prefixOrder.forEach(element => {
-		addDiskBus.add(new Option(diskConfig[type][element].name, element));
-	});
-	addDiskBus.value = diskConfig[type].prefixOrder[0];
-	handleDiskBusChange(diskConfig);
-	addDiskBus.addEventListener("change", handleDiskBusChange);
-
-	let addDiskDevice = document.querySelector("#add-disk #device");
-	addDiskDevice.addEventListener("input", handleDiskDeviceChange);
-	addDiskDevice.addEventListener("focus", handleDiskDeviceChange);
-
-	let addDiskStorage = document.querySelector("#add-disk #storage");
-	let addDiskSize = document.querySelector("#add-disk #size");
-
-	console.log(diskConfig);
-}
-
-function getOrderedUsed(entry){
-	let ordered_keys = Object.keys(entry.used).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
-	return ordered_keys;
-}
-
-function getNextAvaliable(entry){
-	let ordered_keys = getOrderedUsed(entry);
-	let nextAvaliable = 0;
-	ordered_keys.forEach(element => {
-		if (parseInt(element) === nextAvaliable) {
-			nextAvaliable++;
-		}
-	});
-	return nextAvaliable;
-}
-
-function handleDiskBusChange () {
-	let bus = document.querySelector("#add-disk #bus").value;
-	let entry = diskConfig[type][bus];
-	let limit = entry.limit;
-	let addDiskDevice = document.querySelector("#add-disk #device");
-	addDiskDevice.max = limit;
-	let nextAvaliable = getNextAvaliable(entry);
-	if (nextAvaliable > limit) {
-		addDiskDevice.value = 0;
-	}
-	else {
-		addDiskDevice.value = nextAvaliable;
-	}
-	handleDiskDeviceChange();
-}
-
-function handleDiskDeviceChange () {
-	let value = document.querySelector("#add-disk #device").value;
-	let bus = document.querySelector("#add-disk #bus").value;
-	let entry = diskConfig[type][bus];
-	let addDiskDevice = document.querySelector("#add-disk #device");
-	if(value in entry.used){
-		addDiskDevice.style.border = "solid red 1px";
-	}
-	else {
-		addDiskDevice.style.border = "solid white 1px";
 	}
 }
 
@@ -196,4 +135,69 @@ function addDiskLine (fieldset, id, iconHref, labelText, valueText) {
 	config.alt = `Config disk ${labelText}`;
 	config.classList.add("clickable");
 	field.append(config);
+}
+
+async function populateAddDisk () {
+	let addDiskBus = document.querySelector("#add-disk #bus");
+	diskConfig[type].prefixOrder.forEach(element => {
+		addDiskBus.add(new Option(diskConfig[type][element].name, element));
+	});
+	addDiskBus.value = diskConfig[type].prefixOrder[0];
+	handleDiskBusChange(diskConfig);
+	addDiskBus.addEventListener("change", handleDiskBusChange);
+
+	let addDiskDevice = document.querySelector("#add-disk #device");
+	addDiskDevice.addEventListener("input", handleDiskDeviceChange);
+	addDiskDevice.addEventListener("focus", handleDiskDeviceChange);
+
+	let storage = await request(`/nodes/${node}/storage`);
+	console.log(storage)
+
+	let addDiskStorage = document.querySelector("#add-disk #storage");
+	let addDiskSize = document.querySelector("#add-disk #size");
+}
+
+function handleDiskBusChange () {
+	let bus = document.querySelector("#add-disk #bus").value;
+	let entry = diskConfig[type][bus];
+	let limit = entry.limit;
+	let addDiskDevice = document.querySelector("#add-disk #device");
+	addDiskDevice.max = limit;
+	let nextAvaliable = getNextAvaliable(entry);
+	if (nextAvaliable > limit) {
+		addDiskDevice.value = 0;
+	}
+	else {
+		addDiskDevice.value = nextAvaliable;
+	}
+	handleDiskDeviceChange();
+}
+
+function handleDiskDeviceChange () {
+	let value = document.querySelector("#add-disk #device").value;
+	let bus = document.querySelector("#add-disk #bus").value;
+	let entry = diskConfig[type][bus];
+	let addDiskDevice = document.querySelector("#add-disk #device");
+	if(value in entry.used){
+		addDiskDevice.style.border = "solid red 1px";
+	}
+	else {
+		addDiskDevice.style.border = "solid white 1px";
+	}
+}
+
+function getOrderedUsed(entry){
+	let ordered_keys = Object.keys(entry.used).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
+	return ordered_keys;
+}
+
+function getNextAvaliable(entry){
+	let ordered_keys = getOrderedUsed(entry);
+	let nextAvaliable = 0;
+	ordered_keys.forEach(element => {
+		if (parseInt(element) === nextAvaliable) {
+			nextAvaliable++;
+		}
+	});
+	return nextAvaliable;
 }
