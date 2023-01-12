@@ -30,7 +30,7 @@ async function init () {
 	node = uriData.node;
 	type = uriData.type;
 	vmid = uriData.vmid;
-	await populateResources(node, type, vmid);
+	await populateResources();
 	await populateAddDisk();
 
 	let cancelButton = document.querySelector("#cancel");
@@ -44,7 +44,7 @@ async function init () {
 	 */
 }
 
-async function populateResources (node, type, vmid) {
+async function populateResources () {
 	let config = await request(`/nodes/${node}/${type}/${vmid}/config`);
 	console.log(config);
 
