@@ -46,7 +46,6 @@ async function init () {
 
 async function populateResources () {
 	let config = await request(`/nodes/${node}/${type}/${vmid}/config`);
-	console.log(config);
 
 	let name = type === "qemu" ? "name" : "hostname";
 	addMetaLine("name", "Name", {type: "text", value: config.data[name]});
