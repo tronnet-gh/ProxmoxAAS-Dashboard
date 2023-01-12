@@ -4,10 +4,12 @@ window.addEventListener("DOMContentLoaded", init);
 
 let diskConfig = {
 	lxc: {
+		storageContent: "rootdir",
 		prefixOrder: ["mp"],
 		mp: {name: "MP", limit: 255, used: {}}
 	},
 	qemu: {
+		storageContent: "images",
 		prefixOrder: ["sata", "ide"],
 		ide: {name: "IDE", limit: 3, used: {}},
 		sata: {name: "SATA", limit: 5, used: {}}
@@ -150,10 +152,13 @@ async function populateAddDisk () {
 	addDiskDevice.addEventListener("input", handleDiskDeviceChange);
 	addDiskDevice.addEventListener("focus", handleDiskDeviceChange);
 
-	let storage = await request(`/nodes/${node}/storage`);
-	console.log(storage)
-
 	let addDiskStorage = document.querySelector("#add-disk #storage");
+	let storage = await request(`/nodes/${node}/storage`);
+	storage.data.forEach((element) => {
+		if (element.content.includes(diskConfig[type].storageContent)) { // check if the storage contains rootdir or images content
+			addDiskStorage.add(new Option(element.storage));
+		}
+	});
 	let addDiskSize = document.querySelector("#add-disk #size");
 }
 
