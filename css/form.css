@@ -74,3 +74,10 @@ hr {
 	border: none;
 	border-top: solid white 1px;
 }
+
+.last-item {
+	width: 100%; 
+	display: flex; 
+	justify-content: flex-end; 
+	align-items: center;
+}

@@ -131,11 +131,14 @@ function addDiskLine (fieldset, id, iconHref, labelText, valueText) {
 	value.innerText = valueText;
 	field.append(value);
 
+	let configDiv = document.createElement("div");
+	configDiv.classList.add("last-item");
 	let config = document.createElement("img");
 	config.src = "images/actions/config-active.svg";
 	config.alt = `Config disk ${labelText}`;
 	config.classList.add("clickable");
-	field.append(config);
+	configDiv.append(config);
+	field.append(configDiv);
 }
 
 async function populateAddDisk () {
