@@ -145,6 +145,9 @@ async function populateAddDisk () {
 	});
 	addDiskBus.value = diskConfig[type].prefixOrder[0];
 	handleDiskBusChange(diskConfig);
+	if (type === "lxc") {
+		addDiskBus.disabled = true;
+	}
 	addDiskBus.addEventListener("change", handleDiskBusChange);
 
 	let addDiskDevice = document.querySelector("#add-disk #device");
@@ -158,7 +161,13 @@ async function populateAddDisk () {
 			addDiskStorage.add(new Option(element.storage));
 		}
 	});
+
 	let addDiskSize = document.querySelector("#add-disk #size");
+
+	let addDiskPath = document.querySelector("#add-disk #path");
+	if (type === "qemu") {
+		addDiskPath.disabled = true;
+	}
 }
 
 function handleDiskBusChange () {
