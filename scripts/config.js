@@ -57,7 +57,7 @@ async function populateResources () {
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "GiB"); // TODO add max from quota API
 		let rootfs = parseDisk(config.data.rootfs);
-		addDiskLine("disks", "Root FS", null, rootfs.storage, storageOptions, rootfs.size);
+		addDiskLine("disks", diskConfig[type]["mp"].icon, "Root FS", null, rootfs.storage, storageOptions, rootfs.size);
 	}
 
 	for(let i = 0; i < diskConfig[type].prefixOrder.length; i++){
@@ -72,7 +72,7 @@ async function populateResources () {
 		let ordered_keys = getOrderedUsed(entry);
 		ordered_keys.forEach(element => {
 			let disk = parseDisk(entry.used[element]);
-			addDiskLine("disks", busName, element, disk.storage, storageOptions, disk.size);
+			addDiskLine("disks", diskConfig[type][prefix].icon, busName, element, disk.storage, storageOptions, disk.size);
 		});
 	}
 }
@@ -104,11 +104,11 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 	}
 }
 
-function addDiskLine (fieldset, bus, device, storage, storageOptions, size) {
+function addDiskLine (fieldset, iconHref, bus, device, storage, storageOptions, size) {
 	let field = document.querySelector(`#${fieldset}`);
 
 	let icon = document.createElement("img");
-	icon.src = diskConfig[type][bus].icon;
+	icon.src = iconHref;
 	icon.alt = labelText;
 	field.append(icon);
 
