@@ -57,7 +57,7 @@ async function populateResources () {
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "GiB"); // TODO add max from quota API
 		let rootfs = parseDisk(config.data.rootfs);
-		addDiskLine("disks", "mp", "Root FS", null, rootfs.storage, storageOptions, rootfs.size);
+		addDiskLine("disks", "mp", "Root FS", null, rootfs.storage, storageOptions, rootfs.size, rootfs.sizeUnit, rootfs.sizeUnitAllowed);
 	}
 
 	for(let i = 0; i < diskConfig[type].prefixOrder.length; i++){
@@ -72,7 +72,7 @@ async function populateResources () {
 		let ordered_keys = getOrderedUsed(entry);
 		ordered_keys.forEach(element => {
 			let disk = parseDisk(entry.used[element]);
-			addDiskLine("disks", prefix, busName, element, disk.storage, storageOptions, disk.size);
+			addDiskLine("disks", prefix, busName, element, disk.storage, storageOptions, disk.size, disk.sizeUnit, disk.sizeUnitAllowed);
 		});
 	}
 }
