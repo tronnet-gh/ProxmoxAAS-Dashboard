@@ -149,12 +149,12 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	}
 	field.append(sizeInput);
 
-	let sizeUnit = document.createElement("select");
+	let sizeUnitSelect = document.createElement("select");
 	sizeUnitOptions.forEach((element) => {
-		sizeUnit.add(new Option(element));
+		sizeUnitSelect.add(new Option(element));
 	});
-	sizeUnit.value = sizeUnit;
-	field.append(sizeUnit);
+	sizeUnitSelect.value = sizeUnit;
+	field.append(sizeUnitSelect);
 
 	let deleteDiv = document.createElement("div");
 	deleteDiv.classList.add("last-item");
