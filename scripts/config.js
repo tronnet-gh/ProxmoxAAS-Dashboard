@@ -6,13 +6,13 @@ let diskConfig = {
 	lxc: {
 		storageContent: "rootdir",
 		prefixOrder: ["mp"],
-		mp: {name: "MP", limit: 255, used: {}}
+		mp: {name: "MP", limit: 255, used: {}, icon: "images/resources/drive.svg", resizable: true, hasPath: true, hasDiskImage: false}
 	},
 	qemu: {
 		storageContent: "images",
 		prefixOrder: ["sata", "ide"],
-		ide: {name: "IDE", limit: 3, used: {}},
-		sata: {name: "SATA", limit: 5, used: {}}
+		ide: {name: "IDE", limit: 3, used: {}, icon: "images/resources/disk.svg", reziable: false, hasPath: false, hasDiskImage: true},
+		sata: {name: "SATA", limit: 5, used: {}, icon: "images/resources/drive.svg", resizable: true, hasPath: false, hasDiskImage: false}
 	}
 }
 
@@ -51,15 +51,19 @@ async function populateResources () {
 	document.querySelector("#name").innerText = config.data[name];
 	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads"); // TODO add max from quota API
 	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data.memory, min: 16, step: 1}, "MiB"); // TODO add max from quota API
+	
+	let storageOptions = await request(`/nodes/${node}/storage`);
+
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "GiB"); // TODO add max from quota API
-		addDiskLine("disks", "rootfs", "images/resources/drive.svg", "Root FS", config.data.rootfs);
+		let rootfs = parseDisk(config.data.rootfs);
+		addDiskLine("disks", "Root FS", null, rootfs.storage, storageOptions, rootfs.size);
 	}
 
 	for(let i = 0; i < diskConfig[type].prefixOrder.length; i++){
 		let prefix = diskConfig[type].prefixOrder[i];
 		let entry = diskConfig[type][prefix];
-		let name = entry.name;
+		let busName = entry.name;
 		Object.keys(config.data).forEach(element => {
 			if (element.startsWith(prefix)) {
 				entry.used[element.replace(prefix, "")] = config.data[element];
@@ -67,25 +71,10 @@ async function populateResources () {
 		});
 		let ordered_keys = getOrderedUsed(entry);
 		ordered_keys.forEach(element => {
-			addDiskLine("disks", `${prefix}${element}`, entry.used[element].includes("media=cdrom") ? "images/resources/disk.svg" : "images/resources/drive.svg", `${name} ${element}`, entry.used[element]);
+			let disk = parseDisk(entry.used[element]);
+			addDiskLine("disks", busName, element, disk.storage, storageOptions, disk.size);
 		});
 	}
-}
-
-function addMetaLine (fieldset, labelText, inputAttr) {
-	let field = document.querySelector(`#${fieldset}`);
-
-	let label = document.createElement("label");
-	label.innerHTML = labelText;
-	label.htmlFor = labelText;
-	field.append(label);
-
-	let input = document.createElement("input");
-	for (let k in inputAttr) {
-		input.setAttribute(k, inputAttr[k])
-	}
-	input.id = labelText;
-	field.append(input);
 }
 
 function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=null) {
@@ -115,90 +104,46 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 	}
 }
 
-function addDiskLine (fieldset, id, iconHref, labelText, valueText) {
+function addDiskLine (fieldset, bus, device, storage, storageOptions, size) {
 	let field = document.querySelector(`#${fieldset}`);
 
 	let icon = document.createElement("img");
-	icon.src = iconHref;
+	icon.src = diskConfig[type][bus].icon;
 	icon.alt = labelText;
 	field.append(icon);
 
-	let label = document.createElement("label");
-	label.innerHTML = labelText;
-	field.append(label);
+	let busLabel = document.createElement("label");
+	busLabel.innerHTML = bus;
+	field.append(busLabel);
 
-	let value = document.createElement("p");
-	value.innerText = valueText;
-	field.append(value);
-
-	let configDiv = document.createElement("div");
-	configDiv.classList.add("last-item");
-	let config = document.createElement("img");
-	config.src = "images/actions/config-active.svg";
-	config.alt = `Config disk ${labelText}`;
-	config.classList.add("clickable");
-	configDiv.append(config);
-	field.append(configDiv);
-}
-
-async function populateAddDisk () {
-	let addDiskBus = document.querySelector("#add-disk #bus");
-	diskConfig[type].prefixOrder.forEach(element => {
-		addDiskBus.add(new Option(diskConfig[type][element].name, element));
-	});
-	addDiskBus.value = diskConfig[type].prefixOrder[0];
-	handleDiskBusChange(diskConfig);
-	if (type === "lxc") {
-		addDiskBus.disabled = true;
+	if (device) {
+		let deviceInput = document.createElement("input");
+		deviceInput.type = "number";
+		deviceInput.min = 0;
+		deviceInput.max = diskConfig[type][bus].limit;
+		deviceInput.value = device;
+		field.append(deviceInput);
 	}
-	addDiskBus.addEventListener("change", handleDiskBusChange);
-
-	let addDiskDevice = document.querySelector("#add-disk #device");
-	addDiskDevice.addEventListener("input", handleDiskDeviceChange);
-	addDiskDevice.addEventListener("focus", handleDiskDeviceChange);
-
-	let addDiskStorage = document.querySelector("#add-disk #storage");
-	let storage = await request(`/nodes/${node}/storage`);
-	storage.data.forEach((element) => {
+	else {
+		let deviceInput = document.createElement("div");
+		deviceInput.classList.add("hidden");
+		field.append(deviceInput);
+	}
+	
+	let storageSelect = document.createElement("select");
+	storageOptions.forEach((element) => {
 		if (element.content.includes(diskConfig[type].storageContent)) { // check if the storage contains rootdir or images content
-			addDiskStorage.add(new Option(element.storage));
+			storageSelect.add(new Option(element.storage));
 		}
 	});
+	storageSelect.value = storage;
 
-	let addDiskSize = document.querySelector("#add-disk #size");
-
-	let addDiskPath = document.querySelector("#add-disk #path");
-	if (type === "qemu") {
-		addDiskPath.disabled = true;
-	}
-}
-
-function handleDiskBusChange () {
-	let bus = document.querySelector("#add-disk #bus").value;
-	let entry = diskConfig[type][bus];
-	let limit = entry.limit;
-	let addDiskDevice = document.querySelector("#add-disk #device");
-	addDiskDevice.max = limit;
-	let nextAvaliable = getNextAvaliable(entry);
-	if (nextAvaliable > limit) {
-		addDiskDevice.value = 0;
-	}
-	else {
-		addDiskDevice.value = nextAvaliable;
-	}
-	handleDiskDeviceChange();
-}
-
-function handleDiskDeviceChange () {
-	let value = document.querySelector("#add-disk #device").value;
-	let bus = document.querySelector("#add-disk #bus").value;
-	let entry = diskConfig[type][bus];
-	let addDiskDevice = document.querySelector("#add-disk #device");
-	if(value in entry.used){
-		addDiskDevice.style.border = "solid red 1px";
-	}
-	else {
-		addDiskDevice.style.border = "solid white 1px";
+	let sizeInput = document.createElement("input");
+	sizeInput.type = "number";
+	sizeInput.min = 0;
+	deviceInput.value = size;
+	if (!diskConfig[type][bus].resizable) {
+		deviceInput.disabled = true;
 	}
 }
 
@@ -207,13 +152,16 @@ function getOrderedUsed(entry){
 	return ordered_keys;
 }
 
-function getNextAvaliable(entry){
-	let ordered_keys = getOrderedUsed(entry);
-	let nextAvaliable = 0;
-	ordered_keys.forEach(element => {
-		if (parseInt(element) === nextAvaliable) {
-			nextAvaliable++;
-		}
+function parseDisk (disk) { // disk in format: STORAGE: FILENAME, ARG1=..., ARG2 = ..., ...
+	let parsed = {};
+	let kvpairs = disk.split(",");
+	parsed.storage = kvpairs[0].split(":")[0];
+	parsed.filename = kvpairs[0].split(":")[1];
+	kvpairs.shift();
+	kvpairs.forEach((element) => {
+		let key = element.split("=")[0];
+		let val = element.split("=")[1];
+		parsed[key] = val;
 	});
-	return nextAvaliable;
+	return parsed;
 }

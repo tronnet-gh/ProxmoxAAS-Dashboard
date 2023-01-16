@@ -18,16 +18,9 @@
 				</fieldset>
 				<fieldset>
 					<legend>Disks</legend>
-					<div class="input-grid" id="disks" style="grid-template-columns: repeat(3, auto) 1fr;"></div>
+					<div class="input-grid" id="disks" style="grid-template-columns: repeat(4, auto) 1fr;"></div>
 					<hr>
-					<div class="input-grid btn-group" id="add-disk" style="grid-template-columns: repeat(10, auto) 1fr;">
-						<label for="bus">Bus</label><select id="bus"></select>
-						<label for="device">Device</label><input id="device" type="number" step="1" min="0" max="0" value="0">
-						<label for="storage">Storage</label><select id="storage"></select>
-						<label for="size">Size(GiB)</label><input id="size" type="number" step="1" min="0" max="0" value="0">
-						<label for="size">Path</label><input id="path">
-						<div class="last-item"><img id="disk-add" src="images/actions/create.svg"></div>
-					</div>
+					<div class="center-div"><img id="disk-add" src="images/actions/create.svg"></div>
 				</fieldset>
 				<fieldset class="fieldset-no-border">
 					<div class="btn-group" id="form-actions">
