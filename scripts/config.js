@@ -137,14 +137,16 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 		}
 	});
 	storageSelect.value = storage;
+	field.append(storageSelect);
 
 	let sizeInput = document.createElement("input");
 	sizeInput.type = "number";
 	sizeInput.min = 0;
-	deviceInput.value = size;
+	sizeInput.value = size;
 	if (!diskConfig[type][busPrefix].resizable) {
-		deviceInput.disabled = true;
+		sizeInput.disabled = true;
 	}
+	field.append(sizeInput);
 }
 
 function getOrderedUsed(entry){
