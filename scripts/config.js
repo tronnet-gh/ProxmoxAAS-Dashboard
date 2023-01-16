@@ -131,7 +131,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	}
 	
 	let storageSelect = document.createElement("select");
-	storageOptions.forEach((element) => {
+	storageOptions.data.forEach((element) => {
 		if (element.content.includes(diskConfig[type].storageContent)) { // check if the storage contains rootdir or images content
 			storageSelect.add(new Option(element.storage));
 		}
