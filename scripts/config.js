@@ -48,7 +48,7 @@ async function populateResources () {
 	let config = await request(`/nodes/${node}/${type}/${vmid}/config`);
 
 	let name = type === "qemu" ? "name" : "hostname";
-	addMetaLine("name", "Name", {type: "text", value: config.data[name]});
+	document.querySelector("#name").innerText = config.data[name];
 	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads"); // TODO add max from quota API
 	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data.memory, min: 16, step: 1}, "MiB"); // TODO add max from quota API
 	if (type === "lxc") {
