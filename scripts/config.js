@@ -152,7 +152,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	deleteDiv.classList.add("last-item");
 	let deleteBtn = document.createElement("img");
 	deleteBtn.src = "images/actions/delete.svg";
-	deleteBtn.alt = `Config disk ${labelText}`;
+	deleteBtn.alt = `Delete disk ${busName} ${device}`;
 	deleteBtn.classList.add("clickable");
 	deleteDiv.append(deleteBtn);
 	field.append(deleteDiv);
