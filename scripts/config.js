@@ -57,7 +57,7 @@ async function populateResources () {
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "GiB"); // TODO add max from quota API
 		let rootfs = parseDisk(config.data.rootfs);
-		addDiskLine("disks", diskConfig[type]["mp"].icon, "Root FS", null, rootfs.storage, storageOptions, rootfs.size);
+		addDiskLine("disks", "mp", "Root FS", null, rootfs.storage, storageOptions, rootfs.size);
 	}
 
 	for(let i = 0; i < diskConfig[type].prefixOrder.length; i++){
@@ -72,7 +72,7 @@ async function populateResources () {
 		let ordered_keys = getOrderedUsed(entry);
 		ordered_keys.forEach(element => {
 			let disk = parseDisk(entry.used[element]);
-			addDiskLine("disks", diskConfig[type][prefix].icon, busName, element, disk.storage, storageOptions, disk.size);
+			addDiskLine("disks", prefix, busName, element, disk.storage, storageOptions, disk.size);
 		});
 	}
 }
@@ -104,23 +104,23 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 	}
 }
 
-function addDiskLine (fieldset, iconHref, bus, device, storage, storageOptions, size) {
+function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOptions, size) {
 	let field = document.querySelector(`#${fieldset}`);
 
 	let icon = document.createElement("img");
-	icon.src = iconHref;
+	icon.src = diskConfig[type][busPrefix].icon;
 	icon.alt = `${bus} ${device}`;
 	field.append(icon);
 
 	let busLabel = document.createElement("label");
-	busLabel.innerHTML = bus;
+	busLabel.innerHTML = busName;
 	field.append(busLabel);
 
 	if (device) {
 		let deviceInput = document.createElement("input");
 		deviceInput.type = "number";
 		deviceInput.min = 0;
-		deviceInput.max = diskConfig[type][bus].limit;
+		deviceInput.max = diskConfig[type][busPrefix].limit;
 		deviceInput.value = device;
 		field.append(deviceInput);
 	}
@@ -142,7 +142,7 @@ function addDiskLine (fieldset, iconHref, bus, device, storage, storageOptions, 
 	sizeInput.type = "number";
 	sizeInput.min = 0;
 	deviceInput.value = size;
-	if (!diskConfig[type][bus].resizable) {
+	if (!diskConfig[type][busPrefix].resizable) {
 		deviceInput.disabled = true;
 	}
 }
