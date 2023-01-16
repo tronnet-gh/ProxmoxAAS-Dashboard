@@ -142,7 +142,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	let sizeInput = document.createElement("input");
 	sizeInput.type = "number";
 	sizeInput.min = 0;
-	sizeInput.value = size;
+	sizeInput.value = size.replace("G", "");
 	if (!diskConfig[type][busPrefix].resizable) {
 		sizeInput.disabled = true;
 	}
