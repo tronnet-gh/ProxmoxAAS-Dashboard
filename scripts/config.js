@@ -109,7 +109,7 @@ function addDiskLine (fieldset, iconHref, bus, device, storage, storageOptions, 
 
 	let icon = document.createElement("img");
 	icon.src = iconHref;
-	icon.alt = labelText;
+	icon.alt = `${bus} ${device}`;
 	field.append(icon);
 
 	let busLabel = document.createElement("label");
