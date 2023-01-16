@@ -147,6 +147,15 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 		sizeInput.disabled = true;
 	}
 	field.append(sizeInput);
+
+	let deleteDiv = document.createElement("div");
+	deleteDiv.classList.add("last-item");
+	let deleteBtn = document.createElement("img");
+	deleteBtn.src = "images/actions/delete.svg";
+	deleteBtn.alt = `Config disk ${labelText}`;
+	deleteBtn.classList.add("clickable");
+	deleteDiv.append(deleteBtn);
+	field.append(deleteDiv);
 }
 
 function getOrderedUsed(entry){
