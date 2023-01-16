@@ -154,6 +154,9 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 		sizeUnitSelect.add(new Option(element));
 	});
 	sizeUnitSelect.value = sizeUnit;
+	if (!diskConfig[type][busPrefix].resizable) {
+		sizeUnitSelect.disabled = true;
+	}
 	field.append(sizeUnitSelect);
 
 	let deleteDiv = document.createElement("div");
