@@ -54,7 +54,7 @@ async function populateResources () {
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "GiB"); // TODO add max from quota API
 		let rootfs = parseDisk(config.data.rootfs);
-		addDiskLine("disks", "mp", "Root FS", null, rootfs.storage, storageOptions, rootfs.size, rootfs.sizeUnit, rootfs.sizeUnitAllowed);
+		addDiskLine("disks", "mp", "Root FS", null, rootfs, storageOptions);
 	}
 
 	for(let i = 0; i < diskConfig[type].prefixOrder.length; i++){
@@ -69,7 +69,7 @@ async function populateResources () {
 		let ordered_keys = getOrderedUsed(entry);
 		ordered_keys.forEach(element => {
 			let disk = parseDisk(entry.used[element]);
-			addDiskLine("disks", prefix, busName, element, disk.storage, storageOptions, disk.size, disk.sizeUnit, disk.sizeUnitAllowed);
+			addDiskLine("disks", prefix, busName, element, disk, storageOptions);
 		});
 	}
 }
@@ -101,9 +101,9 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 	}
 }
 
-function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOptions, size, sizeUnit, sizeUnitOptions) {
+function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed, storageOptions) {
 	let field = document.querySelector(`#${fieldset}`);
-
+	
 	let icon = document.createElement("img");
 	icon.src = diskConfig[type][busPrefix].icon;
 	icon.alt = `${busName} ${device}`;
@@ -127,6 +127,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 		field.append(deviceInput);
 	}
 	
+	let storage = diskDataParsed.storage;
 	let storageSelect = document.createElement("select");
 	storageOptions.data.forEach((element) => {
 		if (element.content.includes(diskConfig[type][busPrefix].storageContent)) { // check if the storage contains rootdir or images content
@@ -136,29 +137,25 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	storageSelect.value = storage;
 	field.append(storageSelect);
 
+	let size = diskDataParsed.size;
 	let sizeInput = document.createElement("input");
 	sizeInput.type = "number";
 	sizeInput.min = size;
 	sizeInput.minSize = size;
-	sizeInput.max = 1023; // just use the next unit
+	sizeInput.max = 131072; // 128 TiB, everything should just use GiB
 	sizeInput.value = size;
-	sizeInput.id = `${busPrefix}${device}-size`;
 	if (!diskConfig[type][busPrefix].resizable) {
 		sizeInput.disabled = true;
+		sizeInput.classList.add("hidden");
 	}
 	field.append(sizeInput);
 
-	let sizeUnitSelect = document.createElement("select");
-	sizeUnitOptions.forEach((element) => {
-		sizeUnitSelect.add(new Option(element));
-	});
-	sizeUnitSelect.value = sizeUnit;
+	let sizeUnit = document.createElement("p");
+	sizeUnit.innerText = "GiB";
 	if (!diskConfig[type][busPrefix].resizable) {
-		sizeUnitSelect.disabled = true;
+		sizeUnit.classList.add("hidden");
 	}
-	sizeUnitSelect.id = `${busPrefix}${device}-unit`;
-	sizeUnitSelect.addEventListener("change", handleUnitChange);
-	field.append(sizeUnitSelect);
+	field.append(sizeUnit);
 
 	let deleteDiv = document.createElement("div");
 	deleteDiv.classList.add("last-item");
@@ -168,20 +165,6 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	deleteBtn.classList.add("clickable");
 	deleteDiv.append(deleteBtn);
 	field.append(deleteDiv);
-}
-
-function handleUnitChange () {
-	let newUnitIndex = this.selectedIndex;
-	let sizeInput = document.querySelector(`#${this.id.replace("unit", "size")}`);
-	if (newUnitIndex == 0) {
-		sizeInput.min = sizeInput.minSize;
-		if (parseInt(sizeInput.value) < parseInt(sizeInput.min)) {
-			sizeInput.value = sizeInput.min;
-		}
-	}
-	else {
-		sizeInput.min = 1;
-	}
 }
 
 function getOrderedUsed(entry){
@@ -200,22 +183,18 @@ function parseDisk (disk) { // disk in format: STORAGE: FILENAME, ARG1=..., ARG2
 		let val = element.split("=")[1];
 		parsed[key] = val;
 	});
-	if (parsed.size.includes("K")) {
-		parsed.sizeUnit = "KiB";
-		parsed.sizeUnitAllowed = ["KiB", "MiB", "GiB", "TiB"];
-	}
-	else if (parsed.size.includes("M")) {
-		parsed.sizeUnit = "MiB";
-		parsed.sizeUnitAllowed = ["MiB", "GiB", "TiB"];
-	}
-	else if (parsed.size.includes("G")) {
+	if (parsed.size.includes("G")) {
+		parsed.size = parseInt(parsed.size.replace("G", ""));
 		parsed.sizeUnit = "GiB";
-		parsed.sizeUnitAllowed = ["GiB", "TiB"];
 	}
 	else if (parsed.size.includes("T")) {
+		parsed.size = parseInt(parsed.size.replace("G", "")) * 1024;
 		parsed.sizeUnit = "TiB";
-		parsed.sizeUnitAllowed = ["TiB"];
 	}
-	parsed.size = parsed.size.replace("T", "").replace("G", "").replace("M", "").replace("K", "");
+	else {
+		parsed.size = null;
+		parsed.sizeUnit = null;
+	}
+	
 	return parsed;
 }
