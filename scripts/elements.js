@@ -141,6 +141,11 @@ class Instance extends HTMLElement {
 				goToPage("config.html", {node: this.node, type: this.type, vmid: this.vmid});
 			}
 		})
+
+		if (data.node.status !== "online") {
+			powerButton.classList.add("hidden");
+			configButton.classList.add("hidden");
+		}
 	}
 }
 
