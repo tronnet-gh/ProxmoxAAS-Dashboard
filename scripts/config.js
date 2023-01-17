@@ -101,7 +101,7 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 	}
 }
 
-function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed, storageOptions) {
+async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed, storageOptions) {
 	let field = document.querySelector(`#${fieldset}`);
 	
 	let icon = document.createElement("img");
@@ -139,26 +139,48 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed, stor
 	storageSelect.id = `${busPrefix}_${device}_storage`;
 	field.append(storageSelect);
 
-	let size = diskDataParsed.size;
-	let sizeInput = document.createElement("input");
-	sizeInput.type = "number";
-	sizeInput.min = size;
-	sizeInput.minSize = size;
-	sizeInput.max = 131072; // 128 TiB, everything should just use GiB
-	sizeInput.value = size;
-	if (!diskConfig[type][busPrefix].resizable) {
-		sizeInput.disabled = true;
-		sizeInput.classList.add("hidden");
-	}
-	sizeInput.id = `${busPrefix}_${device}_size`;
-	field.append(sizeInput);
+	if (diskConfig[type][busPrefix].resizable) {
+		let size = diskDataParsed.size;
+		let sizeInput = document.createElement("input");
+		sizeInput.type = "number";
+		sizeInput.min = size;
+		sizeInput.minSize = size;
+		sizeInput.max = 131072; // 128 TiB, everything should just use GiB
+		sizeInput.value = size;
+		sizeInput.id = `${busPrefix}_${device}_size`;
+		field.append(sizeInput);
 
-	let sizeUnit = document.createElement("p");
-	sizeUnit.innerText = "GiB";
-	if (!diskConfig[type][busPrefix].resizable) {
-		sizeUnit.classList.add("hidden");
+		let sizeUnit = document.createElement("p");
+		sizeUnit.innerText = "GiB";
+		field.append(sizeUnit);
 	}
-	field.append(sizeUnit);
+	else if (diskConfig[type][busPrefix].hasPath) {
+		let pathInput = document.createElement("input");
+		pathInput.value = diskDataParsed.mp;
+		pathInput.id = `${busPrefix}_${device}_path`;
+		field.append(pathInput);
+
+		let blank = document.createElement("div");
+		field.append(blank);
+	}
+	else if (diskConfig[type][busPrefix].hasDiskImage) {
+		let diskImageSelect = document.createElement("select");
+		let diskImageOptions = await request(`/nodes/${node}/storage/${storage}/content?content=iso`);
+		diskImageOptions.data.forEach((element) => {
+			diskImageSelect.add(new Option(element.replace(`${storage}:`), element));
+		});
+		field.append(diskImageSelect);
+
+		let blank = document.createElement("div");
+		field.append(blank);
+	}
+	else {
+		let blank1 = document.createElement("div");
+		field.append(blank1);
+
+		let blank2 = document.createElement("div");
+		field.append(blank2);
+	}
 
 	let deleteDiv = document.createElement("div");
 	deleteDiv.classList.add("last-item");
@@ -200,4 +222,8 @@ function parseDisk (disk) { // disk in format: STORAGE: FILENAME, ARG1=..., ARG2
 	}
 	
 	return parsed;
+}
+
+function getDiskImageOptions (storage) {
+
 }
