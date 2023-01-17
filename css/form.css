@@ -24,6 +24,7 @@ input, label, legend {
 
 input {
 	border: solid white 1px;
+	width: min-content;
 }
 
 input:focus {

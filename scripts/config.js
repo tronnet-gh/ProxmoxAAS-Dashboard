@@ -122,6 +122,10 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed, stor
 		deviceInput.disabled = true;
 		deviceInput.classList.add("hidden");		
 	}
+	// for now, disable disk device reassignment
+	deviceInput.disabled = true;
+	//
+	deviceInput.addEventListener("change", handleDeviceChange);
 	field.append(deviceInput);
 	
 	let storage = diskDataParsed.storage;
@@ -162,6 +166,11 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed, stor
 	deleteBtn.classList.add("clickable");
 	deleteDiv.append(deleteBtn);
 	field.append(deleteDiv);
+}
+
+function handleDeviceChange () {
+	let newDevice = this.value;
+	if () {}
 }
 
 function getOrderedUsed(entry){
