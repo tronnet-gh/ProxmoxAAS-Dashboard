@@ -220,7 +220,7 @@ function parseDisk (disk) { // disk in format: STORAGE: FILENAME, ARG1=..., ARG2
 	let parsed = {};
 	let kvpairs = disk.split(",");
 	parsed.storage = kvpairs[0].split(":")[0];
-	parsed.filename = kvpairs[0].split(":")[1].replace("iso/", "");
+	parsed.filename = kvpairs[0];
 	kvpairs.shift();
 	kvpairs.forEach((element) => {
 		let key = element.split("=")[0];
