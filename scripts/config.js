@@ -177,7 +177,7 @@ function handleUnitChange () {
 	let sizeInput = document.querySelector(`#${this.id.replace("unit", "size")}`);
 	if (newUnitIndex == 0) {
 		sizeInput.min = sizeInput.minSize;
-		if (sizeInput.value < sizeInput.min) {
+		if (parseInt(sizeInput.value) < parseInt(sizeInput.min)) {
 			sizeInput.value = sizeInput.min;
 		}
 	}
