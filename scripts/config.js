@@ -169,8 +169,6 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed, stor
 }
 
 function handleDeviceChange () {
-	let newDevice = this.value;
-	if () {}
 }
 
 function getOrderedUsed(entry){
