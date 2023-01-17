@@ -27,13 +27,14 @@ async function populateInstances () {
 
 	let instanceContainer = document.getElementById("instance-container")
 
-	instances = [];
+	let instances = [];
 
 	resources.data.forEach((element) => {
 		if (element.type === "lxc" || element.type === "qemu") {
 			let nodeName = element.node;
 			let nodeStatus = resources.find(iem => item.node === nodeName).status;
 			element.node = {name: nodeName, status: nodeStatus};
+			instances.push(element);
 		}
 	});
 
