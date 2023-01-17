@@ -47,7 +47,7 @@ class Instance extends HTMLElement {
 		}
 
 		let nodeImg = this.shadowElement.querySelector("#node-status");
-		if (data.status === "undefined") {
+		if (data.status === "unknown") {
 			data.status = "stopped";
 		}
 		nodeImg.src = `images/nodes/${data.node.status}.svg`;
