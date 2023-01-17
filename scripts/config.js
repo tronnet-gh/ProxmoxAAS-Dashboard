@@ -239,7 +239,3 @@ function parseDisk (disk) { // disk in format: STORAGE: FILENAME, ARG1=..., ARG2
 	
 	return parsed;
 }
-
-function getDiskImageOptions (storage) {
-
-}
