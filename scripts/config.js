@@ -113,19 +113,16 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed, stor
 	busLabel.innerHTML = busName;
 	field.append(busLabel);
 
-	if (device) {
-		let deviceInput = document.createElement("input");
-		deviceInput.type = "number";
-		deviceInput.min = 0;
-		deviceInput.max = diskConfig[type][busPrefix].limit;
-		deviceInput.value = device;
-		field.append(deviceInput);
+	let deviceInput = document.createElement("input");
+	deviceInput.type = "number";
+	deviceInput.min = 0;
+	deviceInput.max = diskConfig[type][busPrefix].limit;
+	deviceInput.value = device;
+	if (!device) {
+		deviceInput.disabled = true;
+		deviceInput.classList.add("hidden");		
 	}
-	else {
-		let deviceInput = document.createElement("div");
-		deviceInput.classList.add("hidden");
-		field.append(deviceInput);
-	}
+	field.append(deviceInput);
 	
 	let storage = diskDataParsed.storage;
 	let storageSelect = document.createElement("select");
