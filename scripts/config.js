@@ -34,11 +34,6 @@ async function init () {
 	cancelButton.addEventListener("click", () => {
 		goToPage("index.html");
 	});
-
-	/**
-	 * Add disk qemu: POST config with sata4:"cephpl:4"
-	 * Add disk lxc POST config with mp2:"cephpl:8,mp=/test/,backup=1"
-	 */
 }
 
 async function populateResources () {
