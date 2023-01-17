@@ -196,7 +196,7 @@ function handleDeviceChange () {
 }
 
 async function handleStorageChange () {
-	let value = this.value;
+	let storage = this.value;
 	let id = this.id;
 	let busPrefix = id.split("_")[0]
 	if (diskConfig[type][busPrefix].hasDiskImage) { // if the bus has diskImage = true
