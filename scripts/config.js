@@ -172,7 +172,7 @@ async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed
 			diskImageSelect.add(new Option(element.volid.replace(`${storage}:iso/`, ""), element.volid));
 		});
 		diskImageSelect.value = diskDataParsed.filename;
-		pathInput.id = `${busPrefix}_${device}_img`;
+		diskImageSelect.id = `${busPrefix}_${device}_img`;
 		diskImageSelect.style.gridColumn = "auto / span 2";
 		field.append(diskImageSelect);
 	}
