@@ -76,7 +76,24 @@ class Instance extends HTMLElement {
 				let configButton = this.shadowElement.querySelector("#configure-btn");
 				configButton.src = "images/actions/config-inactive.svg";
 
-				let task = await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
+				try {
+					let task = await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
+				}
+				catch {
+					typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
+					typeImg.alt = `${this.status} instance`;
+
+					powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
+					powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
+
+					configButton.src = this.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
+
+					this.actionLock = false;
+
+					console.error(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${taskStatus.data.exitstatus}`);
+
+					return;
+				}
 
 				while (true) {
 					let taskStatus = await request(`/nodes/${this.node}/tasks/${task.data}/status`);
