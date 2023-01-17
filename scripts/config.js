@@ -167,8 +167,9 @@ async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed
 		let diskImageSelect = document.createElement("select");
 		let diskImageOptions = await request(`/nodes/${node}/storage/${storage}/content?content=iso`);
 		diskImageOptions.data.forEach((element) => {
-			diskImageSelect.add(new Option(element.replace(`${storage}:`), element));
+			diskImageSelect.add(new Option(element.volid.replace(`${storage}:`), element.volid));
 		});
+		diskImageSelect.value = diskDataParsed.filename;
 		field.append(diskImageSelect);
 
 		let blank = document.createElement("div");
