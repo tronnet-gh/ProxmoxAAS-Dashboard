@@ -52,7 +52,7 @@ async function populateResources () {
 	let storageOptions = await request(`/nodes/${node}/storage`);
 
 	if (type === "lxc") {
-		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "GiB"); // TODO add max from quota API
+		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "MiB"); // TODO add max from quota API
 		let rootfs = parseDisk(config.data.rootfs);
 		addDiskLine("disks", "mp", "Root FS", null, rootfs, storageOptions);
 	}
@@ -189,15 +189,12 @@ function parseDisk (disk) { // disk in format: STORAGE: FILENAME, ARG1=..., ARG2
 	});
 	if (parsed.size.includes("G")) {
 		parsed.size = parseInt(parsed.size.replace("G", ""));
-		parsed.sizeUnit = "GiB";
 	}
 	else if (parsed.size.includes("T")) {
 		parsed.size = parseInt(parsed.size.replace("G", "")) * 1024;
-		parsed.sizeUnit = "TiB";
 	}
 	else {
-		parsed.size = null;
-		parsed.sizeUnit = null;
+		parsed.size = 0;
 	}
 	
 	return parsed;
