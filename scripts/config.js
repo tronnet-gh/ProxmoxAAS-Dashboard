@@ -158,6 +158,7 @@ async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed
 		let pathInput = document.createElement("input");
 		pathInput.value = diskDataParsed.mp;
 		pathInput.id = `${busPrefix}_${device}_path`;
+		pathInput.style.gridColumn = "auto / span 2";
 		field.append(pathInput);
 
 		let blank = document.createElement("div");
@@ -170,17 +171,13 @@ async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed
 			diskImageSelect.add(new Option(element.volid.replace(`${storage}:iso/`, ""), element.volid));
 		});
 		diskImageSelect.value = diskDataParsed.filename;
+		diskImageSelect.style.gridColumn = "auto / span 2";
 		field.append(diskImageSelect);
-
-		let blank = document.createElement("div");
-		field.append(blank);
 	}
 	else {
-		let blank1 = document.createElement("div");
-		field.append(blank1);
-
-		let blank2 = document.createElement("div");
-		field.append(blank2);
+		let blank = document.createElement("div");
+		blank.style.gridColumn = "auto / span 2";
+		field.append(blank);
 	}
 
 	let deleteDiv = document.createElement("div");
