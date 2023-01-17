@@ -31,7 +31,6 @@ async function init () {
 	type = uriData.type;
 	vmid = uriData.vmid;
 	await populateResources();
-	await populateAddDisk();
 
 	let cancelButton = document.querySelector("#cancel");
 	cancelButton.addEventListener("click", () => {
@@ -142,8 +141,10 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	let sizeInput = document.createElement("input");
 	sizeInput.type = "number";
 	sizeInput.min = size;
+	sizeInput.minSize = size;
 	sizeInput.max = 1023; // just use the next unit
 	sizeInput.value = size;
+	sizeInput.id = `${busPrefix}${device}:size`;
 	if (!diskConfig[type][busPrefix].resizable) {
 		sizeInput.disabled = true;
 	}
@@ -157,6 +158,8 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	if (!diskConfig[type][busPrefix].resizable) {
 		sizeUnitSelect.disabled = true;
 	}
+	sizeUnitSelect.id = `${busPrefix}${device}:unit`;
+	sizeUnitSelect.addEventListener("change", handleUnitChange);
 	field.append(sizeUnitSelect);
 
 	let deleteDiv = document.createElement("div");
@@ -167,6 +170,20 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	deleteBtn.classList.add("clickable");
 	deleteDiv.append(deleteBtn);
 	field.append(deleteDiv);
+}
+
+function handleUnitChange () {
+	let newUnitIndex = this.selectedIndex;
+	let sizeInput = document.querySelector(`${this.id.replace("unit", "size")}`);
+	if (newUnitIndex == 0) {
+		sizeInput.min = sizeInput.minSize;
+		if (sizeInput.value < sizeInput.min) {
+			sizeInput.value = sizeInput.min;
+		}
+	}
+	else {
+		sizeInput.min = 1;
+	}
 }
 
 function getOrderedUsed(entry){
