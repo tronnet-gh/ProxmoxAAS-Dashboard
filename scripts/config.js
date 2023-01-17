@@ -136,6 +136,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed, stor
 		}
 	});
 	storageSelect.value = storage;
+	storageSelect.id = `${busPrefix}_${device}_storage`;
 	field.append(storageSelect);
 
 	let size = diskDataParsed.size;
@@ -149,6 +150,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed, stor
 		sizeInput.disabled = true;
 		sizeInput.classList.add("hidden");
 	}
+	sizeInput.id = `${busPrefix}_${device}_size`;
 	field.append(sizeInput);
 
 	let sizeUnit = document.createElement("p");
