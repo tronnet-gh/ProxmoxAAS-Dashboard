@@ -201,7 +201,7 @@ async function handleStorageChange () {
 	let busPrefix = id.split("_")[0]
 	if (diskConfig[type][busPrefix].hasDiskImage) { // if the bus has diskImage = true
 		let diskImageSelect = document.querySelector(`#${id.replace("storage", "img")}`);
-		for(i = diskImageSelect.options.length - 1; i >= 0; i--){
+		for(let i = diskImageSelect.options.length - 1; i >= 0; i--){
 			diskImageSelect.remove(i);
 		}
 		let diskImageOptions = await request(`/nodes/${node}/storage/${storage}/content?content=iso`);
