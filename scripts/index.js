@@ -32,7 +32,7 @@ async function populateInstances () {
 	resources.data.forEach((element) => {
 		if (element.type === "lxc" || element.type === "qemu") {
 			let nodeName = element.node;
-			let nodeStatus = resources.data.find(iem => item.node === nodeName).status;
+			let nodeStatus = resources.data.find(item => item.node === nodeName).status;
 			element.node = {name: nodeName, status: nodeStatus};
 			instances.push(element);
 		}
