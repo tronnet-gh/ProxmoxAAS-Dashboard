@@ -144,7 +144,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	sizeInput.minSize = size;
 	sizeInput.max = 1023; // just use the next unit
 	sizeInput.value = size;
-	sizeInput.id = `${busPrefix}${device}:size`;
+	sizeInput.id = `${busPrefix}${device}-size`;
 	if (!diskConfig[type][busPrefix].resizable) {
 		sizeInput.disabled = true;
 	}
@@ -158,7 +158,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	if (!diskConfig[type][busPrefix].resizable) {
 		sizeUnitSelect.disabled = true;
 	}
-	sizeUnitSelect.id = `${busPrefix}${device}:unit`;
+	sizeUnitSelect.id = `${busPrefix}${device}-unit`;
 	sizeUnitSelect.addEventListener("change", handleUnitChange);
 	field.append(sizeUnitSelect);
 
