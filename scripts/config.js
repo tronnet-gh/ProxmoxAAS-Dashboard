@@ -174,7 +174,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 
 function handleUnitChange () {
 	let newUnitIndex = this.selectedIndex;
-	let sizeInput = document.querySelector(`${this.id.replace("unit", "size")}`);
+	let sizeInput = document.querySelector(`#${this.id.replace("unit", "size")}`);
 	if (newUnitIndex == 0) {
 		sizeInput.min = sizeInput.minSize;
 		if (sizeInput.value < sizeInput.min) {
