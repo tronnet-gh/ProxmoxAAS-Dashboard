@@ -23,28 +23,19 @@ async function populateInstances () {
 		goToPage("login.html");
 	}
 
-	let nodes = await request("/nodes", "GET", null);
-	let instances = [];
+	let resources = await request("/cluster/resources", "GET", null);
 
 	let instanceContainer = document.getElementById("instance-container")
 
-	for (let i = 0; i < nodes.data.length; i++) {	
-		let nodeName = nodes.data[i].node;
-		let nodeStatus = nodes.data[i].status;
+	instances = [];
 
-		let qemu = await request(`/nodes/${nodeName}/qemu`, "GET");
-		qemu.data.forEach((item) => {
-			item.node = {name: nodeName, status: nodeStatus}; 
-			item.maxswap = 0;
-			item.type = "qemu";
-		});
-		let lxc = await request(`/nodes/${nodeName}/lxc`, "GET");
-		lxc.data.forEach((item) => {
-			item.node = {name: nodeName, status: nodeStatus};
-			item.type = "lxc";
-		});
-		instances = instances.concat(qemu.data, lxc.data);
-	}
+	resources.data.forEach((element) => {
+		if (element.type === "lxc" || element.type === "qemu") {
+			let nodeName = element.node;
+			let nodeStatus = resources.find(iem => item.node === nodeName).status;
+			element.node = {name: nodeName, status: nodeStatus};
+		}
+	});
 
 	instances.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
 
