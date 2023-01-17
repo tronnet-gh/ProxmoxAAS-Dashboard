@@ -137,6 +137,7 @@ async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed
 	});
 	storageSelect.value = storage;
 	storageSelect.id = `${busPrefix}_${device}_storage`;
+	storageSelect.addEventListener("change", handleStorageChange);
 	field.append(storageSelect);
 
 	if (diskConfig[type][busPrefix].resizable) {
@@ -171,6 +172,7 @@ async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed
 			diskImageSelect.add(new Option(element.volid.replace(`${storage}:iso/`, ""), element.volid));
 		});
 		diskImageSelect.value = diskDataParsed.filename;
+		pathInput.id = `${busPrefix}_${device}_img`;
 		diskImageSelect.style.gridColumn = "auto / span 2";
 		field.append(diskImageSelect);
 	}
@@ -191,6 +193,22 @@ async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed
 }
 
 function handleDeviceChange () {
+}
+
+async function handleStorageChange () {
+	let value = this.value;
+	let id = this.id;
+	let busPrefix = id.split("_")[0]
+	if (diskConfig[type][busPrefix].hasDiskImage) { // if the bus has diskImage = true
+		let diskImageSelect = document.querySelector(`#${id.replace("storage", "img")}`);
+		for(i = diskImageSelect.options.length - 1; i >= 0; i--){
+			diskImageSelect.remove(i);
+		}
+		let diskImageOptions = await request(`/nodes/${node}/storage/${storage}/content?content=iso`);
+		diskImageOptions.data.forEach((element) => {
+			diskImageSelect.add(new Option(element.volid.replace(`${storage}:iso/`, ""), element.volid));
+		});
+	}
 }
 
 function getOrderedUsed(entry){
