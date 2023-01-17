@@ -4,15 +4,13 @@ window.addEventListener("DOMContentLoaded", init);
 
 let diskConfig = {
 	lxc: {
-		storageContent: "rootdir",
 		prefixOrder: ["mp"],
-		mp: {name: "MP", limit: 255, used: {}, icon: "images/resources/drive.svg", resizable: true, hasPath: true, hasDiskImage: false}
+		mp: {name: "MP", limit: 255, used: {}, icon: "images/resources/drive.svg", storageContent: "rootdir",resizable: true, hasPath: true, hasDiskImage: false}
 	},
 	qemu: {
-		storageContent: "images",
 		prefixOrder: ["sata", "ide"],
-		ide: {name: "IDE", limit: 3, used: {}, icon: "images/resources/disk.svg", reziable: false, hasPath: false, hasDiskImage: true},
-		sata: {name: "SATA", limit: 5, used: {}, icon: "images/resources/drive.svg", resizable: true, hasPath: false, hasDiskImage: false}
+		ide: {name: "IDE", limit: 3, used: {}, icon: "images/resources/disk.svg", storageContent: "iso", reziable: false, hasPath: false, hasDiskImage: true},
+		sata: {name: "SATA", limit: 5, used: {}, icon: "images/resources/drive.svg", storageContent: "images", resizable: true, hasPath: false, hasDiskImage: false}
 	}
 }
 
@@ -131,7 +129,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, storage, storageOpti
 	
 	let storageSelect = document.createElement("select");
 	storageOptions.data.forEach((element) => {
-		if (element.content.includes(diskConfig[type].storageContent)) { // check if the storage contains rootdir or images content
+		if (element.content.includes(diskConfig[type][busPrefix].storageContent)) { // check if the storage contains rootdir or images content
 			storageSelect.add(new Option(element.storage));
 		}
 	});
