@@ -28,6 +28,9 @@ class Instance extends HTMLElement {
 	}
 
 	set data (data) {
+		if (data.status === "unknown") {
+			data.status = "stopped";
+		}
 		let typeImg = this.shadowElement.querySelector("#instance-type");
 		typeImg.src = `images/instances/${data.type}/${data.status}.svg`;
 		typeImg.alt = `${data.status} instance`;
@@ -47,9 +50,6 @@ class Instance extends HTMLElement {
 		}
 
 		let nodeImg = this.shadowElement.querySelector("#node-status");
-		if (data.status === "unknown") {
-			data.status = "stopped";
-		}
 		nodeImg.src = `images/nodes/${data.node.status}.svg`;
 
 		let nodeParagraph = this.shadowElement.querySelector("#node-name");
