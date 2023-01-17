@@ -39,9 +39,17 @@ class Instance extends HTMLElement {
 		this.vmid = data.vmid;
 
 		let nameParagraph = this.shadowElement.querySelector("#instance-name");
-		nameParagraph.innerText = data.name;
+		if (data.name) {
+			nameParagraph.innerText = data.name;
+		}
+		else {
+			nameParagraph.innerText = "";
+		}
 
 		let nodeImg = this.shadowElement.querySelector("#node-status");
+		if (data.status === "undefined") {
+			data.status = "stopped";
+		}
 		nodeImg.src = `images/nodes/${data.node.status}.svg`;
 
 		let nodeParagraph = this.shadowElement.querySelector("#node-name");
