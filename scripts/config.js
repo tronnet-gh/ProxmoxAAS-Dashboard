@@ -5,12 +5,12 @@ window.addEventListener("DOMContentLoaded", init);
 let diskConfig = {
 	lxc: {
 		prefixOrder: ["mp"],
-		mp: {name: "MP", limit: 255, used: {}, icon: "images/resources/drive.svg", storageContent: "rootdir",resizable: true, hasPath: true, hasDiskImage: false}
+		mp: {name: "MP", limit: 255, disks: {}, icon: "images/resources/drive.svg", storageContent: "rootdir",resizable: true, hasPath: true, hasDiskImage: false}
 	},
 	qemu: {
 		prefixOrder: ["sata", "ide"],
-		ide: {name: "IDE", limit: 3, used: {}, icon: "images/resources/disk.svg", storageContent: "iso", reziable: false, hasPath: false, hasDiskImage: true},
-		sata: {name: "SATA", limit: 5, used: {}, icon: "images/resources/drive.svg", storageContent: "images", resizable: true, hasPath: false, hasDiskImage: false}
+		ide: {name: "IDE", limit: 3, disks: {}, icon: "images/resources/disk.svg", storageContent: "iso", reziable: false, hasPath: false, hasDiskImage: true},
+		sata: {name: "SATA", limit: 5, disks: {}, icon: "images/resources/drive.svg", storageContent: "images", resizable: true, hasPath: false, hasDiskImage: false}
 	}
 }
 
@@ -34,6 +34,8 @@ async function init () {
 	cancelButton.addEventListener("click", () => {
 		goToPage("index.html");
 	});
+
+	console.log(diskConfig);
 }
 
 async function populateResources () {
@@ -58,12 +60,12 @@ async function populateResources () {
 		let busName = entry.name;
 		Object.keys(config.data).forEach(element => {
 			if (element.startsWith(prefix)) {
-				entry.used[element.replace(prefix, "")] = config.data[element];
+				entry.disks[element.replace(prefix, "")] = parseDisk(config.data[element]);
 			}
 		});
-		let ordered_keys = getOrderedUsed(entry);
+		let ordered_keys = getOrderedUsed(entry.disks);
 		ordered_keys.forEach(element => {
-			let disk = parseDisk(entry.used[element]);
+			let disk = entry.disks[element];
 			addDiskLine("disks", prefix, busName, element, disk, storageOptions);
 		});
 	}
@@ -99,14 +101,23 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed, storageOptions) {
 	let field = document.querySelector(`#${fieldset}`);
 	
+	// Set the disk icon, either drive.svg or disk.svg
 	let icon = document.createElement("img");
 	icon.src = diskConfig[type][busPrefix].icon;
 	icon.alt = `${busName} ${device}`;
 	field.append(icon);
 
+	// Add a label for the disk bus
 	let busLabel = document.createElement("label");
 	busLabel.innerHTML = busName;
 	field.append(busLabel);
+
+	// Create device number input and hidden label
+	let deviceLabel = document.createElement("label");
+	deviceLabel.classList.add("visuallyhidden");
+	deviceLabel.innerText = "Device Number";
+	deviceLabel.htmlFor = `${busPrefix}_${device}_device`;
+	field.append(deviceLabel);
 
 	let deviceInput = document.createElement("input");
 	deviceInput.type = "number";
@@ -120,8 +131,16 @@ async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed
 	// for now, disable disk device reassignment
 	deviceInput.disabled = true;
 	//
+	deviceInput.id = `${busPrefix}_${device}_device`;
 	deviceInput.addEventListener("change", handleDeviceChange);
 	field.append(deviceInput);
+
+	// Create storage selector and hidden storage label
+	let storageLabel = document.createElement("label");
+	storageLabel.classList.add("visuallyhidden");
+	storageLabel.innerText = "Storage Target";
+	storageLabel.htmlFor = `${busPrefix}_${device}_storage`;
+	field.append(storageLabel);
 	
 	let storage = diskDataParsed.storage;
 	let storageSelect = document.createElement("select");
@@ -135,7 +154,13 @@ async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed
 	storageSelect.addEventListener("change", handleStorageChange);
 	field.append(storageSelect);
 
-	if (diskConfig[type][busPrefix].resizable) {
+	if (diskConfig[type][busPrefix].resizable) { // If resizable, then add a size input and hidden label
+		let sizeLabel = document.createElement("label");
+		sizeLabel.classList.add("visuallyhidden");
+		sizeLabel.innerText = "Size in GiB";
+		sizeLabel.htmlFor = `${busPrefix}_${device}_size`;
+		field.append(sizeLabel);
+
 		let size = diskDataParsed.size;
 		let sizeInput = document.createElement("input");
 		sizeInput.type = "number";
@@ -150,7 +175,13 @@ async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed
 		sizeUnit.innerText = "GiB";
 		field.append(sizeUnit);
 	}
-	else if (diskConfig[type][busPrefix].hasPath) {
+	else if (diskConfig[type][busPrefix].hasPath) { // if disk has a mount path, then add a path input and hidden label
+		let pathLabel = document.createElement("label");
+		pathLabel.classList.add("visuallyhidden");
+		pathLabel.innerText = "Mount Point Path";
+		pathLabel.htmlFor = `${busPrefix}_${device}_path`;
+		field.append(pathLabel);
+
 		let pathInput = document.createElement("input");
 		pathInput.value = diskDataParsed.mp;
 		pathInput.id = `${busPrefix}_${device}_path`;
@@ -160,7 +191,13 @@ async function addDiskLine (fieldset, busPrefix, busName, device, diskDataParsed
 		let blank = document.createElement("div");
 		field.append(blank);
 	}
-	else if (diskConfig[type][busPrefix].hasDiskImage) {
+	else if (diskConfig[type][busPrefix].hasDiskImage) { // if disk has a disk image, then add a image selector and hidden label
+		let imgLabel = document.createElement("label");
+		imgLabel.classList.add("visuallyhidden");
+		imgLabel.innerText = "Disk Image";
+		imgLabel.htmlFor = `${busPrefix}_${device}_img`;
+		field.append(imgLabel);
+
 		let diskImageSelect = document.createElement("select");
 		let diskImageOptions = await request(`/nodes/${node}/storage/${storage}/content?content=iso`);
 		diskImageOptions.data.forEach((element) => {
@@ -206,8 +243,8 @@ async function handleStorageChange () {
 	}
 }
 
-function getOrderedUsed(entry){
-	let ordered_keys = Object.keys(entry.used).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
+function getOrderedUsed(disks){
+	let ordered_keys = Object.keys(disks).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
 	return ordered_keys;
 }
 
