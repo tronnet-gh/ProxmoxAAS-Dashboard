@@ -15,6 +15,10 @@ fieldset {
 	margin: 10px;
 }
 
+form > :first-child {
+	margin-top: 0px;
+}
+
 input, label, legend {
 	font-family: monospace;
 	color: white;
@@ -64,10 +68,6 @@ legend {
 
 form img {
 	width: 16px;
-}
-
-form > * {
-	margin-top: 10px;
 }
 
 hr {
