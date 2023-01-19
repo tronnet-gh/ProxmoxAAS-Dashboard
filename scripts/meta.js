@@ -1,5 +1,5 @@
 export const pveconfig = {
-	pveAPI: "",
+	pveAPI: "https://pve.tronnet.net/api2/json",
 	diskMetaData: {
 		//actionBarOrder: ["config", "move", "reassign", "resize", "delete_detach_attach"],
 		actionBarOrder: ["config", "move", "resize", "delete_detach_attach"], // handle reassign later
