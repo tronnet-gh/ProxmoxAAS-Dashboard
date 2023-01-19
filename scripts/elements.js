@@ -1,4 +1,4 @@
-import {request, goToPage} from "./utils.js";
+import {requestPVE, goToPage} from "./utils.js";
 
 const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
 
@@ -77,7 +77,7 @@ class Instance extends HTMLElement {
 				configButton.src = "images/actions/config-inactive.svg";
 
 				try {
-					let task = await request(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
+					let task = await requestPVE(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
 				}
 				catch {
 					typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
@@ -96,7 +96,7 @@ class Instance extends HTMLElement {
 				}
 
 				while (true) {
-					let taskStatus = await request(`/nodes/${this.node}/tasks/${task.data}/status`);
+					let taskStatus = await requestPVE(`/nodes/${this.node}/tasks/${task.data}/status`);
 					if(taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") {
 						this.status = targetStatus;
 

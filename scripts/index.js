@@ -1,4 +1,4 @@
-import {request, goToPage, deleteAllCookies} from "./utils.js";
+import {requestPVE, goToPage, deleteAllCookies} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -23,7 +23,7 @@ async function populateInstances () {
 		goToPage("login.html");
 	}
 
-	let resources = await request("/cluster/resources", "GET", null);
+	let resources = await requestPVE("/cluster/resources", "GET", null);
 
 	let instanceContainer = document.getElementById("instance-container")
 
