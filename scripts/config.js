@@ -1,4 +1,4 @@
-import {request, goToPage, getURIData} from "./utils.js";
+import {request, goToPage, getURIData, reload} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -142,6 +142,7 @@ async function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 			action.src = `images/actions/${element}-${active}.svg`;
 			action.title = `${element.charAt(0).toUpperCase()}${element.slice(1)} Disk`;
 		}
+		action.id = `${busPrefix}${device}`
 		actionDiv.append(action);
 	});
 	field.append(actionDiv);
