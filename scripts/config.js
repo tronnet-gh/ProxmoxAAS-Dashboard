@@ -4,13 +4,16 @@ window.addEventListener("DOMContentLoaded", init);
 
 let diskConfig = {
 	lxc: {
-		prefixOrder: ["mp"],
-		mp: {name: "MP", icon: "images/resources/drive.svg"}
+		prefixOrder: ["rootfs", "mp", "unused"],
+		rootfs: {name: "ROOTFS", icon: "images/resources/drive.svg"},
+		mp: {name: "MP", icon: "images/resources/drive.svg"},
+		unused: {name: "UNUSED", icon: "images/resources/drive.svg"}
 	},
 	qemu: {
-		prefixOrder: ["sata", "ide"],
+		prefixOrder: ["ide", "sata", "unused"],
 		ide: {name: "IDE", icon: "images/resources/disk.svg"},
-		sata: {name: "SATA", icon: "images/resources/drive.svg"}
+		sata: {name: "SATA", icon: "images/resources/drive.svg"},
+		unused: {name: "UNUSED", icon: "images/resources/drive.svg"}
 	}
 }
 
@@ -49,8 +52,9 @@ async function populateResources () {
 	
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "MiB"); // TODO add max from quota API
+		/*
 		let rootfs = config.data.rootfs;
-		addDiskLine("disks", "mp", "Root FS", null, rootfs);
+		addDiskLine("disks", "mp", "Root FS", null, rootfs);*/
 	}
 
 	for(let i = 0; i < diskConfig[type].prefixOrder.length; i++){
