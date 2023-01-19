@@ -13,6 +13,7 @@ ProxmoxAAS Client provides users of a proxmox based compute on demand service a 
 - Proxmox VE Cluster (v7.0+)
 - Reverse proxy server which serves the Proxmox VE Web GUI & API (ie nginx)
 - Web server to host the ProxmoxAAS Client (ie Apache2)
+- [ProxmoxAAS API](https://github.com/tronnet-gh/ProxmoxAAS-API)
 
 ## Notes
 The supported setup is to use a reverse proxy to serve both the original Proxmox web interface and ProxmoxAAS Client. It is possible other setups can work. Rather than provide specific steps to duplicate a certain setup, the steps included are intended as a guideline of steps required for proper function in most setups. 
@@ -20,7 +21,10 @@ The supported setup is to use a reverse proxy to serve both the original Proxmox
 ## Installation - Client
 1. Install Apache2 or another HTTP server onto a container or vm, which will be `Client Host`
 2. Clone this repo onto `Client Host`, the default location for web root is `/var/www/html/`
-3. Configure Apache2 to serve the Client at port 80:
+3. Navigate to the repo root folder and modify `vars.js` with the following:
+	- Assign the url for the Proxmox Web UI to `pveAPI`
+	- Assign the url for the Proxmox Client API to `paasAPI`
+4. Configure Apache2 to serve the Client at port 80:
 ```
 <VirtualHost *:80>
 	ServerAdmin webmaster@localhost
@@ -98,6 +102,18 @@ server {
 		proxy_set_header Upgrade $http_upgrade;
 		proxy_set_header Connection "upgrade";
 		proxy_pass http://<Client Host IP or DN>:80;
+		proxy_buffering off;
+		client_max_body_size 0;
+		proxy_connect_timeout  3600s;
+		proxy_read_timeout  3600s;
+		proxy_send_timeout  3600s;
+		send_timeout  3600s;
+	}
+	location /api/ {
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+		proxy_pass http://<Client Host IP or DN>:8080;
 		proxy_buffering off;
 		client_max_body_size 0;
 		proxy_connect_timeout  3600s;
