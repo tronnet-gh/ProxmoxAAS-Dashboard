@@ -1,3 +1,5 @@
+import {pveconfig} from "./meta.js";
+
 export class ResponseError extends Error {
 	constructor(message) {
 		super(message);
@@ -29,7 +31,7 @@ function getCookie(cname) {
 }
 
 export async function requestTicket (username, password) {
-	let response = await request("/access/ticket", "POST", {username: `${username}@pve`, password: password}, false);
+	let response = await requestPVE("/access/ticket", "POST", {username: `${username}@pve`, password: password}, false);
 
 	return response;
 }
@@ -41,7 +43,7 @@ export function setTicket (ticket, csrf) {
 	document.cookie = `CSRFPreventionToken=${csrf}; path=/; expires=${d.toUTCString()}; domain=.tronnet.net;`
 }
 
-export async function request (path, method, body = null, auth = true) {
+export async function requestPVE (path, method, body = null, auth = true) {
 	let prms = new URLSearchParams(body);
 
 	let content = {
@@ -57,7 +59,7 @@ export async function request (path, method, body = null, auth = true) {
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
 
-	let response = await fetch(`https://pve.tronnet.net/api2/json${path}`, content)
+	let response = await fetch(`${pveconfig.pveAPI}${path}`, content)
 	.then((response) => {
 		if (!response.ok) {
 			throw new ResponseError(`recieved response status code ${response.status}`);
