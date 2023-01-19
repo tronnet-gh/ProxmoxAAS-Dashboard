@@ -1,9 +1,8 @@
-import {requestPVE, goToPage, getURIData, reload} from "./utils.js";
-import {pveconfig} from "./meta.js";
+import {requestPVE, goToPage, getURIData, reload, resources} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
-let diskMetaData = pveconfig.diskMetaData;
+let diskMetaData = resources.disk;
 
 let node;
 let type;
