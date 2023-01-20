@@ -21,7 +21,7 @@ The supported setup is to use a reverse proxy to serve both the original Proxmox
 ## Installation - Client
 1. Install Apache2 or another HTTP server onto a container or vm, which will be `Client Host`
 2. Clone this repo onto `Client Host`, the default location for web root is `/var/www/html/`
-3. Navigate to the repo root folder and modify `vars.js` with the following:
+3. Navigate to the repo root folder, rename `vars.js.template` to `vars.js` and modify with the following:
 	- Assign the url for the Proxmox Web UI to `pveAPI`
 	- Assign the url for the Proxmox Client API to `paasAPI`
 4. Configure Apache2 to serve the Client at port 80:
