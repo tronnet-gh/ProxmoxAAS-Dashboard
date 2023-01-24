@@ -13,7 +13,6 @@ ProxmoxAAS Client provides users of a proxmox based compute on demand service a 
 - Proxmox VE Cluster (v7.0+)
 - Reverse proxy server which serves the Proxmox VE Web GUI & API (ie nginx)
 - Web server to host the ProxmoxAAS Client (ie Apache2)
-- [ProxmoxAAS API](https://github.com/tronnet-gh/ProxmoxAAS-API)
 
 ## Notes
 The supported setup is to use a reverse proxy to serve both the original Proxmox web interface and ProxmoxAAS Client. It is possible other setups can work. Rather than provide specific steps to duplicate a certain setup, the steps included are intended as a guideline of steps required for proper function in most setups. 
@@ -129,4 +128,6 @@ server {
 ```
 3. Restart nginx with the new configurations by running `systemctl restart nginx`
 
-After this step, the Proxmox web UI will be avaliable at pve.\<FQDN\> and the PAAS Client will be avaliable at client.\<FQDN\>
+## Validating & API Installation
+
+The Proxmox web UI will be avaliable at pve.\<FQDN\> and the PAAS Client will be avaliable at client.\<FQDN\>. Login, instance power management, and instance auditing should be avaliable. To add configuration change functionality, go to [ProxmoxAAS API](https://github.com/tronnet-gh/ProxmoxAAS-API).
