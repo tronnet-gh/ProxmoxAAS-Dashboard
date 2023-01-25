@@ -1,4 +1,4 @@
-import {pveAPI} from "/vars.js";
+import {pveAPI, paasAPI} from "/vars.js";
 
 export class ResponseError extends Error {
 	constructor(message) {
@@ -62,9 +62,8 @@ export function setTicket (ticket, csrf) {
 	document.cookie = `CSRFPreventionToken=${csrf}; path=/; expires=${d.toUTCString()}; domain=.tronnet.net;`
 }
 
-export async function requestPVE (path, method, body = null, auth = true) {
+export async function requestPVE (path, method, body = null) {
 	let prms = new URLSearchParams(body);
-
 	let content = {
 		method: method,
 		mode: "cors",
@@ -78,7 +77,31 @@ export async function requestPVE (path, method, body = null, auth = true) {
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
 
-	let response = await fetch(`${pveAPI}${path}`, content)
+	let response = await request(`${pveAPI}${path}`, content);
+	return response;
+}
+
+export async function requestAPI (path, method, body = null) {
+	let prms = new URLSearchParams(body);
+	let content = {
+		method: method,
+		mode: "cors",
+		credentials: "include",
+		headers: {
+			"Content-Type": "application/x-www-form-urlencoded"
+		}
+	}
+	if(method === "POST") {
+		content.body = prms.toString();
+		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
+	}
+
+	let response = await request(`${paasAPI}${path}`, content);
+	return response;
+}
+
+async function request (url, content) {
+	let response = await fetch(url, content)
 	.then((response) => {
 		if (!response.ok) {
 			throw new ResponseError(`recieved response status code ${response.status}`);

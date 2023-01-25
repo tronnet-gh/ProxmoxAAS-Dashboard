@@ -1,4 +1,4 @@
-import {requestPVE, goToPage, getURIData, reload, resources} from "./utils.js";
+import {requestPVE, requestAPI, goToPage, getURIData, reload, resources} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -29,7 +29,7 @@ async function init () {
 }
 
 async function populateResources () {
-	let config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`);
+	let config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
 	console.log(config);
 
 	let name = type === "qemu" ? "name" : "hostname";
@@ -116,6 +116,7 @@ async function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 		else if (element === "delete_detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")){
 			action.src = "images/actions/detach.svg";
 			action.title = "Detach Disk";
+			action.addEventListener("click", handleDiskDetach);
 		}
 		else if (element === "delete_detach_attach"){
 			let active = diskMetaData[type][busPrefix].actions.includes("delete") ? "active" : "inactive";
@@ -131,6 +132,22 @@ async function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 		actionDiv.append(action);
 	});
 	field.append(actionDiv);
+}
+
+async function handleDiskDetach () {
+	let body = {
+		node: node,
+		type: type,
+		vmid: vmid,
+		action: `delete=${this.id}`
+	};
+	let result = await requestAPI("/disk/detach", "POST", body);
+	if (result.status === 200) {
+		reload();
+	}
+	else{
+		console.error(result);
+	}
 }
 
 function getOrderedUsed(disks){
