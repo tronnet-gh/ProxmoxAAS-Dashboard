@@ -33,6 +33,27 @@ export const resources = {
 	}
 }
 
+export const instances = {
+	running: {
+		powerButtonSrc: "images/actions/stop.svg",
+		powerButtonAlt: "shutdown instance",
+		configButtonSrc: "images/actions/config-inactive.svg",
+		configButtonAlt: "configuration disabled"
+	},
+	stopped: {
+		powerButtonSrc: "images/actions/start.svg",
+		powerButtonAlt: "start instance",
+		configButtonSrc: "images/actions/config-active.svg",
+		configButtonAlt: "configure instance"
+	},
+	loading: {
+		powerButtonSrc: "images/actions/loading.svg",
+		powerButtonAlt: "loading instance",
+		configButtonSrc: "images/actions/config-inactive.svg",
+		configButtonAlt: "configuration disabled"
+	}
+}
+
 function getCookie(cname) {
 	let name = cname + "=";
 	let decodedCookie = decodeURIComponent(document.cookie);
