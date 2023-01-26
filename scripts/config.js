@@ -7,6 +7,7 @@ let diskMetaData = resources.disk;
 let node;
 let type;
 let vmid;
+let config;
 
 async function init () {
 	let cookie = document.cookie;
@@ -18,20 +19,19 @@ async function init () {
 	node = uriData.node;
 	type = uriData.type;
 	vmid = uriData.vmid;
-	await populateResources();
+
+	config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
+
+	populateResources();
+	populateDisk();
 
 	let cancelButton = document.querySelector("#cancel");
 	cancelButton.addEventListener("click", () => {
 		goToPage("index.html");
 	});
-
-	console.log(diskMetaData);
 }
 
 async function populateResources () {
-	let config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
-	console.log(config);
-
 	let name = type === "qemu" ? "name" : "hostname";
 	document.querySelector("#name").innerText = config.data[name];
 	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads"); // TODO add max from quota API
@@ -39,22 +39,6 @@ async function populateResources () {
 	
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "MiB"); // TODO add max from quota API
-	}
-
-	for(let i = 0; i < diskMetaData[type].prefixOrder.length; i++){
-		let prefix = diskMetaData[type].prefixOrder[i];
-		let busName = diskMetaData[type][prefix].name;
-		let disks = {};
-		Object.keys(config.data).forEach(element => {
-			if (element.startsWith(prefix)) {
-				disks[element.replace(prefix, "")] = config.data[element];
-			}
-		});
-		let ordered_keys = getOrderedUsed(disks);
-		ordered_keys.forEach(element => {
-			let disk = disks[element];
-			addDiskLine("disks", prefix, busName, element, disk);
-		});
 	}
 }
 
@@ -82,6 +66,25 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 		let unit = document.createElement("p");
 		unit.innerText = unitText;
 		field.append(unit);
+	}
+}
+
+async function populateDisk () {
+	document.querySelector("#disks").innerHTML = "";
+	for(let i = 0; i < diskMetaData[type].prefixOrder.length; i++){
+		let prefix = diskMetaData[type].prefixOrder[i];
+		let busName = diskMetaData[type][prefix].name;
+		let disks = {};
+		Object.keys(config.data).forEach(element => {
+			if (element.startsWith(prefix)) {
+				disks[element.replace(prefix, "")] = config.data[element];
+			}
+		});
+		let ordered_keys = getOrderedUsed(disks);
+		ordered_keys.forEach(element => {
+			let disk = disks[element];
+			addDiskLine("disks", prefix, busName, element, disk);
+		});
 	}
 }
 
