@@ -13,6 +13,7 @@ ProxmoxAAS Client provides users of a proxmox based compute on demand service a 
 - Proxmox VE Cluster (v7.0+)
 - Reverse proxy server which serves the Proxmox VE Web GUI & API (ie nginx)
 - Web server to host the ProxmoxAAS Client (ie Apache2)
+- [ProxmoxAAS-API](https://github.com/tronnet-gh/ProxmoxAAS-API). Ensure that this is done first.
 
 ## Notes
 The supported setup is to use a reverse proxy to serve both the original Proxmox web interface and ProxmoxAAS Client. It is possible other setups can work. Rather than provide specific steps to duplicate a certain setup, the steps included are intended as a guideline of steps required for proper function in most setups. 
@@ -21,8 +22,8 @@ The supported setup is to use a reverse proxy to serve both the original Proxmox
 1. Install Apache2 or another HTTP server onto a container or vm, which will be `Client Host`
 2. Clone this repo onto `Client Host`, the default location for web root is `/var/www/html/`
 3. Navigate to the repo root folder, rename `vars.js.template` to `vars.js` and modify with the following:
-	- Assign the url for the Proxmox Web UI to `pveAPI`
-	- Assign the url for the Proxmox Client API to `paasAPI`
+	- Assign the url for the Proxmox Web UI to `pveAPI`. This should be at `pve.<FQDN>/api2/json` or similar
+	- Assign the url for the Proxmox Client API to `paasAPI`. This should be at `client.<FQDN>/api`
 4. Configure Apache2 to serve the Client at port 80:
 ```
 <VirtualHost *:80>
