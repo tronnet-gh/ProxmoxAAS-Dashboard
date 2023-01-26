@@ -20,7 +20,7 @@ async function init () {
 	type = uriData.type;
 	vmid = uriData.vmid;
 
-	config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
+	await getConfig();
 
 	populateResources();
 	populateDisk();
@@ -31,7 +31,11 @@ async function init () {
 	});
 }
 
-async function populateResources () {
+async function getConfig () {
+	config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
+}
+
+function populateResources () {
 	let name = type === "qemu" ? "name" : "hostname";
 	document.querySelector("#name").innerText = config.data[name];
 	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads"); // TODO add max from quota API
@@ -69,7 +73,7 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 	}
 }
 
-async function populateDisk () {
+function populateDisk () {
 	document.querySelector("#disks").innerHTML = "";
 	for(let i = 0; i < diskMetaData[type].prefixOrder.length; i++){
 		let prefix = diskMetaData[type].prefixOrder[i];
@@ -88,7 +92,7 @@ async function populateDisk () {
 	}
 }
 
-async function addDiskLine (fieldset, busPrefix, busName, device, disk) {
+function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 	let field = document.querySelector(`#${fieldset}`);
 	
 	// Set the disk icon, either drive.svg or disk.svg
@@ -146,7 +150,8 @@ async function handleDiskDetach () {
 	};
 	let result = await requestAPI("/disk/detach", "POST", body);
 	if (result.status === 200) {
-		reload();
+		await getConfig();
+		populateDisk();
 	}
 	else{
 		console.error(result);
