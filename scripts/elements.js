@@ -1,4 +1,4 @@
-import {requestPVE, goToPage} from "./utils.js";
+import {requestPVE, goToPage, instances} from "./utils.js";
 
 const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
 
@@ -48,120 +48,93 @@ class Instance extends HTMLElement {
 		if (data.status === "unknown") {
 			data.status = "stopped";
 		}
-		let typeImg = this.shadowElement.querySelector("#instance-type");
-		typeImg.src = `images/instances/${data.type}/${data.status}.svg`;
-		typeImg.alt = `${data.status} instance`;
 		this.type = data.type;
 		this.status = data.status;
+		this.vmid = data.vmid;
+		this.name = data.name;
+		this.node = data.node;
+		this.update();
+	}
+
+	update () {
+		let typeImg = this.shadowElement.querySelector("#instance-type");
+		typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
+		typeImg.alt = `${this.status} instance`;
 
 		let vmidParagraph = this.shadowElement.querySelector("#instance-id");
-		vmidParagraph.innerText = data.vmid;
-		this.vmid = data.vmid;
+		vmidParagraph.innerText = this.vmid;
 
 		let nameParagraph = this.shadowElement.querySelector("#instance-name");
-		if (data.name) {
-			nameParagraph.innerText = data.name;
-		}
-		else {
-			nameParagraph.innerText = "";
-		}
+		nameParagraph.innerText = this.name ? this.name : "";
 
 		let nodeImg = this.shadowElement.querySelector("#node-status");
-		nodeImg.src = `images/nodes/${data.node.status}.svg`;
+		nodeImg.src = `images/nodes/${this.node.status}.svg`;
 
 		let nodeParagraph = this.shadowElement.querySelector("#node-name");
-		nodeParagraph.innerText = data.node.name;
-		this.node = data.node.name;
+		nodeParagraph.innerText = this.node.name;
 
 		let powerButton = this.shadowElement.querySelector("#power-btn");
-		powerButton.src = data.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
-		powerButton.alt = data.status === "running" ? "shutdown instance" : "start instance";
-		powerButton.addEventListener("click", async () => {
-			if (!this.actionLock) {
-				this.actionLock = true;
+		powerButton.src = instances[this.status].powerButtonSrc;
+		powerButton.alt = instances[this.status].powerButtonAlt;
+		powerButton.addEventListener("click", this.handlePowerButton.bind(this));
 
-				let targetAction = this.status === "running" ? "shutdown" : "start";
-				let targetActionDesc = targetAction === "start" ? "starting" : "shutting down";
-				let targetStatus = this.status === "running" ? "stopped" : "running";
-
-				let typeImg = this.shadowElement.querySelector("#instance-type");
-				typeImg.src = "images/actions/loading.svg";
-				typeImg.alt = `instance is ${targetActionDesc}`;
-				let powerButton = this.shadowElement.querySelector("#power-btn");
-				powerButton.src = "images/actions/loading.svg";
-				powerButton.alt = `instance is ${targetActionDesc}`;
-				let configButton = this.shadowElement.querySelector("#configure-btn");
-				configButton.src = "images/actions/config-inactive.svg";
-
-				try {
-					let task = await requestPVE(`/nodes/${this.node}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node, vmid: this.vmid});
-				}
-				catch {
-					typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
-					typeImg.alt = `${this.status} instance`;
-
-					powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
-					powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
-
-					configButton.src = this.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
-
-					this.actionLock = false;
-
-					console.error(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${taskStatus.data.exitstatus}`);
-
-					return;
-				}
-
-				while (true) {
-					let taskStatus = await requestPVE(`/nodes/${this.node}/tasks/${task.data}/status`);
-					if(taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") {
-						this.status = targetStatus;
-
-						typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
-						typeImg.alt = `${this.status} instance`;
-
-						powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
-						powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
-
-						configButton.src = this.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
-
-						this.actionLock = false;
-
-						break;
-					}
-					else if (taskStatus.data.status === "stopped") { // stopped but not OK -> instance did not change state
-						typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
-						typeImg.alt = `${this.status} instance`;
-
-						powerButton.src = this.status === "running" ? "images/actions/stop.svg" : "images/actions/start.svg";
-						powerButton.alt = this.status === "running" ? "shutdown instance" : "start instance";
-
-						configButton.src = this.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
-
-						this.actionLock = false;
-
-						console.error(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${taskStatus.data.exitstatus}`);
-
-						break;
-					}
-					else{
-						await waitFor(1000);
-					}
-				}		
-			}
-		});
-	
 		let configButton = this.shadowElement.querySelector("#configure-btn");
-		configButton.src = data.status === "running" ? "images/actions/config-inactive.svg" : "images/actions/config-active.svg";
+		configButton.src = instances[this.status].configButtonSrc;
+		configButton.alt = instances[this.status].configButtonAlt;
 		configButton.addEventListener("click", () => {
 			if (!this.actionLock && this.status !== "running") {
-				goToPage("config.html", {node: this.node, type: this.type, vmid: this.vmid});
+				goToPage("config.html", {node: this.node.name, type: this.type, vmid: this.vmid});
 			}
-		})
+		});
 
-		if (data.node.status !== "online") {
+		if (this.node.status !== "online") {
 			powerButton.classList.add("hidden");
 			configButton.classList.add("hidden");
+		}
+	}
+
+	async handlePowerButton () {
+		if(!this.actionLock) {
+			this.actionLock = true;
+			let targetAction = this.status === "running" ? "shutdown" : "start";
+			let targetStatus = this.status === "running" ? "stopped" : "running";
+			let prevStatus = this.status;
+			this.status = "loading";
+
+			this.update();
+
+			let task;
+
+			try {
+				task = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node.name, vmid: this.vmid});
+			}
+			catch (error) {
+				this.status = prevStatus;
+				this.update();
+				this.actionLock = false;
+				console.error(error);
+				return;
+			}
+
+			while (true) {
+				let taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${task.data}/status`);
+				if(taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
+					this.status = targetStatus;
+					this.update();
+					this.actionLock = false;
+					return;
+				}
+				else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
+					this.status = prevStatus;
+					console.error(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${taskStatus.data.exitstatus}`);
+					this.update();
+					this.actionLock = false;
+					return;
+				}
+				else{
+					await waitFor(1000);
+				}
+			}
 		}
 	}
 }
