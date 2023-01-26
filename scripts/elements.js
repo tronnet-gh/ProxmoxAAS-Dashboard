@@ -7,9 +7,26 @@ class Instance extends HTMLElement {
 		super();
 		let shadowRoot = this.attachShadow({mode: "open"});
 
-		let instanceTemplate = document.querySelector("#instance-template");
-		let instanceTemplateContent = instanceTemplate.content;
-		shadowRoot.append(instanceTemplateContent.cloneNode(true));
+		shadowRoot.innerHTML = `
+		<article>
+			<div>
+				<div>
+					<img id="instance-type">
+					<p id="instance-id"></p>
+					<p id="instance-name"></p>
+				</div>
+				<div>
+					<img id="node-status" alt="instance node">
+					<p id="node-name"></p>
+				</div>
+			</div>
+			<hr>
+			<div class="btn-group">
+				<img id="power-btn">
+				<img id="configure-btn" alt="change instance configuration">
+			</div>
+		</article>
+		`;
 
 		let styleLink = document.createElement("link");
 		styleLink.rel = "stylesheet";
