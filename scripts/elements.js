@@ -131,4 +131,43 @@ class Instance extends HTMLElement {
 	}
 }
 
+class Dialog extends HTMLElement {
+	constructor () {
+		super();
+		let shadowRoot = this.attachShadow({mode: "open"});
+
+		shadowRoot.innerHTML = `
+		<link rel="stylesheet" href="css/style.css" type="text/css">
+		<link rel="stylesheet" href="css/dialog.css" type="text/css">
+		<dialog>
+			<form method="dialog"></form>
+		</dialog>
+		`;
+
+		this.shadowElement = shadowRoot;
+		this.dialog = shadowRoot.querySelector("dialog");
+		this.form = shadowRoot.querySelector("form");
+	}
+
+	set body (body) {
+		this.form.innerHTML = body + `
+		<div class="btn-group">
+			<button value="cancel">Cancel</button>
+			<button value="confirm">Confirm</button>
+		</div>
+		`;
+	}
+
+	set callback (callback) {
+		this.dialog.addEventListener("close", () => {
+			callback(this.dialog.returnValue, new FormData(this.form));
+		});
+	}
+
+	show () {
+		this.dialog.showModal();
+	}
+}
+
 customElements.define("instance-article", Instance);
+customElements.define("dialog-form", Dialog);
