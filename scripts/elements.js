@@ -8,6 +8,8 @@ class Instance extends HTMLElement {
 		let shadowRoot = this.attachShadow({mode: "open"});
 
 		shadowRoot.innerHTML = `
+		<link rel="stylesheet" href="css/style.css" type="text/css">
+		<link rel="stylesheet" href="css/instance.css" type="text/css">
 		<article>
 			<div>
 				<div>
@@ -27,18 +29,6 @@ class Instance extends HTMLElement {
 			</div>
 		</article>
 		`;
-
-		let styleLink = document.createElement("link");
-		styleLink.rel = "stylesheet";
-		styleLink.href = "css/style.css";
-		styleLink.type = "text/css";
-		shadowRoot.append(styleLink);
-
-		let instanceLink = document.createElement("link");
-		instanceLink.rel = "stylesheet";
-		instanceLink.href = "css/instance.css";
-		instanceLink.type = "text/css";
-		shadowRoot.append(instanceLink);
 
 		this.shadowElement = shadowRoot;
 		this.actionLock = false;
@@ -81,11 +71,7 @@ class Instance extends HTMLElement {
 		let configButton = this.shadowElement.querySelector("#configure-btn");
 		configButton.src = instances[this.status].configButtonSrc;
 		configButton.alt = instances[this.status].configButtonAlt;
-		configButton.addEventListener("click", () => {
-			if (!this.actionLock && this.status !== "running") {
-				goToPage("config.html", {node: this.node.name, type: this.type, vmid: this.vmid});
-			}
-		});
+		configButton.addEventListener("click", this.handleConfigButton.bind(this));
 
 		if (this.node.status !== "online") {
 			powerButton.classList.add("hidden");
@@ -131,10 +117,16 @@ class Instance extends HTMLElement {
 					this.actionLock = false;
 					return;
 				}
-				else{
+				else{ // task has not stopped
 					await waitFor(1000);
 				}
 			}
+		}
+	}
+
+	handleConfigButton () {
+		if (!this.actionLock && this.status === "stopped") { // if the action lock is false, and the node is stopped, then navigate to the conig page with the node infor in the search query
+			goToPage("config.html", {node: this.node.name, type: this.type, vmid: this.vmid});
 		}
 	}
 }
