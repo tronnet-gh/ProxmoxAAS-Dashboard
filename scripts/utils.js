@@ -1,4 +1,4 @@
-import {pveAPI, paasAPI} from "/vars.js";
+import {PVE, API} from "/vars.js";
 
 export class ResponseError extends Error {
 	constructor(message) {
@@ -98,7 +98,7 @@ export async function requestPVE (path, method, body = null) {
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
 
-	let response = await request(`${pveAPI}${path}`, content);
+	let response = await request(`${PVE}${path}`, content);
 	return response;
 }
 
@@ -117,7 +117,7 @@ export async function requestAPI (path, method, body = null) {
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
 
-	let response = await request(`${paasAPI}${path}`, content);
+	let response = await request(`${API}${path}`, content);
 	return response;
 }
 
