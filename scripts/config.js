@@ -1,7 +1,12 @@
 import {requestPVE, requestAPI, goToPage, getURIData, reload, resources} from "./utils.js";
 import { Dialog } from "./elements.js";
 
-window.addEventListener("DOMContentLoaded", init);
+setInterval(async () => {
+	await getConfig();
+	populateDisk();
+}, 1000);
+
+window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
 
 let diskMetaData = resources.disk;
 
