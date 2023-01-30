@@ -2,7 +2,7 @@ import {requestPVE, goToPage, instances} from "./utils.js";
 
 const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
 
-class Instance extends HTMLElement {
+export class Instance extends HTMLElement {
 	constructor () {
 		super();
 		let shadowRoot = this.attachShadow({mode: "open"});
@@ -131,16 +131,17 @@ class Instance extends HTMLElement {
 	}
 }
 
-class Dialog extends HTMLElement {
+export class Dialog extends HTMLElement {
 	constructor () {
 		super();
 		let shadowRoot = this.attachShadow({mode: "open"});
 
 		shadowRoot.innerHTML = `
 		<link rel="stylesheet" href="css/style.css" type="text/css">
+		<link rel="stylesheet" href="css/form.css" type="text/css">
 		<link rel="stylesheet" href="css/dialog.css" type="text/css">
 		<dialog>
-			<form method="dialog"></form>
+			<form method="dialog" class="imput-grid" style="auto 1fr"></form>
 		</dialog>
 		`;
 
@@ -150,20 +151,20 @@ class Dialog extends HTMLElement {
 	}
 
 	set body (body) {
-		this.form.innerHTML = body + `
-		<div class="btn-group">
-			<button value="cancel">Cancel</button>
-			<button value="confirm">Confirm</button>
-		</div>
+		this.form.innerHTML = `
+			${body}
+			<div class="btn-group">
+				<button value="cancel">Cancel</button>
+				<button value="confirm">Confirm</button>
+			</div>
 		`;
 	}
 
 	set callback (callback) {
-		this.dialog.addEventListener("close", () => {
-			callback(this.dialog.returnValue, new FormData(this.form));
+		this.dialog.addEventListener("close", async () => {
+			await callback(this.dialog.returnValue, new FormData(this.form));
 		});
 	}
-
 	show () {
 		this.dialog.showModal();
 	}
