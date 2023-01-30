@@ -167,7 +167,7 @@ async function handleDiskDetach () {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: `delete=${this.id}`
+				action: JSON.stringify({delete: this.id})
 			};
 			let result = await requestAPI("/disk/detach", "POST", body);
 			if (result.status === 200) {
@@ -199,7 +199,7 @@ async function handleDiskResize () {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: `disk=${this.id}&size=+${form.get("size-increment")}G`
+				action: JSON.stringify({disk: this.id, size: `+${form.get("size-increment")}G`})
 			}
 			let result = await requestAPI("/disk/resize", "POST", body);
 			if (result.status === 200) {
