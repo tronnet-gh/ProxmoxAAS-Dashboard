@@ -1,4 +1,5 @@
 import {requestPVE, requestAPI, goToPage, getURIData, reload, resources} from "./utils.js";
+import { Dialog } from "./elements.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -116,24 +117,36 @@ function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 	diskMetaData.actionBarOrder.forEach((element) => {
 		let action = document.createElement("img");
 		action.classList.add("clickable");
-		if (element === "delete_detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")){
+		if (element === "delete_detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")){ // attach
 			action.src = "images/actions/attach.svg";
 			action.title = "Attach Disk";
 		}
-		else if (element === "delete_detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")){
+		else if (element === "delete_detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")){ // detach
 			action.src = "images/actions/detach.svg";
 			action.title = "Detach Disk";
 			action.addEventListener("click", handleDiskDetach);
 		}
 		else if (element === "delete_detach_attach"){
-			let active = diskMetaData[type][busPrefix].actions.includes("delete") ? "active" : "inactive";
+			let active = diskMetaData[type][busPrefix].actions.includes("delete") ? "active" : "inactive"; // delete
 			action.src = `images/actions/delete-${active}.svg`;
 			action.title = `Delete Disk`;
 		}
 		else {
-			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive";
+			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
 			action.src = `images/actions/${element}-${active}.svg`;
 			action.title = `${element.charAt(0).toUpperCase()}${element.slice(1)} Disk`;
+			if (element === "config") {
+
+			}
+			else if (element === "move") {
+
+			}
+			else if (element === "resize") {
+				action.addEventListener("click", handleDiskResize);
+			}
+			else {
+
+			}
 		}
 		action.id = `${busPrefix}${device}`
 		actionDiv.append(action);
@@ -142,20 +155,64 @@ function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 }
 
 async function handleDiskDetach () {
-	let body = {
-		node: node,
-		type: type,
-		vmid: vmid,
-		action: `delete=${this.id}`
+	let dialog = document.createElement("dialog-form");
+	document.body.append(dialog);
+	dialog.body = `
+		<p>Detach ${this.id}</p>
+		<hr>
+	`;
+	dialog.callback = async (result, form) => {
+		if(result === "confirm") {
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				action: `delete=${this.id}`
+			};
+			let result = await requestAPI("/disk/detach", "POST", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateDisk();
+			}
+			else{
+				console.error(result);
+			}
+		}
+		document.querySelector("dialog-form").remove();
 	};
-	let result = await requestAPI("/disk/detach", "POST", body);
-	if (result.status === 200) {
-		await getConfig();
-		populateDisk();
-	}
-	else{
-		console.error(result);
-	}
+	dialog.show();
+}
+
+async function handleDiskResize () {
+	let dialog = document.createElement("dialog-form");
+	document.body.append(dialog);
+	dialog.body = `
+		<p>Resize ${this.id}</p>
+		<hr>
+		<label for="size-increment">Size Increment (GiB)</label>
+		<input name="size-increment" type="number" min="0" max="131072" value="0">
+		<hr>
+	`;
+	dialog.callback = async (result, form) => {
+		if(result === "confirm") {
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				action: `disk=${this.id}&size=+${form.get("size-increment")}G`
+			}
+			let result = await requestAPI("/disk/resize", "POST", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateDisk();
+			}
+			else{
+				console.error(result);
+			}
+		}
+		document.querySelector("dialog-form").remove();
+	};
+	dialog.show();
 }
 
 function getOrderedUsed(disks){
