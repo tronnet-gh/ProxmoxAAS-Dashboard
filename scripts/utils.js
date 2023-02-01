@@ -112,9 +112,11 @@ export async function requestAPI (path, method, body = null) {
 			"Content-Type": "application/x-www-form-urlencoded"
 		}
 	}
-	if(method === "POST") {
-		content.body = prms.toString();
+	if (method === "POST") {
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
+	}
+	if (body) {
+		content.body = prms.toString();
 	}
 
 	let response = await request(`${API}${path}`, content);
