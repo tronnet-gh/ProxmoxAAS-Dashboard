@@ -162,10 +162,13 @@ function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 async function handleDiskDetach () {
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
-	dialog.body = `
-		<p>Detach ${this.id}</p>
-		<hr>
-	`;
+
+	dialog.header = `Detach ${this.id}`;
+
+	let confirm = document.createElement("p");
+	confirm.innerText = `Are you sure you want to detach disk ${this.id}?`
+	dialog.append(confirm)
+
 	dialog.callback = async (result, form) => {
 		if(result === "confirm") {
 			let body = {
@@ -191,13 +194,22 @@ async function handleDiskDetach () {
 async function handleDiskResize () {
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
-	dialog.body = `
-		<p>Resize ${this.id}</p>
-		<hr>
-		<label for="size-increment">Size Increment (GiB)</label>
-		<input name="size-increment" type="number" min="0" max="131072" value="0">
-		<hr>
-	`;
+
+	dialog.header = `Resize ${this.id}`;
+
+	let label = document.createElement("label");
+	label.for = "size-increment";
+	label.innerText = "Size Increment (GiB)";
+	dialog.append(label);
+
+	let input = document.createElement("input");
+	input.name = "size-increment";
+	input.type = "number";
+	input.min = 0;
+	input.max = 131072;
+	input.value = 0;
+	dialog.append(input);
+
 	dialog.callback = async (result, form) => {
 		if(result === "confirm") {
 			let body = {
@@ -218,6 +230,11 @@ async function handleDiskResize () {
 		document.querySelector("dialog-form").remove();
 	};
 	dialog.show();
+}
+
+async function handleDiskMove () {
+	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", {format: 1, content: type === "qemu" ? "images" : "rootdir"});
+	let dialog = createElement("dialog-form");
 }
 
 function getOrderedUsed(disks){

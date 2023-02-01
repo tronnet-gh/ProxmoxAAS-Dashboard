@@ -150,11 +150,11 @@ export class Dialog extends HTMLElement {
 		this.shadowElement = shadowRoot;
 		this.dialog = shadowRoot.querySelector("dialog");
 		this.form = shadowRoot.querySelector("form");
-	}
 
-	set body (body) {
 		this.form.innerHTML = `
-			${body}
+			<p id="header"></p>
+			<hr>
+			<hr id="base-hr">
 			<div class="btn-group">
 				<button value="cancel">Cancel</button>
 				<button value="confirm">Confirm</button>
@@ -162,6 +162,14 @@ export class Dialog extends HTMLElement {
 		`;
 	}
 
+	set header (header) {
+		this.shadowElement.querySelector("#header").innerText = header;
+	}
+
+	append (element) {
+		this.form.insertBefore(element, this.shadowElement.querySelector("#base-hr"));
+	}
+	
 	set callback (callback) {
 		this.dialog.addEventListener("close", async () => {
 			await callback(this.dialog.returnValue, new FormData(this.form));
