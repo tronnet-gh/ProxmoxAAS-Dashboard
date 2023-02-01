@@ -36,21 +36,21 @@ export const resources = {
 export const instances = {
 	running: {
 		powerButtonSrc: "images/actions/stop.svg",
-		powerButtonAlt: "shutdown instance",
+		powerButtonAlt: "Shutdown Instance",
 		configButtonSrc: "images/actions/config-inactive.svg",
-		configButtonAlt: "configuration disabled"
+		configButtonAlt: "Configuration Disabled"
 	},
 	stopped: {
 		powerButtonSrc: "images/actions/start.svg",
-		powerButtonAlt: "start instance",
+		powerButtonAlt: "Start Instance",
 		configButtonSrc: "images/actions/config-active.svg",
-		configButtonAlt: "configure instance"
+		configButtonAlt: "Configure Instance"
 	},
 	loading: {
 		powerButtonSrc: "images/actions/loading.svg",
-		powerButtonAlt: "loading instance",
+		powerButtonAlt: "Loading Instance",
 		configButtonSrc: "images/actions/config-inactive.svg",
-		configButtonAlt: "configuration disabled"
+		configButtonAlt: "Configuration Disabled"
 	}
 }
 
@@ -71,7 +71,7 @@ function getCookie(cname) {
 }
 
 export async function requestTicket (username, password) {
-	let response = await requestPVE("/access/ticket", "POST", {username: `${username}@pve`, password: password}, false);
+	let response = await requestPVE("/access/ticket", "POST", {username: `${username}@ldap`, password: password}, false);
 
 	return response;
 }

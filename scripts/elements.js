@@ -66,11 +66,13 @@ export class Instance extends HTMLElement {
 		let powerButton = this.shadowElement.querySelector("#power-btn");
 		powerButton.src = instances[this.status].powerButtonSrc;
 		powerButton.alt = instances[this.status].powerButtonAlt;
+		powerButton.title = instances[this.status].powerButtonAlt;
 		powerButton.addEventListener("click", this.handlePowerButton.bind(this));
 
 		let configButton = this.shadowElement.querySelector("#configure-btn");
 		configButton.src = instances[this.status].configButtonSrc;
 		configButton.alt = instances[this.status].configButtonAlt;
+		configButton.title = instances[this.status].configButtonAlt;
 		configButton.addEventListener("click", this.handleConfigButton.bind(this));
 
 		if (this.node.status !== "online") {
