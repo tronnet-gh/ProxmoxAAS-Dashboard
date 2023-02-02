@@ -244,10 +244,10 @@ async function handleDiskMove () {
 
 	dialog.header = `Move ${this.id}`;
 
-	let label = document.createElement("label");
-	label.for = "storage-select";
-	label.innerText = "Storage";
-	dialog.append(label);
+	let storageLabel = document.createElement("label");
+	storageLabel.for = "storage-select";
+	storageLabel.innerText = "Storage";
+	dialog.append(storageLabel);
 
 	let storageSelect = document.createElement("select");
 	storageSelect.name = "storage-select";
@@ -259,13 +259,24 @@ async function handleDiskMove () {
 
 	dialog.append(storageSelect);
 
+	let deleteLabel = document.createElement("label");
+	deleteLabel.for = "delete-check";
+	deleteLabel.innerText = "Delete Source";
+	dialog.append(deleteLabel);
+
+	let deleteCheckbox = document.createElement("input");
+	deleteCheckbox.type = "checkbox";
+	deleteCheckbox.name = "delete-check"
+	deleteCheckbox.checked = true;
+	dialog.append(deleteCheckbox);
+
 	dialog.callback = async (result, form) => {
 		if(result === "confirm") {
 			let body = {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify({storage: storageSelect.value, disk: this.id})
+				action: JSON.stringify({storage: storageSelect.value, disk: this.id, delete: deleteCheckbox.checked ? "1": "0"})
 			}
 			let result = await requestAPI("/disk/move", "POST", body);
 			if (result.status === 200) {
