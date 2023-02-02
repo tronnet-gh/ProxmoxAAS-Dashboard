@@ -144,7 +144,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 
 			}
 			else if (element === "move") {
-
+				action.addEventListener("click", handleDiskMove);
 			}
 			else if (element === "resize") {
 				action.addEventListener("click", handleDiskResize);
@@ -166,8 +166,12 @@ async function handleDiskDetach () {
 	dialog.header = `Detach ${this.id}`;
 
 	let confirm = document.createElement("p");
-	confirm.innerText = `Are you sure you want to detach disk ${this.id}?`
+	confirm.innerText = "Are you sure you want to detach disk"
 	dialog.append(confirm)
+
+	let idtext = document.createElement("p");
+	idtext.innerText = this.id;
+	dialog.append(idtext);
 
 	dialog.callback = async (result, form) => {
 		if(result === "confirm") {
@@ -233,8 +237,31 @@ async function handleDiskResize () {
 }
 
 async function handleDiskMove () {
-	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", {format: 1, content: type === "qemu" ? "images" : "rootdir"});
-	let dialog = createElement("dialog-form");
+	let content = type === "qemu" ? "images" : "rootdir"
+	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
+	let dialog = document.createElement("dialog-form");
+	document.body.append(dialog);
+
+	let label = document.createElement("label");
+	label.for = "storage-select";
+	label.innerText = "Storage";
+	dialog.append(label);
+
+	let storageSelect = document.createElement("select");
+	storageSelect.name = "storage-select";
+	storage.data.forEach((element) => {
+		if(element.content.includes(content)){
+			storageSelect.add(new Option(element.storage));
+		}
+	});
+
+	dialog.append(storageSelect);
+
+	dialog.callback = () => {
+		document.querySelector("dialog-form").remove();
+	};
+
+	dialog.show();
 }
 
 function getOrderedUsed(disks){
