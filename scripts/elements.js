@@ -143,23 +143,21 @@ export class Dialog extends HTMLElement {
 		<link rel="stylesheet" href="css/form.css" type="text/css">
 		<link rel="stylesheet" href="css/dialog.css" type="text/css">
 		<dialog>
-			<form method="dialog" class="imput-grid" style="auto 1fr"></form>
+			<p id="header"></p>
+			<hr>
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+			</form>
+			<hr id="base-hr">
+			<div class="btn-group">
+				<button value="cancel" form="form">Cancel</button>
+				<button value="confirm" form="form">Confirm</button>
+			</div>
 		</dialog>
 		`;
 
 		this.shadowElement = shadowRoot;
 		this.dialog = shadowRoot.querySelector("dialog");
 		this.form = shadowRoot.querySelector("form");
-
-		this.form.innerHTML = `
-			<p id="header"></p>
-			<hr>
-			<hr id="base-hr">
-			<div class="btn-group">
-				<button value="cancel">Cancel</button>
-				<button value="confirm">Confirm</button>
-			</div>
-		`;
 	}
 
 	set header (header) {
@@ -167,7 +165,7 @@ export class Dialog extends HTMLElement {
 	}
 
 	append (element) {
-		this.form.insertBefore(element, this.shadowElement.querySelector("#base-hr"));
+		this.form.append(element);
 	}
 	
 	set callback (callback) {

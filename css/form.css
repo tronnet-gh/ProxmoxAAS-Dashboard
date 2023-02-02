@@ -15,7 +15,7 @@ fieldset {
 	margin: 10px;
 }
 
-form > :first-child {
+form > fieldset:first-of-type {
 	margin-top: 0px;
 }
 
