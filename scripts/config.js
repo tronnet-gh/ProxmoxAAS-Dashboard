@@ -242,6 +242,8 @@ async function handleDiskMove () {
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
 
+	dialog.header = `Move ${this.id}`;
+
 	let label = document.createElement("label");
 	label.for = "storage-select";
 	label.innerText = "Storage";
@@ -257,7 +259,23 @@ async function handleDiskMove () {
 
 	dialog.append(storageSelect);
 
-	dialog.callback = () => {
+	dialog.callback = async (result, form) => {
+		if(result === "confirm") {
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				action: JSON.stringify({storage: storageSelect.value, disk: this.id})
+			}
+			let result = await requestAPI("/disk/move", "POST", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateDisk();
+			}
+			else{
+				console.error(result);
+			}
+		}
 		document.querySelector("dialog-form").remove();
 	};
 
