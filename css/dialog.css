@@ -2,6 +2,7 @@ dialog {
 	background-color: #000000;
 	border: 1px solid white;
 	border-radius: 5px;
+	padding: 10px;
 }
 
 dialog::backdrop {
@@ -12,7 +13,8 @@ dialog .btn-group {
 	margin-top: 10px;
 }
 
-h1, h2, h3, p {
-	margin: 10px;
+#prompt {
 	text-align: center;
+	margin-bottom: 10px;
+	margin-top: 0px;
 }

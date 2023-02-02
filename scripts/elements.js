@@ -143,7 +143,7 @@ export class Dialog extends HTMLElement {
 		<link rel="stylesheet" href="css/form.css" type="text/css">
 		<link rel="stylesheet" href="css/dialog.css" type="text/css">
 		<dialog>
-			<p id="header"></p>
+			<p id="prompt"></p>
 			<hr>
 			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
 			</form>
@@ -161,7 +161,7 @@ export class Dialog extends HTMLElement {
 	}
 
 	set header (header) {
-		this.shadowElement.querySelector("#header").innerText = header;
+		this.shadowElement.querySelector("#prompt").innerText = header;
 	}
 
 	append (element) {
