@@ -76,11 +76,11 @@ server {
         proxy_read_timeout  3600s;
         proxy_send_timeout  3600s;
         send_timeout  3600s;
-    }
-    location '/.well-known/acme-challenge' {
-        default_type "text/plain";
-        root /var/www/html;
-    }
+        }
+        	location '/.well-known/acme-challenge' {
+        	default_type "text/plain";
+        	root /var/www/html;
+        }
 }
 ```
 2. Configure nginx to reverse proxy the client. This can be done in the same file previously or in a new configuration file. It is a pretty typical nginx config file:
