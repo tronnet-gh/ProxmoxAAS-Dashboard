@@ -1,10 +1,11 @@
 import {requestPVE, requestAPI, goToPage, getURIData, reload, resources} from "./utils.js";
 import { Dialog } from "./elements.js";
 
+/*
 setInterval(async () => {
 	await getConfig();
 	populateDisk();
-}, 1000);
+}, 1000);*/
 
 window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
 
@@ -125,6 +126,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 		if (element === "delete_detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")){ // attach
 			action.src = "images/actions/attach.svg";
 			action.title = "Attach Disk";
+			action.addEventListener("click", handleDiskAttach);
 		}
 		else if (element === "delete_detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")){ // detach
 			action.src = "images/actions/detach.svg";
@@ -140,17 +142,14 @@ function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
 			action.src = `images/actions/${element}-${active}.svg`;
 			action.title = `${element.charAt(0).toUpperCase()}${element.slice(1)} Disk`;
-			if (element === "config") {
-
-			}
-			else if (element === "move") {
+			if (element === "move") {
 				action.addEventListener("click", handleDiskMove);
 			}
 			else if (element === "resize") {
 				action.addEventListener("click", handleDiskResize);
 			}
 			else {
-
+				console.log(`got invalid action ${element} at disk ${busName} ${device}`);
 			}
 		}
 		action.id = `${busPrefix}${device}`
@@ -174,7 +173,7 @@ async function handleDiskDetach () {
 	dialog.append(idtext);
 
 	dialog.callback = async (result, form) => {
-		if(result === "confirm") {
+		if (result === "confirm") {
 			let body = {
 				node: node,
 				type: type,
@@ -186,11 +185,55 @@ async function handleDiskDetach () {
 				await getConfig();
 				populateDisk();
 			}
-			else{
+			else {
 				console.error(result);
 			}
 		}
-		document.querySelector("dialog-form").remove();
+	};
+	dialog.show();
+}
+
+async function handleDiskAttach () {
+	let dialog = document.createElement("dialog-form");
+	document.body.append(dialog);
+
+	let diskImage = config.data[this.id];
+
+	dialog.header = `Attach ${diskImage}`;
+
+	let label = document.createElement("label");
+	label.for = "device";
+	label.innerText = "SATA"
+	dialog.append(label);
+
+	let input = document.createElement("input");
+	input.name = "device";
+	input.id = "device";
+	input.type = "number";
+	input.min = 0;
+	input.max = 5;
+	input.value = 0;
+	dialog.append(input);
+
+	dialog.callback = async (result, form) => {
+		if (result === "confirm") {
+			let action = {};
+			action[`sata${input.value}`] = diskImage;
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				action: JSON.stringify(action)
+			}
+			let result = await requestAPI("/disk/attach", "POST", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateDisk();
+			}
+			else {
+				console.error(result);
+			}
+		}
 	};
 	dialog.show();
 }
@@ -208,6 +251,7 @@ async function handleDiskResize () {
 
 	let input = document.createElement("input");
 	input.name = "size-increment";
+	input.id = "size-increment";
 	input.type = "number";
 	input.min = 0;
 	input.max = 131072;
@@ -215,7 +259,7 @@ async function handleDiskResize () {
 	dialog.append(input);
 
 	dialog.callback = async (result, form) => {
-		if(result === "confirm") {
+		if (result === "confirm") {
 			let body = {
 				node: node,
 				type: type,
@@ -231,7 +275,6 @@ async function handleDiskResize () {
 				console.error(result);
 			}
 		}
-		document.querySelector("dialog-form").remove();
 	};
 	dialog.show();
 }
@@ -251,8 +294,9 @@ async function handleDiskMove () {
 
 	let storageSelect = document.createElement("select");
 	storageSelect.name = "storage-select";
+	storageSelect.id = "storage-select";
 	storage.data.forEach((element) => {
-		if(element.content.includes(content)){
+		if (element.content.includes(content)){
 			storageSelect.add(new Option(element.storage));
 		}
 	});
@@ -267,11 +311,12 @@ async function handleDiskMove () {
 	let deleteCheckbox = document.createElement("input");
 	deleteCheckbox.type = "checkbox";
 	deleteCheckbox.name = "delete-check"
+	deleteCheckbox.id = "delete-check"
 	deleteCheckbox.checked = true;
 	dialog.append(deleteCheckbox);
 
 	dialog.callback = async (result, form) => {
-		if(result === "confirm") {
+		if (result === "confirm") {
 			let body = {
 				node: node,
 				type: type,
@@ -283,11 +328,10 @@ async function handleDiskMove () {
 				await getConfig();
 				populateDisk();
 			}
-			else{
+			else {
 				console.error(result);
 			}
 		}
-		document.querySelector("dialog-form").remove();
 	};
 
 	dialog.show();

@@ -171,6 +171,7 @@ export class Dialog extends HTMLElement {
 	set callback (callback) {
 		this.dialog.addEventListener("close", async () => {
 			await callback(this.dialog.returnValue, new FormData(this.form));
+			document.querySelector("dialog-form").remove();
 		});
 	}
 	show () {
