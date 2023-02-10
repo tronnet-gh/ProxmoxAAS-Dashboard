@@ -123,20 +123,15 @@ function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 	diskMetaData.actionBarOrder.forEach((element) => {
 		let action = document.createElement("img");
 		action.classList.add("clickable");
-		if (element === "delete_detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")){ // attach
+		if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")){ // attach
 			action.src = "images/actions/attach.svg";
 			action.title = "Attach Disk";
 			action.addEventListener("click", handleDiskAttach);
 		}
-		else if (element === "delete_detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")){ // detach
+		else if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")){ // detach
 			action.src = "images/actions/detach.svg";
 			action.title = "Detach Disk";
 			action.addEventListener("click", handleDiskDetach);
-		}
-		else if (element === "delete_detach_attach"){
-			let active = diskMetaData[type][busPrefix].actions.includes("delete") ? "active" : "inactive"; // delete
-			action.src = `images/actions/delete-${active}.svg`;
-			action.title = `Delete Disk`;
 		}
 		else {
 			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
@@ -148,11 +143,16 @@ function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 			else if (element === "resize") {
 				action.addEventListener("click", handleDiskResize);
 			}
-			else {
-				console.log(`got invalid action ${element} at disk ${busName} ${device}`);
+			else if (element === "delete") {
+				action.addEventListener("click", handleDiskDelete);
+			}
+			else { // entry does not support anything in this category, override the src and title with nothing
+				action.src = "";
+				action.title = "";
 			}
 		}
 		action.id = `${busPrefix}${device}`
+		action.alt = action.title;
 		actionDiv.append(action);
 	});
 	field.append(actionDiv);
@@ -317,11 +317,18 @@ async function handleDiskMove () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
+			let action = {storage: storageSelect.value, delete: deleteCheckbox.checked ? "1": "0"}
+			if (type === "qemu") { // if vm, move disk
+				action.disk = this.id;
+			}
+			else { // type is lxc, move volume
+				action.volume = this.id;
+			}
 			let body = {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify({storage: storageSelect.value, disk: this.id, delete: deleteCheckbox.checked ? "1": "0"})
+				action: JSON.stringify(action)
 			}
 			let result = await requestAPI("/disk/move", "POST", body);
 			if (result.status === 200) {
@@ -334,6 +341,43 @@ async function handleDiskMove () {
 		}
 	};
 
+	dialog.show();
+}
+
+async function handleDiskDelete () {
+	let dialog = document.createElement("dialog-form");
+	document.body.append(dialog);
+
+	dialog.header = `Delete ${this.id}`;
+
+	let confirm = document.createElement("p");
+	confirm.innerHTML = "Are you sure you want to <strong>delete</strong> disk"
+	confirm.style.color = "#FF0000";
+	dialog.append(confirm)
+
+	let idtext = document.createElement("p");
+	idtext.innerText = this.id;
+	idtext.style.color = "#FF0000";
+	dialog.append(idtext);
+
+	dialog.callback = async (result, form) => {
+		if (result === "confirm") {
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				action: JSON.stringify({delete: this.id})
+			};
+			let result = await requestAPI("/disk/delete", "POST", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateDisk();
+			}
+			else {
+				console.error(result);
+			}
+		}
+	};
 	dialog.show();
 }
 

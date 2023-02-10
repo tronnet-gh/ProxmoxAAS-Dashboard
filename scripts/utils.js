@@ -16,7 +16,7 @@ export class NetworkError extends Error {
 
 export const resources = {
 	disk: {
-		actionBarOrder: ["move", "resize", "delete_detach_attach"],
+		actionBarOrder: ["move", "resize", "detach_attach", "delete"],
 		lxc: {
 			prefixOrder: ["rootfs", "mp", "unused"],
 			rootfs: {name: "ROOTFS", icon: "images/resources/drive.svg", actions: ["move", "resize"]},
