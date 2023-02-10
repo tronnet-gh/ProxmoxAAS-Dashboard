@@ -203,7 +203,7 @@ async function handleDiskAttach () {
 
 	let label = document.createElement("label");
 	label.for = "device";
-	label.innerText = "SATA"
+	label.innerText = type === "qemu" ? "SATA" : "MP";
 	dialog.append(label);
 
 	let input = document.createElement("input");
@@ -218,7 +218,12 @@ async function handleDiskAttach () {
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
 			let action = {};
-			action[`sata${input.value}`] = diskImage;
+			let bus = type === "qemu" ? "sata" : "mp";
+			let details = diskImage;
+			if (type === "lxc") {
+				details += `,mp=/mp${input.value}/`;
+			}
+			action[`${bus}${input.value}`] = details;			
 			let body = {
 				node: node,
 				type: type,
