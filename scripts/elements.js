@@ -1,7 +1,5 @@
 import {requestPVE, goToPage, instances} from "./utils.js";
 
-const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
-
 export class Instance extends HTMLElement {
 	constructor () {
 		super();
@@ -91,38 +89,29 @@ export class Instance extends HTMLElement {
 
 			this.update();
 
-			let task;
+			let result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node.name, vmid: this.vmid});
 
-			try {
-				task = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node.name, vmid: this.vmid});
-			}
-			catch (error) {
-				this.status = prevStatus;
-				this.update();
-				this.actionLock = false;
-				console.error(error);
-				return;
-			}
+			const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
 
 			while (true) {
-				let taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${task.data}/status`);
+				let taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`);
 				if(taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
 					this.status = targetStatus;
 					this.update();
 					this.actionLock = false;
-					return;
+					break;
 				}
 				else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
 					this.status = prevStatus;
-					console.error(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${taskStatus.data.exitstatus}`);
+					console.error(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${result.data.exitstatus}`);
 					this.update();
 					this.actionLock = false;
-					return;
+					break;
 				}
 				else{ // task has not stopped
 					await waitFor(1000);
 				}
-			}
+			}		
 		}
 	}
 
