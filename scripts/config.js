@@ -93,23 +93,29 @@ function populateDisk () {
 	}
 }
 
-function addDiskLine (fieldset, busPrefix, busName, device, disk) {
+function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 	let field = document.querySelector(`#${fieldset}`);
+
+	let diskName = `${busName} ${device}`;
+	let diskID = `${busPrefix}${device}`;
 	
 	// Set the disk icon, either drive.svg or disk.svg
 	let icon = document.createElement("img");
 	icon.src = diskMetaData[type][busPrefix].icon;
-	icon.alt = `${busName} ${device}`;
+	icon.alt = diskName;
+	icon.dataset.disk = diskID;
 	field.append(icon);
 
 	// Add a label for the disk bus and device number
 	let diskLabel = document.createElement("label");
-	diskLabel.innerHTML = `${busName} ${device}`;
+	diskLabel.innerHTML = diskName;
+	diskLabel.dataset.disk = diskID;
 	field.append(diskLabel);
 
 	// Add text of the disk configuration
 	let diskDesc = document.createElement("p");
-	diskDesc.innerText = disk;
+	diskDesc.innerText = diskDetails;
+	diskDesc.dataset.disk = diskID;
 	field.append(diskDesc);
 
 	let actionDiv = document.createElement("div");
@@ -140,12 +146,12 @@ function addDiskLine (fieldset, busPrefix, busName, device, disk) {
 			else if (element === "delete") {
 				action.addEventListener("click", handleDiskDelete);
 			}
-			else { // entry does not support anything in this category, override the src and title with nothing
-				action.src = "";
+			else { // entry does not support anything in this category, override the src and title for a blank tile
+				action.src = "images/blank.svg";
 				action.title = "";
 			}
 		}
-		action.id = `${busPrefix}${device}`
+		action.dataset.disk = diskID;
 		action.alt = action.title;
 		actionDiv.append(action);
 	});
@@ -156,14 +162,14 @@ async function handleDiskDetach () {
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
 
-	dialog.header = `Detach ${this.id}`;
+	dialog.header = `Detach ${this.dataset.disk}`;
 
 	let confirm = document.createElement("p");
 	confirm.innerText = "Are you sure you want to detach disk"
 	dialog.append(confirm)
 
 	let idtext = document.createElement("p");
-	idtext.innerText = this.id;
+	idtext.innerText = this.dataset.disk;
 	dialog.append(idtext);
 
 	dialog.callback = async (result, form) => {
@@ -172,7 +178,7 @@ async function handleDiskDetach () {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify({delete: this.id})
+				action: JSON.stringify({delete: this.dataset.disk})
 			};
 			let result = await requestAPI("/disk/detach", "POST", body);
 			if (result.status === 200) {
@@ -191,7 +197,7 @@ async function handleDiskAttach () {
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
 
-	let diskImage = config.data[this.id];
+	let diskImage = config.data[this.dataset.disk];
 
 	dialog.header = `Attach ${diskImage}`;
 
@@ -241,7 +247,7 @@ async function handleDiskResize () {
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
 
-	dialog.header = `Resize ${this.id}`;
+	dialog.header = `Resize ${this.dataset.disk}`;
 
 	let label = document.createElement("label");
 	label.for = "size-increment";
@@ -263,7 +269,7 @@ async function handleDiskResize () {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify({disk: this.id, size: `+${form.get("size-increment")}G`})
+				action: JSON.stringify({disk: this.dataset.disk, size: `+${form.get("size-increment")}G`})
 			}
 			let result = await requestAPI("/disk/resize", "POST", body);
 			if (result.status === 200) {
@@ -284,7 +290,7 @@ async function handleDiskMove () {
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
 
-	dialog.header = `Move ${this.id}`;
+	dialog.header = `Move ${this.dataset.disk}`;
 
 	let storageLabel = document.createElement("label");
 	storageLabel.for = "storage-select";
@@ -318,10 +324,10 @@ async function handleDiskMove () {
 		if (result === "confirm") {
 			let action = {storage: storageSelect.value, delete: deleteCheckbox.checked ? "1": "0"}
 			if (type === "qemu") { // if vm, move disk
-				action.disk = this.id;
+				action.disk = this.dataset.disk;
 			}
 			else { // type is lxc, move volume
-				action.volume = this.id;
+				action.volume = this.dataset.disk;
 			}
 			let body = {
 				node: node,
@@ -347,7 +353,7 @@ async function handleDiskDelete () {
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
 
-	dialog.header = `Delete ${this.id}`;
+	dialog.header = `Delete ${this.dataset.disk}`;
 
 	let confirm = document.createElement("p");
 	confirm.innerHTML = "Are you sure you want to <strong>delete</strong> disk"
@@ -355,7 +361,7 @@ async function handleDiskDelete () {
 	dialog.append(confirm)
 
 	let idtext = document.createElement("p");
-	idtext.innerText = this.id;
+	idtext.innerText = this.dataset.disk;
 	idtext.style.color = "#FF0000";
 	dialog.append(idtext);
 
@@ -365,7 +371,7 @@ async function handleDiskDelete () {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify({delete: this.id})
+				action: JSON.stringify({delete: this.dataset.disk})
 			};
 			let result = await requestAPI("/disk/delete", "POST", body);
 			if (result.status === 200) {
