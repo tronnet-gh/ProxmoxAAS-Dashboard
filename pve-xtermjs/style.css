@@ -1,0 +1,144 @@
+html,body {
+    height: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: Consolas,"DejaVu Sans Mono","Liberation Mono",Courier,monospace;
+    background-color: #101010;
+}
+
+.terminal {
+    background-color: #101010;
+    color: #f0f0f0;
+    font-size: 10pt;
+    font-family: Consolas,"DejaVu Sans Mono","Liberation Mono",Courier,monospace;
+    font-variant-ligatures: none;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+}
+
+.terminal .xterm-viewport {
+    background-color: rgba(121, 121, 121, 0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: background-color 800ms linear;
+}
+
+/* fix line height on firefox */
+.xterm-rows > div > span {
+    display: inline-block;
+}
+
+#terminal-container {
+    height: 100%;
+    width: auto;
+}
+
+#wrap {
+    height: 100%;
+    width: auto;
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+#status_bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 500;
+  transform: translateY(-100%);
+
+  transition: 0.25s ease-in-out;
+
+  visibility: hidden;
+  opacity: 0;
+
+  padding: 5px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+
+  line-height: 25px;
+  color: #fff;
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.9);
+}
+
+#status_bar.open {
+  transform: translateY(0);
+  visibility: visible;
+  opacity: 1;
+}
+
+#status_bar.normal {
+  background: rgba(128,128,128,0.9);
+}
+#status_bar.error {
+  background: rgba(200,55,55,0.9);
+}
+#status_bar.warning {
+  background: rgba(180,180,30,0.9);
+}
+
+#pve_start_info {
+    color: white;
+    text-align: center;
+    font-size: 20px;
+    padding: 6px;
+}
+
+#connect_dlg {
+  transition: 0.2s ease-in-out;
+
+  transform: scale(0, 0);
+  visibility: hidden;
+  opacity: 0;
+  font-family: Helvetica;
+}
+
+#connect_dlg.pve_open {
+  transform: scale(1, 1);
+  visibility: visible;
+  opacity: 1;
+}
+
+#connect_btn {
+  cursor: pointer;
+  padding: 6px;
+  color: white;
+  background:#4c4c4c;;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 20px;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
+}
+#connect_btn div {
+  margin: 2px;
+  padding: 5px 30px;
+  border: 1px solid #2f2f2f;
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background:#4c4c4c;;
+
+  /* This avoids it jumping around when :active */
+  vertical-align: middle;
+}
+#connect_btn div:active {
+  border-bottom-width: 1px;
+  margin-top: 3px;
+}
+
+div.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
