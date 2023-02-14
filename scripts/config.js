@@ -339,9 +339,7 @@ async function handleDiskAdd () {
 	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
-
-	let diskImage = config.data[this.dataset.disk];
-
+	
 	dialog.header = `Create A New Disk`;
 
 	let options = "";
