@@ -91,6 +91,7 @@ function populateDisk () {
 			addDiskLine("disks", prefix, busName, element, disk);
 		});
 	}
+	document.querySelector("#disk-add").addEventListener("click", handleDiskAdd);
 }
 
 function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
@@ -161,14 +162,7 @@ async function handleDiskDetach () {
 	document.body.append(dialog);
 
 	dialog.header = `Detach ${this.dataset.disk}`;
-
-	let confirm = document.createElement("p");
-	confirm.innerText = "Are you sure you want to detach disk"
-	dialog.append(confirm)
-
-	let idtext = document.createElement("p");
-	idtext.innerText = this.dataset.disk;
-	dialog.append(idtext);
+	dialog.formBody = `<p>Are you sure you want to detach disk</p><p>${this.dataset.disk}</p>`;
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
@@ -199,31 +193,19 @@ async function handleDiskAttach () {
 	let diskImage = config.data[this.dataset.disk];
 
 	dialog.header = `Attach ${diskImage}`;
-
-	let label = document.createElement("label");
-	label.for = "device";
-	label.innerText = type === "qemu" ? "SATA" : "MP";
-	dialog.append(label);
-
-	let input = document.createElement("input");
-	input.name = "device";
-	input.id = "device";
-	input.type = "number";
-	input.min = 0;
-	input.max = 5;
-	input.value = 0;
-	dialog.append(input);
+	dialog.formBody = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="5" value="0"></input>`;
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
+			let device = form.get("device");
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
 			let action = {};
 			let bus = type === "qemu" ? "sata" : "mp";
 			let details = diskImage;
 			if (type === "lxc") {
-				details += `,mp=/mp${input.value}/`;
+				details += `,mp=/mp${device}/`;
 			}
-			action[`${bus}${input.value}`] = details;			
+			action[`${bus}${device}`] = details;			
 			let body = {
 				node: node,
 				type: type,
@@ -247,21 +229,8 @@ async function handleDiskResize () {
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
 
-	dialog.header = `Resize ${this.dataset.disk}`;
-
-	let label = document.createElement("label");
-	label.for = "size-increment";
-	label.innerText = "Size Increment (GiB)";
-	dialog.append(label);
-
-	let input = document.createElement("input");
-	input.name = "size-increment";
-	input.id = "size-increment";
-	input.type = "number";
-	input.min = 0;
-	input.max = 131072;
-	input.value = 0;
-	dialog.append(input);
+	dialog.header = `Resize ${this.dataset.disk}`; 
+	dialog.formBody = `<label for="size-increment">Size Increment (GiB)</label><input name="size-increment" id="size-increment" type="number" min="0" max="131072" value="0"></input>`;
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
@@ -296,7 +265,7 @@ async function handleDiskMove () {
 	let storageLabel = document.createElement("label");
 	storageLabel.for = "storage-select";
 	storageLabel.innerText = "Storage";
-	dialog.append(storageLabel);
+	dialog.formBodyAppend(storageLabel);
 
 	let storageSelect = document.createElement("select");
 	storageSelect.name = "storage-select";
@@ -306,20 +275,19 @@ async function handleDiskMove () {
 			storageSelect.add(new Option(element.storage));
 		}
 	});
-
-	dialog.append(storageSelect);
+	dialog.formBodyAppend(storageSelect);
 
 	let deleteLabel = document.createElement("label");
 	deleteLabel.for = "delete-check";
 	deleteLabel.innerText = "Delete Source";
-	dialog.append(deleteLabel);
+	dialog.formBodyAppend(deleteLabel);
 
 	let deleteCheckbox = document.createElement("input");
 	deleteCheckbox.type = "checkbox";
 	deleteCheckbox.name = "delete-check"
 	deleteCheckbox.id = "delete-check"
 	deleteCheckbox.checked = true;
-	dialog.append(deleteCheckbox);
+	dialog.formBodyAppend(deleteCheckbox);
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
@@ -356,16 +324,7 @@ async function handleDiskDelete () {
 	document.body.append(dialog);
 
 	dialog.header = `Delete ${this.dataset.disk}`;
-
-	let confirm = document.createElement("p");
-	confirm.innerHTML = "Are you sure you want to <strong>delete</strong> disk"
-	confirm.style.color = "#FF0000";
-	dialog.append(confirm)
-
-	let idtext = document.createElement("p");
-	idtext.innerText = this.dataset.disk;
-	idtext.style.color = "#FF0000";
-	dialog.append(idtext);
+	dialog.formBody = `<p style="color: #FF0000;">Are you sure you want to <strong>delete</strong> disk</p><p style="color: #FF0000;">${this.dataset.disk}</p>`;
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
@@ -387,6 +346,10 @@ async function handleDiskDelete () {
 		}
 	};
 	dialog.show();
+}
+
+async function handleDiskAdd () {
+	
 }
 
 function getOrderedUsed(disks){

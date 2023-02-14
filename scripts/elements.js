@@ -167,7 +167,11 @@ export class Dialog extends HTMLElement {
 		this.shadowElement.querySelector("#prompt").innerText = header;
 	}
 
-	append (element) {
+	set formBody (formBody) {
+		this.form.innerHTML = formBody;
+	}
+
+	formBodyAppend (element) {
 		this.form.append(element);
 	}
 	
