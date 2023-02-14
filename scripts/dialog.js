@@ -32,10 +32,6 @@ export class Dialog extends HTMLElement {
 	set formBody (formBody) {
 		this.form.innerHTML = formBody;
 	}
-
-	formBodyAppend (element) {
-		this.form.append(element);
-	}
 	
 	set callback (callback) {
 		this.dialog.addEventListener("close", async () => {
