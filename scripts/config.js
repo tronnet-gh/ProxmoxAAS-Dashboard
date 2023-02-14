@@ -193,7 +193,7 @@ async function handleDiskAttach () {
 	let diskImage = config.data[this.dataset.disk];
 
 	dialog.header = `Attach ${diskImage}`;
-	dialog.formBody = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="5" value="0"></input>`;
+	dialog.formBody = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0"></input>`;
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
@@ -349,7 +349,39 @@ async function handleDiskDelete () {
 }
 
 async function handleDiskAdd () {
-	
+	let content = type === "qemu" ? "images" : "rootdir"
+	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
+	let dialog = document.createElement("dialog-form");
+	document.body.append(dialog);
+
+	let diskImage = config.data[this.dataset.disk];
+
+	dialog.header = `Create A New Disk`;
+	dialog.formBody = `
+		<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0"></input>
+		<label for="size">Size (GiB)</label><input name="size" id="size" type="number" min="0" max="131072" value="0"></input>
+	`;
+
+	let storageLabel = document.createElement("label");
+	storageLabel.for = "storage-select";
+	storageLabel.innerText = "Storage";
+	dialog.formBodyAppend(storageLabel);
+
+	let storageSelect = document.createElement("select");
+	storageSelect.name = "storage-select";
+	storageSelect.id = "storage-select";
+	storage.data.forEach((element) => {
+		if (element.content.includes(content)){
+			storageSelect.add(new Option(element.storage));
+		}
+	});
+	dialog.formBodyAppend(storageSelect);
+
+	dialog.callback = () => {
+
+	};
+
+	dialog.show();
 }
 
 function getOrderedUsed(disks){
