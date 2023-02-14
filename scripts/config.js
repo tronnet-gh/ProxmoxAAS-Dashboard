@@ -137,18 +137,16 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
 			action.src = `images/actions/${element}-${active}.svg`;
 			action.title = `${element.charAt(0).toUpperCase()}${element.slice(1)} Disk`;
-			if (element === "move") {
-				action.addEventListener("click", handleDiskMove);
-			}
-			else if (element === "resize") {
-				action.addEventListener("click", handleDiskResize);
-			}
-			else if (element === "delete") {
-				action.addEventListener("click", handleDiskDelete);
-			}
-			else { // entry does not support anything in this category, override the src and title for a blank tile
-				action.src = "images/blank.svg";
-				action.title = "";
+			if (active === "active") {
+				if (element === "move") {
+					action.addEventListener("click", handleDiskMove);
+				}
+				else if (element === "resize") {
+					action.addEventListener("click", handleDiskResize);
+				}
+				else if (element === "delete") {
+					action.addEventListener("click", handleDiskDelete);
+				}
 			}
 		}
 		action.dataset.disk = diskID;
