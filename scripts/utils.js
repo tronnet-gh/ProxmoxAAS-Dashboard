@@ -148,12 +148,18 @@ async function request (url, content) {
 	return data;
 }
 
-export function goToPage (page, data={}) {
+export function goToPage (page, data={}, newwindow = false) {
 	let url = new URL(`https://client.tronnet.net/${page}`);
 	for(let k in data) {
 		url.searchParams.append(k, data[k]);
 	}
-	window.location.assign(url.toString());
+
+	if (newwindow) {
+		window.open(url, "tronnet - client", "height=480,width=848");
+	}
+	else {
+		window.location.assign(url.toString());
+	}
 }
 
 export function getURIData () {
