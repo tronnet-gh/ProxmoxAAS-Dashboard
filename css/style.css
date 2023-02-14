@@ -1,5 +1,6 @@
 body {
 	background-color:black;
+	min-width: fit-content;
 }
 
 h1, h2, h3, p {

@@ -8,6 +8,9 @@ article {
 article > div {
 	display: flex;
 	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	column-gap: 10px;
 }
 
 article > div > div {
