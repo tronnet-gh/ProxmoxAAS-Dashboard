@@ -1,5 +1,5 @@
-import {requestPVE, requestAPI, goToPage, getURIData, reload, resources} from "./utils.js";
-import { Dialog } from "./elements.js";
+import {requestPVE, requestAPI, goToPage, getURIData, resources} from "./utils.js";
+import { Dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
 
