@@ -14,7 +14,7 @@ export class Dialog extends HTMLElement {
 			</form>
 			<hr>
 			<div class="btn-group">
-				<button value="cancel" form="form">CANCEL</button>
+				<button value="cancel" form="form" class="active">CANCEL</button>
 				<button value="confirm" form="form">CONFIRM</button>
 			</div>
 		</dialog>
