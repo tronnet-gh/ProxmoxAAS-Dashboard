@@ -174,6 +174,7 @@ async function handleDiskDetach () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
 			let body = {
 				node: node,
 				type: type,
@@ -217,6 +218,7 @@ async function handleDiskAttach () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
 			let action = {};
 			let bus = type === "qemu" ? "sata" : "mp";
 			let details = diskImage;
@@ -265,6 +267,7 @@ async function handleDiskResize () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
 			let body = {
 				node: node,
 				type: type,
@@ -322,6 +325,7 @@ async function handleDiskMove () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
 			let action = {storage: storageSelect.value, delete: deleteCheckbox.checked ? "1": "0"}
 			if (type === "qemu") { // if vm, move disk
 				action.disk = this.dataset.disk;
@@ -367,6 +371,7 @@ async function handleDiskDelete () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
 			let body = {
 				node: node,
 				type: type,
