@@ -262,37 +262,23 @@ async function handleDiskMove () {
 
 	dialog.header = `Move ${this.dataset.disk}`;
 
-	let storageLabel = document.createElement("label");
-	storageLabel.for = "storage-select";
-	storageLabel.innerText = "Storage";
-	dialog.formBodyAppend(storageLabel);
-
-	let storageSelect = document.createElement("select");
-	storageSelect.name = "storage-select";
-	storageSelect.id = "storage-select";
+	let options = "";
 	storage.data.forEach((element) => {
 		if (element.content.includes(content)){
-			storageSelect.add(new Option(element.storage));
+			options += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	dialog.formBodyAppend(storageSelect);
+	let select = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select">${options}</select>`;
 
-	let deleteLabel = document.createElement("label");
-	deleteLabel.for = "delete-check";
-	deleteLabel.innerText = "Delete Source";
-	dialog.formBodyAppend(deleteLabel);
-
-	let deleteCheckbox = document.createElement("input");
-	deleteCheckbox.type = "checkbox";
-	deleteCheckbox.name = "delete-check"
-	deleteCheckbox.id = "delete-check"
-	deleteCheckbox.checked = true;
-	dialog.formBodyAppend(deleteCheckbox);
+	dialog.formBody = `
+		${select}
+		<label for="delete-check">Delete Source</label><input name="delete-check" id="delete-check" type="checkbox" checked>
+	`;
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
-			let action = {storage: storageSelect.value, delete: deleteCheckbox.checked ? "1": "0"}
+			let action = {storage: form.get("storage-select"), delete: form.get("delete-check") === "on" ? "1": "0"}
 			if (type === "qemu") { // if vm, move disk
 				action.disk = this.dataset.disk;
 			}
@@ -357,25 +343,20 @@ async function handleDiskAdd () {
 	let diskImage = config.data[this.dataset.disk];
 
 	dialog.header = `Create A New Disk`;
-	dialog.formBody = `
-		<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0"></input>
-		<label for="size">Size (GiB)</label><input name="size" id="size" type="number" min="0" max="131072" value="0"></input>
-	`;
 
-	let storageLabel = document.createElement("label");
-	storageLabel.for = "storage-select";
-	storageLabel.innerText = "Storage";
-	dialog.formBodyAppend(storageLabel);
-
-	let storageSelect = document.createElement("select");
-	storageSelect.name = "storage-select";
-	storageSelect.id = "storage-select";
+	let options = "";
 	storage.data.forEach((element) => {
 		if (element.content.includes(content)){
-			storageSelect.add(new Option(element.storage));
+			options += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	dialog.formBodyAppend(storageSelect);
+	let select = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select">${options}</select>`;
+
+	dialog.formBody = `
+		<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0"></input>
+		${select}
+		<label for="size">Size (GiB)</label><input name="size" id="size" type="number" min="0" max="131072" value="0"></input>
+	`;
 
 	dialog.callback = () => {
 
