@@ -24,6 +24,7 @@ export class Instance extends HTMLElement {
 			<div class="btn-group">
 				<img id="power-btn">
 				<img id="configure-btn" alt="change instance configuration">
+				<img id="console-btn" alt="connect to instance console or display">
 			</div>
 		</article>
 		`;
@@ -73,9 +74,16 @@ export class Instance extends HTMLElement {
 		configButton.title = instances[this.status].configButtonAlt;
 		configButton.addEventListener("click", this.handleConfigButton.bind(this));
 
+		let consoleButton = this.shadowElement.querySelector("#console-btn");
+		consoleButton.src = instances[this.status].consoleButtonSrc;
+		consoleButton.alt = instances[this.status].consoleButtonAlt;
+		consoleButton.title = instances[this.status].consoleButtonAlt;
+		consoleButton.addEventListener("click", this.handleConsoleButton.bind(this));
+
 		if (this.node.status !== "online") {
 			powerButton.classList.add("hidden");
 			configButton.classList.add("hidden");
+			consoleButton.classList.add("hidden");
 		}
 	}
 
@@ -118,6 +126,12 @@ export class Instance extends HTMLElement {
 	handleConfigButton () {
 		if (!this.actionLock && this.status === "stopped") { // if the action lock is false, and the node is stopped, then navigate to the conig page with the node infor in the search query
 			goToPage("config.html", {node: this.node.name, type: this.type, vmid: this.vmid});
+		}
+	}
+
+	handleConsoleButton () {
+		if (this.status === "running") {
+			goToPage("pve-xtermjs/index.html", {type: this.type, vmid: this.vmid, name: this.name, node: this.node.name, user: "alu@ldap", url: "pve.tronnet.net/api2/json"});
 		}
 	}
 }

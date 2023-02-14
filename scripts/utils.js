@@ -37,19 +37,25 @@ export const instances = {
 		powerButtonSrc: "images/actions/stop.svg",
 		powerButtonAlt: "Shutdown Instance",
 		configButtonSrc: "images/actions/config-inactive.svg",
-		configButtonAlt: "Configuration Disabled"
+		configButtonAlt: "Configuration Disabled",
+		consoleButtonSrc: "images/actions/console-active.svg",
+		consoleButtonAlt: "Open Console"
 	},
 	stopped: {
 		powerButtonSrc: "images/actions/start.svg",
 		powerButtonAlt: "Start Instance",
 		configButtonSrc: "images/actions/config-active.svg",
-		configButtonAlt: "Configure Instance"
+		configButtonAlt: "Configure Instance",
+		consoleButtonSrc: "images/actions/console-inactive.svg",
+		consoleButtonAlt: "Console Inactive"
 	},
 	loading: {
 		powerButtonSrc: "images/actions/loading.svg",
 		powerButtonAlt: "Loading Instance",
 		configButtonSrc: "images/actions/config-inactive.svg",
-		configButtonAlt: "Configuration Disabled"
+		configButtonAlt: "Configuration Disabled",
+		consoleButtonSrc: "images/actions/console-inactive.svg",
+		consoleButtonAlt: "Console Inactive"
 	}
 }
 
