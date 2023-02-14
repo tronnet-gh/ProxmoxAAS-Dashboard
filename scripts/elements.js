@@ -150,7 +150,7 @@ export class Dialog extends HTMLElement {
 			<hr>
 			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
 			</form>
-			<hr id="base-hr">
+			<hr>
 			<div class="btn-group">
 				<button value="cancel" form="form">Cancel</button>
 				<button value="confirm" form="form">Confirm</button>
