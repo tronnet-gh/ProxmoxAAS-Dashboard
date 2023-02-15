@@ -183,6 +183,7 @@ async function handleDiskDetach () {
 			}
 		}
 	};
+
 	dialog.show();
 }
 
@@ -222,6 +223,7 @@ async function handleDiskAttach () {
 			}
 		}
 	};
+
 	dialog.show();
 }
 
@@ -251,6 +253,7 @@ async function handleDiskResize () {
 			}
 		}
 	};
+
 	dialog.show();
 }
 
@@ -331,6 +334,7 @@ async function handleDiskDelete () {
 			}
 		}
 	};
+
 	dialog.show();
 }
 
@@ -356,8 +360,36 @@ async function handleDiskAdd () {
 		<label for="size">Size (GiB)</label><input name="size" id="size" type="number" min="0" max="131072" value="0"></input>
 	`;
 
-	dialog.callback = () => {
+	dialog.callback = async (result, form) => {
+		if (result === "confirm") {
+			let device = form.get("device");
+			let storage = form.get("storage-select");
+			let size = form.get("size");
 
+			let action = {};
+
+			if (type === "qemu") { // type is qemu, use sata
+				action[`sata${device}`] = `${storage}:${size}`;
+			}
+			else { // type is lxc, use mp and add mp and backup values
+				action[`mp${device}`] = `${storage}:${size},mp=/mp${device}/,backup=1`;
+			}
+
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				action: JSON.stringify(action)
+			};
+			let result = await requestAPI("/disk/create", "POST", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateDisk();
+			}
+			else {
+				console.error(result);
+			}
+		}
 	};
 
 	dialog.show();
