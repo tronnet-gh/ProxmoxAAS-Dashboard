@@ -92,6 +92,16 @@ function populateDisk () {
 		});
 	}
 	document.querySelector("#disk-add").addEventListener("click", handleDiskAdd);
+
+	if (type === "qemu") {
+		document.querySelector("#cd-add").classList.remove("none");
+		document.querySelector("#cd-add").addEventListener("click", handleCDAdd);
+	}
+}
+
+function getOrderedUsed(disks){
+	let ordered_keys = Object.keys(disks).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
+	return ordered_keys;
 }
 
 function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
@@ -395,7 +405,4 @@ async function handleDiskAdd () {
 	dialog.show();
 }
 
-function getOrderedUsed(disks){
-	let ordered_keys = Object.keys(disks).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
-	return ordered_keys;
-}
+async function handleCDAdd () {}
