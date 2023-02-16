@@ -131,7 +131,7 @@ export class Instance extends HTMLElement {
 
 	handleConsoleButton () {
 		if (this.status === "running") {
-			goToPage("pve-xtermjs/index.html", {type: this.type, vmid: this.vmid, name: this.name, node: this.node.name, user: getCookie("username"), url: "pve.tronnet.net/api2/json"}, true);
+			//goToPage("pve-xtermjs/index.html", {type: this.type, vmid: this.vmid, name: this.name, node: this.node.name, user: getCookie("username"), url: "pve.tronnet.net/api2/json"}, true);
 		}
 	}
 }
