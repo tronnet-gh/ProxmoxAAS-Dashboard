@@ -405,4 +405,65 @@ async function handleDiskAdd () {
 	dialog.show();
 }
 
-async function handleCDAdd () {}
+async function handleCDAdd () {
+	let content = "iso";
+	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
+	let dialog = document.createElement("dialog-form");
+	document.body.append(dialog);
+	
+	dialog.header = `Add a CDROM`;
+
+	let storageOptions = "";
+	storage.data.forEach((element) => {
+		if (element.content.includes(content)){
+			storageOptions += `<option value="${element.storage}">${element.storage}</option>"`;
+		}
+	});
+	let storageSelect = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select">${storageOptions}</select>`;
+
+	dialog.formBody = `
+		<label for="device">IDE</label><input name="device" id="device" type="number" min="0" max="3" value="0"></input>
+		${storageSelect}
+		<label for="iso-select">Image</label><select name="iso-select" id="iso-select"></select>
+	`;
+
+	dialog.shadowRoot.querySelector("#storage-select").selectedIndex = -1;
+
+	dialog.shadowRoot.querySelector("#storage-select").addEventListener("change", async () => {
+		let storage = dialog.shadowRoot.querySelector("#storage-select").value;
+		let ISOSelect = dialog.shadowRoot.querySelector("#iso-select");
+		let isos = await requestPVE(`/nodes/${node}/storage/${storage}/content`, "GET", {content: content});
+		isos.data.forEach((element) => {
+			if (element.content.includes(content)) {
+				ISOSelect.append(new Option(element.volid.replace(`${storage}:${content}/`, ""), element.volid));
+			}
+		});
+	});
+
+	dialog.callback = async (result, form) => {
+		if (result === "confirm") {
+			let device = form.get("device");
+			let iso = form.get("iso-select");
+
+			let action = {};
+			action[`ide${device}`] = `${iso},media=cdrom`;
+
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				action: JSON.stringify(action)
+			};
+			let result = await requestAPI("/disk/create", "POST", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateDisk();
+			}
+			else {
+				console.error(result);
+			}
+		}
+	};
+
+	dialog.show();
+}
