@@ -1,4 +1,4 @@
-import {requestPVE, goToPage, instances, getCookie} from "./utils.js";
+import {requestPVE, goToPage, goToURL, instances} from "./utils.js";
 
 export class Instance extends HTMLElement {
 	constructor () {
@@ -131,7 +131,9 @@ export class Instance extends HTMLElement {
 
 	handleConsoleButton () {
 		if (this.status === "running") {
-			//goToPage("pve-xtermjs/index.html", {type: this.type, vmid: this.vmid, name: this.name, node: this.node.name, user: getCookie("username"), url: "pve.tronnet.net/api2/json"}, true);
+			let data = {console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node.name, resize: "off", cmd: ""};
+			data[`${this.type === "qemu" ? "novnc" : "xtermjs"}`] = 1;
+			goToURL("https://pve.tronnet.net", data, true);
 		}
 	}
 }
