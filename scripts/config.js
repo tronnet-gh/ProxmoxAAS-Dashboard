@@ -26,14 +26,12 @@ async function init () {
 	populateResources();
 	populateDisk();
 
-	let cancelButton = document.querySelector("#cancel");
-	cancelButton.addEventListener("click", () => {
-		goToPage("index.html");
-	});
+	document.querySelector("#exit").addEventListener("click", handleFormExit);
 }
 
 async function getConfig () {
 	config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
+	console.log(config);
 }
 
 function populateResources () {
@@ -466,4 +464,23 @@ async function handleCDAdd () {
 	};
 
 	dialog.show();
+}
+
+async function handleFormExit () {
+	let body = {
+		node: node,
+		type: type,
+		vmid: vmid,
+		cores: document.querySelector("#Cores").value,
+		memory: document.querySelector("#Memory").value
+	}
+	let result = await requestAPI("/resources", "POST", body);
+	if (result.status === 200) {
+		await getConfig();
+		populateDisk();
+	}
+	else {
+		console.error(result);
+	}
+	goToPage("index.html");
 }
