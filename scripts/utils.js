@@ -54,7 +54,7 @@ export const instances = {
 		deleteButtonAlt: "Delete Instance"
 	},
 	loading: {
-		powerButtonSrc: "images/actions/instance/loading.svg",
+		powerButtonSrc: "images/actions/loading.svg",
 		powerButtonAlt: "Loading Instance",
 		configButtonSrc: "images/actions/instance/config-inactive.svg",
 		configButtonAlt: "Change Configuration (Inactive)",
@@ -124,7 +124,7 @@ export async function requestAPI (path, method, body = null) {
 			"Content-Type": "application/x-www-form-urlencoded"
 		}
 	}
-	if (method === "POST") {
+	if (method === "POST" || method === "DELETE") {
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
 	if (body) {

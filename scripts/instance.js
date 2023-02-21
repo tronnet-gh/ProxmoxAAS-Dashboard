@@ -1,4 +1,4 @@
-import {requestPVE, goToPage, goToURL, instances} from "./utils.js";
+import {requestPVE, requestAPI, goToPage, goToURL, instances} from "./utils.js";
 import { Dialog } from "./dialog.js";
 
 export class Instance extends HTMLElement {
@@ -104,7 +104,7 @@ export class Instance extends HTMLElement {
 			document.body.append(dialog);
 
 			dialog.header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
-			dialog.formBody = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"}</p><p>VM ${this.vmid}</p>`
+			dialog.formBody = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"} VM</p><p>${this.vmid}</p>`
 
 			dialog.callback = async (result, form) => {
 				if (result === "confirm") {
@@ -153,14 +153,51 @@ export class Instance extends HTMLElement {
 	}
 
 	handleConsoleButton () {
-		if (this.status === "running") {
+		if (!this.actionLock && this.status === "running") {
 			let data = {console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node.name, resize: "off", cmd: ""};
 			data[`${this.type === "qemu" ? "novnc" : "xtermjs"}`] = 1;
 			goToURL("https://pve.tronnet.net", data, true);
 		}
 	}
 
-	handleDeleteButton () {}
+	handleDeleteButton () {
+		if (!this.actionLock && this.status === "stopped") {
+			let dialog = document.createElement("dialog-form");
+			document.body.append(dialog);
+
+			dialog.header = `Delete VM ${this.vmid}`;
+			dialog.formBody = `<p>Are you sure you want to <strong>delete</strong> VM </p><p>${this.vmid}</p>`
+
+			dialog.callback = async (result, form) => {
+				if (result === "confirm") {
+					this.actionLock = true;
+					this.status = "loading";
+					this.update();
+
+					let action = {};
+					action.purge = 1;
+					action["destroy-unreferenced-disks"] = 1;
+
+					let body = {
+						node: this.node.name,
+						type: this.type,
+						vmid: this.vmid,
+						action: JSON.stringify(action)
+					};
+
+					let result = await requestAPI("/instance", "DELETE", body);
+					if (result.status === 200) {
+						this.parentNode.removeChild(this);
+					}
+					else {
+						console.error(result);
+					}
+				}
+			}
+
+			dialog.show();
+		}
+	}
 }
 
 customElements.define("instance-article", Instance);
