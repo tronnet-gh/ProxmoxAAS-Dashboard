@@ -34,31 +34,31 @@ export const resources = {
 
 export const instances = {
 	running: {
-		powerButtonSrc: "images/actions/stop.svg",
+		powerButtonSrc: "images/actions/instance/stop.svg",
 		powerButtonAlt: "Shutdown Instance",
-		configButtonSrc: "images/actions/config-inactive.svg",
+		configButtonSrc: "images/actions/instance/config-inactive.svg",
 		configButtonAlt: "Change Configuration (Inactive)",
-		consoleButtonSrc: "images/actions/console-active.svg",
+		consoleButtonSrc: "images/actions/instance/console-active.svg",
 		consoleButtonAlt: "Open Console",
 		deleteButtonSrc: "images/actions/delete-inactive.svg",
 		deleteButtonAlt: "Delete Instance (Inactive)"
 	},
 	stopped: {
-		powerButtonSrc: "images/actions/start.svg",
+		powerButtonSrc: "images/actions/instance/start.svg",
 		powerButtonAlt: "Start Instance",
-		configButtonSrc: "images/actions/config-active.svg",
+		configButtonSrc: "images/actions/instance/config-active.svg",
 		configButtonAlt: "Change Configuration",
-		consoleButtonSrc: "images/actions/console-inactive.svg",
+		consoleButtonSrc: "images/actions/instance/console-inactive.svg",
 		consoleButtonAlt: "Open Console (Inactive)",
 		deleteButtonSrc: "images/actions/delete-active.svg",
 		deleteButtonAlt: "Delete Instance"
 	},
 	loading: {
-		powerButtonSrc: "images/actions/loading.svg",
+		powerButtonSrc: "images/actions/instance/loading.svg",
 		powerButtonAlt: "Loading Instance",
-		configButtonSrc: "images/actions/config-inactive.svg",
+		configButtonSrc: "images/actions/instance/config-inactive.svg",
 		configButtonAlt: "Change Configuration (Inactive)",
-		consoleButtonSrc: "images/actions/console-inactive.svg",
+		consoleButtonSrc: "images/actions/instance/console-inactive.svg",
 		consoleButtonAlt: "Open Console (Inactive)",
 		deleteButtonSrc: "images/actions/delete-inactive.svg",
 		deleteButtonAlt: "Delete Instance (Inactive)"
