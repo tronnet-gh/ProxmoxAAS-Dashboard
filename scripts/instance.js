@@ -1,4 +1,5 @@
 import {requestPVE, goToPage, goToURL, instances} from "./utils.js";
+import { Dialog } from "./dialog.js";
 
 export class Instance extends HTMLElement {
 	constructor () {
@@ -23,8 +24,9 @@ export class Instance extends HTMLElement {
 			<hr>
 			<div class="btn-group">
 				<img id="power-btn">
-				<img id="configure-btn" alt="change instance configuration">
-				<img id="console-btn" alt="connect to instance console or display">
+				<img id="console-btn">
+				<img id="configure-btn">
+				<img id="delete-btn">
 			</div>
 		</article>
 		`;
@@ -80,46 +82,67 @@ export class Instance extends HTMLElement {
 		consoleButton.title = instances[this.status].consoleButtonAlt;
 		consoleButton.addEventListener("click", this.handleConsoleButton.bind(this));
 
+		let deleteButton = this.shadowElement.querySelector("#delete-btn");
+		deleteButton.src = instances[this.status].deleteButtonSrc;
+		deleteButton.alt = instances[this.status].deleteButtonAlt;
+		deleteButton.title = instances[this.status].deleteButtonAlt;
+		deleteButton.addEventListener("click", this.handleDeleteButton.bind(this));
+
 		if (this.node.status !== "online") {
 			powerButton.classList.add("hidden");
 			configButton.classList.add("hidden");
 			consoleButton.classList.add("hidden");
+			deleteButton.classList.add("hidden");
 		}
 	}
 
 	async handlePowerButton () {
+
 		if(!this.actionLock) {
-			this.actionLock = true;
-			let targetAction = this.status === "running" ? "shutdown" : "start";
-			let targetStatus = this.status === "running" ? "stopped" : "running";
-			let prevStatus = this.status;
-			this.status = "loading";
 
-			this.update();
+			let dialog = document.createElement("dialog-form");
+			document.body.append(dialog);
 
-			let result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node.name, vmid: this.vmid});
+			dialog.header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
+			dialog.formBody = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"}</p><p>VM ${this.vmid}</p>`
 
-			const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
+			dialog.callback = async (result, form) => {
+				if (result === "confirm") {
+					this.actionLock = true;
+					let targetAction = this.status === "running" ? "stop" : "start";
+					let targetStatus = this.status === "running" ? "stopped" : "running";
+					let prevStatus = this.status;
+					this.status = "loading";
 
-			while (true) {
-				let taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`);
-				if(taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
-					this.status = targetStatus;
 					this.update();
-					this.actionLock = false;
-					break;
+
+					let result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node.name, vmid: this.vmid});
+
+					const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
+
+					while (true) {
+						let taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`);
+						if(taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
+							this.status = targetStatus;
+							this.update();
+							this.actionLock = false;
+							break;
+						}
+						else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
+							this.status = prevStatus;
+							console.error(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${result.data.exitstatus}`);
+							this.update();
+							this.actionLock = false;
+							break;
+						}
+						else{ // task has not stopped
+							await waitFor(1000);
+						}
+					}
 				}
-				else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
-					this.status = prevStatus;
-					console.error(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${result.data.exitstatus}`);
-					this.update();
-					this.actionLock = false;
-					break;
-				}
-				else{ // task has not stopped
-					await waitFor(1000);
-				}
-			}		
+			}
+
+			dialog.show();
 		}
 	}
 
@@ -136,6 +159,8 @@ export class Instance extends HTMLElement {
 			goToURL("https://pve.tronnet.net", data, true);
 		}
 	}
+
+	handleDeleteButton () {}
 }
 
 customElements.define("instance-article", Instance);
