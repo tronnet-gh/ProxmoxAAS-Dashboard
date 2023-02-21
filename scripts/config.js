@@ -133,18 +133,24 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 		let action = document.createElement("img");
 		action.classList.add("clickable");
 		if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")){ // attach
-			action.src = "images/actions/attach.svg";
+			action.src = "images/actions/disk/attach.svg";
 			action.title = "Attach Disk";
 			action.addEventListener("click", handleDiskAttach);
 		}
 		else if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")){ // detach
-			action.src = "images/actions/detach.svg";
+			action.src = "images/actions/disk/detach.svg";
 			action.title = "Detach Disk";
 			action.addEventListener("click", handleDiskDetach);
 		}
+		else if (element === "delete") {
+			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
+			action.src = `images/actions/delete-${active}.svg`;
+			action.title = "Delete Disk";
+			action.addEventListener("click", handleDiskDelete);
+		}
 		else {
 			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
-			action.src = `images/actions/${element}-${active}.svg`;
+			action.src = `images/actions/disk/${element}-${active}.svg`;
 			action.title = `${element.charAt(0).toUpperCase()}${element.slice(1)} Disk`;
 			if (active === "active") {
 				if (element === "move") {
@@ -152,9 +158,6 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 				}
 				else if (element === "resize") {
 					action.addEventListener("click", handleDiskResize);
-				}
-				else if (element === "delete") {
-					action.addEventListener("click", handleDiskDelete);
 				}
 			}
 		}
