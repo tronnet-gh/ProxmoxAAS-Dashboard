@@ -271,7 +271,7 @@ async function handleDiskResize () {
 }
 
 async function handleDiskMove () {
-	let content = type === "qemu" ? "images" : "rootdir"
+	let content = type === "qemu" ? "images" : "rootdir";
 	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
@@ -352,7 +352,7 @@ async function handleDiskDelete () {
 }
 
 async function handleDiskAdd () {
-	let content = type === "qemu" ? "images" : "rootdir"
+	let content = type === "qemu" ? "images" : "rootdir";
 	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
