@@ -63,6 +63,8 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 		input.setAttribute(k, inputAttr[k])
 	}
 	input.id = labelText;
+	input.name = labelText;
+	input.required = true;
 	field.append(input);
 
 	if (unitText) {
@@ -205,7 +207,7 @@ async function handleDiskAttach () {
 	let diskImage = config.data[this.dataset.disk];
 
 	dialog.header = `Attach ${diskImage}`;
-	dialog.formBody = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0"></input>`;
+	dialog.formBody = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required></input>`;
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
@@ -286,7 +288,7 @@ async function handleDiskMove () {
 
 	dialog.formBody = `
 		${select}
-		<label for="delete-check">Delete Source</label><input name="delete-check" id="delete-check" type="checkbox" checked>
+		<label for="delete-check">Delete Source</label><input name="delete-check" id="delete-check" type="checkbox" checked required>
 	`;
 
 	dialog.callback = async (result, form) => {
@@ -355,7 +357,7 @@ async function handleDiskAdd () {
 	let dialog = document.createElement("dialog-form");
 	document.body.append(dialog);
 	
-	dialog.header = `Create A New Disk`;
+	dialog.header = "Create New Disk";
 
 	let options = "";
 	storage.data.forEach((element) => {
@@ -363,12 +365,12 @@ async function handleDiskAdd () {
 			options += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	let select = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select">${options}</select>`;
+	let select = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select" required>${options}</select>`;
 
 	dialog.formBody = `
-		<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0"></input>
+		<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required></input>
 		${select}
-		<label for="size">Size (GiB)</label><input name="size" id="size" type="number" min="0" max="131072" value="0"></input>
+		<label for="size">Size (GiB)</label><input name="size" id="size" type="number" min="0" max="131072" value="0" required></input>
 	`;
 
 	dialog.callback = async (result, form) => {
@@ -420,12 +422,12 @@ async function handleCDAdd () {
 			storageOptions += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	let storageSelect = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select">${storageOptions}</select>`;
+	let storageSelect = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select" required>${storageOptions}</select>`;
 
 	dialog.formBody = `
-		<label for="device">IDE</label><input name="device" id="device" type="number" min="0" max="3" value="0"></input>
+		<label for="device">IDE</label><input name="device" id="device" type="number" min="0" max="3" value="0" required></input>
 		${storageSelect}
-		<label for="iso-select">Image</label><select name="iso-select" id="iso-select"></select>
+		<label for="iso-select">Image</label><select name="iso-select" id="iso-select" required></select>
 	`;
 
 	dialog.shadowRoot.querySelector("#storage-select").selectedIndex = -1;
