@@ -64,27 +64,29 @@ async function handleInstanceAdd () {
 			<option value="lxc">Container</option>
 			<option value="qemu">Virtual Machine</option>
 		</select>
+		<label for="node">Node</label>
+		<select name="node" id="node" required></select>
 		<label for="name">Name</label>
 		<input name="name" id="name" required></input>
 		<label for="vmid">ID</label>
 		<input name="vmid" id="vmid" type="number" required></input>
-		<label for="cpu">Cores</label>
+		<label for="cpu">Cores (Threads)</label>
 		<input name="cpu" id="cpu" type="number" min="1" max="8192" required></input>
-		<label for="ram">Memory</label>
+		<label for="ram">Memory (MiB)</label>
 		<input name="ram" id="ram" type="number" min="16", step="1" required></input>
 		<fieldset class="none" id="container-specific" style="grid-column: 1 / span 2; margin-top: 10px;">
 			<legend>Container Options</legend>
 			<div class="input-grid" style="grid-template-columns: auto 1fr;">
-				<label for="swap">Swap</label>
-				<input name="swap" id="swap" type="number" min="0" step="1" required disabled></input>				
+				<label for="swap">Swap (MiB)</label>
+				<input name="swap" id="swap" type="number" min="0" step="1" required disabled></input>
 				<label for="template-storage">Template Storage</label>
 				<select name="template-storage" id="template-storage" required disabled></select>
-				<label for="template-storage">Template Image</label>
+				<label for="template-image">Template Image</label>
 				<select name="template-image" id="template-image" required disabled></select>
-				<label for="template-storage">ROOTFS Storage</label>
-				<select name="rootfs-storage" id="rootfs-storage" required disabled></select>
-				<label for="template-size">ROOTFS Size (GiB)</label>
-				<input name="template-size" id="template-size" type="number" min="0" max="131072" required disabled></input>
+				<label for="rootfs-storage">ROOTFS Storage</label>
+				<select name="rootfs-storage" id="rootfs-storage" required disabled></select>				
+				<label for="rootfs-size">ROOTFS Size (GiB)</label>
+				<input name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled></input>
 			</div>
 		</fieldset>
 	`;
@@ -104,9 +106,23 @@ async function handleInstanceAdd () {
 		}
 	});
 
+	let nodeSelect = dialog.shadowRoot.querySelector("#node");
+	nodeSelect.selectedIndex = -1;
+	// populate nodeSelect
+	nodeSelect.addEventListener("change", async () => { // change template and rootfs storage based on node
+	});
+
 	let vmidInput = dialog.shadowRoot.querySelector("#vmid");
 	//vmidInput.min = 200;
 	//vmidInput.max = 299;
+
+	let templateContent = "iso";
+	let templateStorage = dialog.shadowRoot.querySelector("#template-storage");
+	let templateImage = dialog.shadowRoot.querySelector("#template-image");
+
+	let rootfsContent = "rootdir";
+	let rootfsStorage = dialog.shadowRoot.querySelector("#rootfs-storage");
+	let rootfsSize = dialog.shadowRoot.querySelector("#rootfs-size");
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
