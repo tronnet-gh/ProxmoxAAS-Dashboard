@@ -64,26 +64,49 @@ async function handleInstanceAdd () {
 			<option value="lxc">Container</option>
 			<option value="qemu">Virtual Machine</option>
 		</select>
+		<label for="name">Name</label>
+		<input name="name" id="name" required></input>
+		<label for="vmid">ID</label>
+		<input name="vmid" id="vmid" type="number" required></input>
 		<label for="cpu">Cores</label>
 		<input name="cpu" id="cpu" type="number" min="1" max="8192" required></input>
 		<label for="ram">Memory</label>
 		<input name="ram" id="ram" type="number" min="16", step="1" required></input>
-		<label for="swap" disabled>Swap</label>
-		<input name="swap" id="swap" type="number" min="0" step="1" required disabled></input>
+		<fieldset class="none" id="container-specific" style="grid-column: 1 / span 2; margin-top: 10px;">
+			<legend>Container Options</legend>
+			<div class="input-grid" style="grid-template-columns: auto 1fr;">
+				<label for="swap">Swap</label>
+				<input name="swap" id="swap" type="number" min="0" step="1" required disabled></input>				
+				<label for="template-storage">Template Storage</label>
+				<select name="template-storage" id="template-storage" required disabled></select>
+				<label for="template-storage">Template Image</label>
+				<select name="template-image" id="template-image" required disabled></select>
+				<label for="template-storage">ROOTFS Storage</label>
+				<select name="rootfs-storage" id="rootfs-storage" required disabled></select>
+				<label for="template-size">ROOTFS Size (GiB)</label>
+				<input name="template-size" id="template-size" type="number" min="0" max="131072" required disabled></input>
+			</div>
+		</fieldset>
 	`;
 
 	let typeSelect = dialog.shadowRoot.querySelector("#type");
 	typeSelect.selectedIndex = -1;
 	typeSelect.addEventListener("change", () => {
 		if(typeSelect.value === "qemu") {
-			dialog.shadowRoot.querySelector(`label[for="swap"]`).disabled = true;
-			dialog.shadowRoot.querySelector("#swap").disabled = true;
+			dialog.shadowRoot.querySelectorAll("#container-specific input").forEach((element) => {element.disabled = true});
+			dialog.shadowRoot.querySelectorAll("#container-specific select").forEach((element) => {element.disabled = true});
+			dialog.shadowRoot.querySelector("#container-specific").classList.add("none");
 		}
 		else {
-			dialog.shadowRoot.querySelector(`label[for="swap"]`).disabled = false;
-			dialog.shadowRoot.querySelector("#swap").disabled = false;
+			dialog.shadowRoot.querySelectorAll("#container-specific input").forEach((element) => {element.disabled = false});
+			dialog.shadowRoot.querySelectorAll("#container-specific select").forEach((element) => {element.disabled = false});
+			dialog.shadowRoot.querySelector("#container-specific").classList.remove("none");
 		}
 	});
+
+	let vmidInput = dialog.shadowRoot.querySelector("#vmid");
+	//vmidInput.min = 200;
+	//vmidInput.max = 299;
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
