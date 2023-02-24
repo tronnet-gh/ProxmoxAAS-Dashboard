@@ -110,7 +110,7 @@ export async function requestPVE (path, method, body = null) {
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
 
-	let response = await request(`${PVE}${path}`, content);
+	let response = await request(`${API}/proxmox${path}`, content);
 	return response;
 }
 
