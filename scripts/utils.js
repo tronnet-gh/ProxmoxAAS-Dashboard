@@ -1,4 +1,4 @@
-import {PVE, API} from "/vars.js";
+import {API} from "/vars.js";
 
 export class ResponseError extends Error {
 	constructor(message) {
