@@ -74,56 +74,71 @@ async function handleInstanceAdd () {
 		<input name="cpu" id="cpu" type="number" min="1" max="8192" required></input>
 		<label for="ram">Memory (MiB)</label>
 		<input name="ram" id="ram" type="number" min="16", step="1" required></input>
-		<fieldset class="none" id="container-specific" style="grid-column: 1 / span 2; margin-top: 10px;">
-			<legend>Container Options</legend>
-			<div class="input-grid" style="grid-template-columns: auto 1fr;">
-				<label for="swap">Swap (MiB)</label>
-				<input name="swap" id="swap" type="number" min="0" step="1" required disabled></input>
-				<label for="template-storage">Template Storage</label>
-				<select name="template-storage" id="template-storage" required disabled></select>
-				<label for="template-image">Template Image</label>
-				<select name="template-image" id="template-image" required disabled></select>
-				<label for="rootfs-storage">ROOTFS Storage</label>
-				<select name="rootfs-storage" id="rootfs-storage" required disabled></select>				
-				<label for="rootfs-size">ROOTFS Size (GiB)</label>
-				<input name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled></input>
-			</div>
-		</fieldset>
+		<p class="container-specific none" style="grid-column: 1 / span 2; text-align: center;">Container Options</p>
+		<label class="container-specific none" for="swap">Swap (MiB)</label>
+		<input class="container-specific none" name="swap" id="swap" type="number" min="0" step="1" required disabled></input>
+		<label class="container-specific none" for="template-storage">Template Storage</label>
+		<select class="container-specific none" name="template-storage" id="template-storage" required disabled></select>
+		<label class="container-specific none" for="template-image">Template Image</label>
+		<select class="container-specific none" name="template-image" id="template-image" required disabled></select>
+		<label class="container-specific none" for="rootfs-storage">ROOTFS Storage</label>
+		<select class="container-specific none" name="rootfs-storage" id="rootfs-storage" required disabled></select>				
+		<label class="container-specific none" for="rootfs-size">ROOTFS Size (GiB)</label>
+		<input class="container-specific none" name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled></input>
 	`;
 
 	let typeSelect = dialog.shadowRoot.querySelector("#type");
 	typeSelect.selectedIndex = -1;
 	typeSelect.addEventListener("change", () => {
 		if(typeSelect.value === "qemu") {
-			dialog.shadowRoot.querySelectorAll("#container-specific input").forEach((element) => {element.disabled = true});
-			dialog.shadowRoot.querySelectorAll("#container-specific select").forEach((element) => {element.disabled = true});
-			dialog.shadowRoot.querySelector("#container-specific").classList.add("none");
+			dialog.shadowRoot.querySelectorAll(".container-specific").forEach((element) => {
+				element.classList.add("none");
+				element.disabled = true;
+			});
 		}
 		else {
-			dialog.shadowRoot.querySelectorAll("#container-specific input").forEach((element) => {element.disabled = false});
-			dialog.shadowRoot.querySelectorAll("#container-specific select").forEach((element) => {element.disabled = false});
-			dialog.shadowRoot.querySelector("#container-specific").classList.remove("none");
+			dialog.shadowRoot.querySelectorAll(".container-specific").forEach((element) => {
+				element.classList.remove("none");
+				element.disabled = false;
+			});
 		}
 	});
-
-	let nodeSelect = dialog.shadowRoot.querySelector("#node");
-	nodeSelect.selectedIndex = -1;
-	// populate nodeSelect
-	nodeSelect.addEventListener("change", async () => { // change template and rootfs storage based on node
-	});
-
-	let vmidInput = dialog.shadowRoot.querySelector("#vmid");
-	//vmidInput.min = 200;
-	//vmidInput.max = 299;
 
 	let templateContent = "iso";
 	let templateStorage = dialog.shadowRoot.querySelector("#template-storage");
-	let templateImage = dialog.shadowRoot.querySelector("#template-image");
+	templateStorage.selectedIndex = -1;
 
 	let rootfsContent = "rootdir";
 	let rootfsStorage = dialog.shadowRoot.querySelector("#rootfs-storage");
-	let rootfsSize = dialog.shadowRoot.querySelector("#rootfs-size");
+	rootfsStorage.selectedIndex = -1;
 
+	let nodeSelect = dialog.shadowRoot.querySelector("#node");
+	let nodes = await requestPVE("/nodes", "GET");
+	nodes.data.forEach((element) => {
+		if (element.status === "online") {
+			nodeSelect.add(new Option(element.node));
+		}
+	});
+	nodeSelect.selectedIndex = -1;
+	nodeSelect.addEventListener("change", async () => { // change template and rootfs storage based on node
+		let node = nodeSelect.value;
+		let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
+		storage.data.forEach((element) => {
+			if (element.content.includes(templateContent)) {
+				templateStorage.add(new Option(element.storage));
+			}
+			if (element.content.includes(rootfsContent)) {
+				rootfsStorage.add(new Option(element.storage));
+			}
+		});
+		templateStorage.selectedIndex = -1;
+		rootfsStorage.selectedIndex = -1;
+	});
+
+	let vmidInput = dialog.shadowRoot.querySelector("#vmid"); // suggest min and max based on user restrictions
+
+	let templateImage = dialog.shadowRoot.querySelector("#template-image"); // populate templateImage by 
+	
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
 

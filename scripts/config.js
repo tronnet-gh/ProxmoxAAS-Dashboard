@@ -31,7 +31,6 @@ async function init () {
 
 async function getConfig () {
 	config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
-	console.log(config);
 }
 
 function populateResources () {
@@ -291,6 +290,8 @@ async function handleDiskMove () {
 		<label for="delete-check">Delete Source</label><input name="delete-check" id="delete-check" type="checkbox" checked required>
 	`;
 
+	dialog.shadowRoot.querySelector("#storage-select").selectedIndex = -1;
+
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
@@ -373,6 +374,8 @@ async function handleDiskAdd () {
 		<label for="size">Size (GiB)</label><input name="size" id="size" type="number" min="0" max="131072" required></input>
 	`;
 
+	dialog.shadowRoot.querySelector("#storage-select").selectedIndex = -1;
+
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
 			let device = form.get("device");
@@ -441,6 +444,7 @@ async function handleCDAdd () {
 				ISOSelect.append(new Option(element.volid.replace(`${storage}:${content}/`, ""), element.volid));
 			}
 		});
+		ISOSelect.selectedIndex = -1;
 	});
 
 	dialog.callback = async (result, form) => {
