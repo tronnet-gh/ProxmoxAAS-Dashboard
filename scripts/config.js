@@ -183,7 +183,7 @@ async function handleDiskDetach () {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify({delete: this.dataset.disk})
+				disk: this.dataset.disk
 			};
 			let result = await requestAPI("/disk/detach", "POST", body);
 			if (result.status === 200) {
@@ -211,19 +211,13 @@ async function handleDiskAttach () {
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
 			let device = form.get("device");
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
-			let action = {};
-			let bus = type === "qemu" ? "sata" : "mp";
-			let details = diskImage;
-			if (type === "lxc") {
-				details += `,mp=/mp${device}/`;
-			}
-			action[`${bus}${device}`] = details;			
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";		
 			let body = {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify(action)
+				disk: `${type === "qemu" ? "sata" : "mp"}${device}`,
+				data: type === "lxc" ? diskImage + `,mp=/mp${device}/` : diskImage
 			}
 			let result = await requestAPI("/disk/attach", "POST", body);
 			if (result.status === 200) {
@@ -253,7 +247,8 @@ async function handleDiskResize () {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify({disk: this.dataset.disk, size: `+${form.get("size-increment")}G`})
+				disk: this.dataset.disk,
+				size: form.get("size-increment")
 			}
 			let result = await requestAPI("/disk/resize", "POST", body);
 			if (result.status === 200) {
@@ -295,18 +290,13 @@ async function handleDiskMove () {
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
-			let action = {storage: form.get("storage-select"), delete: form.get("delete-check") === "on" ? "1": "0"}
-			if (type === "qemu") { // if vm, move disk
-				action.disk = this.dataset.disk;
-			}
-			else { // type is lxc, move volume
-				action.volume = this.dataset.disk;
-			}
 			let body = {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify(action)
+				disk: this.dataset.disk,
+				storage: form.get("storage-select"),
+				delete: form.get("delete-check") === "on" ? "1": "0"
 			}
 			let result = await requestAPI("/disk/move", "POST", body);
 			if (result.status === 200) {
@@ -336,7 +326,7 @@ async function handleDiskDelete () {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify({delete: this.dataset.disk})
+				disk: this.dataset.disk
 			};
 			let result = await requestAPI("/disk/delete", "POST", body);
 			if (result.status === 200) {
@@ -378,24 +368,13 @@ async function handleDiskAdd () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
-			let device = form.get("device");
-			let storage = form.get("storage-select");
-			let size = form.get("size");
-
-			let action = {};
-
-			if (type === "qemu") { // type is qemu, use sata
-				action[`sata${device}`] = `${storage}:${size}`;
-			}
-			else { // type is lxc, use mp and add mp and backup values
-				action[`mp${device}`] = `${storage}:${size},mp=/mp${device}/,backup=1`;
-			}
-
 			let body = {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify(action)
+				disk: `${type === "qemu" ? "sata" : "mp"}${form.get("device")}`,
+				storage: form.get("storage-select"),
+				size: form.get("size")
 			};
 			let result = await requestAPI("/disk/create", "POST", body);
 			if (result.status === 200) {
@@ -449,17 +428,12 @@ async function handleCDAdd () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
-			let device = form.get("device");
-			let iso = form.get("iso-select");
-
-			let action = {};
-			action[`ide${device}`] = `${iso},media=cdrom`;
-
 			let body = {
 				node: node,
 				type: type,
 				vmid: vmid,
-				action: JSON.stringify(action)
+				disk: `ide${form.get("device")}`,
+				iso: form.get("iso-select")
 			};
 			let result = await requestAPI("/disk/create", "POST", body);
 			if (result.status === 200) {
