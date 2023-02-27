@@ -1,4 +1,4 @@
-import {requestPVE, goToPage, deleteAllCookies} from "./utils.js";
+import {requestPVE, requestAPI, goToPage, deleteAllCookies} from "./utils.js";
 import { Dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
@@ -70,10 +70,10 @@ async function handleInstanceAdd () {
 		<input name="name" id="name" required></input>
 		<label for="vmid">ID</label>
 		<input name="vmid" id="vmid" type="number" required></input>
-		<label for="cpu">Cores (Threads)</label>
-		<input name="cpu" id="cpu" type="number" min="1" max="8192" required></input>
-		<label for="ram">Memory (MiB)</label>
-		<input name="ram" id="ram" type="number" min="16", step="1" required></input>
+		<label for="cores">Cores (Threads)</label>
+		<input name="cores" id="cores" type="number" min="1" max="8192" required></input>
+		<label for="memory">Memory (MiB)</label>
+		<input name="memory" id="memory" type="number" min="16", step="1" required></input>
 		<p class="container-specific none" style="grid-column: 1 / span 2; text-align: center;">Container Options</p>
 		<label class="container-specific none" for="swap">Swap (MiB)</label>
 		<input class="container-specific none" name="swap" id="swap" type="number" min="0" step="1" required disabled></input>
@@ -85,6 +85,8 @@ async function handleInstanceAdd () {
 		<select class="container-specific none" name="rootfs-storage" id="rootfs-storage" required disabled></select>				
 		<label class="container-specific none" for="rootfs-size">ROOTFS Size (GiB)</label>
 		<input class="container-specific none" name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled></input>
+		<label class="container-specific none" for="password">Password</label>
+		<input class="container-specific none" name="password" id="password" type="password" required disabled></input>
 	`;
 
 	let typeSelect = dialog.shadowRoot.querySelector("#type");
@@ -135,13 +137,42 @@ async function handleInstanceAdd () {
 		rootfsStorage.selectedIndex = -1;
 	});
 
-	let vmidInput = dialog.shadowRoot.querySelector("#vmid"); // suggest min and max based on user restrictions
-
 	let templateImage = dialog.shadowRoot.querySelector("#template-image"); // populate templateImage by 
+	templateStorage.addEventListener("change", async () => {
+		let content = "vztmpl";
+		let images = await requestPVE(`/nodes/${nodeSelect.value}/storage/${templateStorage.value}/content`, "GET");
+		images.data.forEach((element) => {
+			if (element.content.includes(content)) {
+				templateImage.append(new Option(element.volid.replace(`${templateStorage.value}:${content}/`, ""), element.volid));
+			}
+		});
+		templateImage.selectedIndex = -1;
+	});
 	
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
-
+			let body = {
+				node: form.get("node"),
+				type: form.get("type"),
+				name: form.get("name"),
+				vmid: form.get("vmid"),
+				cores: form.get("cores"),
+				memory: form.get("memory")
+			};
+			if (form.get("type") === "lxc") {
+				body.swap = form.get("swap");
+				body.password = form.get("password");
+				body.ostemplate = form.get("template-image");
+				body.rootfslocation = form.get("rootfs-storage");
+				body.rootfssize = form.get("rootfs-size");
+			}
+			let result = await requestAPI("/instance", "POST", body);
+			if (result.status === 200) {
+				populateInstances();
+			}
+			else {
+				console.error(result);
+			}
 		}
 	}
 

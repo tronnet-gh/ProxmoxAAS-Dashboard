@@ -68,25 +68,25 @@ export class Instance extends HTMLElement {
 		powerButton.src = instances[this.status].powerButtonSrc;
 		powerButton.alt = instances[this.status].powerButtonAlt;
 		powerButton.title = instances[this.status].powerButtonAlt;
-		powerButton.addEventListener("click", this.handlePowerButton.bind(this));
+		powerButton.onclick = this.handlePowerButton.bind(this)
 
 		let configButton = this.shadowElement.querySelector("#configure-btn");
 		configButton.src = instances[this.status].configButtonSrc;
 		configButton.alt = instances[this.status].configButtonAlt;
 		configButton.title = instances[this.status].configButtonAlt;
-		configButton.addEventListener("click", this.handleConfigButton.bind(this));
+		configButton.onclick = this.handleConfigButton.bind(this);
 
 		let consoleButton = this.shadowElement.querySelector("#console-btn");
 		consoleButton.src = instances[this.status].consoleButtonSrc;
 		consoleButton.alt = instances[this.status].consoleButtonAlt;
 		consoleButton.title = instances[this.status].consoleButtonAlt;
-		consoleButton.addEventListener("click", this.handleConsoleButton.bind(this));
+		consoleButton.onclick = this.handleConsoleButton.bind(this);
 
 		let deleteButton = this.shadowElement.querySelector("#delete-btn");
 		deleteButton.src = instances[this.status].deleteButtonSrc;
 		deleteButton.alt = instances[this.status].deleteButtonAlt;
 		deleteButton.title = instances[this.status].deleteButtonAlt;
-		deleteButton.addEventListener("click", this.handleDeleteButton.bind(this));
+		deleteButton.onclick = this.handleDeleteButton.bind(this);
 
 		if (this.node.status !== "online") {
 			powerButton.classList.add("hidden");
