@@ -151,6 +151,7 @@ async function request (url, content) {
 	});
 
 	let data = await response.json();
+	data.status = response.status;
 	return data;
 }
 
