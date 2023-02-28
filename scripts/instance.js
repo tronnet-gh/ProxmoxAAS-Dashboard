@@ -171,6 +171,7 @@ export class Instance extends HTMLElement {
 			dialog.callback = async (result, form) => {
 				if (result === "confirm") {
 					this.actionLock = true;
+					let prevStatus = this.status;
 					this.status = "loading";
 					this.update();
 
@@ -191,6 +192,9 @@ export class Instance extends HTMLElement {
 					}
 					else {
 						console.error(result);
+						this.status = this.prevStatus;
+						this.update();
+						this.actionLock = false;
 					}
 				}
 			}

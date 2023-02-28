@@ -192,6 +192,8 @@ async function handleDiskDetach () {
 			}
 			else {
 				console.error(result);
+				await getConfig();
+				populateDisk();
 			}
 		}
 	};
@@ -226,6 +228,8 @@ async function handleDiskAttach () {
 			}
 			else {
 				console.error(result);
+				await getConfig();
+				populateDisk();
 			}
 		}
 	};
@@ -257,6 +261,8 @@ async function handleDiskResize () {
 			}
 			else{
 				console.error(result);
+				await getConfig();
+				populateDisk();
 			}
 		}
 	};
@@ -305,6 +311,8 @@ async function handleDiskMove () {
 			}
 			else {
 				console.error(result);
+				await getConfig();
+				populateDisk();
 			}
 		}
 	};
@@ -335,6 +343,8 @@ async function handleDiskDelete () {
 			}
 			else {
 				console.error(result);
+				await getConfig();
+				populateDisk();
 			}
 		}
 	};
@@ -383,6 +393,8 @@ async function handleDiskAdd () {
 			}
 			else {
 				console.error(result);
+				await getConfig();
+				populateDisk();
 			}
 		}
 	};
@@ -442,6 +454,8 @@ async function handleCDAdd () {
 			}
 			else {
 				console.error(result);
+				await getConfig();
+				populateDisk();
 			}
 		}
 	};
