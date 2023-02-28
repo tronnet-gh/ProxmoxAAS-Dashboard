@@ -8,6 +8,7 @@ function init (){
 	let status = document.querySelector("#status");
 	formSubmitButton.addEventListener("click", async (e) => {
 		status.innerText = "";
+		status.style.color = "#000000";
 		e.preventDefault();
 		let form = document.querySelector("form");
 		let formData = new FormData(form);

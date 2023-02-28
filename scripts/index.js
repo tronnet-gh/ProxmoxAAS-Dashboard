@@ -172,6 +172,7 @@ async function handleInstanceAdd () {
 			}
 			else {
 				console.error(result);
+				populateInstances();
 			}
 		}
 	}
