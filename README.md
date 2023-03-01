@@ -38,7 +38,7 @@ The supported setup is to use a reverse proxy to serve both the original Proxmox
 After this step, the Client should be available at `PAAS Client Host` on port `80`
 
 ## Installation - Reverse Proxy
-1. Configure nginx to reverse proxy the default Proxmox web UI, the example below also includes configuration for SSL. **Note the add_header directives, which are required in order to use the proxmox API correctly**:
+1. Configure nginx to reverse proxy the default Proxmox web UI, the example below also includes configuration for SSL.
 ```
 server {
 	listen 80;
@@ -53,19 +53,6 @@ server {
 	ssl_certificate_key <privkey.pem>;
 	include /etc/nginx/snippets/ssl-params.conf;
 	proxy_redirect off;
-	location / {
-		if ($request_method = OPTIONS) {
-			add_header 'ALLOW' 'GET, POST, DELETE, OPTIONS' always;
-			add_header 'Access-Control-Allow-Origin' '$http_origin' always;
-			add_header 'Access-Control-Allow-Credentials' 'true' always;
-			add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS';
-			add_header 'Access-Control-Allow-Headers' 'CSRFPreventionToken';
-			return 200;
-		}
-        add_header 'Access-Control-Allow-Origin' '$http_origin' always;
-        add_header 'Access-Control-Allow-Credentials' 'true' always;
-        add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS';
-        add_header 'AAccess-Control-Allow-Headers' 'CSRFPreventionToken';
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade"; 
