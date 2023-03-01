@@ -138,15 +138,9 @@ export async function requestAPI (path, method, body = null) {
 async function request (url, content) {
 	let response = await fetch(url, content)
 	.then((response) => {
-		if (!response.ok) {
-			throw new ResponseError(`recieved response status code ${response.status}`);
-		}
 		return response;
 	})
 	.catch((error) => {
-		if (error instanceof ResponseError) {
-			throw error;
-		}
 		throw new NetworkError(error);
 	});
 
