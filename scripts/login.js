@@ -10,6 +10,9 @@ async function init (){
 	let realmSelect = document.querySelector("#realm");
 	realms.data.forEach((element) => {
 		realmSelect.add(new Option(element.comment, element.realm));
+		if("default" in element && element.default === 1){
+			realmSelect.value = element.realm;
+		}
 	});
 	formSubmitButton.addEventListener("click", async (e) => {
 		status.innerText = "";
