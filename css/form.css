@@ -23,7 +23,8 @@ input, label, legend {
 
 input {
 	border: solid white 1px;
-	width: min-content;
+	min-width: fit-content;
+	width: 100%;
 }
 
 input:focus {
@@ -38,7 +39,8 @@ select {
 	border: solid white 1px;
 	background-color: black;
 	color: white;
-	width: min-content;
+	min-width: fit-content;
+	width: 100%;
 }
 
 select:disabled {

@@ -81,9 +81,8 @@ export function getCookie(cname) {
 	return "";
 }
 
-export async function requestTicket (username, password) {
-	let response = await requestPVE("/access/ticket", "POST", {username: `${username}@ldap`, password: password}, false);
-
+export async function requestTicket (username, password, realm) {
+	let response = await requestPVE("/access/ticket", "POST", {username: `${username}@${realm}`, password: password}, false);
 	return response;
 }
 
@@ -143,6 +142,10 @@ async function request (url, content) {
 	.catch((error) => {
 		throw new NetworkError(error);
 	});
+
+	if(!response.ok){
+		throw new ResponseError(response);
+	}
 
 	let data = await response.json();
 	data.status = response.status;
