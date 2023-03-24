@@ -11,7 +11,7 @@
 	</head>
 	<body>
 		<div class="center-div">
-			<form style="margin-top: 20px; width: min-content; margin-left: auto; margin-right: auto;">
+			<form style="margin-top: 20px; min-width: min-content; margin-left: auto; margin-right: auto;">
 				<fieldset>
 					<legend>Proxmox VE Login</legend>
 					<div class="input-grid" style="grid-template-columns: repeat(2, auto);">
@@ -19,6 +19,8 @@
 						<input type="text" id="username" name="username">
 						<label for="password">Password</label>
 						<input type="password" id="password" name="password">
+						<label for="realm">Realm</label>
+						<select id="realm" name="realm"></select>
 					</div>
 				</fieldset>
 				<fieldset class="fieldset-no-border">
