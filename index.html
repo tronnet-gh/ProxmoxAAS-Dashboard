@@ -7,14 +7,15 @@
 		<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
 		<link rel="stylesheet" href="css/style.css" type="text/css">
 		<link rel="stylesheet" href="css/form.css" type="text/css">
+		<link rel="stylesheet" href="css/buttons.css" type="text/css">
 		<script src="scripts/index.js" type="module"></script>
 		<script src="scripts/instance.js" type="module"></script>
 	</head>
 	<body>
 		<header>
-			<nav class="btn-group">
-				<button id="instances" class="active">INSTANCES</button>
-				<button id="logout">LOGOUT</button>
+			<nav>
+				<a href="index.html" aria-current="true">INSTANCES</a>
+				<a href="login.html">LOGOUT</a>
 			</nav>
 		</header>
 		<main>
@@ -24,5 +25,6 @@
 				<img id="instance-add" src="images/actions/instance/add-instance.svg" class="clickable" alt="Create New Instance" title="Create New Instance">
 			</div>
 		</main>
+		<footer><p>&copy; tronnet</p></footer>
 	</body>
 </html>

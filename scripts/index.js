@@ -6,17 +6,6 @@ window.addEventListener("DOMContentLoaded", init);
 async function init () {
 	await populateInstances();
 
-	let instances = document.querySelector("nav #instances");
-	instances.addEventListener("click", () => {
-		goToPage("index.html");
-	});
-
-	let logout = document.querySelector("nav #logout");
-	logout.addEventListener("click", () => {
-		deleteAllCookies();
-		goToPage("login.html");
-	});
-
 	let addInstanceBtn = document.querySelector("#instance-add");
 	addInstanceBtn.addEventListener("click", handleInstanceAdd);
 }
