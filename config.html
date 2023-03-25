@@ -7,31 +7,41 @@
 		<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
 		<link rel="stylesheet" href="css/style.css" type="text/css">
 		<link rel="stylesheet" href="css/form.css" type="text/css">
+		<link rel="stylesheet" href="css/buttons.css" type="text/css">
 		<script src="scripts/config.js" type="module"></script>
 	</head>
 	<body>
-		<h3 id="name"></h3>
-		<div class="center-div">
-			<form>
-				<fieldset>
-					<legend>Resources</legend>
-					<div class="input-grid" id="resources" style="grid-template-columns: repeat(3, auto) 1fr;"></div>
-				</fieldset>
-				<fieldset>
-					<legend>Disks</legend>
-					<div class="input-grid" id="disks" style="grid-template-columns: auto auto auto 1fr;"></div>
-					<hr>
-					<div class="btn-group">
-						<img id="disk-add" src="images/actions/disk/add-disk.svg" class="clickable" alt="Add New Disk" title="Add New Disk">
-						<img id="cd-add" src="images/actions/disk/add-cd.svg" class="clickable none" alt="Add New CDROM" title="Add New CDROM">
-					</div>
-				</fieldset>
-				<fieldset class="fieldset-no-border">
-					<div class="btn-group" id="form-actions">
-						<button id="exit" type="button">EXIT</button>
-					</div>
-				</fieldset>
-			</form>
-		</div>
+		<header>
+			<nav>
+				<a href="index.html" aria-current="true">INSTANCES</a>
+				<a href="login.html">LOGOUT</a>
+			</nav>
+		</header>
+		<main>
+			<h3 id="name"></h3>
+			<div class="center-div">
+				<form>
+					<fieldset>
+						<legend>Resources</legend>
+						<div class="input-grid" id="resources" style="grid-template-columns: repeat(3, auto) 1fr;"></div>
+					</fieldset>
+					<fieldset>
+						<legend>Disks</legend>
+						<div class="input-grid" id="disks" style="grid-template-columns: auto auto auto 1fr;"></div>
+						<hr>
+						<div class="btn-group">
+							<img id="disk-add" src="images/actions/disk/add-disk.svg" class="clickable" alt="Add New Disk" title="Add New Disk">
+							<img id="cd-add" src="images/actions/disk/add-cd.svg" class="clickable none" alt="Add New CDROM" title="Add New CDROM">
+						</div>
+					</fieldset>
+					<fieldset class="fieldset-no-border">
+						<div class="btn-group" id="form-actions">
+							<button id="exit" type="button">EXIT</button>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+		</main>
+		<footer><p>&copy; tronnet</p></footer>
 	</body>
 </html>
