@@ -1,30 +1,104 @@
+:root {
+    --accent-bkg-color: black;
+	--accent-txt-color: white;
+	--content-bkg-color: white;
+	--content-txt-color: black;
+	--form-disabled-color: #606060;
+	--button-accept: #0F0;
+	--button-cancel: #F00;
+}
+
+* {
+	font-family: monospace;
+	font-size: large;
+}
+
 body {
-	background-color:black;
-	min-width: fit-content;
+	display: grid;
+	min-height: 100vh;
+	grid-template-rows: 1fr auto;
+	grid-template-columns: auto 1fr;
+	grid-template-areas: 
+		"header main"
+		"footer main"
+	;
+	margin: 0px;
+}
+
+header, footer {
+	background-color: var(--accent-bkg-color);
+	color: var(--accent-txt-color);
+	padding: 20px;
+	width: 15vw;
+	min-width: max-content;
+	max-width: 25ch;
+}
+
+main {
+	background-color: var(--content-bkg-color);
+	color: var(--content-txt-color);
+	padding: 20px;
+}
+
+footer p {
+	text-align: center;
+}
+
+nav {
+	display: flex;
+	flex-direction: column;
+	row-gap: 20px;
+}
+
+nav a {
+	color: var(--accent-txt-color);
+	font-size: xx-large;
+	text-decoration: none;
+	position: relative;
+	padding: 10px;
+	padding-left: 20px;
+}
+
+nav a:before {
+	position: absolute;
+    width: 0px;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    content: '';
+    background: var(--accent-txt-color);
+    opacity: 0.3;
+    transition: all 0.3s;
+}
+
+nav a[aria-current="true"]:before {
+	width: 10px;
+}
+
+nav a:hover:before {
+    width: 100%;
 }
 
 h1, h2, h3, p {
 	font-family: monospace;
-	color: white;
 }
 
 h1 {
-	font-size: 72px; 
+	font-size: xx-large; 
 	text-align: center;
 }
 
 h2 {
-	font-size: 32px; 
+	font-size: x-large; 
 	text-align: center;
 }
 
 h3 {
-	font-size: 24px; 
+	font-size: larger; 
 	text-align: center;
 }
 
 p {
-	font-size: 14px; 
 	text-align: left;
 }
 
@@ -45,44 +119,6 @@ p {
 }
 }
 
-.btn-group {
-	display: flex;
-	justify-content: center;
-	flex-direction: row;
-	flex-wrap: wrap;
-	gap: 10px;
-}
-
-.btn-group button {
-	background-color: #00ff00; /* Green background */
-	color: black; /* White text */
-	padding: 10px; /* Some padding */
-	cursor: pointer; /* Pointer/hand icon */
-	border: none;
-}
-
-.btn-group button:hover {
-	background-color: #008800;
-}
-
-.btn-group button.active {
-	background-color: black;
-	color: white;
-	border: solid white 1px;
-}
-
-nav {
-	margin: 20px 0px 20px 0px;
-}
-
-.btn-group img:hover {
-	cursor: pointer;
-}
-
-img.clickable {
-	cursor: pointer;
-}
-
 .hidden {
 	visibility: hidden;	
 }
@@ -90,14 +126,3 @@ img.clickable {
 .none {
 	display: none;
 }
-
-.visuallyhidden {
-	border: 0;
-	clip: rect(0 0 0 0);
-	height: 1px;
-	margin: -1px;
-	overflow: hidden;
-	padding: 0;
-	position: absolute;
-	width: 1px;
-  }

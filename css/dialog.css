@@ -1,6 +1,6 @@
 dialog {
-	background-color: #000000;
-	border: 1px solid white;
+	background-color: var(--content-bkg-color);
+	border: 1px solid var(--content-txt-color);
 	border-radius: 5px;
 	padding: 10px;
 }

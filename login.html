@@ -7,29 +7,38 @@
 		<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
 		<link rel="stylesheet" href="css/style.css" type="text/css">
 		<link rel="stylesheet" href="css/form.css" type="text/css">
+		<link rel="stylesheet" href="css/buttons.css" type="text/css">
 		<script src="scripts/login.js" type="module"></script>
 	</head>
 	<body>
-		<div class="center-div">
-			<form style="margin-top: 20px; min-width: min-content; margin-left: auto; margin-right: auto;">
-				<fieldset>
-					<legend>Proxmox VE Login</legend>
-					<div class="input-grid" style="grid-template-columns: repeat(2, auto);">
-						<label for="username">Username</label>
-						<input type="text" id="username" name="username">
-						<label for="password">Password</label>
-						<input type="password" id="password" name="password">
-						<label for="realm">Realm</label>
-						<select id="realm" name="realm"></select>
-					</div>
-				</fieldset>
-				<fieldset class="fieldset-no-border">
-					<div class="btn-group">
-						<button id="submit">LOGIN</button>
-					</div>
-				</fieldset>
-			</form>
-			<p id="status"></p>
-		</div>
+		<header>
+			<nav>
+				<a href="login.html" aria-current="true">LOGIN</a>
+			</nav>
+		</header>
+		<main>
+			<div class="center-div">
+				<form style="margin-left: auto; margin-right: auto;">
+					<fieldset>
+						<legend>Proxmox VE Login</legend>
+						<div class="input-grid" style="grid-template-columns: repeat(2, auto);">
+							<label for="username">Username</label>
+							<input type="text" id="username" name="username">
+							<label for="password">Password</label>
+							<input type="password" id="password" name="password">
+							<label for="realm">Realm</label>
+							<select id="realm" name="realm"></select>
+						</div>
+					</fieldset>
+					<fieldset class="fieldset-no-border">
+						<div class="btn-group">
+							<button id="submit">LOGIN</button>
+						</div>
+					</fieldset>
+				</form>
+				<p id="status"></p>
+			</div>
+		</main>
+		<footer><p>&copy; tronnet</p></footer>
 	</body>
 </html>

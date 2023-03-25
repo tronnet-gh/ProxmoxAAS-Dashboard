@@ -1,50 +1,34 @@
+form {
+	width: fit-content;
+}
+
 p {
 	text-align: left;
 	margin: 0px;
 }
 
 fieldset {
-	border: solid white 1px;
-	border-radius: 5px;
+	border: solid var(--content-txt-color) 1px;
 	padding: 10px;
 	margin: 10px;
 }
 
-form > fieldset:first-of-type {
-	margin-top: 0px;
-}
-
 input, label, legend {
 	font-family: monospace;
-	color: white;
 	font-size: 14px;
-	background-color: black;
 }
 
-input {
-	border: solid white 1px;
+input, select {
+	border: solid var(--content-txt-color) 1px;
 	min-width: fit-content;
-	width: 100%;
 }
 
-input:focus {
+input:focus, select:focus {
 	outline: none;
 }
 
-input:disabled {
-	background-color: #606060;
-}
-
-select {
-	border: solid white 1px;
-	background-color: black;
-	color: white;
-	min-width: fit-content;
-	width: 100%;
-}
-
-select:disabled {
-	background-color: #606060;
+input:disabled, select:disabled {
+	background-color: var(--form-disabled-color);
 }
 
 button {
@@ -71,7 +55,7 @@ form img {
 hr {
 	width: 100%;
 	border: none;
-	border-top: solid white 1px;
+	border-top: solid var(--content-txt-color) 1px;
 }
 
 .last-item {

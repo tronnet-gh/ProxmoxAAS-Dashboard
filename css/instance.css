@@ -1,5 +1,5 @@
 article {
-	border: solid white 1px;
+	border: solid var(--content-txt-color) 1px;
 	border-radius: 5px;
 	padding: 0px 1em 0px 1em;
 	margin: 20px 0px 20px 0px;
@@ -27,7 +27,7 @@ article > div > div > img {
 
 hr {
 	border: none;
-	border-top: solid white 1px;
+	border-top: solid var(--content-txt-color) 1px;
 	margin: 0px;
 }
 

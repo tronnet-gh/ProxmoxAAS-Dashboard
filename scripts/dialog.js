@@ -7,6 +7,7 @@ export class Dialog extends HTMLElement {
 		<link rel="stylesheet" href="css/style.css" type="text/css">
 		<link rel="stylesheet" href="css/form.css" type="text/css">
 		<link rel="stylesheet" href="css/dialog.css" type="text/css">
+		<link rel="stylesheet" href="css/buttons.css" type="text/css">
 		<dialog>
 			<p id="prompt"></p>
 			<hr>
@@ -14,8 +15,8 @@ export class Dialog extends HTMLElement {
 			</form>
 			<hr>
 			<div class="btn-group">
-				<button value="cancel" form="form" class="active" formnovalidate>CANCEL</button>
-				<button value="confirm" form="form">CONFIRM</button>
+				<button value="cancel" form="form" class="cancel" formnovalidate>CANCEL</button>
+				<button value="confirm" form="form" class="accept">CONFIRM</button>
 			</div>
 		</dialog>
 		`;

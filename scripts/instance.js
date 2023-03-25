@@ -9,6 +9,7 @@ export class Instance extends HTMLElement {
 		shadowRoot.innerHTML = `
 		<link rel="stylesheet" href="css/style.css" type="text/css">
 		<link rel="stylesheet" href="css/instance.css" type="text/css">
+		<link rel="stylesheet" href="css/buttons.css" type="text/css">
 		<article>
 			<div>
 				<div>
@@ -23,10 +24,10 @@ export class Instance extends HTMLElement {
 			</div>
 			<hr>
 			<div class="btn-group">
-				<img id="power-btn">
-				<img id="console-btn">
-				<img id="configure-btn">
-				<img id="delete-btn">
+				<img id="power-btn" class="clickable">
+				<img id="console-btn" class="clickable">
+				<img id="configure-btn" class="clickable">
+				<img id="delete-btn" class="clickable">
 			</div>
 		</article>
 		`;
