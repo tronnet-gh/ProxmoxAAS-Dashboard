@@ -17,27 +17,25 @@
 			</nav>
 		</header>
 		<main>
-			<div class="center-div">
-				<form style="margin-left: auto; margin-right: auto;">
-					<fieldset>
-						<legend>Proxmox VE Login</legend>
-						<div class="input-grid" style="grid-template-columns: repeat(2, auto);">
-							<label for="username">Username</label>
-							<input type="text" id="username" name="username">
-							<label for="password">Password</label>
-							<input type="password" id="password" name="password">
-							<label for="realm">Realm</label>
-							<select id="realm" name="realm"></select>
-						</div>
-					</fieldset>
-					<fieldset class="fieldset-no-border">
-						<div class="btn-group">
-							<button id="submit">LOGIN</button>
-						</div>
-					</fieldset>
-				</form>
-				<p id="status"></p>
-			</div>
+			<form style="margin-left: auto; margin-right: auto;">
+				<fieldset>
+					<legend>Proxmox VE Login</legend>
+					<div class="input-grid" style="grid-template-columns: repeat(2, auto);">
+						<label for="username">Username</label>
+						<input type="text" id="username" name="username">
+						<label for="password">Password</label>
+						<input type="password" id="password" name="password">
+						<label for="realm">Realm</label>
+						<select id="realm" name="realm"></select>
+					</div>
+				</fieldset>
+				<fieldset class="fieldset-no-border">
+					<div class="btn-group">
+						<button id="submit">LOGIN</button>
+					</div>
+				</fieldset>
+			</form>
+			<p id="status" style="text-align: center;"></p>
 		</main>
 		<footer><p>&copy; tronnet</p></footer>
 	</body>

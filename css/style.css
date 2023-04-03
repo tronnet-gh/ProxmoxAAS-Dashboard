@@ -5,7 +5,9 @@
 	--content-txt-color: black;
 	--form-disabled-color: #606060;
 	--button-accept: #0F0;
+	--success-color: #0F0;
 	--button-cancel: #F00;
+	--fail-color: #F00;
 }
 
 * {
@@ -108,23 +110,6 @@ h3 {
 
 p {
 	text-align: left;
-}
-
-@media screen and (min-width: 480px) {
-.center-div {
-	min-width: 480px;
-	max-width: 50%;
-	width: fit-content;
-	margin-left: auto;
-	margin-right: auto;
-}
-}
-@media screen and (max-width: 480px) {
-.center-div {
-	width: 100%;
-	margin-left: auto;
-	margin-right: auto;
-}
 }
 
 .hidden {

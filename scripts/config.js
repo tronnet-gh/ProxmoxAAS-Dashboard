@@ -325,7 +325,7 @@ async function handleDiskDelete () {
 	document.body.append(dialog);
 
 	dialog.header = `Delete ${this.dataset.disk}`;
-	dialog.formBody = `<p style="color: #FF0000;">Are you sure you want to <strong>delete</strong> disk</p><p style="color: #FF0000;">${this.dataset.disk}</p>`;
+	dialog.formBody = `<p>Are you sure you want to <strong>delete</strong> disk</p><p>${this.dataset.disk}</p>`;
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
