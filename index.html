@@ -9,6 +9,20 @@
 		<link rel="stylesheet" href="css/buttons.css" type="text/css">
 		<script src="scripts/index.js" type="module"></script>
 		<script src="scripts/instance.js" type="module"></script>
+		<style>
+			#instance-container {
+				display: grid; 
+				grid-template-columns: auto auto 1fr;
+			}
+			instance-obj {
+				display: contents;
+			}
+			instance-obj:after, instance-obj:first-child:before {
+				content: " ";
+				border-bottom: 1px solid black;
+				grid-column: 1 / span 3;
+			}
+		</style>
 	</head>
 	<body>
 		<header>
@@ -19,7 +33,7 @@
 			</nav>
 		</header>
 		<main>
-			<div id="instance-container" class="center-div">
+			<div id="instance-container">
 			</div>
 			<div class="center-div" style="text-align: center;">
 				<img id="instance-add" src="images/actions/instance/add-instance.svg" class="clickable" alt="Create New Instance" title="Create New Instance">

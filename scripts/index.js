@@ -35,7 +35,7 @@ async function populateInstances () {
 
 	instanceContainer.innerText = "";
 	for(let i = 0; i < instances.length; i++) {
-		let newInstance = document.createElement("instance-article");
+		let newInstance = document.createElement("instance-obj");
 		newInstance.data = instances[i];
 		instanceContainer.append(newInstance);
 	}

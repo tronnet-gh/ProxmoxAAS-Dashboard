@@ -1,40 +1,16 @@
-article {
-	border: solid var(--content-txt-color) 1px;
-	border-radius: 5px;
-	padding: 0px 1em 0px 1em;
-	margin: 20px 0px 20px 0px;
+img {
+	height: 1em;
 }
 
-article > div {
+div {
 	display: flex;
+	flex-direction: row;
 	align-items: center;
-	justify-content: center;
-	flex-wrap: wrap;
 	column-gap: 10px;
-}
-
-article > div > div {
-	display: flex;
-	column-gap: 10px;
-	align-items: center;
-	flex-grow: 1;
-	flex-basis: 0;
-}
-
-article > div > div > img {
-	height: 16px;
-}
-
-hr {
-	border: none;
-	border-top: solid var(--content-txt-color) 1px;
-	margin: 0px;
+	margin-right: 4ch;
 }
 
 .btn-group {
-	margin: 14px 0px 14px 0px;
-}
-
-.btn-group img {
-	height: 16px;
+	margin-left: 0px;
+	justify-content: flex-end;
 }
