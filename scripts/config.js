@@ -152,8 +152,8 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 		else {
 			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
 			action.src = `images/actions/disk/${element}-${active}.svg`;
-			action.title = `${element.charAt(0).toUpperCase()}${element.slice(1)} Disk`;
 			if (active === "active") {
+				action.title = `${element.charAt(0).toUpperCase()}${element.slice(1)} Disk`;
 				if (element === "move") {
 					action.addEventListener("click", handleDiskMove);
 				}
