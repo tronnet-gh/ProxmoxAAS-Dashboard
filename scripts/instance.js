@@ -8,28 +8,23 @@ export class Instance extends HTMLElement {
 
 		shadowRoot.innerHTML = `
 		<link rel="stylesheet" href="css/style.css" type="text/css">
-		<link rel="stylesheet" href="css/instance.css" type="text/css">
 		<link rel="stylesheet" href="css/buttons.css" type="text/css">
-		<article>
-			<div>
-				<div>
-					<img id="instance-type">
-					<p id="instance-id"></p>
-					<p id="instance-name"></p>
-				</div>
-				<div>
-					<img id="node-status" alt="instance node">
-					<p id="node-name"></p>
-				</div>
-			</div>
-			<hr>
-			<div class="btn-group">
-				<img id="power-btn" class="clickable">
-				<img id="console-btn" class="clickable">
-				<img id="configure-btn" class="clickable">
-				<img id="delete-btn" class="clickable">
-			</div>
-		</article>
+		<link rel="stylesheet" href="css/instance.css" type="text/css">
+		<div>
+			<img id="node-status" alt="instance node">
+			<p id="node-name"></p>
+		</div>
+		<div>
+			<img id="instance-type">
+			<p id="instance-id"></p>
+			<p id="instance-name"></p>
+		</div>				
+		<div class="btn-group">
+			<img id="power-btn" class="clickable">
+			<img id="console-btn" class="clickable">
+			<img id="configure-btn" class="clickable">
+			<img id="delete-btn" class="clickable">
+		</div>
 		`;
 
 		this.shadowElement = shadowRoot;
@@ -205,4 +200,4 @@ export class Instance extends HTMLElement {
 	}
 }
 
-customElements.define("instance-article", Instance);
+customElements.define("instance-obj", Instance);
