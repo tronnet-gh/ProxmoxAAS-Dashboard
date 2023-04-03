@@ -34,10 +34,19 @@ header, footer {
 	max-width: 25ch;
 }
 
+header {
+	grid-area: header;
+}
+
 main {
+	grid-area: main;
 	background-color: var(--content-bkg-color);
 	color: var(--content-txt-color);
 	padding: 20px;
+}
+
+footer {
+	grid-area: footer;
 }
 
 footer p {
