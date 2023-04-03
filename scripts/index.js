@@ -1,4 +1,4 @@
-import {requestPVE, requestAPI, goToPage, deleteAllCookies} from "./utils.js";
+import {requestPVE, requestAPI, goToPage} from "./utils.js";
 import { Dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
