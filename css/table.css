@@ -5,24 +5,24 @@ table {
 	text-align: left;
 }
 
-thead {
+table thead {
 	background-color: var(--accent-bkg-color);
 	color: var(--accent-txt-color);
 }
 
-tbody {
+table tbody {
 	background-color: var(--content-bkg-color);
 	color: var(--content-txt-color);
 }
 
-tbody tr:nth-child(even) {
+table tbody tr:nth-child(even) {
 	background-color: #ddd;
 }
 
-tbody tr:hover {
+table tbody tr:hover {
 	background-color: #aaa;
 }
 
-th, td {
+table th, table td {
 	padding: 5px;
 }

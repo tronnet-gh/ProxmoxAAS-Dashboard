@@ -2,47 +2,47 @@ form {
 	width: fit-content;
 }
 
-p {
+form p {
 	text-align: left;
 	margin: 0px;
 }
 
-fieldset {
+form fieldset {
 	border: solid var(--content-txt-color) 1px;
 	padding: 10px;
 	margin: 10px;
 }
 
-input, label, legend {
+form input, form label, form legend {
 	font-family: monospace;
 	font-size: 14px;
 }
 
-input, select {
+form input, form select {
 	border: solid var(--content-txt-color) 1px;
 	min-width: fit-content;
 }
 
-input:focus, select:focus {
+form input:focus, form select:focus {
 	outline: none;
 }
 
-input:disabled, select:disabled {
+form input:disabled, form select:disabled {
 	background-color: var(--form-disabled-color);
 }
 
-button {
+form button {
 	margin-top: 0px;
 }
 
-.input-grid {
+form .input-grid {
 	display: grid;
 	column-gap: 10px;
 	row-gap: 5px;
 	align-items: center;
 }
 
-legend {
+form legend {
 	top: -0.6em;
 	position: relative;
 	height: 0;
@@ -52,13 +52,13 @@ form img {
 	width: 16px;
 }
 
-hr {
+form hr {
 	width: 100%;
 	border: none;
 	border-top: solid var(--content-txt-color) 1px;
 }
 
-.last-item {
+form .last-item {
 	width: 100%; 
 	display: flex; 
 	justify-content: flex-end; 
