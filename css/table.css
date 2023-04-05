@@ -1,21 +1,28 @@
 table {
 	padding: 10px;
 	border-collapse: collapse;
-	border: 1px solid var(--content-txt-color);
+	width: 100%;
+	text-align: left;
 }
 
-tr {
-	background-color: white;
+thead {
+	background-color: var(--accent-bkg-color);
+	color: var(--accent-txt-color);
 }
 
-tr:nth-child(even) {
+tbody {
+	background-color: var(--content-bkg-color);
+	color: var(--content-txt-color);
+}
+
+tbody tr:nth-child(even) {
 	background-color: #ddd;
 }
 
-tr:hover {
+tbody tr:hover {
 	background-color: #aaa;
 }
 
-td {
+th, td {
 	padding: 5px;
 }
