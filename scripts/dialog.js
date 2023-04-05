@@ -7,7 +7,7 @@ export class Dialog extends HTMLElement {
 		<link rel="stylesheet" href="css/style.css" type="text/css">
 		<link rel="stylesheet" href="css/form.css" type="text/css">
 		<link rel="stylesheet" href="css/dialog.css" type="text/css">
-		<link rel="stylesheet" href="css/buttons.css" type="text/css">
+		<link rel="stylesheet" href="css/button.css" type="text/css">
 		<dialog>
 			<p id="prompt"></p>
 			<hr>
