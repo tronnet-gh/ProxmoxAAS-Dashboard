@@ -4,27 +4,26 @@ window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
 	let resources = await requestAPI("/user/resources");
-	document.querySelector("main").innerHTML = buildTable(resources.resources, 1);
+	document.querySelector("main").append(buildResourceTable(resources.resources, "#resource-table"));
 }
 
-function buildTable (object, idx) {
+function buildResourceTable (object, tableid) {
 
 	if (object instanceof Object) {
-		let table = "";
-		if (idx === 1) { // topmost table gets some margin and a border
-			table += `<table style="margin-top: 10px; border: 1px solid black;">`;
-		}
-		else {
-			table += `<table>`;
-		}
+
+		let table = document.querySelector(tableid);
 		Object.keys(object).forEach((element) => {
-			table += `<tr><td>${element}</td><td>${buildTable(object[element], idx + 1)}</td></tr>`;
+			let row = table.insertRow();
+			let key = row.insertCell();
+			key.innerText = `${element}`;
+			let val = row.insertCell();
+			val.innerText = `${object[element]}`
+			let total = row.insertCell();;
+			total.innerText = `${object[element]}`
 		});
-		table += "</table>"
-		
 		return table;
 	}
 	else {
-		return object;
+		return null;
 	}
 }

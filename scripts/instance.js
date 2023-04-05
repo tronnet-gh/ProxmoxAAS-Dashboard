@@ -8,7 +8,7 @@ export class Instance extends HTMLElement {
 
 		shadowRoot.innerHTML = `
 		<link rel="stylesheet" href="css/style.css" type="text/css">
-		<link rel="stylesheet" href="css/buttons.css" type="text/css">
+		<link rel="stylesheet" href="css/button.css" type="text/css">
 		<link rel="stylesheet" href="css/instance.css" type="text/css">
 		<div>
 			<img id="node-status" alt="instance node">
