@@ -31,13 +31,15 @@ header, footer {
 	background-color: var(--accent-bkg-color);
 	color: var(--accent-txt-color);
 	padding: 20px;
-	width: 15vw;
-	min-width: max-content;
-	max-width: 25ch;
 }
 
 header {
 	grid-area: header;
+}
+
+header hr {
+	margin-top: 20px;
+	margin-bottom: 20px;
 }
 
 main {
@@ -62,7 +64,7 @@ nav {
 
 nav a {
 	color: var(--accent-txt-color);
-	font-size: xx-large;
+	font-size: x-large;
 	text-decoration: none;
 	position: relative;
 	padding: 10px;
@@ -94,21 +96,23 @@ h1, h2, h3, p {
 }
 
 h1 {
+	font-size: xxx-large; 
+	text-align: center;
+	margin: 0px;
+}
+
+h2 {
 	font-size: xx-large; 
 	text-align: center;
 }
 
-h2 {
+h3 {
 	font-size: x-large; 
 	text-align: center;
 }
 
-h3 {
-	font-size: larger; 
-	text-align: center;
-}
-
 p {
+	font-size: large;
 	text-align: left;
 }
 
