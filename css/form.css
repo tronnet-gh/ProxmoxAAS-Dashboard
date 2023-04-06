@@ -19,7 +19,7 @@ form input, form label, form legend {
 
 form input, form select {
 	border: solid var(--content-txt-color) 1px;
-	min-width: fit-content;
+	width: 100%;
 }
 
 form input:focus, form select:focus {
