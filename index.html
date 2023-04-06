@@ -10,22 +10,47 @@
 		<script src="scripts/index.js" type="module"></script>
 		<script src="scripts/instance.js" type="module"></script>
 		<style>
-			#instance-container {
-				display: grid; 
-				grid-template-columns: auto auto auto auto auto auto 1fr auto;
-				column-gap: 2.5em;
-				align-items: center;
+			@media screen and (min-width: 1000px) {
+				#instance-container {
+					display: grid; 
+					grid-template-columns: auto auto auto auto auto 1fr auto;
+					column-gap: 2.5em;
+					align-items: center;
+				}
+				#instance-container-header * {
+					margin-top: 0px;
+				}
+				instance-obj {
+					display: contents;
+				}
+				instance-obj:after, instance-obj:first-of-type:before {
+					content: " ";
+					border-bottom: 1px solid var(--content-txt-color);
+					grid-column: 1 / span 8;
+				}
 			}
-			#instance-container-header * {
-				margin-top: 0px;
-			}
-			instance-obj {
-				display: contents;
-			}
-			instance-obj:after, instance-obj:first-of-type:before {
-				content: " ";
-				border-bottom: 1px solid var(--content-txt-color);
-				grid-column: 1 / span 8;
+			@media screen and (max-width: 1000px) {
+				#instance-container {
+					display: flex;
+					flex-direction: column;
+				}
+				#instance-container-header * {
+					display: none;
+				}
+				instance-obj {
+					display: grid;
+					grid-template-columns: auto auto auto 1fr;
+					gap: 20px;
+					padding-top: 20px;
+					padding-bottom: 20px;
+					border-bottom: 1px solid var(--content-txt-color);
+				}
+				instance-obj:first-of-type {
+					border-top: 1px solid var(--content-txt-color);
+				}
+				.btn-group {
+					grid-column: 3 / span 2;
+				}
 			}
 		</style>
 	</head>
