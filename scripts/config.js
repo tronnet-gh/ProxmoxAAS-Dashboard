@@ -178,7 +178,7 @@ async function handleDiskDetach () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
 			let body = {
 				node: node,
 				type: type,
@@ -213,7 +213,7 @@ async function handleDiskAttach () {
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
 			let device = form.get("device");
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";		
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";		
 			let body = {
 				node: node,
 				type: type,
@@ -246,7 +246,7 @@ async function handleDiskResize () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
 			let body = {
 				node: node,
 				type: type,
@@ -295,7 +295,7 @@ async function handleDiskMove () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
 			let body = {
 				node: node,
 				type: type,
@@ -329,7 +329,7 @@ async function handleDiskDelete () {
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/actions/loading.svg";
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
 			let body = {
 				node: node,
 				type: type,
