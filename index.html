@@ -12,15 +12,20 @@
 		<style>
 			#instance-container {
 				display: grid; 
-				grid-template-columns: auto auto 1fr;
+				grid-template-columns: auto auto auto auto auto auto 1fr auto;
+				column-gap: 4em;
+				align-items: center;
+			}
+			#instance-container-header * {
+				margin-top: 0px;
 			}
 			instance-obj {
 				display: contents;
 			}
-			instance-obj:after, instance-obj:first-child:before {
+			instance-obj:after, instance-obj:first-of-type:before {
 				content: " ";
 				border-bottom: 1px solid var(--content-txt-color);
-				grid-column: 1 / span 3;
+				grid-column: 1 / span 8;
 			}
 		</style>
 	</head>
