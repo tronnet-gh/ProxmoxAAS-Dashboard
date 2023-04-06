@@ -1,13 +1,8 @@
-img {
-	height: 1em;
-}
-
 div {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	column-gap: 10px;
-	margin-right: 4ch;
 }
 
 .btn-group {

@@ -15,7 +15,6 @@ form fieldset {
 
 form input, form label, form legend {
 	font-family: monospace;
-	font-size: 14px;
 }
 
 form input, form select {
@@ -46,10 +45,6 @@ form legend {
 	top: -0.6em;
 	position: relative;
 	height: 0;
-}
-
-form img {
-	width: 16px;
 }
 
 form hr {
