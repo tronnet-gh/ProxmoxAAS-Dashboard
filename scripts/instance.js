@@ -16,7 +16,6 @@ export class Instance extends HTMLElement {
 		<div><img id="instance-status-icon"><p id="instance-status"></p></div>
 		<p id="node-name"></p>
 		<div><img id="node-status-icon"><p id="node-status"></p></div>
-		<div class="hidden"></div>
 		<div class="btn-group">
 			<img id="power-btn" class="clickable">
 			<img id="console-btn" class="clickable">

@@ -41,7 +41,6 @@ async function populateInstances () {
 			<p>VM Status</p>
 			<p>Host Name</p>
 			<p>Host Status</p>
-			<div class="hidden"></div>
 			<p>Actions</p>
 		</div>
 	`;
