@@ -1,8 +1,10 @@
 :root {
-    --accent-bkg-color: black;
+	--accent-bkg-color: black;
 	--accent-txt-color: white;
+	--accent-lnk-color: white;
 	--content-bkg-color: white;
 	--content-txt-color: black;
+	--content-lnk-color: #6666FF;
 	--form-disabled-color: #606060;
 	--button-accept: #0F0;
 	--success-color: #0F0;
@@ -53,30 +55,26 @@ nav {
 }
 
 nav a {
-	color: var(--accent-txt-color);
-	font-size: x-large;
-	text-decoration: none;
-	position: relative;
+	background-color: var(--accent-bkg-color);
+	color: var(--accent-lnk-color);
+	font-size: xx-large;
+	text-decoration: underline 0.1em var(--accent-bkg-color);
+	transition: text-decoration-color 250ms;
 }
 
-nav a:before {
-	position: absolute;
-    width: 0px;
-    height: 100%;
-    left: 0px;
-    top: 0px;
-    content: '';
-    background: var(--accent-txt-color);
-    opacity: 0.3;
-    transition: all 0.3s;
+nav a:hover, nav a[aria-current="true"] {
+	text-decoration: underline 0.1em var(--accent-lnk-color);
 }
 
-nav a[aria-current="true"]:before {
-	width: 10px;
+main a {
+	font-size: inherit;
+	color: var(--content-lnk-color);
+	text-decoration: underline 0.1em var(--content-bkg-color);
+	transition: text-decoration-color 250ms;
 }
 
-nav a:hover:before {
-    width: 100%;
+main a:hover {
+	text-decoration: underline 0.1em var(--content-lnk-color);
 }
 
 h1 {
