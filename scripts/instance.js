@@ -1,5 +1,5 @@
 import {requestPVE, requestAPI, goToPage, goToURL, instances, nodes} from "./utils.js";
-import { Dialog } from "./dialog.js";
+import {Dialog} from "./dialog.js";
 
 export class Instance extends HTMLElement {
 	constructor () {
