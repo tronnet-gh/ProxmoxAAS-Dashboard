@@ -18,35 +18,41 @@
 body {
 	display: grid;
 	min-height: 100vh;
-	grid-template-rows: 1fr auto;
+	grid-template-rows: auto 1fr auto;
 	grid-template-columns: auto 1fr;
 	grid-template-areas: 
-		"header main"
+		"logo 	title"
+		"nav	main"
 		"footer main"
 	;
 	margin: 0px;
 }
 
-header, footer {
+header {
+	display: contents;
+}
+
+#logo {
+	grid-area: logo;
+}
+
+#nav {
+	grid-area: nav;
+}
+
+#title {
+	grid-area: title;
+}
+
+#logo, #nav, footer {
 	background-color: var(--accent-bkg-color);
 	color: var(--accent-txt-color);
-	padding: 20px;
-}
-
-header {
-	grid-area: header;
-}
-
-header hr {
-	margin-top: 20px;
-	margin-bottom: 20px;
 }
 
 main {
 	grid-area: main;
 	background-color: var(--content-bkg-color);
 	color: var(--content-txt-color);
-	padding: 20px;
 }
 
 footer {
@@ -67,8 +73,6 @@ nav a {
 	font-size: x-large;
 	text-decoration: none;
 	position: relative;
-	padding: 10px;
-	padding-left: 20px;
 }
 
 nav a:before {
@@ -96,24 +100,19 @@ h1, h2, h3, p {
 }
 
 h1 {
-	font-size: xxx-large; 
-	text-align: center;
-	margin: 0px;
+	font-size: xxx-large;
 }
 
 h2 {
 	font-size: xx-large; 
-	text-align: center;
 }
 
 h3 {
 	font-size: x-large; 
-	text-align: center;
 }
 
 p {
 	font-size: large;
-	text-align: left;
 }
 
 .hidden {
