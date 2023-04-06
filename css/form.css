@@ -35,7 +35,7 @@ form button {
 	margin-top: 0px;
 }
 
-form .input-grid {
+.input-grid {
 	display: grid;
 	column-gap: 10px;
 	row-gap: 5px;
