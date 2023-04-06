@@ -1,4 +1,4 @@
-import {requestPVE, requestAPI, goToPage, goToURL, instances} from "./utils.js";
+import {requestPVE, requestAPI, goToPage, goToURL, instances, nodes} from "./utils.js";
 import { Dialog } from "./dialog.js";
 
 export class Instance extends HTMLElement {
@@ -13,9 +13,9 @@ export class Instance extends HTMLElement {
 		<p id="instance-id"></p>
 		<p id="instance-name"></p>
 		<p id="instance-type"></p>
-		<p id="instance-status"></p>
+		<div><img id="instance-status-icon"><p id="instance-status"></p></div>
 		<p id="node-name"></p>
-		<p id="node-status"></p>
+		<div><img id="node-status-icon"><p id="node-status"></p></div>
 		<div class="hidden"></div>
 		<div class="btn-group">
 			<img id="power-btn" class="clickable">
@@ -54,11 +54,19 @@ export class Instance extends HTMLElement {
 		let statusParagraph = this.shadowElement.querySelector("#instance-status");
 		statusParagraph.innerText = this.status;
 
+		let statusIcon = this.shadowElement.querySelector("#instance-status-icon");
+		statusIcon.src = instances[this.status].statusSrc;
+		statusIcon.alt = instances[this.status].statusAlt;
+
 		let nodeNameParagraph = this.shadowElement.querySelector("#node-name");
 		nodeNameParagraph.innerText = this.node.name;
 
 		let nodeStatusParagraph = this.shadowElement.querySelector("#node-status");
 		nodeStatusParagraph.innerText = this.node.status;
+
+		let nodeStatusIcon = this.shadowElement.querySelector("#node-status-icon");
+		nodeStatusIcon.src = nodes[this.node.status].statusSrc;
+		nodeStatusIcon.alt = nodes[this.node.status].statusAlt;
 
 		let powerButton = this.shadowElement.querySelector("#power-btn");
 		powerButton.src = instances[this.status].powerButtonSrc;

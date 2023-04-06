@@ -34,6 +34,8 @@ export const resources = {
 
 export const instances = {
 	running: {
+		statusSrc: "images/status/active.svg",
+		statusAlt: "Instance is running",
 		powerButtonSrc: "images/actions/instance/stop.svg",
 		powerButtonAlt: "Shutdown Instance",
 		configButtonSrc: "images/actions/instance/config-inactive.svg",
@@ -44,6 +46,8 @@ export const instances = {
 		deleteButtonAlt: "Delete Instance (Inactive)"
 	},
 	stopped: {
+		statusSrc: "images/status/inactive.svg",
+		statusAlt: "Instance is stopped",
 		powerButtonSrc: "images/actions/instance/start.svg",
 		powerButtonAlt: "Start Instance",
 		configButtonSrc: "images/actions/instance/config-active.svg",
@@ -54,7 +58,9 @@ export const instances = {
 		deleteButtonAlt: "Delete Instance"
 	},
 	loading: {
-		powerButtonSrc: "images/actions/loading.svg",
+		statusSrc: "images/status/loading.svg",
+		statusAlt: "Instance is loading",
+		powerButtonSrc: "images/status/loading.svg",
 		powerButtonAlt: "Loading Instance",
 		configButtonSrc: "images/actions/instance/config-inactive.svg",
 		configButtonAlt: "Change Configuration (Inactive)",
@@ -62,6 +68,21 @@ export const instances = {
 		consoleButtonAlt: "Open Console (Inactive)",
 		deleteButtonSrc: "images/actions/delete-inactive.svg",
 		deleteButtonAlt: "Delete Instance (Inactive)"
+	}
+}
+
+export const nodes = {
+	online: {
+		statusSrc: "images/status/active.svg",
+		statusAlt: "Node is online",
+	},
+	offline: {
+		statusSrc: "images/status/inactive.svg",
+		statusAlt: "Node is offline",
+	},
+	uknown: {
+		statusSrc: "images/status/inactive.svg",
+		statusAlt: "Node status is unknown",
 	}
 }
 
