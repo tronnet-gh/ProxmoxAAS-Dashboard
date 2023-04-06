@@ -18,10 +18,11 @@
 body {
 	display: grid;
 	min-height: 100vh;
-	grid-template-rows: auto 1fr auto;
+	grid-template-rows: auto auto 1fr auto;
 	grid-template-columns: auto 1fr;
 	grid-template-areas: 
 		"logo 	title"
+		"hr1	hr2"
 		"nav	main"
 		"footer main"
 	;
@@ -34,17 +35,57 @@ header {
 
 #logo {
 	grid-area: logo;
+	padding: 20px;
+	padding-bottom: 0px;
+}
+
+#hr1 {
+	grid-area: hr1;
+	margin: 0px;
+	padding: 0px;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: var(--accent-bkg-color);
+	color: var(--accent-txt-color);
+}
+
+#hr1 hr {
+	height: 1px;
+}
+
+#hr2 {
+	grid-area: hr2;
+	margin: 0px;
+	padding: 0px;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: var(--content-bkg-color);
+	color: var(--content-txt-color);
+}
+
+#hr2 hr {
+	height: 1px;
 }
 
 #nav {
 	grid-area: nav;
+	padding: 20px;
 }
 
 #title {
 	grid-area: title;
+	padding: 20px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: end;
 }
 
-#logo, #nav, footer {
+#title * {
+	margin: 0px;
+}
+
+#logo, #nav, #hr1, footer {
 	background-color: var(--accent-bkg-color);
 	color: var(--accent-txt-color);
 }
@@ -53,6 +94,8 @@ main {
 	grid-area: main;
 	background-color: var(--content-bkg-color);
 	color: var(--content-txt-color);
+	padding-left: 20px;
+	padding-right: 20px;
 }
 
 footer {
@@ -95,16 +138,12 @@ nav a:hover:before {
     width: 100%;
 }
 
-h1, h2, h3, p {
-	font-family: monospace;
-}
-
 h1 {
 	font-size: xxx-large;
 }
 
 h2 {
-	font-size: xx-large; 
+	font-size: xxx-large; 
 }
 
 h3 {
