@@ -66,6 +66,14 @@ nav a:hover, nav a[aria-current="true"] {
 	text-decoration: underline 0.1em var(--accent-lnk-color);
 }
 
+nav:hover a[aria-current="true"] {
+	text-decoration: underline 0.1em var(--accent-bkg-color);
+}
+
+nav:hover a[aria-current="true"]:hover {
+	text-decoration: underline 0.1em var(--accent-lnk-color);
+}
+
 main a {
 	font-size: inherit;
 	color: var(--content-lnk-color);
