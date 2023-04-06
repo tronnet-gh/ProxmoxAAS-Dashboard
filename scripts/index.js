@@ -33,7 +33,18 @@ async function populateInstances () {
 
 	instances.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
 
-	instanceContainer.innerText = "";
+	instanceContainer.innerHTML = `
+		<div style="display: contents;" id="instance-container-header">
+			<p>VM ID</p>
+			<p>VM Name</p>
+			<p>VM Type</p>
+			<p>VM Status</p>
+			<p>Host Name</p>
+			<p>Host Status</p>
+			<div class="hidden"></div>
+			<p>Actions</p>
+		</div>
+	`;
 	for(let i = 0; i < instances.length; i++) {
 		let newInstance = document.createElement("instance-obj");
 		newInstance.data = instances[i];

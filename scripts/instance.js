@@ -10,15 +10,13 @@ export class Instance extends HTMLElement {
 		<link rel="stylesheet" href="css/style.css" type="text/css">
 		<link rel="stylesheet" href="css/button.css" type="text/css">
 		<link rel="stylesheet" href="css/instance.css" type="text/css">
-		<div>
-			<img id="node-status" alt="instance node">
-			<p id="node-name"></p>
-		</div>
-		<div>
-			<img id="instance-type">
-			<p id="instance-id"></p>
-			<p id="instance-name"></p>
-		</div>				
+		<p id="instance-id"></p>
+		<p id="instance-name"></p>
+		<p id="instance-type"></p>
+		<p id="instance-status"></p>
+		<p id="node-name"></p>
+		<p id="node-status"></p>
+		<div class="hidden"></div>
 		<div class="btn-group">
 			<img id="power-btn" class="clickable">
 			<img id="console-btn" class="clickable">
@@ -44,21 +42,23 @@ export class Instance extends HTMLElement {
 	}
 
 	update () {
-		let typeImg = this.shadowElement.querySelector("#instance-type");
-		typeImg.src = `images/instances/${this.type}/${this.status}.svg`;
-		typeImg.alt = `${this.status} instance`;
-
 		let vmidParagraph = this.shadowElement.querySelector("#instance-id");
 		vmidParagraph.innerText = this.vmid;
 
 		let nameParagraph = this.shadowElement.querySelector("#instance-name");
 		nameParagraph.innerText = this.name ? this.name : "";
 
-		let nodeImg = this.shadowElement.querySelector("#node-status");
-		nodeImg.src = `images/nodes/${this.node.status}.svg`;
+		let typeParagraph = this.shadowElement.querySelector("#instance-type");
+		typeParagraph.innerText = this.type;
 
-		let nodeParagraph = this.shadowElement.querySelector("#node-name");
-		nodeParagraph.innerText = this.node.name;
+		let statusParagraph = this.shadowElement.querySelector("#instance-status");
+		statusParagraph.innerText = this.status;
+
+		let nodeNameParagraph = this.shadowElement.querySelector("#node-name");
+		nodeNameParagraph.innerText = this.node.name;
+
+		let nodeStatusParagraph = this.shadowElement.querySelector("#node-status");
+		nodeStatusParagraph.innerText = this.node.status;
 
 		let powerButton = this.shadowElement.querySelector("#power-btn");
 		powerButton.src = instances[this.status].powerButtonSrc;
