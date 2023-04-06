@@ -35,7 +35,7 @@ async function getConfig () {
 
 function populateResources () {
 	let name = type === "qemu" ? "name" : "hostname";
-	document.querySelector("#name").innerText = config.data[name];
+	document.querySelector("#name").innerText = document.querySelector("#name").innerText.replace("%{vmname}", config.data[name]);
 	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads"); // TODO add max from quota API
 	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data.memory, min: 16, step: 1}, "MiB"); // TODO add max from quota API
 	

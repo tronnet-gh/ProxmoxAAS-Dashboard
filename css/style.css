@@ -12,98 +12,38 @@
 
 * {
 	font-family: monospace;
-	font-size: large;
 }
 
 body {
 	display: grid;
 	min-height: 100vh;
-	grid-template-rows: auto auto 1fr auto;
+	grid-template-rows: 1fr auto;
 	grid-template-columns: auto 1fr;
 	grid-template-areas: 
-		"logo 	title"
-		"hr1	hr2"
-		"nav	main"
+		"bar	main"
 		"footer main"
 	;
 	margin: 0px;
 }
 
 header {
-	display: contents;
-}
-
-#logo {
-	grid-area: logo;
-	padding: 20px;
-	padding-bottom: 0px;
-}
-
-#hr1 {
-	grid-area: hr1;
-	margin: 0px;
-	padding: 0px;
-	padding-left: 20px;
-	padding-right: 20px;
-	background-color: var(--accent-bkg-color);
-	color: var(--accent-txt-color);
-}
-
-#hr1 hr {
-	height: 1px;
-}
-
-#hr2 {
-	grid-area: hr2;
-	margin: 0px;
-	padding: 0px;
-	padding-left: 20px;
-	padding-right: 20px;
-	background-color: var(--content-bkg-color);
-	color: var(--content-txt-color);
-}
-
-#hr2 hr {
-	height: 1px;
-}
-
-#nav {
-	grid-area: nav;
-	padding: 20px;
-}
-
-#title {
-	grid-area: title;
-	padding: 20px;
-	display: flex;
-	flex-direction: row;
-	flex-wrap: nowrap;
-	align-items: end;
-}
-
-#title * {
-	margin: 0px;
-}
-
-#logo, #nav, #hr1, footer {
-	background-color: var(--accent-bkg-color);
-	color: var(--accent-txt-color);
+	grid-area: bar;
 }
 
 main {
+	padding: 20px;
 	grid-area: main;
-	background-color: var(--content-bkg-color);
-	color: var(--content-txt-color);
-	padding-left: 20px;
-	padding-right: 20px;
 }
 
 footer {
 	grid-area: footer;
+	text-align: center;
 }
 
-footer p {
-	text-align: center;
+header, footer {
+	background-color: var(--accent-bkg-color);
+	color: var(--accent-txt-color);
+	padding: 20px;
 }
 
 nav {
@@ -139,11 +79,14 @@ nav a:hover:before {
 }
 
 h1 {
-	font-size: xxx-large;
+	font-size: xx-large;
+	margin: 0px;
+	text-align: center;
 }
 
 h2 {
-	font-size: xxx-large; 
+	font-size: xx-large; 
+	margin: 0px;
 }
 
 h3 {
@@ -160,4 +103,11 @@ p {
 
 .none {
 	display: none;
+}
+
+hr {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	border: 1px solid;
+	border-color: inherit;
 }
