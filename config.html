@@ -22,28 +22,26 @@
 		</header>
 		<main>
 			<h2 id="name">Instances / %{vmname}</h2><hr>
-			<div class="center-div">
-				<form>
-					<fieldset>
-						<legend>Resources</legend>
-						<div class="input-grid" id="resources" style="grid-template-columns: repeat(3, auto) 1fr;"></div>
-					</fieldset>
-					<fieldset>
-						<legend>Disks</legend>
-						<div class="input-grid" id="disks" style="grid-template-columns: auto auto auto 1fr;"></div>
-						<hr>
-						<div class="btn-group">
-							<img id="disk-add" src="images/actions/disk/add-disk.svg" class="clickable" alt="Add New Disk" title="Add New Disk">
-							<img id="cd-add" src="images/actions/disk/add-cd.svg" class="clickable none" alt="Add New CDROM" title="Add New CDROM">
-						</div>
-					</fieldset>
-					<fieldset class="fieldset-no-border">
-						<div class="btn-group" id="form-actions">
-							<button id="exit" type="button">EXIT</button>
-						</div>
-					</fieldset>
-				</form>
-			</div>
+			<form style="margin-left: auto; margin-right: auto;">
+				<fieldset>
+					<legend>Resources</legend>
+					<div class="input-grid" id="resources" style="grid-template-columns: repeat(3, auto) 1fr;"></div>
+				</fieldset>
+				<fieldset>
+					<legend>Disks</legend>
+					<div class="input-grid" id="disks" style="grid-template-columns: auto auto auto 1fr;"></div>
+					<hr>
+					<div class="btn-group">
+						<img id="disk-add" src="images/actions/disk/add-disk.svg" class="clickable" alt="Add New Disk" title="Add New Disk">
+						<img id="cd-add" src="images/actions/disk/add-cd.svg" class="clickable none" alt="Add New CDROM" title="Add New CDROM">
+					</div>
+				</fieldset>
+				<fieldset class="fieldset-no-border">
+					<div class="btn-group" id="form-actions">
+						<button id="exit" type="button">EXIT</button>
+					</div>
+				</fieldset>
+			</form>
 		</main>
 		<footer><p>&copy; tronnet</p></footer>
 	</body>
