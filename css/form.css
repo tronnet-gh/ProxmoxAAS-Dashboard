@@ -1,39 +1,3 @@
-form {
-	width: fit-content;
-}
-
-form p {
-	text-align: left;
-	margin: 0px;
-}
-
-form fieldset {
-	border: solid var(--content-txt-color) 1px;
-	padding: 10px;
-	margin: 10px;
-}
-
-form input, form label, form legend {
-	font-family: monospace;
-}
-
-form input, form select {
-	border: solid var(--content-txt-color) 1px;
-	width: 100%;
-}
-
-form input:focus, form select:focus {
-	outline: none;
-}
-
-form input:disabled, form select:disabled {
-	background-color: var(--form-disabled-color);
-}
-
-form button {
-	margin-top: 0px;
-}
-
 .input-grid {
 	display: grid;
 	column-gap: 10px;
@@ -41,22 +5,11 @@ form button {
 	align-items: center;
 }
 
-form legend {
-	top: -0.6em;
-	position: relative;
-	height: 0;
+.input-grid * {
+	margin-top: 0px;
+	margin-bottom: 0px;
 }
 
-form hr {
-	width: 100%;
-	border: none;
-	border-top: solid var(--content-txt-color) 1px;
-}
-
-form .last-item {
-	width: 100%; 
-	display: flex; 
-	justify-content: flex-end; 
-	align-items: center;
-	column-gap: 5px;
+.input-grid .last-item {
+	text-align: right;
 }

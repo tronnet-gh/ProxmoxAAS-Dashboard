@@ -5,33 +5,31 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>tronnet - client</title>
 		<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
-		<link rel="stylesheet" href="css/style.css" type="text/css">
-		<link rel="stylesheet" href="css/table.css" type="text/css">
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="css/style.css">
 		<script src="scripts/account.js" type="module"></script>
 	</head>
 	<body>
-		<header>
-			<h1>tronnet</h1>
-			<hr>
-			<nav id="nav">
-				<a href="index.html">Instances</a>
-				<a href="account.html" aria-current="true">Account</a>
-				<a href="login.html">Logout</a>
+		<header class="w3-black w3-bar">				
+			<nav class="w3-large w3-bar" id="nav">
+				<h1 class="w3-bar-item" style="font-size: 18px; margin: 0px; background-color: #0f0; color: #000;">tronnet</h1>
+				<a class="w3-bar-item w3-button" href="index.html">Instances</a>
+				<a class="w3-bar-item w3-button" href="account.html" aria-current="true">Account</a>
+				<a class="w3-bar-item w3-button" href="login.html">Logout</a>
 			</nav>
 		</header>
-		<main>
-			<h2>Account</h2><hr>
-			<table id="resource-table">
-				<thead>
-					<tr>
-						<th>Resource Type</th>
-						<th>Avaliable Amount</th>
-						<th>Total Amount</th>
+		<main class="w3-container">
+			<h2>Account</h2>
+			<table id="resource-table" class="w3-table w3-table-all">
+				<thead style="background-color: black; color: white;">
+					<tr style="background-color: black; color: white;">
+						<th style="background-color: black; color: white;">Resource Type</th>
+						<th style="background-color: black; color: white;">Avaliable Amount</th>
+						<th style="background-color: black; color: white;">Total Amount</th>
 					</tr>
 				</thead>
 				<tbody></tbody>
 			</table>
 		</main>
-		<footer><p>&copy; tronnet</p></footer>
 	</body>
 </html>
