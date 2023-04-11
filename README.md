@@ -31,17 +31,7 @@ The supported setup is to use a reverse proxy to serve both the original Proxmox
 After this step, the Client should be available on the `Client Host` at port `80`
 
 ## Installation - Reverse Proxy
-1. Configure nginx or preferred reverse proxy service to reverse proxy the default Proxmox web UI hosted by `Proxmox Host`:
-```
-server {
-	listen 443 ssl;
-	server_name pve.<FQDN>;
-	location / {
-		proxy_pass https://<Proxmox Host>:8006;
-    	}
-}
-```
-2. Configure nginx to reverse proxy the client. This can be done in the same file previously or in a new configuration file:
+1. Configure nginx or preferred reverse proxy to reverse proxy the client. This can be done in the same file previously or in a new configuration file:
 ```
 server {
 	listen 443 ssl;
@@ -54,7 +44,7 @@ server {
 	}
 }
 ```
-3. Restart nginx with the new configurations by running `systemctl restart nginx`
+2. Restart nginx with the new configurations by running `systemctl restart nginx`
 
 ## Installation - Client Configuration
 1. In the `Client Host`, navigate to the repo root folder, rename `vars.js.template` to `vars.js` and modify `API` withe the value `client.<FQDN>/api`
