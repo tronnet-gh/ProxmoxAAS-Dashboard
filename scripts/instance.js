@@ -7,21 +7,36 @@ export class Instance extends HTMLElement {
 		let shadowRoot = this.attachShadow({mode: "open"});
 
 		shadowRoot.innerHTML = `
-		<link rel="stylesheet" href="css/style.css" type="text/css">
-		<link rel="stylesheet" href="css/button.css" type="text/css">
-		<link rel="stylesheet" href="css/instance.css" type="text/css">
-		<p id="instance-id"></p>
-		<p id="instance-name"></p>
-		<p id="instance-type"></p>
-		<div id="instance-status-div"><img id="instance-status-icon"><p id="instance-status"></p></div>
-		<p id="node-name"></p>
-		<div id="node-status-div"><img id="node-status-icon"><p id="node-status"></p></div>
-		<div class="btn-group">
-			<img id="power-btn" class="clickable">
-			<img id="console-btn" class="clickable">
-			<img id="configure-btn" class="clickable">
-			<img id="delete-btn" class="clickable">
-		</div>
+			<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+			<link rel="stylesheet" href="css/style.css">
+			<div class="w3-row w3-border-bottom">
+				<div class="w3-col m1 s6">
+					<p id="instance-id"></p>
+				</div>
+				<div class="w3-col m2 s6">
+					<p id="instance-name"></p>
+				</div>
+				<div class="w3-col m1 w3-hide-small">
+					<p id="instance-type"></p>
+				</div>
+				<div class="w3-col m2 s6 flex-row-nowrap">
+					<img id="instance-status-icon">
+					<p id="instance-status"></p>
+				</div>
+				<div class="w3-col m2 w3-hide-small">
+					<p id="node-name"></p>
+				</div>
+				<div class="w3-col m2 flex-row-nowrap w3-hide-small">
+					<img id="node-status-icon">
+					<p id="node-status"></p>
+				</div>
+				<div class="w3-col m2 s6 flex-row-nowrap" style="padding-top: 15px;">
+					<img id="power-btn" class="clickable">
+					<img id="console-btn" class="clickable">
+					<img id="configure-btn" class="clickable">
+					<img id="delete-btn" class="clickable">
+				</div>
+			</div>
 		`;
 
 		this.shadowElement = shadowRoot;

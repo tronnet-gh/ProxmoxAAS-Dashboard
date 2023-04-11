@@ -1,125 +1,25 @@
-:root {
-	--accent-bkg-color: black;
-	--accent-txt-color: white;
-	--accent-lnk-color: white;
-	--content-bkg-color: white;
-	--content-txt-color: black;
-	--content-lnk-color: #6666FF;
-	--form-disabled-color: #606060;
-	--button-accept: #0F0;
-	--success-color: #0F0;
-	--button-cancel: #F00;
-	--fail-color: #F00;
-}
-
-* {
+h1, h2, h3, h3, h4, h5, h6, p, a, label, button {
 	font-family: monospace;
-	font-size: large;
-	box-sizing: border-box;
 }
 
 body {
-	display: grid;
 	min-height: 100vh;
-	grid-template-rows: 1fr auto;
-	grid-template-columns: auto 1fr;
-	grid-template-areas: 
-		"bar	main"
-		"footer main"
-	;
-	margin: 0px;
 }
 
-header {
-	grid-area: bar;
-}
-
-main {
-	padding: 20px;
-	grid-area: main;
-}
-
-footer {
-	grid-area: footer;
-	text-align: center;
-}
-
-header, footer {
-	background-color: var(--accent-bkg-color);
-	color: var(--accent-txt-color);
-	padding: 20px;
-}
-
-nav {
-	display: flex;
-	flex-direction: column;
-}
-
-nav a {
-	background-color: var(--accent-bkg-color);
-	color: var(--accent-lnk-color);
-	font-size: xx-large;
-	text-decoration: underline 0.1em var(--accent-bkg-color);
-	transition: text-decoration-color 250ms;
-}
-
-nav a:hover, nav a[aria-current="true"] {
-	text-decoration: underline 0.1em var(--accent-lnk-color);
-}
-
-nav:hover a[aria-current="true"] {
-	text-decoration: underline 0.1em var(--accent-bkg-color);
-}
-
-nav:hover a[aria-current="true"]:hover {
-	text-decoration: underline 0.1em var(--accent-lnk-color);
-}
-
-main a {
-	font-size: inherit;
-	color: var(--content-lnk-color);
-	text-decoration: underline 0.1em var(--content-bkg-color);
-	transition: text-decoration-color 250ms;
-}
-
-main a:hover {
-	text-decoration: underline 0.1em var(--content-lnk-color);
-}
-
-h1 {
-	font-size: xx-large;
-	margin: 0px;
-	text-align: center;
-}
-
-h2 {
-	font-size: xx-large; 
-	margin: 0px;
-}
-
-h3 {
-	font-size: x-large; 
-}
-
-p {
-	font-size: large;
-}
-
-.hidden {
-	visibility: hidden;	
-}
-
-.none {
-	display: none;
-}
-
-hr {
-	margin-top: 20px;
-	margin-bottom: 20px;
-	border: 1px solid;
-	border-color: inherit;
+img.clickable {
+	cursor: pointer;
 }
 
 img {
-	height: 1lh;
+	height: 1em;
+	width: 1em;
+}
+
+.flex-row-nowrap {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	column-gap: 10px;
+	align-items: center;
+	height: 100%;
 }

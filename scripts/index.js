@@ -34,14 +34,28 @@ async function populateInstances () {
 	instances.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
 
 	instanceContainer.innerHTML = `
-		<div style="display: contents;" id="instance-container-header">
-			<p>VM ID</p>
-			<p>VM Name</p>
-			<p>VM Type</p>
-			<p>VM Status</p>
-			<p>Host Name</p>
-			<p>Host Status</p>
+		<div class="w3-row w3-hide-small w3-border-bottom">
+			<div class="w3-col s1">
+				<p>VM ID</p>
+			</div>
+			<div class="w3-col s2">
+				<p>VM Name</p>
+			</div>
+			<div class="w3-col s1">
+				<p>VM Type</p>
+			</div>
+			<div class="w3-col s2">
+				<p>VM Status</p>
+			</div>
+			<div class="w3-col s2">
+				<p>Host Name</p>
+			</div>
+			<div class="w3-col s2">
+				<p>Host Status</p>
+			</div>
+			<div class="w3-col s2">
 			<p>Actions</p>
+			</div>
 		</div>
 	`;
 	for(let i = 0; i < instances.length; i++) {
