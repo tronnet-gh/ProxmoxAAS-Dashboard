@@ -7,11 +7,12 @@ ProxmoxAAS Client provides users of a proxmox based compute on demand service a 
 - Instance resource configuration
 - Instance creation and destruction
 - Remote console
-- Basic account management
+- Extended account management
 
 ## Prerequisites
 - Proxmox VE Cluster (v7.0+)
-- Reverse proxy server which serves the Proxmox VE Web GUI & API (ie nginx)
+- Reverse proxy server which can serve the client
+	- FQDN
 - Web server to host the ProxmoxAAS Client (ie Apache2)
 
 ## Notes
