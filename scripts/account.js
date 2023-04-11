@@ -13,14 +13,14 @@ function buildResourceTable (object, tableid) {
 
 		let table = document.querySelector(tableid);
 		let tbody = table.querySelector("tbody");
-		Object.keys(object).forEach((element) => {
+		Object.keys(object.available).forEach((element) => {
 			let row = tbody.insertRow();
 			let key = row.insertCell();
 			key.innerText = `${element}`;
 			let val = row.insertCell();
-			val.innerText = `${object[element]}`
+			val.innerText = `${object.available[element]}`
 			let total = row.insertCell();;
-			total.innerText = `${object[element]}`
+			total.innerText = `${object.maximum[element]}`
 		});
 	}
 }

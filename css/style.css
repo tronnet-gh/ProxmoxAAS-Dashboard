@@ -15,6 +15,7 @@
 * {
 	font-family: monospace;
 	font-size: large;
+	box-sizing: border-box;
 }
 
 body {
