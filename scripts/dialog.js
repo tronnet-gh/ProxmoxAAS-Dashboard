@@ -4,19 +4,18 @@ export class Dialog extends HTMLElement {
 		let shadowRoot = this.attachShadow({mode: "open"});
 
 		shadowRoot.innerHTML = `
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<link rel="stylesheet" href="css/style.css" type="text/css">
 		<link rel="stylesheet" href="css/form.css" type="text/css">
-		<link rel="stylesheet" href="css/dialog.css" type="text/css">
-		<link rel="stylesheet" href="css/button.css" type="text/css">
 		<dialog>
-			<p id="prompt"></p>
+			<p id="prompt" style="text-align: center;"></p>
 			<hr>
 			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
 			</form>
 			<hr>
-			<div class="btn-group">
-				<button value="cancel" form="form" class="cancel" formnovalidate>CANCEL</button>
-				<button value="confirm" form="form" class="accept">CONFIRM</button>
+			<div class="w3-center">
+				<button value="cancel" form="form" class="w3-button w3-margin" style="background-color: #f00;" formnovalidate>CANCEL</button>
+				<button value="confirm" form="form" class="w3-button w3-margin" style="background-color: #0f0;">CONFIRM</button>
 			</div>
 		</dialog>
 		`;
