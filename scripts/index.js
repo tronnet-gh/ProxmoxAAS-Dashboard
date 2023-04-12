@@ -35,26 +35,26 @@ async function populateInstances () {
 
 	instanceContainer.innerHTML = `
 		<div class="w3-row w3-hide-small w3-border-bottom">
-			<div class="w3-col s1">
+			<div class="w3-col l1 m2">
 				<p>VM ID</p>
 			</div>
-			<div class="w3-col s2">
+			<div class="w3-col l2 m3">
 				<p>VM Name</p>
 			</div>
-			<div class="w3-col s1">
+			<div class="w3-col l1 m2">
 				<p>VM Type</p>
 			</div>
-			<div class="w3-col s2">
+			<div class="w3-col l2 m3">
 				<p>VM Status</p>
 			</div>
-			<div class="w3-col s2">
+			<div class="w3-col l2 w3-hide-medium">
 				<p>Host Name</p>
 			</div>
-			<div class="w3-col s2">
+			<div class="w3-col l2 w3-hide-medium">
 				<p>Host Status</p>
 			</div>
-			<div class="w3-col s2">
-			<p>Actions</p>
+			<div class="w3-col l2 m2">
+				<p>Actions</p>
 			</div>
 		</div>
 	`;
