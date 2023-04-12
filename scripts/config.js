@@ -64,6 +64,8 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 	input.id = labelText;
 	input.name = labelText;
 	input.required = true;
+	input.classList.add("w3-input");
+	input.classList.add("w3-border");
 	field.append(input);
 
 	if (unitText) {
@@ -147,7 +149,9 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
 			action.src = `images/actions/delete-${active}.svg`;
 			action.title = "Delete Disk";
-			action.addEventListener("click", handleDiskDelete);
+			if (active === "active") {
+				action.addEventListener("click", handleDiskDelete);
+			}			
 		}
 		else {
 			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
@@ -208,7 +212,7 @@ async function handleDiskAttach () {
 	let diskImage = config.data[this.dataset.disk];
 
 	dialog.header = `Attach ${diskImage}`;
-	dialog.formBody = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required></input>`;
+	dialog.formBody = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required></input>`;
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
@@ -242,7 +246,7 @@ async function handleDiskResize () {
 	document.body.append(dialog);
 
 	dialog.header = `Resize ${this.dataset.disk}`; 
-	dialog.formBody = `<label for="size-increment">Size Increment (GiB)</label><input name="size-increment" id="size-increment" type="number" min="0" max="131072"></input>`;
+	dialog.formBody = `<label for="size-increment">Size Increment (GiB)</label><input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072"></input>`;
 
 	dialog.callback = async (result, form) => {
 		if (result === "confirm") {
@@ -284,11 +288,11 @@ async function handleDiskMove () {
 			options += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	let select = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select">${options}</select>`;
+	let select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select">${options}</select>`;
 
 	dialog.formBody = `
 		${select}
-		<label for="delete-check">Delete Source</label><input name="delete-check" id="delete-check" type="checkbox" checked required>
+		<label for="delete-check">Delete Source</label><input class="w3-input w3-border" name="delete-check" id="delete-check" type="checkbox" checked required>
 	`;
 
 	dialog.shadowRoot.querySelector("#storage-select").selectedIndex = -1;
@@ -369,9 +373,9 @@ async function handleDiskAdd () {
 	let select = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select" required>${options}</select>`;
 
 	dialog.formBody = `
-		<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required></input>
+		<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required></input>
 		${select}
-		<label for="size">Size (GiB)</label><input name="size" id="size" type="number" min="0" max="131072" required></input>
+		<label for="size">Size (GiB)</label><input class="w3-input w3-border" name="size" id="size" type="number" min="0" max="131072" required></input>
 	`;
 
 	dialog.shadowRoot.querySelector("#storage-select").selectedIndex = -1;
@@ -419,7 +423,7 @@ async function handleCDAdd () {
 	let storageSelect = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select" required>${storageOptions}</select>`;
 
 	dialog.formBody = `
-		<label for="device">IDE</label><input name="device" id="device" type="number" min="0" max="3" required></input>
+		<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required></input>
 		${storageSelect}
 		<label for="iso-select">Image</label><select name="iso-select" id="iso-select" required></select>
 	`;
