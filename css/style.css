@@ -23,3 +23,11 @@ img {
 	align-items: center;
 	height: 100%;
 }
+
+.hidden {
+	visibility: hidden;
+}
+
+.none {
+	display: none;
+}
