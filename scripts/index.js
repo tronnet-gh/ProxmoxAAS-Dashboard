@@ -73,33 +73,33 @@ async function handleInstanceAdd () {
 
 	dialog.formBody = `
 		<label for="type">Instance Type</label>
-		<select name="type" id="type" required>
+		<select class="w3-select w3-border" name="type" id="type" required>
 			<option value="lxc">Container</option>
 			<option value="qemu">Virtual Machine</option>
 		</select>
 		<label for="node">Node</label>
-		<select name="node" id="node" required></select>
+		<select class="w3-select w3-border" name="node" id="node" required></select>
 		<label for="name">Name</label>
-		<input name="name" id="name" required></input>
+		<input class="w3-input w3-border" name="name" id="name" required></input>
 		<label for="vmid">ID</label>
-		<input name="vmid" id="vmid" type="number" required></input>
+		<input class="w3-input w3-border" name="vmid" id="vmid" type="number" required></input>
 		<label for="cores">Cores (Threads)</label>
-		<input name="cores" id="cores" type="number" min="1" max="8192" required></input>
+		<input class="w3-input w3-border" name="cores" id="cores" type="number" min="1" max="8192" required></input>
 		<label for="memory">Memory (MiB)</label>
-		<input name="memory" id="memory" type="number" min="16", step="1" required></input>
+		<input class="w3-input w3-border" name="memory" id="memory" type="number" min="16", step="1" required></input>
 		<p class="container-specific none" style="grid-column: 1 / span 2; text-align: center;">Container Options</p>
 		<label class="container-specific none" for="swap">Swap (MiB)</label>
-		<input class="container-specific none" name="swap" id="swap" type="number" min="0" step="1" required disabled></input>
+		<input class="w3-input w3-border container-specific none" name="swap" id="swap" type="number" min="0" step="1" required disabled></input>
 		<label class="container-specific none" for="template-storage">Template Storage</label>
-		<select class="container-specific none" name="template-storage" id="template-storage" required disabled></select>
+		<select class="w3-select w3-border container-specific none" name="template-storage" id="template-storage" required disabled></select>
 		<label class="container-specific none" for="template-image">Template Image</label>
-		<select class="container-specific none" name="template-image" id="template-image" required disabled></select>
+		<select class="w3-select w3-border container-specific none" name="template-image" id="template-image" required disabled></select>
 		<label class="container-specific none" for="rootfs-storage">ROOTFS Storage</label>
-		<select class="container-specific none" name="rootfs-storage" id="rootfs-storage" required disabled></select>				
+		<select class="w3-select w3-border container-specific none" name="rootfs-storage" id="rootfs-storage" required disabled></select>				
 		<label class="container-specific none" for="rootfs-size">ROOTFS Size (GiB)</label>
-		<input class="container-specific none" name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled></input>
+		<input class="w3-input w3-border container-specific none" name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled></input>
 		<label class="container-specific none" for="password">Password</label>
-		<input class="container-specific none" name="password" id="password" type="password" required disabled></input>
+		<input class="w3-input w3-border container-specific none" name="password" id="password" type="password" required disabled></input>
 	`;
 
 	let typeSelect = dialog.shadowRoot.querySelector("#type");
