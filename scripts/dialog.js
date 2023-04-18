@@ -41,4 +41,23 @@ export class Dialog extends HTMLElement {
 	}
 }
 
+export function alert (message) {
+	let form = document.createElement("form");
+	form.method = "dialog";
+	form.innerHTML = `
+		<p class="w3-center" style="margin-bottom: 0px;">${message}</p>
+		<div class="w3-center">
+			<button class="w3-button w3-margin" id="submit">OK</button>
+		</div>
+	`;
+
+	let dialog = document.createElement("dialog");
+	dialog.classList.add("w3-card-4");
+	dialog.classList.add("w3-container");
+	dialog.append(form);
+
+	document.body.append(dialog);
+	dialog.showModal();
+}
+
 customElements.define("dialog-form", Dialog);
