@@ -4,7 +4,7 @@ window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
 	let resources = await requestAPI("/user/resources");
-	buildResourceTable(resources.resources, "#resource-table");
+	buildResourceTable(resources, "#resource-table");
 }
 
 function buildResourceTable (object, tableid) {
@@ -17,10 +17,12 @@ function buildResourceTable (object, tableid) {
 			let row = tbody.insertRow();
 			let key = row.insertCell();
 			key.innerText = `${element}`;
+			let used = row.insertCell();
+			used.innerText = `${object.used[element]}`;
 			let val = row.insertCell();
-			val.innerText = `${object.available[element]}`
-			let total = row.insertCell();;
-			total.innerText = `${object.maximum[element]}`
+			val.innerText = `${object.available[element]}`;
+			let total = row.insertCell();
+			total.innerText = `${object.maximum[element]}`;
 		});
 	}
 }
