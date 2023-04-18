@@ -10,18 +10,16 @@
 		<script src="scripts/login.js" type="module"></script>
 	</head>
 	<body class="w3-display-container" style="min-height: 100vh;">
-		<header>
-			<header class="w3-black w3-bar">				
-				<nav class="w3-large w3-bar" id="nav">
-					<h1 class="w3-bar-item w3-mobile w3-hide-small" style="font-size: 18px; margin: 0px; background-color: #0f0; color: #000;">tronnet</h1>
-					<a class="w3-bar-item w3-mobile w3-button w3-hide-small" href="login.html" aria-current="true">Login</a>
-				</nav>
-			</header>
+		<header class="w3-black w3-bar">				
+			<nav class="w3-large w3-bar" id="nav">
+				<h1 class="w3-bar-item w3-mobile w3-hide-small" style="font-size: 18px; margin: 0px; background-color: #0f0; color: #000;">tronnet</h1>
+				<a class="w3-bar-item w3-mobile w3-button w3-hide-small" href="login.html" aria-current="true">Login</a>
+			</nav>
 		</header>
 		<main class="w3-container w3-display-middle w3-mobile">
-			<div class="w3-card-4 w3-margin">
+			<div class="w3-card-4 w3-margin w3-container">
 				<h2 class="w3-center">Proxmox VE Login</h2>
-				<form class="w3-container">     
+				<form>     
 					<label for="username"><b>Username</b></label>
 					<input class="w3-input w3-border" id="username" name="username" type="text">    
 					<label for="password"><b>Password</b></label>
@@ -34,7 +32,7 @@
 				</form>
 			</div>
 			<div class="w3-container w3-center w3-margin">
-				<output id="status"></output>
+				<output id="status"> </output>
 			</div>
 		</main>
 	</body>
