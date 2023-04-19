@@ -13,7 +13,7 @@ function buildResourceTable (object, tableid) {
 
 		let table = document.querySelector(tableid);
 		let tbody = table.querySelector("tbody");
-		Object.keys(object.available).forEach((element) => {
+		Object.keys(object.avail).forEach((element) => {
 			let row = tbody.insertRow();
 			let key = row.insertCell();
 			key.innerText = `${element}`;
