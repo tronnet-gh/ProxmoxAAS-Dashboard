@@ -1,4 +1,4 @@
-import {requestPVE, requestAPI} from "./utils.js";
+import {requestAPI, goToPage} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -11,6 +11,11 @@ let SIPrefix = [
 ]
 
 async function init () {
+	let cookie = document.cookie;
+	if (cookie === "") {
+		goToPage("login.html");
+	}
+
 	let resources = await requestAPI("/user/resources");
 	buildResourceTable(resources, "#resource-table");
 }

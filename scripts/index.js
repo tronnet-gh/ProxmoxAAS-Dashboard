@@ -4,6 +4,11 @@ import {Dialog} from "./dialog.js";
 window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
+	let cookie = document.cookie;
+	if (cookie === "") {
+		goToPage("login.html");
+	}
+	
 	await populateInstances();
 
 	let addInstanceBtn = document.querySelector("#instance-add");
@@ -11,15 +16,8 @@ async function init () {
 }
 
 async function populateInstances () {
-	let cookie = document.cookie;
-	if (cookie === "") {
-		goToPage("login.html");
-	}
-
 	let resources = await requestPVE("/cluster/resources", "GET", null);
-
-	let instanceContainer = document.getElementById("instance-container")
-
+	let instanceContainer = document.getElementById("instance-container");
 	let instances = [];
 
 	resources.data.forEach((element) => {
