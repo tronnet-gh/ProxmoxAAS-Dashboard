@@ -11,7 +11,7 @@ ProxmoxAAS Client provides users of a proxmox based compute on demand service a 
 
 ## Prerequisites
 - Proxmox VE Cluster (v7.0+)
-- Reverse proxy server which can serve the client
+- Reverse proxy server which can proxy the client and API
 	- FQDN
 - Web server to host the ProxmoxAAS Client (ie Apache2)
 
@@ -31,26 +31,10 @@ The supported setup is to use a reverse proxy to serve both the original Proxmox
 
 After this step, the Client should be available on the `Client Host` at port `80`
 
-## Installation - Reverse Proxy
-1. Configure nginx or preferred reverse proxy to reverse proxy the client. This can be done in the same file previously or in a new configuration file:
-```
-server {
-	listen 443 ssl;
-	server_name client.<FQDN>;
-	location / {
-		proxy_pass http://<Client Host>:80;
-	}
-	location /api/ {
-		proxy_pass http://<Client Host>:8080;
-	}
-}
-```
-2. Restart nginx with the new configurations by running `systemctl restart nginx`
-
 ## Installation - Client Configuration
 1. In the `Client Host`, navigate to the repo root folder, rename `vars.js.template` to `vars.js` and modify `API` withe the value `client.<FQDN>/api`
 
 
 ## API Installation
 
-To install the API, go to [ProxmoxAAS API](https://github.com/tronnet-gh/ProxmoxAAS-API). This is required for the client to function. 
+To install the API, go to [ProxmoxAAS API](https://github.com/tronnet-gh/ProxmoxAAS-API). This is required for the client to function. The API installation will also have steps for setting up the reverse proxy server.  
