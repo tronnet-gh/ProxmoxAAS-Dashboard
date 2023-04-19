@@ -46,6 +46,6 @@ function parseNumber(value, unitData) {
 		return `${value} ${unitPrefix}${unit}`
 	}
 	else {
-		return value;
+		return `${value} ${unit}`;
 	}
 }
