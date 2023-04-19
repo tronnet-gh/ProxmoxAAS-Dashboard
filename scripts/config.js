@@ -370,7 +370,7 @@ async function handleDiskAdd () {
 			options += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	let select = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select" required>${options}</select>`;
+	let select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required>${options}</select>`;
 
 	dialog.formBody = `
 		<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required></input>
@@ -420,12 +420,12 @@ async function handleCDAdd () {
 			storageOptions += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	let storageSelect = `<label for="storage-select">Storage</label><select name="storage-select" id="storage-select" required>${storageOptions}</select>`;
+	let storageSelect = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required>${storageOptions}</select>`;
 
 	dialog.formBody = `
 		<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required></input>
 		${storageSelect}
-		<label for="iso-select">Image</label><select name="iso-select" id="iso-select" required></select>
+		<label for="iso-select">Image</label><select class="w3-select w3-border" name="iso-select" id="iso-select" required></select>
 	`;
 
 	dialog.shadowRoot.querySelector("#storage-select").selectedIndex = -1;

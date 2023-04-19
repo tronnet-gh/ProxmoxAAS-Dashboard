@@ -1,12 +1,5 @@
 import {API} from "/vars.js";
 
-export class ResponseError extends Error {
-	constructor(message) {
-		super(message);
-		this.name = "ResponseError";
-	}
-}
-
 export class NetworkError extends Error {
 	constructor(message) {
 		super(message);
@@ -161,16 +154,21 @@ async function request (url, content) {
 		return response;
 	})
 	.catch((error) => {
-		throw new NetworkError(error);
+		return new NetworkError(error);
 	});
 
-	if(!response.ok){
-		throw new ResponseError(response);
+	if (response instanceof NetworkError) {
+		return {status: 408, error: "network error"};
 	}
-
-	let data = await response.json();
-	data.status = response.status;
-	return data;
+	else if(!response.ok){
+		let data = await response.json()
+		return {status: response.status, error: data.error};
+	}
+	else {
+		let data = await response.json();
+		data.status = response.status;
+		return data;
+	}
 }
 
 export function goToPage (page, data={}, newwindow = false) {
