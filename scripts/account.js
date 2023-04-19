@@ -20,9 +20,9 @@ function buildResourceTable (object, tableid) {
 			let used = row.insertCell();
 			used.innerText = `${object.used[element]}`;
 			let val = row.insertCell();
-			val.innerText = `${object.available[element]}`;
+			val.innerText = `${object.avail[element]}`;
 			let total = row.insertCell();
-			total.innerText = `${object.maximum[element]}`;
+			total.innerText = `${object.max[element]}`;
 		});
 	}
 }
