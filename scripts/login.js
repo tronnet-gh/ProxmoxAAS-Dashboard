@@ -1,4 +1,4 @@
-import {requestTicket, setTicket, ResponseError, NetworkError, goToPage, deleteAllCookies, requestPVE} from "./utils.js";
+import {requestTicket, setTicket, NetworkError, goToPage, deleteAllCookies, requestPVE} from "./utils.js";
 import {alert} from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
@@ -18,27 +18,26 @@ async function init (){
 		e.preventDefault();
 		let form = document.querySelector("form");
 		let formData = new FormData(form);
-		try {
-			formSubmitButton.innerText = "Authenticating...";
-			let ticket = await requestTicket(formData.get("username"), formData.get("password"), formData.get("realm"));
+
+		formSubmitButton.innerText = "Authenticating...";
+		let ticket = await requestTicket(formData.get("username"), formData.get("password"), formData.get("realm"));
+		if (ticket.status === 200) {
 			setTicket(ticket.data.ticket, ticket.data.CSRFPreventionToken, formData.get("username"));
 			formSubmitButton.innerText = "LOGIN";		
 			goToPage("index.html");
 		}
-		catch (error) {
-			if(error instanceof ResponseError) { // response error is usually 401 auth failed
-				alert("Authenticaton failed.");
-				formSubmitButton.innerText = "LOGIN";
-			}
-			else if (error instanceof NetworkError) {
-				alert("Network error.");
-				formSubmitButton.innerText = "LOGIN";
-			}
-			else {
-				alert("An error.");
-				formSubmitButton.innerText = "LOGIN";
-				console.error(error);
-			}
+		else if (ticket.status === 401) {
+			alert("Authenticaton failed.");
+			formSubmitButton.innerText = "LOGIN";
+		}
+		else if (ticket.status === 408) {
+			alert("Network error.");
+			formSubmitButton.innerText = "LOGIN";
+		}
+		else {
+			alert("An error occured.");
+			formSubmitButton.innerText = "LOGIN";
+			console.error(error);
 		}
 	});
 }
