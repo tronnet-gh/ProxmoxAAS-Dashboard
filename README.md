@@ -31,10 +31,11 @@ The supported setup is to use a reverse proxy to serve both the original Proxmox
 
 After this step, the Client should be available on the `Client Host` at port `80`
 
-## Installation - Client Configuration
-1. In the `Client Host`, navigate to the repo root folder, rename `vars.js.template` to `vars.js` and modify `API` withe the value `client.<FQDN>/api`
+## Configuration - Client
+1. In `Client Host`, navigate to this repo's root folder
+2. Copy `vars.js.template` to `vars.js` and assign the `API` varaible with the value of the API's URL. This will likely be `client.<FQDN>/api`
 
 
-## API Installation
+## Installation - API
 
 To install the API, go to [ProxmoxAAS API](https://github.com/tronnet-gh/ProxmoxAAS-API). This is required for the client to function. The API installation will also have steps for setting up the reverse proxy server.  
