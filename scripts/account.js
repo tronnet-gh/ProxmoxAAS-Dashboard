@@ -25,16 +25,16 @@ function buildResourceTable (object, tableid) {
 	if (object instanceof Object) {
 		let table = document.querySelector(tableid);
 		let tbody = table.querySelector("tbody");
-		Object.keys(object.avail).forEach((element) => {
+		Object.keys(object.resources.avail).forEach((element) => {
 			let row = tbody.insertRow();
 			let key = row.insertCell();
 			key.innerText = `${element}`;
 			let used = row.insertCell();
-			used.innerText = `${parseNumber(object.used[element], object.units[element])}`;
+			used.innerText = `${parseNumber(object.resources.used[element], object.resources.units[element])}`;
 			let val = row.insertCell();
-			val.innerText = `${parseNumber(object.avail[element], object.units[element])}`;
+			val.innerText = `${parseNumber(object.resources.avail[element], object.resources.units[element])}`;
 			let total = row.insertCell();
-			total.innerText = `${parseNumber(object.max[element], object.units[element])}`;
+			total.innerText = `${parseNumber(object.resources.max[element], object.resources.units[element])}`;
 		});
 	}
 }
