@@ -3,7 +3,7 @@
 	--success-color: #0f0;
 }
 
-h1, h2, h3, h3, h4, h5, h6, p, a, label, button, input, select {
+h1, h2, h3, h3, h4, h5, h6, p, a, label, button, input, select, td {
 	font-family: monospace;
 }
 
@@ -20,13 +20,27 @@ img {
 	width: 1em;
 }
 
-.flex-row-nowrap {
+.flex {
 	display: flex;
+}
+
+.flex * {
+	margin: 0px;
+}
+
+.row {
 	flex-direction: row;
-	flex-wrap: nowrap;
 	column-gap: 10px;
 	align-items: center;
-	height: 100%;
+}
+
+.wrap {
+	flex-wrap: wrap;
+	row-gap: 10px;
+}
+
+.nowrap {
+	flex-wrap: nowrap;
 }
 
 .hidden {

@@ -19,18 +19,18 @@ export class Instance extends HTMLElement {
 				<div class="w3-col l1 m2 w3-hide-small">
 					<p id="instance-type"></p>
 				</div>
-				<div class="w3-col l2 m3 s6 flex-row-nowrap">
+				<div class="w3-col l2 m3 s6 flex row nowrap">
 					<img id="instance-status-icon">
 					<p id="instance-status"></p>
 				</div>
 				<div class="w3-col l2 w3-hide-medium w3-hide-small">
 					<p id="node-name"></p>
 				</div>
-				<div class="w3-col l2 w3-hide-medium w3-hide-small flex-row-nowrap">
+				<div class="w3-col l2 w3-hide-medium w3-hide-small flex row nowrap">
 					<img id="node-status-icon">
 					<p id="node-status"></p>
 				</div>
-				<div class="w3-col l2 m2 s6 flex-row-nowrap" style="padding-top: 15px;">
+				<div class="w3-col l2 m2 s6 flex row nowrap" style="padding-top: 15px;">
 					<img id="power-btn" class="clickable">
 					<img id="console-btn" class="clickable">
 					<img id="configure-btn" class="clickable">
