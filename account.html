@@ -20,17 +20,19 @@
 		</header>
 		<main class="w3-container">
 			<h2>Account</h2>
-			<table id="resource-table" class="w3-table w3-table-all w3-responsive">
-				<thead style="background-color: black; color: white;">
-					<tr style="background-color: black; color: white;">
-						<th style="background-color: black; color: white;">Resource Type</th>
-						<th style="background-color: black; color: white;">Allocated Amount</th>
-						<th style="background-color: black; color: white;">Free Amount</th>
-						<th style="background-color: black; color: white;">Total Amount</th>
-					</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
+			<div class="w3-responsive">
+				<table id="resource-table" class="w3-table w3-table-all" style="overflow-x: auto;">
+					<thead>
+						<tr class="w3-black">
+							<th>Resource Type</th>
+							<th>Allocated Amount</th>
+							<th>Free Amount</th>
+							<th>Total Amount</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
 		</main>
 	</body>
 </html>
