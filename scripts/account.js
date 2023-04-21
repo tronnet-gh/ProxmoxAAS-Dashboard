@@ -1,4 +1,4 @@
-import {requestAPI, goToPage} from "./utils.js";
+import {requestAPI, goToPage, getCookie} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -17,24 +17,30 @@ async function init () {
 	}
 
 	let resources = await requestAPI("/user/resources");
+	resources = resources.resources;
+	let instances = await requestAPI("/user/instances");
+	instances = instances.instances;
+	document.querySelector("#username").innerHTML += getCookie("username");
+	document.querySelector("#pool").innerHTML += instances.pool;
+	document.querySelector("#vmid").innerHTML += `[${instances.vmid.min},${instances.vmid.max}]`;
 	buildResourceTable(resources, "#resource-table");
 }
 
-function buildResourceTable (object, tableid) {
+function buildResourceTable (resources, tableid) {
 
-	if (object instanceof Object) {
+	if (resources instanceof Object) {
 		let table = document.querySelector(tableid);
 		let tbody = table.querySelector("tbody");
-		Object.keys(object.resources.avail).forEach((element) => {
+		Object.keys(resources.avail).forEach((element) => {
 			let row = tbody.insertRow();
 			let key = row.insertCell();
 			key.innerText = `${element}`;
 			let used = row.insertCell();
-			used.innerText = `${parseNumber(object.resources.used[element], object.resources.units[element])}`;
+			used.innerText = `${parseNumber(resources.used[element], resources.units[element])}`;
 			let val = row.insertCell();
-			val.innerText = `${parseNumber(object.resources.avail[element], object.resources.units[element])}`;
+			val.innerText = `${parseNumber(resources.avail[element], resources.units[element])}`;
 			let total = row.insertCell();
-			total.innerText = `${parseNumber(object.resources.max[element], object.resources.units[element])}`;
+			total.innerText = `${parseNumber(resources.max[element], resources.units[element])}`;
 		});
 	}
 }
