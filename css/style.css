@@ -24,10 +24,6 @@ img {
 	display: flex;
 }
 
-.flex * {
-	margin: 0px;
-}
-
 .row {
 	flex-direction: row;
 	column-gap: 10px;
