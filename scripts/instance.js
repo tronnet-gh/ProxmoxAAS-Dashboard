@@ -30,7 +30,7 @@ export class Instance extends HTMLElement {
 					<img id="node-status-icon">
 					<p id="node-status"></p>
 				</div>
-				<div class="w3-col l2 m2 s6 flex row nowrap" style="padding-top: 15px;">
+				<div class="w3-col l2 m2 s6 flex row nowrap">
 					<img id="power-btn" class="clickable">
 					<img id="console-btn" class="clickable">
 					<img id="configure-btn" class="clickable">
