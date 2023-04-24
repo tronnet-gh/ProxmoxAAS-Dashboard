@@ -16,10 +16,9 @@ async function init () {
 		goToPage("login.html");
 	}
 
-	let resources = await requestAPI("/user/resources");
-	resources = resources.resources;
-	let instances = await requestAPI("/user/instances");
-	instances = instances.instances;
+	let user = await requestAPI("/user");
+	let resources = user.resources;
+	let instances = user.instances;
 	document.querySelector("#username").innerHTML += getCookie("username");
 	document.querySelector("#pool").innerHTML += instances.pool;
 	document.querySelector("#vmid").innerHTML += `[${instances.vmid.min},${instances.vmid.max}]`;

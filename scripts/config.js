@@ -189,7 +189,7 @@ async function handleDiskDetach () {
 				vmid: vmid,
 				disk: this.dataset.disk
 			};
-			let result = await requestAPI("/disk/detach", "POST", body);
+			let result = await requestAPI("/instance/disk/detach", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -225,7 +225,7 @@ async function handleDiskAttach () {
 				disk: `${type === "qemu" ? "sata" : "mp"}${device}`,
 				data: type === "lxc" ? diskImage + `,mp=/mp${device}/` : diskImage
 			}
-			let result = await requestAPI("/disk/attach", "POST", body);
+			let result = await requestAPI("/instance/disk/attach", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -258,7 +258,7 @@ async function handleDiskResize () {
 				disk: this.dataset.disk,
 				size: form.get("size-increment")
 			}
-			let result = await requestAPI("/disk/resize", "POST", body);
+			let result = await requestAPI("/instance/disk/resize", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -308,7 +308,7 @@ async function handleDiskMove () {
 				storage: form.get("storage-select"),
 				delete: form.get("delete-check") === "on" ? "1": "0"
 			}
-			let result = await requestAPI("/disk/move", "POST", body);
+			let result = await requestAPI("/instance/disk/move", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -340,7 +340,7 @@ async function handleDiskDelete () {
 				vmid: vmid,
 				disk: this.dataset.disk
 			};
-			let result = await requestAPI("/disk/delete", "POST", body);
+			let result = await requestAPI("/instance/disk/delete", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -390,7 +390,7 @@ async function handleDiskAdd () {
 				storage: form.get("storage-select"),
 				size: form.get("size")
 			};
-			let result = await requestAPI("/disk/create", "POST", body);
+			let result = await requestAPI("/instance/disk/create", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -451,7 +451,7 @@ async function handleCDAdd () {
 				disk: `ide${form.get("device")}`,
 				iso: form.get("iso-select")
 			};
-			let result = await requestAPI("/disk/create", "POST", body);
+			let result = await requestAPI("/instance/disk/create", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
