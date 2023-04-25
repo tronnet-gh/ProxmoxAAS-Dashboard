@@ -11,12 +11,16 @@
 		<script src="scripts/config.js" type="module"></script>
 	</head>
 	<body>
-		<header class="w3-black w3-bar">				
-			<nav class="w3-large w3-bar" id="nav">
-				<h1 class="w3-bar-item w3-mobile w3-hide-small" style="font-size: 18px; margin: 0px; background-color: #0f0; color: #000;">tronnet</h1>
-				<a class="w3-bar-item w3-mobile w3-button" href="index.html" aria-current="true">Instances</a>
-				<a class="w3-bar-item w3-mobile w3-button" href="account.html">Account</a>
-				<a class="w3-bar-item w3-mobile w3-button" href="login.html">Logout</a>
+		<header>
+			<nav id="hamnav">
+				<h1 style="font-size: 18px; margin: 0px; background-color: #0f0; color: #000;">tronnet</h1>
+				<label for="hamburger">&#9776;</label>
+				<input type="checkbox" id="hamburger">
+				<div id="hamitems">
+					<a href="index.html" aria-current="true">Instances</a>
+					<a href="account.html">Account</a>
+					<a href="login.html">Logout</a>
+				</div>
 			</nav>
 		</header>
 		<main class="w3-container">
