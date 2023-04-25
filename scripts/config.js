@@ -475,7 +475,7 @@ async function handleFormExit () {
 		cores: document.querySelector("#Cores").value,
 		memory: document.querySelector("#Memory").value
 	}
-	let result = await requestAPI("/resources", "POST", body);
+	let result = await requestAPI("/instance/resources", "POST", body);
 	if (result.status === 200) {
 		await getConfig();
 		populateDisk();
