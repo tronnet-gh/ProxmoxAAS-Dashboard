@@ -49,7 +49,10 @@ function parseNumber(value, unitData) {
 	let multiplier = unitData.multiplier;
 	let unit = unitData.unit;
 	value = multiplier * value;
-	if (compact) {
+	if (value <= 0) {
+		return `0 ${unit}`;
+	}
+	else if (compact) {
 		let exponent = Math.floor(Math.log2(value) / 10);
 		value = value / 1024 ** exponent;
 		let unitPrefix = SIPrefix[exponent];
