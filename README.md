@@ -33,7 +33,7 @@ After this step, the Client should be available on the `Client Host` at port `80
 
 ## Configuration - Client
 1. In `Client Host`, navigate to this repo's root folder
-2. Copy `vars.js.template` to `vars.js` and assign the `API` varaible with the value of the API's URL. This will likely be `client.<FQDN>/api`
+2. Copy `vars.js.template` to `vars.js` and assign the `API` variable with the value of the API's URL. This will likely be `client.<FQDN>/api`
 
 
 ## Installation - API
