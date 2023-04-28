@@ -52,12 +52,16 @@ export function alert (message) {
 	`;
 
 	let dialog = document.createElement("dialog");
-	dialog.classList.add("w3-card-4");
+	dialog.classList.add("w3-card");
 	dialog.classList.add("w3-container");
 	dialog.append(form);
 
 	document.body.append(dialog);
 	dialog.showModal();
+
+	dialog.addEventListener("close", () => {
+		dialog.parentElement.removeChild(dialog);
+	})
 }
 
 customElements.define("dialog-form", Dialog);
