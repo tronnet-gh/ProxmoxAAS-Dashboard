@@ -23,24 +23,28 @@
 				</div>
 			</nav>
 		</header>
-		<main class="w3-container">
-			<h2>Account</h2>			
-			<div class="flex row wrap">
-				<p id="username">Username: </p>
-				<p id="pool">Pool: </p>
-				<p id="vmid">VMID Range: </p>
-			</div>
-			<table id="resource-table" class="w3-table w3-table-all" style="overflow-x: auto;">
-				<thead>
-					<tr class="w3-black">
-						<th>Resource</th>
-						<th>Used</th>
-						<th>Free</th>
-						<th>Total</th>
-					</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
+		<main>
+			<section class="w3-container">
+				<h2>Account</h2>			
+				<div class="flex row wrap w3-card">
+					<p id="username">Username: </p>
+					<p id="pool">Pool: </p>
+					<p id="vmid">VMID Range: </p>
+				</div>
+				<div class="w3-card">
+					<table id="resource-table" class="w3-table w3-table-all" style="overflow-x: auto;">
+						<thead>
+							<tr class="w3-black">
+								<th>Resource</th>
+								<th>Used</th>
+								<th>Free</th>
+								<th>Total</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</section>
 		</main>
 	</body>
 </html>
