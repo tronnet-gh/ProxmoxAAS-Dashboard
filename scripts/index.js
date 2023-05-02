@@ -32,7 +32,7 @@ async function populateInstances () {
 	instances.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
 
 	instanceContainer.innerHTML = `
-		<div class="w3-row w3-hide-small w3-border-bottom">
+		<div class="w3-row w3-hide-small w3-border-bottom w3-border-black">
 			<div class="w3-col l1 m2">
 				<p>VM ID</p>
 			</div>
