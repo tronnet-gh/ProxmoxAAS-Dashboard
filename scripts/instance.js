@@ -9,7 +9,7 @@ export class Instance extends HTMLElement {
 		shadowRoot.innerHTML = `
 			<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 			<link rel="stylesheet" href="css/style.css">
-			<div class="w3-row w3-border-bottom">
+			<div class="w3-row">
 				<div class="w3-col l1 m2 s6">
 					<p id="instance-id"></p>
 				</div>
