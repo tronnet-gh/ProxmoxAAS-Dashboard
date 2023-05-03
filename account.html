@@ -27,24 +27,25 @@
 			<section class="w3-container">
 				<h2>Account</h2>
 				<div class="w3-card w3-padding">
-					<div class="flex row wrap">
-						<p id="username">Username: </p>
-						<p id="pool">Pool: </p>
-						<p id="vmid">VMID Range: </p>
-					</div>
-					<div class="">
-						<table id="resource-table" class="w3-table w3-table-all" style="overflow-x: auto;">
-							<thead>
-								<tr class="w3-black">
-									<th>Resource</th>
-									<th>Used</th>
-									<th>Free</th>
-									<th>Total</th>
-								</tr>
-							</thead>
-							<tbody></tbody>
-						</table>
-					</div>
+					<h3>Account Details</h3>
+					<p id="username">Username:</p>
+					<p id="pool">Pool:</p>
+					<p id="vmid">VMID Range:</p>
+					<p id="nodes">Nodes:</p>
+				</div>
+				<div class="w3-card w3-padding w3-margin-top">
+					<h3>Cluster Resources</h3>
+					<table id="resource-table" class="w3-table w3-table-all" style="overflow-x: auto;">
+						<thead>
+							<tr class="w3-black">
+								<th>Resource</th>
+								<th>Used</th>
+								<th>Free</th>
+								<th>Total</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
 				</div>
 			</section>
 		</main>

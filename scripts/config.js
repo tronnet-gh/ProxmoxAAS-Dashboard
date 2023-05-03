@@ -53,7 +53,7 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 	field.append(icon);
 
 	let label = document.createElement("label");
-	label.innerHTML = labelText;
+	label.innerText = labelText;
 	label.htmlFor = labelText;
 	field.append(label);
 
@@ -120,7 +120,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 
 	// Add a label for the disk bus and device number
 	let diskLabel = document.createElement("label");
-	diskLabel.innerHTML = diskName;
+	diskLabel.innerText = diskName;
 	diskLabel.dataset.disk = diskID;
 	field.append(diskLabel);
 
