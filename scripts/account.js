@@ -19,9 +19,10 @@ async function init () {
 	let user = await requestAPI("/user");
 	let resources = user.resources;
 	let instances = user.instances;
-	document.querySelector("#username").innerHTML += getCookie("username");
-	document.querySelector("#pool").innerHTML += instances.pool;
-	document.querySelector("#vmid").innerHTML += `[${instances.vmid.min},${instances.vmid.max}]`;
+	document.querySelector("#username").innerText = `Username: ${getCookie("username")}`;
+	document.querySelector("#pool").innerText = `Pool: ${instances.pool}`;
+	document.querySelector("#vmid").innerText = `VMID Range: ${instances.vmid.min} - ${instances.vmid.max}`;
+	document.querySelector("#nodes").innerText = `Nodes: ${user.nodes.toString()}`;
 	buildResourceTable(resources, "#resource-table");
 }
 
