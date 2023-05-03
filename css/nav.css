@@ -11,21 +11,21 @@ nav a, nav h1, nav label {
 	text-decoration: none;
 }
 
-#hamitems a:hover, #hamitems a[aria-current="true"], #hamitems:hover a[aria-current="true"]:hover {
-	background-color: white;
-	color: black;
-}
-
-#hamitems:hover a[aria-current="true"] {
-	background-color: black;
-	color: white;
-}
-
 #hamnav label, #hamburger {
 	display: none;
 }
 
 @media screen and (min-width: 600px){
+	#hamitems a:hover, #hamitems a[aria-current="true"], #hamitems:hover a[aria-current="true"]:hover {
+		background-color: white;
+		color: black;
+	}
+	
+	#hamitems:hover a[aria-current="true"] {
+		background-color: black;
+		color: white;
+	}
+
 	nav {
 		display: flex;
 		align-items: center;
@@ -44,7 +44,10 @@ nav a, nav h1, nav label {
 
 	#hamitems {
 		display: block;
-		grid-column: 1 / span 2;
+		position: absolute;
+		top: 55px;
+		right: 0;
+		background-color: black;
 	}
 
 	#hamitems a {
@@ -52,7 +55,6 @@ nav a, nav h1, nav label {
 		display: block;
 		text-align: center;
 		width: 100%;
-		border-top: 1px solid #888;
 	}
 
    	#hamnav label { 
