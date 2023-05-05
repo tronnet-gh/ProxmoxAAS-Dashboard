@@ -1,5 +1,5 @@
 import {requestPVE, requestAPI, goToPage} from "./utils.js";
-import {Dialog} from "./dialog.js";
+import {dialog} from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -64,12 +64,9 @@ async function populateInstances () {
 }
 
 async function handleInstanceAdd () {
-	let dialog = document.createElement("dialog-form");
-	document.body.append(dialog);
-	
-	dialog.header = "Create New Instance";
+	let header = "Create New Instance";
 
-	dialog.formBody = `
+	let body = `
 		<label for="type">Instance Type</label>
 		<select class="w3-select w3-border" name="type" id="type" required>
 			<option value="lxc">Container</option>
@@ -100,67 +97,7 @@ async function handleInstanceAdd () {
 		<input class="w3-input w3-border container-specific none" name="password" id="password" type="password" required disabled></input>
 	`;
 
-	let typeSelect = dialog.shadowRoot.querySelector("#type");
-	typeSelect.selectedIndex = -1;
-	typeSelect.addEventListener("change", () => {
-		if(typeSelect.value === "qemu") {
-			dialog.shadowRoot.querySelectorAll(".container-specific").forEach((element) => {
-				element.classList.add("none");
-				element.disabled = true;
-			});
-		}
-		else {
-			dialog.shadowRoot.querySelectorAll(".container-specific").forEach((element) => {
-				element.classList.remove("none");
-				element.disabled = false;
-			});
-		}
-	});
-
-	let templateContent = "iso";
-	let templateStorage = dialog.shadowRoot.querySelector("#template-storage");
-	templateStorage.selectedIndex = -1;
-
-	let rootfsContent = "rootdir";
-	let rootfsStorage = dialog.shadowRoot.querySelector("#rootfs-storage");
-	rootfsStorage.selectedIndex = -1;
-
-	let nodeSelect = dialog.shadowRoot.querySelector("#node");
-	let nodes = await requestPVE("/nodes", "GET");
-	nodes.data.forEach((element) => {
-		if (element.status === "online") {
-			nodeSelect.add(new Option(element.node));
-		}
-	});
-	nodeSelect.selectedIndex = -1;
-	nodeSelect.addEventListener("change", async () => { // change template and rootfs storage based on node
-		let node = nodeSelect.value;
-		let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
-		storage.data.forEach((element) => {
-			if (element.content.includes(templateContent)) {
-				templateStorage.add(new Option(element.storage));
-			}
-			if (element.content.includes(rootfsContent)) {
-				rootfsStorage.add(new Option(element.storage));
-			}
-		});
-		templateStorage.selectedIndex = -1;
-		rootfsStorage.selectedIndex = -1;
-	});
-
-	let templateImage = dialog.shadowRoot.querySelector("#template-image"); // populate templateImage by 
-	templateStorage.addEventListener("change", async () => {
-		let content = "vztmpl";
-		let images = await requestPVE(`/nodes/${nodeSelect.value}/storage/${templateStorage.value}/content`, "GET");
-		images.data.forEach((element) => {
-			if (element.content.includes(content)) {
-				templateImage.append(new Option(element.volid.replace(`${templateStorage.value}:${content}/`, ""), element.volid));
-			}
-		});
-		templateImage.selectedIndex = -1;
-	});
-	
-	dialog.callback = async (result, form) => {
+	let d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			let body = {
 				node: form.get("node"),
@@ -186,7 +123,66 @@ async function handleInstanceAdd () {
 				populateInstances();
 			}
 		}
-	}
+	});
 
-	dialog.show();
+	let typeSelect = d.querySelector("#type");
+	typeSelect.selectedIndex = -1;
+	typeSelect.addEventListener("change", () => {
+		if(typeSelect.value === "qemu") {
+			d.querySelectorAll(".container-specific").forEach((element) => {
+				element.classList.add("none");
+				element.disabled = true;
+			});
+		}
+		else {
+			d.querySelectorAll(".container-specific").forEach((element) => {
+				element.classList.remove("none");
+				element.disabled = false;
+			});
+		}
+	});
+
+	let templateContent = "iso";
+	let templateStorage = d.querySelector("#template-storage");
+	templateStorage.selectedIndex = -1;
+
+	let rootfsContent = "rootdir";
+	let rootfsStorage = d.querySelector("#rootfs-storage");
+	rootfsStorage.selectedIndex = -1;
+
+	let nodeSelect = d.querySelector("#node");
+	let nodes = await requestPVE("/nodes", "GET");
+	nodes.data.forEach((element) => {
+		if (element.status === "online") {
+			nodeSelect.add(new Option(element.node));
+		}
+	});
+	nodeSelect.selectedIndex = -1;
+	nodeSelect.addEventListener("change", async () => { // change template and rootfs storage based on node
+		let node = nodeSelect.value;
+		let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
+		storage.data.forEach((element) => {
+			if (element.content.includes(templateContent)) {
+				templateStorage.add(new Option(element.storage));
+			}
+			if (element.content.includes(rootfsContent)) {
+				rootfsStorage.add(new Option(element.storage));
+			}
+		});
+		templateStorage.selectedIndex = -1;
+		rootfsStorage.selectedIndex = -1;
+	});
+
+	let templateImage = d.querySelector("#template-image"); // populate templateImage depending on selected image storage
+	templateStorage.addEventListener("change", async () => {
+		templateImage.innerHTML = ``;
+		let content = "vztmpl";
+		let images = await requestPVE(`/nodes/${nodeSelect.value}/storage/${templateStorage.value}/content`, "GET");
+		images.data.forEach((element) => {
+			if (element.content.includes(content)) {
+				templateImage.append(new Option(element.volid.replace(`${templateStorage.value}:${content}/`, ""), element.volid));
+			}
+		});
+		templateImage.selectedIndex = -1;
+	});
 }

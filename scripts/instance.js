@@ -1,5 +1,5 @@
 import {requestPVE, requestAPI, goToPage, goToURL, instances, nodes} from "./utils.js";
-import {Dialog} from "./dialog.js";
+import {dialog} from "./dialog.js";
 
 export class Instance extends HTMLElement {
 	constructor () {
@@ -117,14 +117,10 @@ export class Instance extends HTMLElement {
 	async handlePowerButton () {
 
 		if(!this.actionLock) {
+			let header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
+			let body = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"} VM</p><p>${this.vmid}</p>`
 
-			let dialog = document.createElement("dialog-form");
-			document.body.append(dialog);
-
-			dialog.header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
-			dialog.formBody = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"} VM</p><p>${this.vmid}</p>`
-
-			dialog.callback = async (result, form) => {
+			dialog(header, body, async (result, form) => {
 				if (result === "confirm") {
 					this.actionLock = true;
 					let targetAction = this.status === "running" ? "stop" : "start";
@@ -158,9 +154,7 @@ export class Instance extends HTMLElement {
 						}
 					}
 				}
-			}
-
-			dialog.show();
+			});
 		}
 	}
 
@@ -180,13 +174,11 @@ export class Instance extends HTMLElement {
 
 	handleDeleteButton () {
 		if (!this.actionLock && this.status === "stopped") {
-			let dialog = document.createElement("dialog-form");
-			document.body.append(dialog);
 
-			dialog.header = `Delete VM ${this.vmid}`;
-			dialog.formBody = `<p>Are you sure you want to <strong>delete</strong> VM </p><p>${this.vmid}</p>`
+			let header = `Delete VM ${this.vmid}`;
+			let body = `<p>Are you sure you want to <strong>delete</strong> VM </p><p>${this.vmid}</p>`
 
-			dialog.callback = async (result, form) => {
+			dialog(header, body, async (result, form) => {
 				if (result === "confirm") {
 					this.actionLock = true;
 					let prevStatus = this.status;
@@ -215,9 +207,7 @@ export class Instance extends HTMLElement {
 						this.actionLock = false;
 					}
 				}
-			}
-
-			dialog.show();
+			});
 		}
 	}
 }

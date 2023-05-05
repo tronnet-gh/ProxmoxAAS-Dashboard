@@ -1,5 +1,5 @@
 import {requestPVE, requestAPI, goToPage, getURIData, resources} from "./utils.js";
-import {Dialog} from "./dialog.js";
+import {dialog} from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
 
@@ -174,13 +174,9 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 }
 
 async function handleDiskDetach () {
-	let dialog = document.createElement("dialog-form");
-	document.body.append(dialog);
-
-	dialog.header = `Detach ${this.dataset.disk}`;
-	dialog.formBody = `<p>Are you sure you want to detach disk</p><p>${this.dataset.disk}</p>`;
-
-	dialog.callback = async (result, form) => {
+	let header = `Detach ${this.dataset.disk}`;
+	let body = `<p>Are you sure you want to detach disk</p><p>${this.dataset.disk}</p>`;
+	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
 			let body = {
@@ -200,21 +196,16 @@ async function handleDiskDetach () {
 				populateDisk();
 			}
 		}
-	};
-
-	dialog.show();
+	});
 }
 
 async function handleDiskAttach () {
-	let dialog = document.createElement("dialog-form");
-	document.body.append(dialog);
-
 	let diskImage = config.data[this.dataset.disk];
 
-	dialog.header = `Attach ${diskImage}`;
-	dialog.formBody = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required></input>`;
+	let header = `Attach ${diskImage}`;
+	let body = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required></input>`;
 
-	dialog.callback = async (result, form) => {
+	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			let device = form.get("device");
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";		
@@ -236,19 +227,14 @@ async function handleDiskAttach () {
 				populateDisk();
 			}
 		}
-	};
-
-	dialog.show();
+	});
 }
 
 async function handleDiskResize () {
-	let dialog = document.createElement("dialog-form");
-	document.body.append(dialog);
+	let header = `Resize ${this.dataset.disk}`; 
+	let body = `<label for="size-increment">Size Increment (GiB)</label><input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072"></input>`;
 
-	dialog.header = `Resize ${this.dataset.disk}`; 
-	dialog.formBody = `<label for="size-increment">Size Increment (GiB)</label><input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072"></input>`;
-
-	dialog.callback = async (result, form) => {
+	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
 			let body = {
@@ -269,18 +255,14 @@ async function handleDiskResize () {
 				populateDisk();
 			}
 		}
-	};
-
-	dialog.show();
+	});
 }
 
 async function handleDiskMove () {
 	let content = type === "qemu" ? "images" : "rootdir";
 	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
-	let dialog = document.createElement("dialog-form");
-	document.body.append(dialog);
 
-	dialog.header = `Move ${this.dataset.disk}`;
+	let header = `Move ${this.dataset.disk}`;
 
 	let options = "";
 	storage.data.forEach((element) => {
@@ -288,16 +270,14 @@ async function handleDiskMove () {
 			options += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	let select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select">${options}</select>`;
+	let select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select"><option hidden disabled selected value></option>${options}</select>`;
 
-	dialog.formBody = `
+	let body = `
 		${select}
 		<label for="delete-check">Delete Source</label><input class="w3-input w3-border" name="delete-check" id="delete-check" type="checkbox" checked required>
 	`;
 
-	dialog.shadowRoot.querySelector("#storage-select").selectedIndex = -1;
-
-	dialog.callback = async (result, form) => {
+	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
 			let body = {
@@ -319,19 +299,14 @@ async function handleDiskMove () {
 				populateDisk();
 			}
 		}
-	};
-
-	dialog.show();
+	});
 }
 
 async function handleDiskDelete () {
-	let dialog = document.createElement("dialog-form");
-	document.body.append(dialog);
+	let header = `Delete ${this.dataset.disk}`;
+	let body = `<p>Are you sure you want to <strong>delete</strong> disk</p><p>${this.dataset.disk}</p>`;
 
-	dialog.header = `Delete ${this.dataset.disk}`;
-	dialog.formBody = `<p>Are you sure you want to <strong>delete</strong> disk</p><p>${this.dataset.disk}</p>`;
-
-	dialog.callback = async (result, form) => {
+	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
 			let body = {
@@ -351,18 +326,14 @@ async function handleDiskDelete () {
 				populateDisk();
 			}
 		}
-	};
-
-	dialog.show();
+	});
 }
 
 async function handleDiskAdd () {
 	let content = type === "qemu" ? "images" : "rootdir";
 	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
-	let dialog = document.createElement("dialog-form");
-	document.body.append(dialog);
 	
-	dialog.header = "Create New Disk";
+	let header = "Create New Disk";
 
 	let options = "";
 	storage.data.forEach((element) => {
@@ -370,17 +341,15 @@ async function handleDiskAdd () {
 			options += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	let select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required>${options}</select>`;
+	let select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required><option hidden disabled selected value></option>${options}</select>`;
 
-	dialog.formBody = `
+	let body = `
 		<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required></input>
 		${select}
 		<label for="size">Size (GiB)</label><input class="w3-input w3-border" name="size" id="size" type="number" min="0" max="131072" required></input>
 	`;
 
-	dialog.shadowRoot.querySelector("#storage-select").selectedIndex = -1;
-
-	dialog.callback = async (result, form) => {
+	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			let body = {
 				node: node,
@@ -401,18 +370,14 @@ async function handleDiskAdd () {
 				populateDisk();
 			}
 		}
-	};
-
-	dialog.show();
+	});
 }
 
 async function handleCDAdd () {
 	let content = "iso";
 	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
-	let dialog = document.createElement("dialog-form");
-	document.body.append(dialog);
 	
-	dialog.header = `Add a CDROM`;
+	let header = `Add a CDROM`;
 
 	let storageOptions = "";
 	storage.data.forEach((element) => {
@@ -420,29 +385,15 @@ async function handleCDAdd () {
 			storageOptions += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	let storageSelect = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required>${storageOptions}</select>`;
+	let storageSelect = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required><option hidden disabled selected value></option>${storageOptions}</select>`;
 
-	dialog.formBody = `
+	let body = `
 		<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required></input>
 		${storageSelect}
 		<label for="iso-select">Image</label><select class="w3-select w3-border" name="iso-select" id="iso-select" required></select>
 	`;
 
-	dialog.shadowRoot.querySelector("#storage-select").selectedIndex = -1;
-
-	dialog.shadowRoot.querySelector("#storage-select").addEventListener("change", async () => {
-		let storage = dialog.shadowRoot.querySelector("#storage-select").value;
-		let ISOSelect = dialog.shadowRoot.querySelector("#iso-select");
-		let isos = await requestPVE(`/nodes/${node}/storage/${storage}/content`, "GET", {content: content});
-		isos.data.forEach((element) => {
-			if (element.content.includes(content)) {
-				ISOSelect.append(new Option(element.volid.replace(`${storage}:${content}/`, ""), element.volid));
-			}
-		});
-		ISOSelect.selectedIndex = -1;
-	});
-
-	dialog.callback = async (result, form) => {
+	let d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			let body = {
 				node: node,
@@ -462,9 +413,19 @@ async function handleCDAdd () {
 				populateDisk();
 			}
 		}
-	};
+	});
 
-	dialog.show();
+	d.querySelector("#storage-select").addEventListener("change", async () => {
+		let storage = document.querySelector("#storage-select").value;
+		let ISOSelect = document.querySelector("#iso-select");
+		ISOSelect.innerHTML = `<option hidden disabled selected value></option>`;
+		let isos = await requestPVE(`/nodes/${node}/storage/${storage}/content`, "GET", {content: content});
+		isos.data.forEach((element) => {
+			if (element.content.includes(content)) {
+				ISOSelect.append(new Option(element.volid.replace(`${storage}:${content}/`, ""), element.volid));
+			}
+		});
+	});
 }
 
 async function handleFormExit () {
