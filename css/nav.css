@@ -7,7 +7,7 @@ nav {
 
 nav a, nav h1, nav label {
 	text-align: left;
-	padding: 14px 16px;
+	padding: 8px 10px;
 	text-decoration: none;
 }
 
@@ -17,8 +17,8 @@ nav a, nav h1, nav label {
 
 @media screen and (min-width: 600px){
 	#hamitems a:hover, #hamitems a[aria-current="true"], #hamitems:hover a[aria-current="true"]:hover {
-		background-color: white;
-		color: black;
+		background-color: #303030;
+		color: white;
 	}
 	
 	#hamitems:hover a[aria-current="true"] {

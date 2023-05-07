@@ -20,6 +20,26 @@ body {
 
 main {
 	max-width: 100vw;
+	background-color: #303030;
+	color: white;
+}
+
+.w3-card {
+	background-color: #202020;
+	box-shadow: 0 2px 5px 0 black;
+}
+
+th {
+	background-color: #080808;
+}
+
+td {
+	background-color: #202020;
+}
+
+input, select, textarea {
+	background-color: #303030;
+	color: white;
 }
 
 img.clickable {
