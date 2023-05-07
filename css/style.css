@@ -18,7 +18,7 @@ body {
 	grid-template-rows: auto 1fr;
 }
 
-main {
+main, dialog {
 	max-width: 100vw;
 	background-color: #303030;
 	color: white;
