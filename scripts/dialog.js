@@ -4,8 +4,8 @@ export function dialog (header, body, callback = async (result, form) => {}) {
 		<p class="w3-large" id="prompt" style="text-align: center;"></p>
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form"></form>
 		<div class="w3-center w3-container">
-			<button value="cancel" form="form" class="w3-button w3-margin" style="background-color: #f00; color: black;" formnovalidate>CANCEL</button>
-			<button value="confirm" form="form" class="w3-button w3-margin" style="background-color: #0f0; color: black;">CONFIRM</button>
+			<button value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+			<button value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
 		</div>
 	`;
 	dialog.className = "w3-container w3-card w3-border-0";
