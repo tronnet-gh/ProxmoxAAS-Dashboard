@@ -24,6 +24,13 @@ main, dialog {
 	color: white;
 }
 
+h1 {
+	font-size: 18px;
+	margin: 0px;
+	background-color: #0f0;
+	color: #000;
+}
+
 .w3-card {
 	background-color: #202020;
 	box-shadow: 0 2px 5px 0 black;
