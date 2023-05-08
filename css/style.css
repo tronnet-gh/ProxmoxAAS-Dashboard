@@ -1,6 +1,12 @@
 :root {
 	--fail-color: #f00;
 	--success-color: #0f0;
+	--main-bg-color: #404040;
+	--main-text-color: white;
+	--main-card-bg-color: #202020;
+	--main-card-shadow-color: black;
+	--main-table-header-bg-color: black;
+	--main-input-bg-color: #404040;
 }
 
 * {
@@ -20,33 +26,26 @@ body {
 
 main, dialog {
 	max-width: 100vw;
-	background-color: #303030;
-	color: white;
-}
-
-h1 {
-	font-size: 18px;
-	margin: 0px;
-	background-color: #0f0;
-	color: #000;
+	background-color: var(--main-bg-color);
+	color: var(--main-text-color);
 }
 
 .w3-card {
-	background-color: #202020;
-	box-shadow: 0 2px 5px 0 black;
+	background-color: var(--main-card-bg-color);
+	box-shadow: 0 2px 5px 0 var(--main-card-shadow-color);
 }
 
 th {
-	background-color: #080808;
+	background-color: var(--main-table-header-bg-color);
 }
 
 td {
-	background-color: #202020;
+	background-color: var(--main-card-bg-color);
 }
 
 input, select, textarea {
-	background-color: #303030;
-	color: white;
+	background-color: var(--main-input-bg-color);
+	color: var(--main-text-color);
 }
 
 img.clickable {
