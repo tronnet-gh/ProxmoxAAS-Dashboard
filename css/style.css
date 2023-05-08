@@ -1,6 +1,7 @@
 :root {
-	--fail-color: #f00;
-	--success-color: #0f0;
+	--negative-color: #f00;
+	--positive-color: #0f0;
+	--lightbg-text-color: black;
 	--main-bg-color: #404040;
 	--main-text-color: white;
 	--main-card-bg-color: #202020;
