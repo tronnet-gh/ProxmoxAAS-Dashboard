@@ -15,23 +15,18 @@
 }
 
 legend {
-    display: table;
-    float: left;
-    margin: 8px 0;
-    padding: 0;
-    width: 100%;
-    + * {
-        clear: both;
-    }
+	display: table;
+	float: left;
+	margin: 8px 0;
+	padding: 0;
+	width: 100%;
+	+ * {
+		clear: both;
+	}
 }
 
 fieldset {
-    border: 0;
-    padding: 8px 16px;
-    margin: 0;
-    min-width: 0;
-	background-color: #202020;
-	box-shadow: 0 2px 5px 0px black;
+	border: 0;
 }
 
 fieldset > *:last-child {
@@ -39,5 +34,5 @@ fieldset > *:last-child {
 }
 
 body:not(:-moz-handler-blocked) fieldset {
-    display: table-cell;
+	display: table-cell;
 }

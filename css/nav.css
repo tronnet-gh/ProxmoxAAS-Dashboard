@@ -1,8 +1,23 @@
+:root {
+	--nav-bg-color: black;
+	--nav-text-color: white;
+	--nav-header-bg-color: #0f0;
+	--nav-header-text-color: black;
+	--nav-link-hover-color: var(--main-bg-color, #404040);
+}
+
 nav {
 	overflow: hidden;
-	color: white;
-	background-color: black;
+	background-color: var(--nav-bg-color);
+	color: var(--nav-text-color);
 	font-size: larger;
+}
+
+nav h1 {
+	font-size: 18px;
+	margin: 0px;
+	background-color: var(--nav-header-bg-color);
+	color: var(--nav-header-text-color);
 }
 
 nav a, nav h1, nav label {
@@ -17,13 +32,11 @@ nav a, nav h1, nav label {
 
 @media screen and (min-width: 600px){
 	#hamitems a:hover, #hamitems a[aria-current="true"], #hamitems:hover a[aria-current="true"]:hover {
-		background-color: #303030;
-		color: white;
+		background-color: var(--nav-link-hover-color);
 	}
 	
 	#hamitems:hover a[aria-current="true"] {
-		background-color: black;
-		color: white;
+		background-color: var(--nav-bg-color);
 	}
 
 	nav {
