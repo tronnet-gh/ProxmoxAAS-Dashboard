@@ -103,9 +103,9 @@ export async function requestTicket (username, password, realm) {
 export function setTicket (ticket, csrf, username) {
 	let d = new Date();
 	d.setTime(d.getTime() + (2*60*60*1000));
-	document.cookie = `PVEAuthCookie=${ticket}; path=/; expires=${d.toUTCString()}; domain=.tronnet.net`;
-	document.cookie = `CSRFPreventionToken=${csrf}; path=/; expires=${d.toUTCString()}; domain=.tronnet.net;`
-	document.cookie = `username=${username}@ldap; path=/; expires=${d.toUTCString()}; domain=.tronnet.net;`
+	document.cookie = `PVEAuthCookie=${ticket}; path=/; expires=${d.toUTCString()}; domain=.tronnet.net; Secure;`;
+	document.cookie = `CSRFPreventionToken=${csrf}; path=/; expires=${d.toUTCString()}; domain=.tronnet.net; Secure;`
+	document.cookie = `username=${username}@ldap; path=/; expires=${d.toUTCString()}; domain=.tronnet.net; Secure;`
 }
 
 export async function requestPVE (path, method, body = null) {
