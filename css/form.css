@@ -15,14 +15,9 @@
 }
 
 legend {
-	display: table;
-	float: left;
-	margin: 8px 0;
-	padding: 0;
-	width: 100%;
-	+ * {
-		clear: both;
-	}
+	line-height: 1.5em;
+	margin-top: 0.25lh;
+	margin-bottom: 0.25lh;
 }
 
 fieldset {
