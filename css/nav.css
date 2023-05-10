@@ -3,7 +3,19 @@
 	--nav-text-color: white;
 	--nav-header-bg-color: #0f0;
 	--nav-header-text-color: black;
-	--nav-link-hover-color: var(--main-bg-color, #404040);
+	--nav-link-active-text-color: white;
+	--nav-link-active-bg-color: var(--main-bg-color, #404040);
+}
+
+@media screen and (prefers-color-scheme: light) {
+	:root {
+		--nav-bg-color: black;
+		--nav-text-color: white;
+		--nav-header-bg-color: #0f0;
+		--nav-header-text-color: black;
+		--nav-link-active-text-color: black;
+		--nav-link-active-bg-color: var(--main-bg-color, white);
+	}
 }
 
 nav {
@@ -32,10 +44,12 @@ nav a, nav h1, nav label {
 
 @media screen and (min-width: 600px){
 	#hamitems a:hover, #hamitems a[aria-current="true"], #hamitems:hover a[aria-current="true"]:hover {
-		background-color: var(--nav-link-hover-color);
+		color: var(--nav-link-active-text-color);
+		background-color: var(--nav-link-active-bg-color);
 	}
 	
 	#hamitems:hover a[aria-current="true"] {
+		color: var(--nav-text-color);
 		background-color: var(--nav-bg-color);
 	}
 
