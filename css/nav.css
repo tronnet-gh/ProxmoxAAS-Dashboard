@@ -18,21 +18,28 @@
 	}
 }
 
-nav {
-	overflow: hidden;
+header {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: center;
+	width: 100%;
 	background-color: var(--nav-bg-color);
 	color: var(--nav-text-color);
-	font-size: larger;
 }
 
-nav h1 {
+header h1 {
 	font-size: 18px;
 	margin: 0px;
 	background-color: var(--nav-header-bg-color);
 	color: var(--nav-header-text-color);
 }
 
-nav a, nav h1, nav label {
+nav {
+	overflow: hidden;
+	font-size: larger;
+}
+
+nav a, header h1, nav label {
 	text-align: left;
 	padding: 8px 10px;
 	text-decoration: none;
@@ -64,7 +71,7 @@ nav a, nav h1, nav label {
 }
 
 @media screen and (max-width: 600px){
-	nav {
+	header {
 		display: grid;
 		grid-template-columns: 1fr auto;
 	}
