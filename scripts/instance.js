@@ -135,7 +135,7 @@ export class Instance extends HTMLElement {
 					const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
 
 					while (true) {
-						let taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`);
+						let taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`, "GET");
 						if(taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
 							this.status = targetStatus;
 							this.update();

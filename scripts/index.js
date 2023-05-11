@@ -16,7 +16,7 @@ async function init () {
 }
 
 async function populateInstances () {
-	let resources = await requestPVE("/cluster/resources", "GET", null);
+	let resources = await requestPVE("/cluster/resources", "GET");
 	let instanceContainer = document.getElementById("instance-container");
 	let instances = [];
 

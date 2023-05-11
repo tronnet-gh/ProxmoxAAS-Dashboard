@@ -15,7 +15,6 @@ async function init () {
 	if (cookie === "") {
 		goToPage("login.html");
 	}
-
 	let user = await requestAPI("/user");
 	let resources = user.resources;
 	let instances = user.instances;
