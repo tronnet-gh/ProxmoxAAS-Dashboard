@@ -260,7 +260,7 @@ async function handleDiskResize () {
 
 async function handleDiskMove () {
 	let content = type === "qemu" ? "images" : "rootdir";
-	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
+	let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
 
 	let header = `Move ${this.dataset.disk}`;
 
@@ -331,7 +331,7 @@ async function handleDiskDelete () {
 
 async function handleDiskAdd () {
 	let content = type === "qemu" ? "images" : "rootdir";
-	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
+	let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
 	
 	let header = "Create New Disk";
 
@@ -375,7 +375,7 @@ async function handleDiskAdd () {
 
 async function handleCDAdd () {
 	let content = "iso";
-	let storage = await requestPVE(`/nodes/${node}/storage`, "GET", null);
+	let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
 	
 	let header = `Add a CDROM`;
 
