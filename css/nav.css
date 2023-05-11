@@ -39,23 +39,23 @@ nav {
 	font-size: larger;
 }
 
-nav a, header h1, nav label {
+nav a, header h1, label[for="navtoggle"] {
 	text-align: left;
 	padding: 8px 10px;
 	text-decoration: none;
 }
 
-#hamnav label, #hamburger {
+label[for="navtoggle"], #navtoggle {
 	display: none;
 }
 
 @media screen and (min-width: 600px){
-	#hamitems a:hover, #hamitems a[aria-current="true"], #hamitems:hover a[aria-current="true"]:hover {
+	nav a:hover, nav a[aria-current="true"], nav:hover a[aria-current="true"]:hover {
 		color: var(--nav-link-active-text-color);
 		background-color: var(--nav-link-active-bg-color);
 	}
 	
-	#hamitems:hover a[aria-current="true"] {
+	nav:hover a[aria-current="true"] {
 		color: var(--nav-text-color);
 		background-color: var(--nav-bg-color);
 	}
@@ -65,7 +65,7 @@ nav a, header h1, nav label {
 		align-items: center;
 	}
 
-	#hamitems {
+	nav {
 		display: flex;
 	}
 }
@@ -76,7 +76,7 @@ nav a, header h1, nav label {
 		grid-template-columns: 1fr auto;
 	}
 
-	#hamitems {
+	nav {
 		display: block;
 		position: absolute;
 		top: 43px;
@@ -84,18 +84,18 @@ nav a, header h1, nav label {
 		background-color: var(--nav-bg-color);
 	}
 
-	#hamitems a {
+	nav a {
 		box-sizing: border-box;
 		display: block;
 		text-align: center;
 		width: 100%;
 	}
 
-   	#hamnav label { 
+	label[for="navtoggle"] { 
 		display: inline-block; 
 	}
   
-	#hamburger ~ #hamitems a {
+	#navtoggle ~ nav a {
 		height: 0;
 		padding: 0 0.5em;
 		border: 0;
@@ -103,7 +103,7 @@ nav a, header h1, nav label {
 		visibility: hidden;
 	}
 
-	#hamburger:checked ~ #hamitems a {
+	#navtoggle:checked ~ nav a {
 		height: 2.5em;
 		padding: 0.5em;
 		transition: height 250ms cubic-bezier(0.23, 1, 0.32, 1);
