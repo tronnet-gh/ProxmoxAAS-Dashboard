@@ -1,5 +1,5 @@
 import {requestPVE, requestAPI, goToPage} from "./utils.js";
-import {dialog} from "./dialog.js";
+import {alert, dialog} from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -119,7 +119,7 @@ async function handleInstanceAdd () {
 				populateInstances();
 			}
 			else {
-				console.error(result);
+				alert(result.error);
 				populateInstances();
 			}
 		}

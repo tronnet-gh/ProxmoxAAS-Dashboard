@@ -1,5 +1,5 @@
 import {requestPVE, requestAPI, goToPage, getURIData, resources} from "./utils.js";
-import {dialog} from "./dialog.js";
+import {alert, dialog} from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
 
@@ -191,7 +191,7 @@ async function handleDiskDetach () {
 				populateDisk();
 			}
 			else {
-				console.error(result);
+				alert(result.error);
 				await getConfig();
 				populateDisk();
 			}
@@ -222,7 +222,7 @@ async function handleDiskAttach () {
 				populateDisk();
 			}
 			else {
-				console.error(result);
+				alert(result.error);
 				await getConfig();
 				populateDisk();
 			}
@@ -250,7 +250,7 @@ async function handleDiskResize () {
 				populateDisk();
 			}
 			else{
-				console.error(result);
+				alert(result.error);
 				await getConfig();
 				populateDisk();
 			}
@@ -294,7 +294,7 @@ async function handleDiskMove () {
 				populateDisk();
 			}
 			else {
-				console.error(result);
+				alert(result.error);
 				await getConfig();
 				populateDisk();
 			}
@@ -321,7 +321,7 @@ async function handleDiskDelete () {
 				populateDisk();
 			}
 			else {
-				console.error(result);
+				alert(result.error);
 				await getConfig();
 				populateDisk();
 			}
@@ -365,7 +365,7 @@ async function handleDiskAdd () {
 				populateDisk();
 			}
 			else {
-				console.error(result);
+				alert(result.error);
 				await getConfig();
 				populateDisk();
 			}
@@ -408,7 +408,7 @@ async function handleCDAdd () {
 				populateDisk();
 			}
 			else {
-				console.error(result);
+				alert(result.error);
 				await getConfig();
 				populateDisk();
 			}
@@ -442,7 +442,7 @@ async function handleFormExit () {
 		populateDisk();
 	}
 	else {
-		console.error(result);
+		alert(result.error);
 	}
 	goToPage("index.html");
 }
