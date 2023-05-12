@@ -15,13 +15,13 @@ async function init () {
 	if (cookie === "") {
 		goToPage("login.html");
 	}
-	let user = await requestAPI("/user");
-	let resources = user.resources;
-	let instances = user.instances;
+	let resources = await requestAPI("/user/resources");
+	let instances = await requestAPI("/user/instances");
+	let nodes = await requestAPI("/user/nodes");
 	document.querySelector("#username").innerText = `Username: ${getCookie("username")}`;
 	document.querySelector("#pool").innerText = `Pool: ${instances.pool}`;
 	document.querySelector("#vmid").innerText = `VMID Range: ${instances.vmid.min} - ${instances.vmid.max}`;
-	document.querySelector("#nodes").innerText = `Nodes: ${user.nodes.toString()}`;
+	document.querySelector("#nodes").innerText = `Nodes: ${nodes.toString()}`;
 	buildResourceTable(resources, "#resource-table");
 }
 
