@@ -1,5 +1,5 @@
 import {requestPVE, requestAPI, goToPage, goToURL, instances, nodes} from "./utils.js";
-import {dialog} from "./dialog.js";
+import {alert, dialog} from "./dialog.js";
 
 export class Instance extends HTMLElement {
 	constructor () {
@@ -144,7 +144,7 @@ export class Instance extends HTMLElement {
 						}
 						else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
 							this.status = prevStatus;
-							console.error(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${result.data.exitstatus}`);
+							alert(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${result.data.exitstatus}`);
 							this.update();
 							this.actionLock = false;
 							break;
@@ -201,7 +201,7 @@ export class Instance extends HTMLElement {
 						this.parentNode.removeChild(this);
 					}
 					else {
-						console.error(result);
+						alert(result.error);
 						this.status = this.prevStatus;
 						this.update();
 						this.actionLock = false;
