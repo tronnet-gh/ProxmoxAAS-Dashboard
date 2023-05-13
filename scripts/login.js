@@ -1,10 +1,10 @@
-import {requestTicket, setTicket, NetworkError, goToPage, deleteAllCookies, requestPVE} from "./utils.js";
+import {requestTicket, NetworkError, goToPage, deleteAllCookies, requestPVE} from "./utils.js";
 import {alert} from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
 async function init (){
-	deleteAllCookies();
+	await deleteAllCookies();
 	let formSubmitButton = document.querySelector("#submit");
 	let realms = await requestPVE("/access/domains", "GET");
 	let realmSelect = document.querySelector("#realm");
@@ -22,7 +22,6 @@ async function init (){
 		formSubmitButton.innerText = "Authenticating...";
 		let ticket = await requestTicket(formData.get("username"), formData.get("password"), formData.get("realm"));
 		if (ticket.status === 200) {
-			setTicket(ticket.data.ticket, ticket.data.CSRFPreventionToken, formData.get("username"));
 			formSubmitButton.innerText = "LOGIN";		
 			goToPage("index.html");
 		}
