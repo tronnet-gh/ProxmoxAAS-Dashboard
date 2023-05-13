@@ -96,16 +96,8 @@ export function getCookie(cname) {
 }
 
 export async function requestTicket (username, password, realm) {
-	let response = await requestPVE("/access/ticket", "POST", {username: `${username}@${realm}`, password: password}, false);
+	let response = await requestAPI("/ticket", "POST", {username: `${username}@${realm}`, password: password}, false);
 	return response;
-}
-
-export function setTicket (ticket, csrf, username) {
-	let d = new Date();
-	d.setTime(d.getTime() + (2*60*60*1000));
-	document.cookie = `PVEAuthCookie=${ticket}; path=/; expires=${d.toUTCString()}; domain=.tronnet.net; Secure;`;
-	document.cookie = `CSRFPreventionToken=${csrf}; path=/; expires=${d.toUTCString()}; domain=.tronnet.net; Secure;`
-	document.cookie = `username=${username}@ldap; path=/; expires=${d.toUTCString()}; domain=.tronnet.net; Secure;`
 }
 
 export async function requestPVE (path, method, body = null) {
@@ -204,6 +196,7 @@ export function getURIData () {
 	return Object.fromEntries(url.searchParams);
 }
 
-export function deleteAllCookies () {
-	document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/;domain=.tronnet.net;"); });
+export async function deleteAllCookies () {
+	document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/;domain=.client.tronnet.net;"); });
+	await requestAPI("/ticket", "DELETE");
 }
