@@ -7,7 +7,7 @@ export class NetworkError extends Error {
 	}
 }
 
-export const resources = {
+export const resources_config = {
 	disk: {
 		actionBarOrder: ["move", "resize", "detach_attach", "delete"],
 		lxc: {
@@ -25,7 +25,7 @@ export const resources = {
 	}
 }
 
-export const instances = {
+export const instances_config = {
 	running: {
 		statusSrc: "images/status/active.svg",
 		statusAlt: "Instance is running",
@@ -64,7 +64,7 @@ export const instances = {
 	}
 }
 
-export const nodes = {
+export const nodes_config = {
 	online: {
 		statusSrc: "images/status/active.svg",
 		statusAlt: "Node is online",
