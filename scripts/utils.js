@@ -1,12 +1,5 @@
 import {API} from "/vars.js";
 
-export class NetworkError extends Error {
-	constructor(message) {
-		super(message);
-		this.name = "NetworkError";
-	}
-}
-
 export const resources_config = {
 	disk: {
 		actionBarOrder: ["move", "resize", "detach_attach", "delete"],
@@ -144,25 +137,23 @@ export async function requestAPI (path, method, body = null) {
 }
 
 async function request (url, content) {
-	let response = await fetch(url, content)
-	.then((response) => {
-		return response;
-	})
-	.catch((error) => {
-		return new NetworkError(error);
-	});
 
-	if (response instanceof NetworkError) {
-		return {status: 408, error: "network error"};
+	let response = await fetch(url, content);
+	let data = null;
+	try {
+		data = await response.json();
+		data.status = response.status;
 	}
-	else if(!response.ok){
-		let data = await response.json()
-		return {status: response.status, error: data.error};
+	catch {
+		data = null;
+	}
+
+	if(!response.ok){
+		return {status: response.status, error: data ? data.error : response.status};
 	}
 	else {
-		let data = await response.json();
 		data.status = response.status;
-		return data;
+		return data ? data : response;
 	}
 }
 

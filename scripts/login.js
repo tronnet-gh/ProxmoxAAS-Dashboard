@@ -36,7 +36,7 @@ async function init (){
 		else {
 			alert("An error occured.");
 			formSubmitButton.innerText = "LOGIN";
-			console.error(error);
+			console.error(ticket.error);
 		}
 	});
 }

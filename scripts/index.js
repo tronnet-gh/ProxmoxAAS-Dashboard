@@ -1,5 +1,6 @@
-import {requestPVE, requestAPI, goToPage, instances_config, nodes_config} from "./utils.js";
+import {requestPVE, requestAPI, goToPage, goToURL, instances_config, nodes_config} from "./utils.js";
 import {alert, dialog} from "./dialog.js";
+import {PVE} from "../vars.js"
 
 window.addEventListener("DOMContentLoaded", init);
 

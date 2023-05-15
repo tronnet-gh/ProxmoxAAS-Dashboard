@@ -452,16 +452,19 @@ function addNetworkLine (fieldset, netID, netDetails) {
 	icon.src = "images/resources/network.svg";
 	icon.alt = netID;
 	icon.dataset.network = netID;
+	icon.dataset.netvals = netDetails;
 	field.appendChild(icon);
 
 	let netLabel = document.createElement("label");
 	netLabel.innerText = netID;
 	netLabel.dataset.network = netID;
+	netLabel.dataset.netvals = netDetails;
 	field.append(netLabel);
 
 	let netDesc = document.createElement("p");
 	netDesc.innerText = netDetails;
 	netDesc.dataset.network = netID;
+	netDesc.dataset.netvals = netDetails;
 	field.append(netDesc);
 
 	let actionDiv = document.createElement("div");
@@ -472,19 +475,41 @@ function addNetworkLine (fieldset, netID, netDetails) {
 	action.title = "Config Network";
 	action.addEventListener("click", handleNetworkConfig);
 	action.dataset.network = netID;
+	action.dataset.netvals = netDetails;
 	actionDiv.appendChild(action);
 	field.append(actionDiv);
 }
 
 async function handleNetworkConfig () {
 	let netID = this.dataset.network;
+	let netDetails = this.dataset.netvals;
 	let header = `Edit ${netID}`;
-	let body = ``;
-
-	dialog(header, body, async (result, form) => {
+	let body = `<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">`;
+	
+	let d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
+			document.querySelector(`img[data-network="${netID}"]`).src = "images/status/loading.svg";
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				netid: netID,
+				rate: form.get("rate")
+			}
+			let result = await requestAPI("/instance/network", "POST", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateNetworks();
+			}
+			else{
+				alert(result.error);
+				await getConfig();
+				populateNetworks();
+			}
 		}
 	});
+
+	d.querySelector("#rate").value = netDetails.split("rate=")[1].split(",")[0];
 }
 
 async function handleFormExit () {
@@ -499,9 +524,9 @@ async function handleFormExit () {
 	if (result.status === 200) {
 		await getConfig();
 		populateDisk();
+		goToPage("index.html");
 	}
 	else {
 		alert(result.error);
 	}
-	goToPage("index.html");
 }
