@@ -1,4 +1,4 @@
-import {requestTicket, NetworkError, goToPage, deleteAllCookies, requestPVE} from "./utils.js";
+import {requestTicket, goToPage, deleteAllCookies, requestPVE} from "./utils.js";
 import {alert} from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);

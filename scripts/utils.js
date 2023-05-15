@@ -197,6 +197,5 @@ export function getURIData () {
 }
 
 export async function deleteAllCookies () {
-	document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/;domain=.client.tronnet.net;"); });
 	await requestAPI("/ticket", "DELETE");
 }
