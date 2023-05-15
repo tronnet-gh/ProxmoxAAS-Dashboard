@@ -388,7 +388,7 @@ export class Instance {
 
 					let result = await requestAPI("/instance", "DELETE", body);
 					if (result.status === 200) {
-						this.parentNode.removeChild(this);
+						this.shadowElement.parentElement.removeChild(this.shadowElement);
 					}
 					else {
 						alert(result.error);
