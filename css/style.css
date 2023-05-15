@@ -47,6 +47,10 @@ main, dialog {
 	box-shadow: var(--main-card-box-shadow);
 }
 
+.w3-card + .w3-card {
+	margin-top: 16px;
+}
+
 th {
 	background-color: var(--main-table-header-bg-color);
 }
