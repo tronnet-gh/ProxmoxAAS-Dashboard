@@ -198,35 +198,34 @@ async function handleInstanceAdd () {
 export class Instance {
 	constructor () {
 		let shadowRoot = document.createElement("div");
+		shadowRoot.classList.add("w3-row");
 
 		shadowRoot.innerHTML = `
-			<div class="w3-row">
-				<div class="w3-col l1 m2 s6">
-					<p id="instance-id"></p>
-				</div>
-				<div class="w3-col l2 m3 s6">
-					<p id="instance-name"></p>
-				</div>
-				<div class="w3-col l1 m2 w3-hide-small">
-					<p id="instance-type"></p>
-				</div>
-				<div class="w3-col l2 m3 s6 flex row nowrap">
-					<img id="instance-status-icon">
-					<p id="instance-status"></p>
-				</div>
-				<div class="w3-col l2 w3-hide-medium w3-hide-small">
-					<p id="node-name"></p>
-				</div>
-				<div class="w3-col l2 w3-hide-medium w3-hide-small flex row nowrap">
-					<img id="node-status-icon">
-					<p id="node-status"></p>
-				</div>
-				<div class="w3-col l2 m2 s6 flex row nowrap" style="height: 1lh; margin-top: 15px; margin-bottom: 15px;">
-					<img id="power-btn" class="clickable">
-					<img id="console-btn" class="clickable">
-					<img id="configure-btn" class="clickable">
-					<img id="delete-btn" class="clickable">
-				</div>
+			<div class="w3-col l1 m2 s6">
+				<p id="instance-id"></p>
+			</div>
+			<div class="w3-col l2 m3 s6">
+				<p id="instance-name"></p>
+			</div>
+			<div class="w3-col l1 m2 w3-hide-small">
+				<p id="instance-type"></p>
+			</div>
+			<div class="w3-col l2 m3 s6 flex row nowrap">
+				<img id="instance-status-icon">
+				<p id="instance-status"></p>
+			</div>
+			<div class="w3-col l2 w3-hide-medium w3-hide-small">
+				<p id="node-name"></p>
+			</div>
+			<div class="w3-col l2 w3-hide-medium w3-hide-small flex row nowrap">
+				<img id="node-status-icon">
+				<p id="node-status"></p>
+			</div>
+			<div class="w3-col l2 m2 s6 flex row nowrap" style="height: 1lh; margin-top: 15px; margin-bottom: 15px;">
+				<img id="power-btn" class="clickable">
+				<img id="console-btn" class="clickable">
+				<img id="configure-btn" class="clickable">
+				<img id="delete-btn" class="clickable">
 			</div>
 		`;
 
