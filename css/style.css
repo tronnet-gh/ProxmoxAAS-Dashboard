@@ -5,8 +5,7 @@
 	--main-bg-color: #404040;
 	--main-text-color: white;
 	--main-card-bg-color: #202020;
-	--main-card-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.84), 0 2px 10px 0 rgba(0,0,0,0.88);
-	/*--main-card-shadow-color: black;*/
+	--main-card-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.8), 0 2px 10px 0 rgba(0,0,0,0.8);
 	--main-table-header-bg-color: black;
 	--main-input-bg-color: #404040;
 }
@@ -16,14 +15,13 @@
 		--main-bg-color: white;
 		--main-text-color: black;
 		--main-card-bg-color: white;
-		--main-card-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
-		/*--main-card-shadow-color: rgba(0,0,0,0.25);*/
+		--main-card-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.2), 0 2px 10px 0 rgba(0,0,0,0.2);
 		--main-table-header-bg-color: #808080;
 		--main-input-bg-color: white;
 	}
 }
 
-* {
+html {
 	box-sizing: border-box;
 }
 
@@ -69,6 +67,10 @@ img.clickable {
 img {
 	height: 1em;
 	width: 1em;
+}
+
+hr, * {
+	border-color: var(--main-text-color);
 }
 
 .flex {
