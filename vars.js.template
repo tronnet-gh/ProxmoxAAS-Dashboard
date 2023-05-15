@@ -1,1 +1,2 @@
 export const API = "https://client.mydomain.example/api"; // the proxmox-aas api
+export const PVE = "https://pve.mydomain.example"; // the proxmox api

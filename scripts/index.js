@@ -125,13 +125,6 @@ async function handleInstanceAdd () {
 		}
 	});
 
-	let userResources = await requestAPI("/user/resources", "GET");
-	let userInstances = await requestAPI("/user/instances", "GET")
-	d.querySelector("#cores").max = userResources.avail.cores;
-	d.querySelector("#memory").max = userResources.avail.memory;
-	d.querySelector("#vmid").min = userInstances.vmid.min;
-	d.querySelector("#vmid").max = userInstances.vmid.max;
-
 	let typeSelect = d.querySelector("#type");
 	typeSelect.selectedIndex = -1;
 	typeSelect.addEventListener("change", () => {
@@ -193,4 +186,11 @@ async function handleInstanceAdd () {
 		});
 		templateImage.selectedIndex = -1;
 	});
+
+	let userResources = await requestAPI("/user/resources", "GET");
+	let userInstances = await requestAPI("/user/instances", "GET");
+	d.querySelector("#cores").max = userResources.avail.cores;
+	d.querySelector("#memory").max = userResources.avail.memory;
+	d.querySelector("#vmid").min = userInstances.vmid.min;
+	d.querySelector("#vmid").max = userInstances.vmid.max;
 }

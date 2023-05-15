@@ -1,5 +1,6 @@
 import {requestPVE, requestAPI, goToPage, goToURL, instances, nodes} from "./utils.js";
 import {alert, dialog} from "./dialog.js";
+import {PVE} from "../vars.js"
 
 export class Instance extends HTMLElement {
 	constructor () {
@@ -168,7 +169,7 @@ export class Instance extends HTMLElement {
 		if (!this.actionLock && this.status === "running") {
 			let data = {console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node.name, resize: "off", cmd: ""};
 			data[`${this.type === "qemu" ? "novnc" : "xtermjs"}`] = 1;
-			goToURL("https://pve.tronnet.net", data, true);
+			goToURL(PVE, data, true);
 		}
 	}
 
