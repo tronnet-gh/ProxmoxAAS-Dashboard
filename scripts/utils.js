@@ -22,6 +22,9 @@ export const resources_config = {
 			sata: {name: "SATA", icon: "images/resources/drive.svg", actions: ["detach", "move", "reassign", "resize"]},
 			unused: {name: "UNUSED", icon: "images/resources/drive.svg", actions: ["attach", "delete", "reassign"]}
 		}
+	},
+	network: {
+		prefix: "net"
 	}
 }
 

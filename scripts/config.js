@@ -3,7 +3,8 @@ import {alert, dialog} from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
 
-let diskMetaData = resources.disk;
+let diskMetaData = resources_config.disk;
+let networkMetaData = resources_config.network;
 
 let node;
 let type;
@@ -25,8 +26,14 @@ async function init () {
 
 	populateResources();
 	populateDisk();
+	populateNetworks();
 
 	document.querySelector("#exit").addEventListener("click", handleFormExit);
+}
+
+function getOrdered(keys){
+	let ordered_keys = Object.keys(keys).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
+	return ordered_keys;
 }
 
 async function getConfig () {
@@ -36,11 +43,11 @@ async function getConfig () {
 function populateResources () {
 	let name = type === "qemu" ? "name" : "hostname";
 	document.querySelector("#name").innerHTML = document.querySelector("#name").innerHTML.replace("%{vmname}", config.data[name]);
-	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads"); // TODO add max from quota API
-	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data.memory, min: 16, step: 1}, "MiB"); // TODO add max from quota API
+	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads");
+	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data.memory, min: 16, step: 1}, "MiB");
 	
 	if (type === "lxc") {
-		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "MiB"); // TODO add max from quota API
+		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "MiB");
 	}
 }
 
@@ -86,7 +93,7 @@ function populateDisk () {
 				disks[element.replace(prefix, "")] = config.data[element];
 			}
 		});
-		let ordered_keys = getOrderedUsed(disks);
+		let ordered_keys = getOrdered(disks);
 		ordered_keys.forEach(element => {
 			let disk = disks[element];
 			addDiskLine("disks", prefix, busName, element, disk);
@@ -98,11 +105,6 @@ function populateDisk () {
 		document.querySelector("#cd-add").classList.remove("none");
 		document.querySelector("#cd-add").addEventListener("click", handleCDAdd);
 	}
-}
-
-function getOrderedUsed(disks){
-	let ordered_keys = Object.keys(disks).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
-	return ordered_keys;
 }
 
 function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
@@ -425,6 +427,63 @@ async function handleCDAdd () {
 				ISOSelect.append(new Option(element.volid.replace(`${storage}:${content}/`, ""), element.volid));
 			}
 		});
+	});
+}
+
+function populateNetworks () {
+	document.querySelector("#networks").innerHTML = "";
+	let networks = {};
+	let prefix = networkMetaData.prefix;
+	Object.keys(config.data).forEach(element => {
+		if (element.startsWith(prefix)) {
+			networks[element.replace(prefix, "")] = config.data[element];
+		}
+	});
+	let ordered_keys = getOrdered(networks);
+	ordered_keys.forEach(element => {
+		addNetworkLine("networks", `${prefix}${element}`, networks[element]);
+	});
+}
+
+function addNetworkLine (fieldset, netID, netDetails) {
+	let field = document.querySelector(`#${fieldset}`);
+
+	let icon = document.createElement("img");
+	icon.src = "images/resources/network.svg";
+	icon.alt = netID;
+	icon.dataset.network = netID;
+	field.appendChild(icon);
+
+	let netLabel = document.createElement("label");
+	netLabel.innerText = netID;
+	netLabel.dataset.network = netID;
+	field.append(netLabel);
+
+	let netDesc = document.createElement("p");
+	netDesc.innerText = netDetails;
+	netDesc.dataset.network = netID;
+	field.append(netDesc);
+
+	let actionDiv = document.createElement("div");
+	actionDiv.classList.add("last-item");
+	let action = document.createElement("img");
+	action.classList.add("clickable");
+	action.src = `images/actions/network/config.svg`;
+	action.title = "Config Network";
+	action.addEventListener("click", handleNetworkConfig);
+	action.dataset.network = netID;
+	actionDiv.appendChild(action);
+	field.append(actionDiv);
+}
+
+async function handleNetworkConfig () {
+	let netID = this.dataset.network;
+	let header = `Edit ${netID}`;
+	let body = ``;
+
+	dialog(header, body, async (result, form) => {
+		if (result === "confirm") {
+		}
 	});
 }
 
