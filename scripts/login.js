@@ -1,9 +1,10 @@
-import {requestTicket, goToPage, deleteAllCookies, requestPVE} from "./utils.js";
+import {requestTicket, goToPage, deleteAllCookies, requestPVE, setTitleAndHeader} from "./utils.js";
 import {alert} from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
 async function init (){
+	setTitleAndHeader();
 	await deleteAllCookies();
 	let formSubmitButton = document.querySelector("#submit");
 	let realms = await requestPVE("/access/domains", "GET");
