@@ -1,4 +1,4 @@
-import {requestAPI, goToPage, getCookie} from "./utils.js";
+import {requestAPI, goToPage, getCookie, setTitleAndHeader} from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -11,6 +11,7 @@ let SIPrefix = [
 ]
 
 async function init () {
+	setTitleAndHeader();
 	let cookie = document.cookie;
 	if (cookie === "") {
 		goToPage("login.html");

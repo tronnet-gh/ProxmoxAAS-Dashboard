@@ -1,4 +1,4 @@
-import {API} from "/vars.js";
+import {API, organization} from "/vars.js";
 
 export const resources_config = {
 	disk: {
@@ -164,7 +164,7 @@ export function goToPage (page, data={}, newwindow = false) {
 	}
 
 	if (newwindow) {
-		window.open(url, "tronnet - client", "height=480,width=848");
+		window.open(url, `${organization} - client`, "height=480,width=848");
 	}
 	else {
 		window.location.assign(url.toString());
@@ -178,7 +178,7 @@ export function goToURL (href, data={}, newwindow = false) {
 	}
 
 	if (newwindow) {
-		window.open(url, "tronnet - client", "height=480,width=848");
+		window.open(url, `${organization} - client`, "height=480,width=848");
 	}
 	else {
 		window.location.assign(url.toString());
@@ -192,4 +192,9 @@ export function getURIData () {
 
 export async function deleteAllCookies () {
 	await requestAPI("/ticket", "DELETE");
+}
+
+export function setTitleAndHeader () {
+	document.title = `${organization} - client`;
+	document.querySelector("h1").innerText = organization;
 }

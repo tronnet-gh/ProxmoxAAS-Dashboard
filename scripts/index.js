@@ -1,10 +1,11 @@
-import {requestPVE, requestAPI, goToPage, goToURL, instances_config, nodes_config} from "./utils.js";
+import {requestPVE, requestAPI, goToPage, goToURL, instances_config, nodes_config, setTitleAndHeader} from "./utils.js";
 import {alert, dialog} from "./dialog.js";
 import {PVE} from "../vars.js"
 
 window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
+	setTitleAndHeader();
 	let cookie = document.cookie;
 	if (cookie === "") {
 		goToPage("login.html");
