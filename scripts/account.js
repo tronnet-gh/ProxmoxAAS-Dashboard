@@ -1,16 +1,25 @@
-import {requestAPI, goToPage, getCookie, setTitleAndHeader} from "./utils.js";
+import { requestAPI, goToPage, getCookie, setTitleAndHeader } from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
-let SIPrefix = [
-	"",
-	"Ki",
-	"Mi",
-	"Gi",
-	"Ti"
-]
+let prefixes = {
+	1024: [
+		"",
+		"Ki",
+		"Mi",
+		"Gi",
+		"Ti"
+	],
+	1000: [
+		"",
+		"K",
+		"M",
+		"G",
+		"T"
+	]
+}
 
-async function init () {
+async function init() {
 	setTitleAndHeader();
 	let cookie = document.cookie;
 	if (cookie === "") {
@@ -26,7 +35,7 @@ async function init () {
 	buildResourceTable(resources, "#resource-table");
 }
 
-function buildResourceTable (resources, tableid) {
+function buildResourceTable(resources, tableid) {
 
 	if (resources instanceof Object) {
 		let table = document.querySelector(tableid);
@@ -48,15 +57,16 @@ function buildResourceTable (resources, tableid) {
 function parseNumber(value, unitData) {
 	let compact = unitData.compact;
 	let multiplier = unitData.multiplier;
+	let base = unitData.base;
 	let unit = unitData.unit;
 	value = multiplier * value;
 	if (value <= 0) {
 		return `0 ${unit}`;
 	}
 	else if (compact) {
-		let exponent = Math.floor(Math.log2(value) / 10);
-		value = value / 1024 ** exponent;
-		let unitPrefix = SIPrefix[exponent];
+		let exponent = Math.floor(Math.log(value) / Math.log(base));
+		value = value / base ** exponent;
+		let unitPrefix = prefixes[base][exponent];
 		return `${value} ${unitPrefix}${unit}`
 	}
 	else {

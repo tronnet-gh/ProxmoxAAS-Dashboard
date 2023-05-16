@@ -442,17 +442,17 @@ function populateNetworks () {
 	});
 	let ordered_keys = getOrdered(networks);
 	ordered_keys.forEach(element => {
-		addNetworkLine("networks", `${prefix}${element}`, networks[element]);
+		addNetworkLine("networks", prefix, element, networks[element]);
 	});
 }
 
-function addNetworkLine (fieldset, netID, netDetails) {
+function addNetworkLine (fieldset, prefix, netID, netDetails) {
 	let field = document.querySelector(`#${fieldset}`);
 
 	let icon = document.createElement("img");
 	icon.src = "images/resources/network.svg";
 	icon.alt = netID;
-	icon.dataset.network = netID;
+	icon.dataset.network = `${prefix}${netID}`;
 	icon.dataset.netvals = netDetails;
 	field.appendChild(icon);
 
