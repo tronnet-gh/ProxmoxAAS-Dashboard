@@ -197,7 +197,7 @@ async function handleInstanceAdd() {
 	d.querySelector("#vmid").max = userInstances.vmid.max;
 }
 
-export class Instance {
+class Instance {
 	constructor() {
 		let shadowRoot = document.createElement("div");
 		shadowRoot.classList.add("w3-row");
@@ -307,7 +307,6 @@ export class Instance {
 	}
 
 	async handlePowerButton() {
-
 		if (!this.actionLock) {
 			let header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
 			let body = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"} VM</p><p>${this.vmid}</p>`

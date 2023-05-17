@@ -36,7 +36,6 @@ async function init() {
 }
 
 function buildResourceTable(resources, tableid) {
-
 	if (resources instanceof Object) {
 		let table = document.querySelector(tableid);
 		let tbody = table.querySelector("tbody");
