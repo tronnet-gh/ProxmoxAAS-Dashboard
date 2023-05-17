@@ -1,4 +1,4 @@
-export function dialog (header, body, callback = async (result, form) => {}) {
+export function dialog(header, body, callback = async (result, form) => { }) {
 	let dialog = document.createElement("dialog");
 	dialog.innerHTML = `
 		<p class="w3-large" id="prompt" style="text-align: center;"></p>
@@ -23,7 +23,7 @@ export function dialog (header, body, callback = async (result, form) => {}) {
 	return dialog;
 }
 
-export function alert (message) {
+export function alert(message) {
 	let dialog = document.createElement("dialog");
 	dialog.innerHTML = `
 		<form method="dialog">

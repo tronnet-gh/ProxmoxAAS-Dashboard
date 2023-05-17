@@ -1,19 +1,19 @@
-import {API, organization} from "/vars.js";
+import { API, organization } from "/vars.js";
 
 export const resources_config = {
 	disk: {
 		actionBarOrder: ["move", "resize", "detach_attach", "delete"],
 		lxc: {
 			prefixOrder: ["rootfs", "mp", "unused"],
-			rootfs: {name: "ROOTFS", icon: "images/resources/drive.svg", actions: ["move", "resize"]},
-			mp: {name: "MP", icon: "images/resources/drive.svg", actions: ["detach", "move", "reassign", "resize"]},
-			unused: {name: "UNUSED", icon: "images/resources/drive.svg", actions: ["attach", "delete", "reassign"]}
+			rootfs: { name: "ROOTFS", icon: "images/resources/drive.svg", actions: ["move", "resize"] },
+			mp: { name: "MP", icon: "images/resources/drive.svg", actions: ["detach", "move", "reassign", "resize"] },
+			unused: { name: "UNUSED", icon: "images/resources/drive.svg", actions: ["attach", "delete", "reassign"] }
 		},
 		qemu: {
 			prefixOrder: ["ide", "sata", "unused"],
-			ide: {name: "IDE", icon: "images/resources/disk.svg", actions: ["delete"]},
-			sata: {name: "SATA", icon: "images/resources/drive.svg", actions: ["detach", "move", "reassign", "resize"]},
-			unused: {name: "UNUSED", icon: "images/resources/drive.svg", actions: ["attach", "delete", "reassign"]}
+			ide: { name: "IDE", icon: "images/resources/disk.svg", actions: ["delete"] },
+			sata: { name: "SATA", icon: "images/resources/drive.svg", actions: ["detach", "move", "reassign", "resize"] },
+			unused: { name: "UNUSED", icon: "images/resources/drive.svg", actions: ["attach", "delete", "reassign"] }
 		}
 	},
 	network: {
@@ -79,7 +79,7 @@ export function getCookie(cname) {
 	let name = cname + "=";
 	let decodedCookie = decodeURIComponent(document.cookie);
 	let ca = decodedCookie.split(";");
-	for(let i = 0; i < ca.length; i++) {
+	for (let i = 0; i < ca.length; i++) {
 		let c = ca[i];
 		while (c.charAt(0) === " ") {
 			c = c.substring(1);
@@ -91,12 +91,12 @@ export function getCookie(cname) {
 	return "";
 }
 
-export async function requestTicket (username, password, realm) {
-	let response = await requestAPI("/ticket", "POST", {username: `${username}@${realm}`, password: password}, false);
+export async function requestTicket(username, password, realm) {
+	let response = await requestAPI("/ticket", "POST", { username: `${username}@${realm}`, password: password }, false);
 	return response;
 }
 
-export async function requestPVE (path, method, body = null) {
+export async function requestPVE(path, method, body = null) {
 	let prms = new URLSearchParams(body);
 	let content = {
 		method: method,
@@ -106,7 +106,7 @@ export async function requestPVE (path, method, body = null) {
 			"Content-Type": "application/x-www-form-urlencoded"
 		}
 	}
-	if(method === "POST") {
+	if (method === "POST") {
 		content.body = prms.toString();
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
@@ -115,7 +115,7 @@ export async function requestPVE (path, method, body = null) {
 	return response;
 }
 
-export async function requestAPI (path, method, body = null) {
+export async function requestAPI(path, method, body = null) {
 	let prms = new URLSearchParams(body);
 	let content = {
 		method: method,
@@ -136,7 +136,7 @@ export async function requestAPI (path, method, body = null) {
 	return response;
 }
 
-async function request (url, content) {
+async function request(url, content) {
 
 	let response = await fetch(url, content);
 	let data = null;
@@ -148,8 +148,8 @@ async function request (url, content) {
 		data = null;
 	}
 
-	if(!response.ok){
-		return {status: response.status, error: data ? data.error : response.status};
+	if (!response.ok) {
+		return { status: response.status, error: data ? data.error : response.status };
 	}
 	else {
 		data.status = response.status;
@@ -157,9 +157,9 @@ async function request (url, content) {
 	}
 }
 
-export function goToPage (page, data={}, newwindow = false) {
+export function goToPage(page, data = {}, newwindow = false) {
 	let url = new URL(`https://${window.location.host}/${page}`);
-	for(let k in data) {
+	for (let k in data) {
 		url.searchParams.append(k, data[k]);
 	}
 
@@ -171,9 +171,9 @@ export function goToPage (page, data={}, newwindow = false) {
 	}
 }
 
-export function goToURL (href, data={}, newwindow = false) {
+export function goToURL(href, data = {}, newwindow = false) {
 	let url = new URL(href);
-	for(let k in data) {
+	for (let k in data) {
 		url.searchParams.append(k, data[k]);
 	}
 
@@ -185,16 +185,16 @@ export function goToURL (href, data={}, newwindow = false) {
 	}
 }
 
-export function getURIData () {
+export function getURIData() {
 	let url = new URL(window.location.href);
 	return Object.fromEntries(url.searchParams);
 }
 
-export async function deleteAllCookies () {
+export async function deleteAllCookies() {
 	await requestAPI("/ticket", "DELETE");
 }
 
-export function setTitleAndHeader () {
+export function setTitleAndHeader() {
 	document.title = `${organization} - client`;
 	document.querySelector("h1").innerText = organization;
 }

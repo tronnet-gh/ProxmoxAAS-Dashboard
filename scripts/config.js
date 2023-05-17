@@ -1,5 +1,5 @@
-import {requestPVE, requestAPI, goToPage, getURIData, resources_config, setTitleAndHeader} from "./utils.js";
-import {alert, dialog} from "./dialog.js";
+import { requestPVE, requestAPI, goToPage, getURIData, resources_config, setTitleAndHeader } from "./utils.js";
+import { alert, dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
 
@@ -11,13 +11,13 @@ let type;
 let vmid;
 let config;
 
-async function init () {
+async function init() {
 	setTitleAndHeader();
 	let cookie = document.cookie;
 	if (cookie === "") {
 		goToPage("login.html");
 	}
-	
+
 	let uriData = getURIData();
 	node = uriData.node;
 	type = uriData.type;
@@ -32,27 +32,27 @@ async function init () {
 	document.querySelector("#exit").addEventListener("click", handleFormExit);
 }
 
-function getOrdered(keys){
-	let ordered_keys = Object.keys(keys).sort((a,b) => {parseInt(a) - parseInt(b)}); // ordered integer list
+function getOrdered(keys) {
+	let ordered_keys = Object.keys(keys).sort((a, b) => { parseInt(a) - parseInt(b) }); // ordered integer list
 	return ordered_keys;
 }
 
-async function getConfig () {
+async function getConfig() {
 	config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
 }
 
-function populateResources () {
+function populateResources() {
 	let name = type === "qemu" ? "name" : "hostname";
 	document.querySelector("#name").innerHTML = document.querySelector("#name").innerHTML.replace("%{vmname}", config.data[name]);
-	addResourceLine("resources", "images/resources/cpu.svg", "Cores", {type: "number", value: config.data.cores, min: 1, max: 8192}, "Threads");
-	addResourceLine("resources", "images/resources/ram.svg", "Memory", {type: "number", value: config.data.memory, min: 16, step: 1}, "MiB");
-	
+	addResourceLine("resources", "images/resources/cpu.svg", "Cores", { type: "number", value: config.data.cores, min: 1, max: 8192 }, "Threads");
+	addResourceLine("resources", "images/resources/ram.svg", "Memory", { type: "number", value: config.data.memory, min: 16, step: 1 }, "MiB");
+
 	if (type === "lxc") {
-		addResourceLine("resources", "images/resources/swap.svg", "Swap", {type: "number", value: config.data.swap, min: 0, step: 1}, "MiB");
+		addResourceLine("resources", "images/resources/swap.svg", "Swap", { type: "number", value: config.data.swap, min: 0, step: 1 }, "MiB");
 	}
 }
 
-function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=null) {
+function addResourceLine(fieldset, iconHref, labelText, inputAttr, unitText = null) {
 	let field = document.querySelector(`#${fieldset}`);
 
 	let icon = document.createElement("img");
@@ -83,9 +83,9 @@ function addResourceLine (fieldset, iconHref, labelText, inputAttr, unitText=nul
 	}
 }
 
-function populateDisk () {
+function populateDisk() {
 	document.querySelector("#disks").innerHTML = "";
-	for(let i = 0; i < diskMetaData[type].prefixOrder.length; i++){
+	for (let i = 0; i < diskMetaData[type].prefixOrder.length; i++) {
 		let prefix = diskMetaData[type].prefixOrder[i];
 		let busName = diskMetaData[type][prefix].name;
 		let disks = {};
@@ -108,12 +108,12 @@ function populateDisk () {
 	}
 }
 
-function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
+function addDiskLine(fieldset, busPrefix, busName, device, diskDetails) {
 	let field = document.querySelector(`#${fieldset}`);
 
 	let diskName = `${busName} ${device}`;
 	let diskID = `${busPrefix}${device}`;
-	
+
 	// Set the disk icon, either drive.svg or disk.svg
 	let icon = document.createElement("img");
 	icon.src = diskMetaData[type][busPrefix].icon;
@@ -138,12 +138,12 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 	diskMetaData.actionBarOrder.forEach((element) => {
 		let action = document.createElement("img");
 		action.classList.add("clickable");
-		if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")){ // attach
+		if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")) { // attach
 			action.src = "images/actions/disk/attach.svg";
 			action.title = "Attach Disk";
 			action.addEventListener("click", handleDiskAttach);
 		}
-		else if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")){ // detach
+		else if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")) { // detach
 			action.src = "images/actions/disk/detach.svg";
 			action.title = "Detach Disk";
 			action.addEventListener("click", handleDiskDetach);
@@ -154,7 +154,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 			action.title = "Delete Disk";
 			if (active === "active") {
 				action.addEventListener("click", handleDiskDelete);
-			}			
+			}
 		}
 		else {
 			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
@@ -176,7 +176,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 	field.append(actionDiv);
 }
 
-async function handleDiskDetach () {
+async function handleDiskDetach() {
 	let header = `Detach ${this.dataset.disk}`;
 	let body = `<p>Are you sure you want to detach disk</p><p>${this.dataset.disk}</p>`;
 	dialog(header, body, async (result, form) => {
@@ -202,7 +202,7 @@ async function handleDiskDetach () {
 	});
 }
 
-async function handleDiskAttach () {
+async function handleDiskAttach() {
 	let diskImage = config.data[this.dataset.disk];
 
 	let header = `Attach ${diskImage}`;
@@ -211,7 +211,7 @@ async function handleDiskAttach () {
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			let device = form.get("device");
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";		
+			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
 			let body = {
 				node: node,
 				type: type,
@@ -233,8 +233,8 @@ async function handleDiskAttach () {
 	});
 }
 
-async function handleDiskResize () {
-	let header = `Resize ${this.dataset.disk}`; 
+async function handleDiskResize() {
+	let header = `Resize ${this.dataset.disk}`;
 	let body = `<label for="size-increment">Size Increment (GiB)</label><input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072"></input>`;
 
 	dialog(header, body, async (result, form) => {
@@ -252,7 +252,7 @@ async function handleDiskResize () {
 				await getConfig();
 				populateDisk();
 			}
-			else{
+			else {
 				alert(result.error);
 				await getConfig();
 				populateDisk();
@@ -261,7 +261,7 @@ async function handleDiskResize () {
 	});
 }
 
-async function handleDiskMove () {
+async function handleDiskMove() {
 	let content = type === "qemu" ? "images" : "rootdir";
 	let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
 
@@ -269,7 +269,7 @@ async function handleDiskMove () {
 
 	let options = "";
 	storage.data.forEach((element) => {
-		if (element.content.includes(content)){
+		if (element.content.includes(content)) {
 			options += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
@@ -289,7 +289,7 @@ async function handleDiskMove () {
 				vmid: vmid,
 				disk: this.dataset.disk,
 				storage: form.get("storage-select"),
-				delete: form.get("delete-check") === "on" ? "1": "0"
+				delete: form.get("delete-check") === "on" ? "1" : "0"
 			}
 			let result = await requestAPI("/instance/disk/move", "POST", body);
 			if (result.status === 200) {
@@ -305,7 +305,7 @@ async function handleDiskMove () {
 	});
 }
 
-async function handleDiskDelete () {
+async function handleDiskDelete() {
 	let header = `Delete ${this.dataset.disk}`;
 	let body = `<p>Are you sure you want to <strong>delete</strong> disk</p><p>${this.dataset.disk}</p>`;
 
@@ -332,15 +332,15 @@ async function handleDiskDelete () {
 	});
 }
 
-async function handleDiskAdd () {
+async function handleDiskAdd() {
 	let content = type === "qemu" ? "images" : "rootdir";
 	let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
-	
+
 	let header = "Create New Disk";
 
 	let options = "";
 	storage.data.forEach((element) => {
-		if (element.content.includes(content)){
+		if (element.content.includes(content)) {
 			options += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
@@ -376,15 +376,15 @@ async function handleDiskAdd () {
 	});
 }
 
-async function handleCDAdd () {
+async function handleCDAdd() {
 	let content = "iso";
 	let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
-	
+
 	let header = `Add a CDROM`;
 
 	let storageOptions = "";
 	storage.data.forEach((element) => {
-		if (element.content.includes(content)){
+		if (element.content.includes(content)) {
 			storageOptions += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
@@ -422,7 +422,7 @@ async function handleCDAdd () {
 		let storage = document.querySelector("#storage-select").value;
 		let ISOSelect = document.querySelector("#iso-select");
 		ISOSelect.innerHTML = `<option hidden disabled selected value></option>`;
-		let isos = await requestPVE(`/nodes/${node}/storage/${storage}/content`, "GET", {content: content});
+		let isos = await requestPVE(`/nodes/${node}/storage/${storage}/content`, "GET", { content: content });
 		isos.data.forEach((element) => {
 			if (element.content.includes(content)) {
 				ISOSelect.append(new Option(element.volid.replace(`${storage}:${content}/`, ""), element.volid));
@@ -431,7 +431,7 @@ async function handleCDAdd () {
 	});
 }
 
-function populateNetworks () {
+function populateNetworks() {
 	document.querySelector("#networks").innerHTML = "";
 	let networks = {};
 	let prefix = networkMetaData.prefix;
@@ -446,7 +446,7 @@ function populateNetworks () {
 	});
 }
 
-function addNetworkLine (fieldset, prefix, netID, netDetails) {
+function addNetworkLine(fieldset, prefix, netID, netDetails) {
 	let field = document.querySelector(`#${fieldset}`);
 
 	let icon = document.createElement("img");
@@ -481,12 +481,12 @@ function addNetworkLine (fieldset, prefix, netID, netDetails) {
 	field.append(actionDiv);
 }
 
-async function handleNetworkConfig () {
+async function handleNetworkConfig() {
 	let netID = this.dataset.network;
 	let netDetails = this.dataset.netvals;
 	let header = `Edit ${netID}`;
 	let body = `<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">`;
-	
+
 	let d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-network="${netID}"]`).src = "images/status/loading.svg";
@@ -502,7 +502,7 @@ async function handleNetworkConfig () {
 				await getConfig();
 				populateNetworks();
 			}
-			else{
+			else {
 				alert(result.error);
 				await getConfig();
 				populateNetworks();
@@ -513,7 +513,7 @@ async function handleNetworkConfig () {
 	d.querySelector("#rate").value = netDetails.split("rate=")[1].split(",")[0];
 }
 
-async function handleFormExit () {
+async function handleFormExit() {
 	let body = {
 		node: node,
 		type: type,
