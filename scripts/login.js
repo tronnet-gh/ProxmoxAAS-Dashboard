@@ -1,9 +1,9 @@
-import {requestTicket, goToPage, deleteAllCookies, requestPVE, setTitleAndHeader} from "./utils.js";
-import {alert} from "./dialog.js";
+import { requestTicket, goToPage, deleteAllCookies, requestPVE, setTitleAndHeader } from "./utils.js";
+import { alert } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
-async function init (){
+async function init() {
 	setTitleAndHeader();
 	await deleteAllCookies();
 	let formSubmitButton = document.querySelector("#submit");
@@ -11,7 +11,7 @@ async function init (){
 	let realmSelect = document.querySelector("#realm");
 	realms.data.forEach((element) => {
 		realmSelect.add(new Option(element.comment, element.realm));
-		if("default" in element && element.default === 1){
+		if ("default" in element && element.default === 1) {
 			realmSelect.value = element.realm;
 		}
 	});
@@ -23,7 +23,7 @@ async function init (){
 		formSubmitButton.innerText = "Authenticating...";
 		let ticket = await requestTicket(formData.get("username"), formData.get("password"), formData.get("realm"));
 		if (ticket.status === 200) {
-			formSubmitButton.innerText = "LOGIN";		
+			formSubmitButton.innerText = "LOGIN";
 			goToPage("index.html");
 		}
 		else if (ticket.status === 401) {

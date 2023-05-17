@@ -1,23 +1,23 @@
-import {requestPVE, requestAPI, goToPage, goToURL, instances_config, nodes_config, setTitleAndHeader} from "./utils.js";
-import {alert, dialog} from "./dialog.js";
-import {PVE} from "../vars.js"
+import { requestPVE, requestAPI, goToPage, goToURL, instances_config, nodes_config, setTitleAndHeader } from "./utils.js";
+import { alert, dialog } from "./dialog.js";
+import { PVE } from "../vars.js"
 
 window.addEventListener("DOMContentLoaded", init);
 
-async function init () {
+async function init() {
 	setTitleAndHeader();
 	let cookie = document.cookie;
 	if (cookie === "") {
 		goToPage("login.html");
 	}
-	
+
 	await populateInstances();
 
 	let addInstanceBtn = document.querySelector("#instance-add");
 	addInstanceBtn.addEventListener("click", handleInstanceAdd);
 }
 
-async function populateInstances () {
+async function populateInstances() {
 	let resources = await requestPVE("/cluster/resources", "GET");
 	let instanceContainer = document.getElementById("instance-container");
 	let instances = [];
@@ -26,7 +26,7 @@ async function populateInstances () {
 		if (element.type === "lxc" || element.type === "qemu") {
 			let nodeName = element.node;
 			let nodeStatus = resources.data.find(item => item.node === nodeName && item.type === "node").status;
-			element.node = {name: nodeName, status: nodeStatus};
+			element.node = { name: nodeName, status: nodeStatus };
 			instances.push(element);
 		}
 	});
@@ -58,14 +58,14 @@ async function populateInstances () {
 			</div>
 		</div>
 	`;
-	for(let i = 0; i < instances.length; i++) {
+	for (let i = 0; i < instances.length; i++) {
 		let newInstance = new Instance();
 		newInstance.data = instances[i];
 		instanceContainer.append(newInstance.shadowElement);
 	}
 }
 
-async function handleInstanceAdd () {
+async function handleInstanceAdd() {
 	let header = "Create New Instance";
 
 	let body = `
@@ -130,7 +130,7 @@ async function handleInstanceAdd () {
 	let typeSelect = d.querySelector("#type");
 	typeSelect.selectedIndex = -1;
 	typeSelect.addEventListener("change", () => {
-		if(typeSelect.value === "qemu") {
+		if (typeSelect.value === "qemu") {
 			d.querySelectorAll(".container-specific").forEach((element) => {
 				element.classList.add("none");
 				element.disabled = true;
@@ -198,7 +198,7 @@ async function handleInstanceAdd () {
 }
 
 export class Instance {
-	constructor () {
+	constructor() {
 		let shadowRoot = document.createElement("div");
 		shadowRoot.classList.add("w3-row");
 
@@ -235,7 +235,7 @@ export class Instance {
 		this.actionLock = false;
 	}
 
-	set data (data) {
+	set data(data) {
 		if (data.status === "unknown") {
 			data.status = "stopped";
 		}
@@ -247,7 +247,7 @@ export class Instance {
 		this.update();
 	}
 
-	update () {
+	update() {
 		let vmidParagraph = this.shadowElement.querySelector("#instance-id");
 		vmidParagraph.innerText = this.vmid;
 
@@ -306,9 +306,9 @@ export class Instance {
 		}
 	}
 
-	async handlePowerButton () {
+	async handlePowerButton() {
 
-		if(!this.actionLock) {
+		if (!this.actionLock) {
 			let header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
 			let body = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"} VM</p><p>${this.vmid}</p>`
 
@@ -322,13 +322,13 @@ export class Instance {
 
 					this.update();
 
-					let result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", {node: this.node.name, vmid: this.vmid});
+					let result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", { node: this.node.name, vmid: this.vmid });
 
 					const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
 
 					while (true) {
 						let taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`, "GET");
-						if(taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
+						if (taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
 							this.status = targetStatus;
 							this.update();
 							this.actionLock = false;
@@ -341,7 +341,7 @@ export class Instance {
 							this.actionLock = false;
 							break;
 						}
-						else{ // task has not stopped
+						else { // task has not stopped
 							await waitFor(1000);
 						}
 					}
@@ -350,21 +350,21 @@ export class Instance {
 		}
 	}
 
-	handleConfigButton () {
+	handleConfigButton() {
 		if (!this.actionLock && this.status === "stopped") { // if the action lock is false, and the node is stopped, then navigate to the conig page with the node infor in the search query
-			goToPage("config.html", {node: this.node.name, type: this.type, vmid: this.vmid});
+			goToPage("config.html", { node: this.node.name, type: this.type, vmid: this.vmid });
 		}
 	}
 
-	handleConsoleButton () {
+	handleConsoleButton() {
 		if (!this.actionLock && this.status === "running") {
-			let data = {console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node.name, resize: "off", cmd: ""};
+			let data = { console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node.name, resize: "off", cmd: "" };
 			data[`${this.type === "qemu" ? "novnc" : "xtermjs"}`] = 1;
 			goToURL(PVE, data, true);
 		}
 	}
 
-	handleDeleteButton () {
+	handleDeleteButton() {
 		if (!this.actionLock && this.status === "stopped") {
 
 			let header = `Delete VM ${this.vmid}`;
