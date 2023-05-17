@@ -137,7 +137,6 @@ export async function requestAPI(path, method, body = null) {
 }
 
 async function request(url, content) {
-
 	let response = await fetch(url, content);
 	let data = null;
 	try {
