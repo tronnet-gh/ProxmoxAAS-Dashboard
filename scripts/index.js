@@ -156,7 +156,7 @@ async function handleInstanceAdd() {
 	let clusterNodes = await requestPVE("/nodes", "GET");
 	let allowedNodes = await requestAPI("/user/nodes", "GET");
 	clusterNodes.data.forEach((element) => {
-		if (element.status === "online" && allowedNodes.includes(element.node)) {
+		if (element.status === "online" && allowedNodes.nodes.includes(element.node)) {
 			nodeSelect.add(new Option(element.node));
 		}
 	});

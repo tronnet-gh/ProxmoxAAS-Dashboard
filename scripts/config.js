@@ -519,6 +519,9 @@ async function handleFormExit() {
 		cores: document.querySelector("#Cores").value,
 		memory: document.querySelector("#Memory").value
 	}
+	if (type === "lxc") {
+		body.swap = document.querySelector("#Swap").value;
+	}
 	let result = await requestAPI("/instance/resources", "POST", body);
 	if (result.status === 200) {
 		await getConfig();
