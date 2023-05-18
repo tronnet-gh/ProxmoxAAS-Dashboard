@@ -31,7 +31,7 @@ async function init() {
 	document.querySelector("#username").innerText = `Username: ${getCookie("username")}`;
 	document.querySelector("#pool").innerText = `Pool: ${instances.pool}`;
 	document.querySelector("#vmid").innerText = `VMID Range: ${instances.vmid.min} - ${instances.vmid.max}`;
-	document.querySelector("#nodes").innerText = `Nodes: ${nodes.toString()}`;
+	document.querySelector("#nodes").innerText = `Nodes: ${nodes.nodes.toString()}`;
 	buildResourceTable(resources, "#resource-table");
 }
 
