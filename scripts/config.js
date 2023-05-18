@@ -203,9 +203,7 @@ async function handleDiskDetach() {
 }
 
 async function handleDiskAttach() {
-	let diskImage = config.data[this.dataset.disk];
-
-	let header = `Attach ${diskImage}`;
+	let header = `Attach ${this.dataset.disk}`;
 	let body = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required></input>`;
 
 	dialog(header, body, async (result, form) => {
@@ -217,7 +215,7 @@ async function handleDiskAttach() {
 				type: type,
 				vmid: vmid,
 				disk: `${type === "qemu" ? "sata" : "mp"}${device}`,
-				data: type === "lxc" ? diskImage + `,mp=/mp${device}/` : diskImage
+				source: this.dataset.disk.replace("unused", "")
 			}
 			let result = await requestAPI("/instance/disk/attach", "POST", body);
 			if (result.status === 200) {
