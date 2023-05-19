@@ -450,12 +450,12 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 	let icon = document.createElement("img");
 	icon.src = "images/resources/network.svg";
 	icon.alt = netID;
-	icon.dataset.network = `${prefix}${netID}`;
+	icon.dataset.network = netID;
 	icon.dataset.netvals = netDetails;
 	field.appendChild(icon);
 
 	let netLabel = document.createElement("label");
-	netLabel.innerText = netID;
+	netLabel.innerText = `${prefix}${netID}`;
 	netLabel.dataset.network = netID;
 	netLabel.dataset.netvals = netDetails;
 	field.append(netLabel);
