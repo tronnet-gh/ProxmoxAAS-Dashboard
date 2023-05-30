@@ -18,6 +18,9 @@ export const resources_config = {
 	},
 	network: {
 		prefix: "net"
+	},
+	pcie: {
+		prefix: "hostpci"
 	}
 }
 

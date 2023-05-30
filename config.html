@@ -32,7 +32,7 @@
 					</fieldset>
 					<fieldset class="w3-card w3-padding">
 						<span><legend>Disks</legend></span>
-						<div class="input-grid" id="disks" style="grid-template-columns: auto auto auto 1fr;"></div>
+						<div class="input-grid" id="disks" style="grid-template-columns: auto auto 1fr auto;"></div>
 						<div class="w3-container w3-center">
 							<img id="disk-add" src="images/actions/disk/add-disk.svg" class="clickable" alt="Add New Disk" title="Add New Disk">
 							<img id="cd-add" src="images/actions/disk/add-cd.svg" class="clickable none" alt="Add New CDROM" title="Add New CDROM">
@@ -40,7 +40,11 @@
 					</fieldset>
 					<fieldset class="w3-card w3-padding">
 						<span><legend>Network Interfaces</legend></span>
-						<div class="input-grid" id="networks" style="grid-template-columns: auto auto auto 1fr;"></div>
+						<div class="input-grid" id="networks" style="grid-template-columns: auto auto 1fr auto;"></div>
+					</fieldset>
+					<fieldset class="w3-card w3-padding none" id="devices-card">
+						<span><legend>PCIe Devices</legend></span>
+						<div class="input-grid" id="devices" style="grid-template-columns: auto 1fr auto;"></div>
 					</fieldset>
 					<div class="w3-container w3-center" id="form-actions">
 						<button class="w3-button w3-margin" id="exit" type="button">EXIT</button>

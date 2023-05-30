@@ -5,6 +5,7 @@ window.addEventListener("DOMContentLoaded", init); // do the dumb thing where th
 
 let diskMetaData = resources_config.disk;
 let networkMetaData = resources_config.network;
+let pcieMetaData = resources_config.pcie;
 
 let node;
 let type;
@@ -28,6 +29,7 @@ async function init() {
 	populateResources();
 	populateDisk();
 	populateNetworks();
+	populateDevices();
 
 	document.querySelector("#exit").addEventListener("click", handleFormExit);
 }
@@ -89,13 +91,13 @@ function populateDisk() {
 		let prefix = diskMetaData[type].prefixOrder[i];
 		let busName = diskMetaData[type][prefix].name;
 		let disks = {};
-		Object.keys(config.data).forEach(element => {
+		Object.keys(config.data).forEach((element) => {
 			if (element.startsWith(prefix)) {
 				disks[element.replace(prefix, "")] = config.data[element];
 			}
 		});
 		let ordered_keys = getOrdered(disks);
-		ordered_keys.forEach(element => {
+		ordered_keys.forEach((element) => {
 			let disk = disks[element];
 			addDiskLine("disks", prefix, busName, element, disk);
 		});
@@ -134,7 +136,6 @@ function addDiskLine(fieldset, busPrefix, busName, device, diskDetails) {
 	field.append(diskDesc);
 
 	let actionDiv = document.createElement("div");
-	actionDiv.classList.add("last-item");
 	diskMetaData.actionBarOrder.forEach((element) => {
 		let action = document.createElement("img");
 		action.classList.add("clickable");
@@ -433,13 +434,13 @@ function populateNetworks() {
 	document.querySelector("#networks").innerHTML = "";
 	let networks = {};
 	let prefix = networkMetaData.prefix;
-	Object.keys(config.data).forEach(element => {
+	Object.keys(config.data).forEach((element) => {
 		if (element.startsWith(prefix)) {
 			networks[element.replace(prefix, "")] = config.data[element];
 		}
 	});
 	let ordered_keys = getOrdered(networks);
-	ordered_keys.forEach(element => {
+	ordered_keys.forEach((element) => {
 		addNetworkLine("networks", prefix, element, networks[element]);
 	});
 }
@@ -449,7 +450,7 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 
 	let icon = document.createElement("img");
 	icon.src = "images/resources/network.svg";
-	icon.alt = netID;
+	icon.alt = `${prefix}${netID}`;
 	icon.dataset.network = netID;
 	icon.dataset.netvals = netDetails;
 	field.appendChild(icon);
@@ -467,7 +468,6 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 	field.append(netDesc);
 
 	let actionDiv = document.createElement("div");
-	actionDiv.classList.add("last-item");
 	let action = document.createElement("img");
 	action.classList.add("clickable");
 	action.src = `images/actions/network/config.svg`;
@@ -510,6 +510,54 @@ async function handleNetworkConfig() {
 
 	d.querySelector("#rate").value = netDetails.split("rate=")[1].split(",")[0];
 }
+
+function populateDevices() {
+	if (type === "qemu") {
+		document.querySelector("#devices-card").classList.remove("none");
+		document.querySelector("#devices").innerHTML = "";
+		let devices = {};
+		let prefix = pcieMetaData.prefix;
+		Object.keys(config.data).forEach((element) => {
+			if (element.startsWith(prefix)) {
+				devices[element.replace(prefix, "")] = config.data[element];
+			}
+		});
+		let ordered_keys = getOrdered(devices);
+		ordered_keys.forEach((element) => {
+			addDeviceLine("devices", prefix, element, devices[element]);
+		});
+	}
+}
+
+function addDeviceLine(fieldset, prefix, deviceID, deviceDetails) {
+	let field = document.querySelector(`#${fieldset}`);
+
+	let icon = document.createElement("img");
+	icon.src = "images/resources/device.svg";
+	icon.alt = `${prefix}${deviceID}`;
+	icon.dataset.device = deviceID;
+	icon.dataset.values = deviceDetails;
+	field.appendChild(icon);
+
+	let deviceLabel = document.createElement("p");
+	deviceLabel.innerText = deviceDetails;
+	deviceLabel.dataset.device = deviceID;
+	deviceLabel.dataset.values = deviceDetails;
+	field.append(deviceLabel);
+
+	let actionDiv = document.createElement("div");
+	let action = document.createElement("img");
+	action.classList.add("clickable");
+	action.src = `images/actions/device/config.svg`;
+	action.title = "Config Device";
+	action.addEventListener("click", handleDeviceConfig);
+	action.dataset.device = deviceID;
+	action.dataset.values = deviceDetails;
+	actionDiv.appendChild(action);
+	field.append(actionDiv);
+}
+
+async function handleDeviceConfig() {}
 
 async function handleFormExit() {
 	let body = {
