@@ -523,13 +523,14 @@ function populateDevices() {
 			}
 		});
 		let ordered_keys = getOrdered(devices);
-		ordered_keys.forEach((element) => {
-			addDeviceLine("devices", prefix, element, devices[element]);
+		ordered_keys.forEach(async (element) => {
+			let deviceData = await requestAPI(`/nodes/pci?node=${node}&type=${type}&vmid=${vmid}&hostpci=${element}`, "GET");
+			addDeviceLine("devices", prefix, element, devices[element], deviceData);
 		});
 	}
 }
 
-function addDeviceLine(fieldset, prefix, deviceID, deviceDetails) {
+function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceData) {
 	let field = document.querySelector(`#${fieldset}`);
 
 	let icon = document.createElement("img");
@@ -540,7 +541,8 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails) {
 	field.appendChild(icon);
 
 	let deviceLabel = document.createElement("p");
-	deviceLabel.innerText = deviceDetails;
+	let deviceNames = Array.from(deviceData, element => element.device_name);
+	deviceLabel.innerText = deviceNames.toString();
 	deviceLabel.dataset.device = deviceID;
 	deviceLabel.dataset.values = deviceDetails;
 	field.append(deviceLabel);
