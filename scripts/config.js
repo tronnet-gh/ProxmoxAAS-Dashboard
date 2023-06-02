@@ -524,7 +524,7 @@ function populateDevices() {
 		});
 		let ordered_keys = getOrdered(devices);
 		ordered_keys.forEach(async (element) => {
-			let deviceData = await requestAPI(`/nodes/pci?node=${node}&type=${type}&vmid=${vmid}&hostpci=${element}`, "GET");
+			let deviceData = await requestAPI(`/instance/pci?node=${node}&type=${type}&vmid=${vmid}&hostpci=${element}`, "GET");
 			addDeviceLine("devices", prefix, element, devices[element], deviceData);
 		});
 	}
