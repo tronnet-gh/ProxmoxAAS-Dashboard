@@ -468,14 +468,25 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 	field.append(netDesc);
 
 	let actionDiv = document.createElement("div");
-	let action = document.createElement("img");
-	action.classList.add("clickable");
-	action.src = `images/actions/network/config.svg`;
-	action.title = "Config Network";
-	action.addEventListener("click", handleNetworkConfig);
-	action.dataset.network = netID;
-	action.dataset.netvals = netDetails;
-	actionDiv.appendChild(action);
+
+	let configBtn  = document.createElement("img");
+	configBtn.classList.add("clickable");
+	configBtn.src = `images/actions/network/config.svg`;
+	configBtn.title = "Config Interface";
+	configBtn.addEventListener("click", handleNetworkConfig);
+	configBtn.dataset.network = netID;
+	configBtn.dataset.netvals = netDetails;
+	actionDiv.appendChild(configBtn);
+
+	let deleteBtn = document.createElement("img");
+	deleteBtn.classList.add("clickable");
+	deleteBtn.src = `images/actions/delete-active.svg`;
+	deleteBtn.title = "Delete Interface";
+	deleteBtn.addEventListener("click", handleNetworkDelete);
+	deleteBtn.dataset.network = netID;
+	deleteBtn.dataset.netvals = netDetails;
+	actionDiv.appendChild(deleteBtn);
+
 	field.append(actionDiv);
 }
 
@@ -510,6 +521,10 @@ async function handleNetworkConfig() {
 
 	d.querySelector("#rate").value = netDetails.split("rate=")[1].split(",")[0];
 }
+
+async function handleNetworkDelete() {} //TODO
+
+async function handleNetworkAdd() {} // TODO
 
 function populateDevices() {
 	if (type === "qemu") {
@@ -548,18 +563,33 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceData) {
 	field.append(deviceLabel);
 
 	let actionDiv = document.createElement("div");
-	let action = document.createElement("img");
-	action.classList.add("clickable");
-	action.src = `images/actions/device/config.svg`;
-	action.title = "Config Device";
-	action.addEventListener("click", handleDeviceConfig);
-	action.dataset.device = deviceID;
-	action.dataset.values = deviceDetails;
-	actionDiv.appendChild(action);
+
+	let configBtn = document.createElement("img");
+	configBtn.classList.add("clickable");
+	configBtn.src = `images/actions/device/config.svg`;
+	configBtn.title = "Config Device";
+	configBtn.addEventListener("click", handleDeviceConfig);
+	configBtn.dataset.device = deviceID;
+	configBtn.dataset.values = deviceDetails;
+	actionDiv.appendChild(configBtn);
+
+	let deleteBtn = document.createElement("img");
+	deleteBtn.classList.add("clickable");
+	deleteBtn.src = `images/actions/delete-active.svg`;
+	deleteBtn.title = "Delete Device";
+	deleteBtn.addEventListener("click", handleDeviceDelete);
+	configBtn.dataset.device = deviceID;
+	configBtn.dataset.values = deviceDetails;
+	actionDiv.appendChild(deleteBtn);
+
 	field.append(actionDiv);
 }
 
-async function handleDeviceConfig() {}
+async function handleDeviceDelete() {} // TODO
+
+async function handleDeviceConfig() {} // TODO
+
+async function handleDeviceAdd() {} // TODO
 
 async function handleFormExit() {
 	let body = {
