@@ -317,7 +317,7 @@ async function handleDiskDelete() {
 				vmid: vmid,
 				disk: this.dataset.disk
 			};
-			let result = await requestAPI("/instance/disk/delete", "POST", body);
+			let result = await requestAPI("/instance/disk/delete", "DELETE", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -506,7 +506,7 @@ async function handleNetworkConfig() {
 				netid: netID,
 				rate: form.get("rate")
 			}
-			let result = await requestAPI("/instance/network", "POST", body);
+			let result = await requestAPI("/instance/network/modify", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateNetworks();
