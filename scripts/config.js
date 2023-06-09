@@ -443,6 +443,8 @@ function populateNetworks() {
 	ordered_keys.forEach((element) => {
 		addNetworkLine("networks", prefix, element, networks[element]);
 	});
+
+	document.querySelector("#network-add").addEventListener("click", handleNetworkAdd)
 }
 
 function addNetworkLine(fieldset, prefix, netID, netDetails) {
@@ -469,7 +471,7 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 
 	let actionDiv = document.createElement("div");
 
-	let configBtn  = document.createElement("img");
+	let configBtn = document.createElement("img");
 	configBtn.classList.add("clickable");
 	configBtn.src = `images/actions/network/config.svg`;
 	configBtn.title = "Config Interface";
@@ -493,7 +495,7 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 async function handleNetworkConfig() {
 	let netID = this.dataset.network;
 	let netDetails = this.dataset.netvals;
-	let header = `Edit ${netID}`;
+	let header = `Edit net${netID}`;
 	let body = `<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">`;
 
 	let d = dialog(header, body, async (result, form) => {
@@ -522,9 +524,66 @@ async function handleNetworkConfig() {
 	d.querySelector("#rate").value = netDetails.split("rate=")[1].split(",")[0];
 }
 
-async function handleNetworkDelete() {} //TODO
+async function handleNetworkDelete() {
+	let netID = this.dataset.network;
+	let header = `Delete net${netID}`;
+	let body = ``;
 
-async function handleNetworkAdd() {} // TODO
+	let d = dialog(header, body, async (result, form) => {
+		if (result === "confirm") {
+			document.querySelector(`img[data-network="${netID}"]`).src = "images/status/loading.svg";
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				netid: netID
+			}
+			let result = await requestAPI("/instance/network/delete", "DELETE", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateNetworks();
+			}
+			else {
+				alert(result.error);
+				await getConfig();
+				populateNetworks();
+			}
+		}
+	});
+}
+
+async function handleNetworkAdd() {
+	let header = `Create Network Interface`;
+	let body = `<label for="netid">Interface ID</label><input type="number" id="netid" name="netid" class="w3-input w3-border"><label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">`;
+	if (type === "lxc") {
+		body += `<label for="name">Interface Name</label><input type="text" id="name" name="name" class="w3-input w3-border"></input>`;
+	}
+
+	let d = dialog(header, body, async (result, form) => {
+		if (result === "confirm") {
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				netid: form.get("netid"),
+				rate: form.get("rate")
+			}
+			if (type === "lxc") {
+				body.name = form.get("name")
+			}
+			let result = await requestAPI("/instance/network/create", "POST", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateNetworks();
+			}
+			else {
+				alert(result.error);
+				await getConfig();
+				populateNetworks();
+			}
+		}
+	});
+}
 
 function populateDevices() {
 	if (type === "qemu") {
@@ -542,6 +601,8 @@ function populateDevices() {
 			let deviceData = await requestAPI(`/instance/pci?node=${node}&type=${type}&vmid=${vmid}&hostpci=${element}`, "GET");
 			addDeviceLine("devices", prefix, element, devices[element], deviceData);
 		});
+
+		document.querySelector("#device-add").addEventListener("click", handleDeviceAdd)
 	}
 }
 
@@ -585,11 +646,11 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceData) {
 	field.append(actionDiv);
 }
 
-async function handleDeviceDelete() {} // TODO
+async function handleDeviceDelete() { } // TODO
 
-async function handleDeviceConfig() {} // TODO
+async function handleDeviceConfig() { } // TODO
 
-async function handleDeviceAdd() {} // TODO
+async function handleDeviceAdd() { } // TODO
 
 async function handleFormExit() {
 	let body = {
