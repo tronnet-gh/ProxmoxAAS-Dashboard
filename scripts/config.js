@@ -133,6 +133,8 @@ function addDiskLine(fieldset, busPrefix, busName, device, diskDetails) {
 	let diskDesc = document.createElement("p");
 	diskDesc.innerText = diskDetails;
 	diskDesc.dataset.disk = diskID;
+	diskDesc.style.overflowX = "hidden";
+	diskDesc.style.whiteSpace = "nowrap";
 	field.append(diskDesc);
 
 	let actionDiv = document.createElement("div");
@@ -467,6 +469,8 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 	netDesc.innerText = netDetails;
 	netDesc.dataset.network = netID;
 	netDesc.dataset.netvals = netDetails;
+	netDesc.style.overflowX = "hidden";
+	netDesc.style.whiteSpace = "nowrap";
 	field.append(netDesc);
 
 	let actionDiv = document.createElement("div");
@@ -621,6 +625,8 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceData) {
 	deviceLabel.innerText = deviceNames.toString();
 	deviceLabel.dataset.device = deviceID;
 	deviceLabel.dataset.values = deviceDetails;
+	deviceLabel.style.overflowX = "hidden";
+	deviceLabel.style.whiteSpace = "nowrap";
 	field.append(deviceLabel);
 
 	let actionDiv = document.createElement("div");
