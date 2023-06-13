@@ -140,16 +140,17 @@ function addDiskLine(fieldset, busPrefix, busName, device, diskDetails) {
 	let actionDiv = document.createElement("div");
 	diskMetaData.actionBarOrder.forEach((element) => {
 		let action = document.createElement("img");
-		action.classList.add("clickable");
 		if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")) { // attach
 			action.src = "images/actions/disk/attach.svg";
 			action.title = "Attach Disk";
 			action.addEventListener("click", handleDiskAttach);
+			action.classList.add("clickable");
 		}
 		else if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")) { // detach
 			action.src = "images/actions/disk/detach.svg";
 			action.title = "Detach Disk";
 			action.addEventListener("click", handleDiskDetach);
+			action.classList.add("clickable");
 		}
 		else if (element === "delete") {
 			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
@@ -157,6 +158,7 @@ function addDiskLine(fieldset, busPrefix, busName, device, diskDetails) {
 			action.title = "Delete Disk";
 			if (active === "active") {
 				action.addEventListener("click", handleDiskDelete);
+				action.classList.add("clickable");
 			}
 		}
 		else {
@@ -170,6 +172,7 @@ function addDiskLine(fieldset, busPrefix, busName, device, diskDetails) {
 				else if (element === "resize") {
 					action.addEventListener("click", handleDiskResize);
 				}
+				action.classList.add("clickable");
 			}
 		}
 		action.dataset.disk = diskID;
