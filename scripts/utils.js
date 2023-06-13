@@ -26,55 +26,106 @@ export const resources_config = {
 
 export const instances_config = {
 	running: {
-		statusSrc: "images/status/active.svg",
-		statusAlt: "Instance is running",
-		powerButtonSrc: "images/actions/instance/stop.svg",
-		powerButtonAlt: "Shutdown Instance",
-		configButtonSrc: "images/actions/instance/config-inactive.svg",
-		configButtonAlt: "Change Configuration (Inactive)",
-		consoleButtonSrc: "images/actions/instance/console-active.svg",
-		consoleButtonAlt: "Open Console",
-		deleteButtonSrc: "images/actions/delete-inactive.svg",
-		deleteButtonAlt: "Delete Instance (Inactive)"
+		status: {
+			src: "images/status/active.svg",
+			alt: "Instance is running",
+			clickable: false
+		},
+		power: {
+			src: "images/actions/instance/stop.svg",
+			alt: "Shutdown Instance",
+			clickable: true,
+		},
+		config: {
+			src: "images/actions/instance/config-inactive.svg",
+			alt: "Change Configuration (Inactive)",
+			clickable: false,
+		},
+		console: {
+			src: "images/actions/instance/console-active.svg",
+			alt: "Open Console",
+			clickable: true,
+		},
+		delete: {
+			src: "images/actions/delete-inactive.svg",
+			alt: "Delete Instance (Inactive)",
+			clickable: false,
+		}
 	},
 	stopped: {
-		statusSrc: "images/status/inactive.svg",
-		statusAlt: "Instance is stopped",
-		powerButtonSrc: "images/actions/instance/start.svg",
-		powerButtonAlt: "Start Instance",
-		configButtonSrc: "images/actions/instance/config-active.svg",
-		configButtonAlt: "Change Configuration",
-		consoleButtonSrc: "images/actions/instance/console-inactive.svg",
-		consoleButtonAlt: "Open Console (Inactive)",
-		deleteButtonSrc: "images/actions/delete-active.svg",
-		deleteButtonAlt: "Delete Instance"
+		status: {
+			src: "images/status/inactive.svg",
+			alt: "Instance is stopped",
+			clickable: false
+		},
+		power: {
+			src: "images/actions/instance/start.svg",
+			alt: "Start Instance",
+			clickable: true,
+		},
+		config: {
+			src: "images/actions/instance/config-active.svg",
+			alt: "Change Configuration",
+			clickable: true,
+		},
+		console: {
+			src: "images/actions/instance/console-inactive.svg",
+			alt: "Open Console (Inactive)",
+			clickable: false,
+		},
+		delete: {
+			src: "images/actions/delete-active.svg",
+			alt: "Delete Instance",
+			clickable: true,
+		}
 	},
 	loading: {
-		statusSrc: "images/status/loading.svg",
-		statusAlt: "Instance is loading",
-		powerButtonSrc: "images/status/loading.svg",
-		powerButtonAlt: "Loading Instance",
-		configButtonSrc: "images/actions/instance/config-inactive.svg",
-		configButtonAlt: "Change Configuration (Inactive)",
-		consoleButtonSrc: "images/actions/instance/console-inactive.svg",
-		consoleButtonAlt: "Open Console (Inactive)",
-		deleteButtonSrc: "images/actions/delete-inactive.svg",
-		deleteButtonAlt: "Delete Instance (Inactive)"
+		status: {
+			src: "images/status/loading.svg",
+			alt: "Instance is loading",
+			clickable: false
+		},
+		power: {
+			src: "images/status/loading.svg",
+			alt: "Loading Instance",
+			clickable: false,
+		},
+		config: {
+			src: "images/actions/instance/config-inactive.svg",
+			alt: "Change Configuration (Inactive)",
+			clickable: false,
+		},
+		console: {
+			src: "images/actions/instance/console-inactive.svg",
+			alt: "Open Console (Inactive)",
+			clickable: false,
+		},
+		delete: {
+			src: "images/actions/delete-inactive.svg",
+			alt: "Delete Instance (Inactive)",
+			clickable: false,
+		}
 	}
 }
 
 export const nodes_config = {
 	online: {
-		statusSrc: "images/status/active.svg",
-		statusAlt: "Node is online",
+		status: {
+			src: "images/status/active.svg",
+			alt: "Node is online"
+		}
 	},
 	offline: {
-		statusSrc: "images/status/inactive.svg",
-		statusAlt: "Node is offline",
+		status: {
+			src: "images/status/inactive.svg",
+			alt: "Node is offline"
+		}
 	},
 	uknown: {
-		statusSrc: "images/status/inactive.svg",
-		statusAlt: "Node status is unknown",
+		status: {
+			src: "images/status/inactive.svg",
+			alt: "Node is offline"
+		}
 	}
 }
 

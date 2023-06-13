@@ -224,10 +224,10 @@ class Instance {
 				<p id="node-status"></p>
 			</div>
 			<div class="w3-col l2 m2 s6 flex row nowrap" style="height: 1lh; margin-top: 15px; margin-bottom: 15px;">
-				<img id="power-btn" class="clickable">
-				<img id="console-btn" class="clickable">
-				<img id="configure-btn" class="clickable">
-				<img id="delete-btn" class="clickable">
+				<img id="power-btn">
+				<img id="console-btn">
+				<img id="configure-btn">
+				<img id="delete-btn">
 			</div>
 		`;
 
@@ -261,8 +261,8 @@ class Instance {
 		statusParagraph.innerText = this.status;
 
 		let statusIcon = this.shadowElement.querySelector("#instance-status-icon");
-		statusIcon.src = instances_config[this.status].statusSrc;
-		statusIcon.alt = instances_config[this.status].statusAlt;
+		statusIcon.src = instances_config[this.status].status.src;
+		statusIcon.alt = instances_config[this.status].status.alt;
 
 		let nodeNameParagraph = this.shadowElement.querySelector("#node-name");
 		nodeNameParagraph.innerText = this.node.name;
@@ -271,32 +271,44 @@ class Instance {
 		nodeStatusParagraph.innerText = this.node.status;
 
 		let nodeStatusIcon = this.shadowElement.querySelector("#node-status-icon");
-		nodeStatusIcon.src = nodes_config[this.node.status].statusSrc;
-		nodeStatusIcon.alt = nodes_config[this.node.status].statusAlt;
+		nodeStatusIcon.src = nodes_config[this.node.status].status.src;
+		nodeStatusIcon.alt = nodes_config[this.node.status].status.src;
 
 		let powerButton = this.shadowElement.querySelector("#power-btn");
-		powerButton.src = instances_config[this.status].powerButtonSrc;
-		powerButton.alt = instances_config[this.status].powerButtonAlt;
-		powerButton.title = instances_config[this.status].powerButtonAlt;
-		powerButton.onclick = this.handlePowerButton.bind(this)
+		powerButton.src = instances_config[this.status].power.src;
+		powerButton.alt = instances_config[this.status].power.alt;
+		powerButton.title = instances_config[this.status].power.alt;
+		if (instances_config[this.status].power.clickable) {
+			powerButton.classList.add("clickable");
+			powerButton.onclick = this.handlePowerButton.bind(this)
+		}
 
 		let configButton = this.shadowElement.querySelector("#configure-btn");
-		configButton.src = instances_config[this.status].configButtonSrc;
-		configButton.alt = instances_config[this.status].configButtonAlt;
-		configButton.title = instances_config[this.status].configButtonAlt;
-		configButton.onclick = this.handleConfigButton.bind(this);
+		configButton.src = instances_config[this.status].config.src;
+		configButton.alt = instances_config[this.status].config.alt;
+		configButton.title = instances_config[this.status].config.alt;
+		if (instances_config[this.status].config.clickable) {
+			configButton.classList.add("clickable");
+			configButton.onclick = this.handleConfigButton.bind(this);
+		}
 
 		let consoleButton = this.shadowElement.querySelector("#console-btn");
-		consoleButton.src = instances_config[this.status].consoleButtonSrc;
-		consoleButton.alt = instances_config[this.status].consoleButtonAlt;
-		consoleButton.title = instances_config[this.status].consoleButtonAlt;
-		consoleButton.onclick = this.handleConsoleButton.bind(this);
+		consoleButton.src = instances_config[this.status].console.src;
+		consoleButton.alt = instances_config[this.status].console.alt;
+		consoleButton.title = instances_config[this.status].console.alt;
+		if (instances_config[this.status].console.clickable) {
+			consoleButton.classList.add("clickable");
+			consoleButton.onclick = this.handleConsoleButton.bind(this);
+		}
 
 		let deleteButton = this.shadowElement.querySelector("#delete-btn");
-		deleteButton.src = instances_config[this.status].deleteButtonSrc;
-		deleteButton.alt = instances_config[this.status].deleteButtonAlt;
-		deleteButton.title = instances_config[this.status].deleteButtonAlt;
-		deleteButton.onclick = this.handleDeleteButton.bind(this);
+		deleteButton.src = instances_config[this.status].delete.src;
+		deleteButton.alt = instances_config[this.status].delete.alt;
+		deleteButton.title = instances_config[this.status].delete.alt;
+		if (instances_config[this.status].delete.clickable) {
+			deleteButton.classList.add("clickable");
+			deleteButton.onclick = this.handleDeleteButton.bind(this);
+		}
 
 		if (this.node.status !== "online") {
 			powerButton.classList.add("hidden");
