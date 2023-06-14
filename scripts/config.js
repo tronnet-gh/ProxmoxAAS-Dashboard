@@ -46,15 +46,17 @@ async function getConfig() {
 function populateResources() {
 	let name = type === "qemu" ? "name" : "hostname";
 	document.querySelector("#name").innerHTML = document.querySelector("#name").innerHTML.replace("%{vmname}", config.data[name]);
-	addResourceLine("resources", "images/resources/cpu.svg", "Cores", { type: "number", value: config.data.cores, min: 1, max: 8192 }, "Threads");
-	addResourceLine("resources", "images/resources/ram.svg", "Memory", { type: "number", value: config.data.memory, min: 16, step: 1 }, "MiB");
-
+	if (type === "qemu") {
+		addResourceLine("resources", "images/resources/cpu.svg", "select", "Processors Type", "proctype", { value: config.data.cpu, options: ["host", "kvm64"] });
+	}
+	addResourceLine("resources", "images/resources/cpu.svg", "input", "Processors Amount", "cores", { type: "number", value: config.data.cores, min: 1, max: 8192 }, "Cores");
+	addResourceLine("resources", "images/resources/ram.svg", "input", "Memory", "ram", { type: "number", value: config.data.memory, min: 16, step: 1 }, "MiB");
 	if (type === "lxc") {
-		addResourceLine("resources", "images/resources/swap.svg", "Swap", { type: "number", value: config.data.swap, min: 0, step: 1 }, "MiB");
+		addResourceLine("resources", "images/resources/swap.svg", "Swap", "swap", { type: "number", value: config.data.swap, min: 0, step: 1 }, "MiB");
 	}
 }
 
-function addResourceLine(fieldset, iconHref, labelText, inputAttr, unitText = null) {
+function addResourceLine(fieldset, iconHref, type, labelText, id, attributes, unitText = null) {
 	let field = document.querySelector(`#${fieldset}`);
 
 	let icon = document.createElement("img");
@@ -67,20 +69,40 @@ function addResourceLine(fieldset, iconHref, labelText, inputAttr, unitText = nu
 	label.htmlFor = labelText;
 	field.append(label);
 
-	let input = document.createElement("input");
-	for (let k in inputAttr) {
-		input.setAttribute(k, inputAttr[k])
+	if (type === "input") {
+		let input = document.createElement("input");
+		for (let k in attributes) {
+			input.setAttribute(k, attributes[k])
+		}
+		input.id = id;
+		input.name = id;
+		input.required = true;
+		input.classList.add("w3-input");
+		input.classList.add("w3-border");
+		field.append(input);
 	}
-	input.id = labelText;
-	input.name = labelText;
-	input.required = true;
-	input.classList.add("w3-input");
-	input.classList.add("w3-border");
-	field.append(input);
+	else if (type === "select") {
+		let select = document.createElement("select");
+		select.value = attributes.value;
+		for (let option of attributes.options) {
+			select.append(new Option(option));
+		}
+		select.id = id;
+		select.name = id;
+		select.required = true;
+		select.classList.add("w3-select");
+		select.classList.add("w3-border");
+		field.append(select);
+	}
 
 	if (unitText) {
 		let unit = document.createElement("p");
 		unit.innerText = unitText;
+		field.append(unit);
+	}
+	else {
+		let unit = document.createElement("div");
+		unit.classList.add("hidden");
 		field.append(unit);
 	}
 }
@@ -666,8 +688,9 @@ async function handleFormExit() {
 		node: node,
 		type: type,
 		vmid: vmid,
-		cores: document.querySelector("#Cores").value,
-		memory: document.querySelector("#Memory").value
+		proctype: document.querySelector("#proctype").value,
+		cores: document.querySelector("#cores").value,
+		memory: document.querySelector("#ram").value
 	}
 	if (type === "lxc") {
 		body.swap = document.querySelector("#Swap").value;
