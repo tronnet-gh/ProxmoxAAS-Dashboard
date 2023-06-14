@@ -43,11 +43,28 @@ async function getConfig() {
 	config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
 }
 
-function populateResources() {
+async function populateResources() {
 	let name = type === "qemu" ? "name" : "hostname";
 	document.querySelector("#name").innerHTML = document.querySelector("#name").innerHTML.replace("%{vmname}", config.data[name]);
 	if (type === "qemu") {
-		addResourceLine("resources", "images/resources/cpu.svg", "select", "Processors Type", "proctype", { value: config.data.cpu, options: ["host", "kvm64"] });
+		let global = await requestAPI("/global/config/resources");
+		let user = await requestAPI("/user/config/resources");
+		let options = [];
+		if (global.cpu.whitelist) {
+			options = user.max.cpu.sort((a,b) => {return a.localeCompare(b)});
+		}
+		else {
+			let supported = await requestPVE(`/nodes/${node}/capabilities/qemu/cpu`);
+			supported.data.forEach((element) => {
+				if (!user.max.cpu.includes(element.name)) {
+					options.push(element.name);
+				}
+			});
+			options = options.sort((a,b) => {return a.localeCompare(b)})
+			console.log(options);
+			console.log("blacklist not yet supported")
+		}
+		addResourceLine("resources", "images/resources/cpu.svg", "select", "Processors Type", "proctype", { value: config.data.cpu, options: options });
 	}
 	addResourceLine("resources", "images/resources/cpu.svg", "input", "Processors Amount", "cores", { type: "number", value: config.data.cores, min: 1, max: 8192 }, "Cores");
 	addResourceLine("resources", "images/resources/ram.svg", "input", "Memory", "ram", { type: "number", value: config.data.memory, min: 16, step: 1 }, "MiB");
@@ -107,7 +124,7 @@ function addResourceLine(fieldset, iconHref, type, labelText, id, attributes, un
 	}
 }
 
-function populateDisk() {
+async function populateDisk() {
 	document.querySelector("#disks").innerHTML = "";
 	for (let i = 0; i < diskMetaData[type].prefixOrder.length; i++) {
 		let prefix = diskMetaData[type].prefixOrder[i];
@@ -457,7 +474,7 @@ async function handleCDAdd() {
 	});
 }
 
-function populateNetworks() {
+async function populateNetworks() {
 	document.querySelector("#networks").innerHTML = "";
 	let networks = {};
 	let prefix = networkMetaData.prefix;
@@ -614,7 +631,7 @@ async function handleNetworkAdd() {
 	});
 }
 
-function populateDevices() {
+async function populateDevices() {
 	if (type === "qemu") {
 		document.querySelector("#devices-card").classList.remove("none");
 		document.querySelector("#devices").innerHTML = "";

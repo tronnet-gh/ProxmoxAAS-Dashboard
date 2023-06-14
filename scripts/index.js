@@ -154,9 +154,9 @@ async function handleInstanceAdd() {
 
 	let nodeSelect = d.querySelector("#node");
 	let clusterNodes = await requestPVE("/nodes", "GET");
-	let allowedNodes = await requestAPI("/user/nodes", "GET");
+	let allowedNodes = await requestAPI("/user/config/nodes", "GET");
 	clusterNodes.data.forEach((element) => {
-		if (element.status === "online" && allowedNodes.nodes.includes(element.node)) {
+		if (element.status === "online" && allowedNodes.includes(element.node)) {
 			nodeSelect.add(new Option(element.node));
 		}
 	});
@@ -190,7 +190,7 @@ async function handleInstanceAdd() {
 	});
 
 	let userResources = await requestAPI("/user/resources", "GET");
-	let userInstances = await requestAPI("/user/instances", "GET");
+	let userInstances = await requestAPI("/user/config/instances", "GET");
 	d.querySelector("#cores").max = userResources.avail.cores;
 	d.querySelector("#memory").max = userResources.avail.memory;
 	d.querySelector("#vmid").min = userInstances.vmid.min;
