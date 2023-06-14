@@ -64,9 +64,9 @@ async function populateResources() {
 			console.log(options);
 			console.log("blacklist not yet supported")
 		}
-		addResourceLine("resources", "images/resources/cpu.svg", "select", "Processors Type", "proctype", { value: config.data.cpu, options: options });
+		addResourceLine("resources", "images/resources/cpu.svg", "select", "CPU Type", "proctype", { value: config.data.cpu, options: options });
 	}
-	addResourceLine("resources", "images/resources/cpu.svg", "input", "Processors Amount", "cores", { type: "number", value: config.data.cores, min: 1, max: 8192 }, "Cores");
+	addResourceLine("resources", "images/resources/cpu.svg", "input", "CPU Amount", "cores", { type: "number", value: config.data.cores, min: 1, max: 8192 }, "Cores");
 	addResourceLine("resources", "images/resources/ram.svg", "input", "Memory", "ram", { type: "number", value: config.data.memory, min: 16, step: 1 }, "MiB");
 	if (type === "lxc") {
 		addResourceLine("resources", "images/resources/swap.svg", "input", "Swap", "swap", { type: "number", value: config.data.swap, min: 0, step: 1 }, "MiB");
