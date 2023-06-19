@@ -31,3 +31,9 @@ fieldset > *:last-child {
 body:not(:-moz-handler-blocked) fieldset {
 	display: table-cell;
 }
+
+input[type="checkbox"] {
+	width: min-content;
+	margin-left: auto;
+	margin-right: auto;
+}
