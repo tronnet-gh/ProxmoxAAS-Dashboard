@@ -51,7 +51,7 @@ async function populateResources() {
 		let user = await requestAPI("/user/config/resources");
 		let options = [];
 		if (global.cpu.whitelist) {
-			options = user.max.cpu.sort((a,b) => {return a.localeCompare(b)});
+			options = user.max.cpu.sort((a, b) => { return a.localeCompare(b) });
 		}
 		else {
 			let supported = await requestPVE(`/nodes/${node}/capabilities/qemu/cpu`);
@@ -60,7 +60,7 @@ async function populateResources() {
 					options.push(element.name);
 				}
 			});
-			options = options.sort((a,b) => {return a.localeCompare(b)})
+			options = options.sort((a, b) => { return a.localeCompare(b) })
 			console.log(options);
 			console.log("blacklist not yet supported")
 		}
@@ -498,19 +498,19 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 	icon.src = "images/resources/network.svg";
 	icon.alt = `${prefix}${netID}`;
 	icon.dataset.network = netID;
-	icon.dataset.netvals = netDetails;
+	icon.dataset.values = netDetails;
 	field.appendChild(icon);
 
 	let netLabel = document.createElement("label");
 	netLabel.innerText = `${prefix}${netID}`;
 	netLabel.dataset.network = netID;
-	netLabel.dataset.netvals = netDetails;
+	netLabel.dataset.values = netDetails;
 	field.append(netLabel);
 
 	let netDesc = document.createElement("p");
 	netDesc.innerText = netDetails;
 	netDesc.dataset.network = netID;
-	netDesc.dataset.netvals = netDetails;
+	netDesc.dataset.values = netDetails;
 	netDesc.style.overflowX = "hidden";
 	netDesc.style.whiteSpace = "nowrap";
 	field.append(netDesc);
@@ -523,7 +523,7 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 	configBtn.title = "Config Interface";
 	configBtn.addEventListener("click", handleNetworkConfig);
 	configBtn.dataset.network = netID;
-	configBtn.dataset.netvals = netDetails;
+	configBtn.dataset.values = netDetails;
 	actionDiv.appendChild(configBtn);
 
 	let deleteBtn = document.createElement("img");
@@ -532,7 +532,7 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 	deleteBtn.title = "Delete Interface";
 	deleteBtn.addEventListener("click", handleNetworkDelete);
 	deleteBtn.dataset.network = netID;
-	deleteBtn.dataset.netvals = netDetails;
+	deleteBtn.dataset.values = netDetails;
 	actionDiv.appendChild(deleteBtn);
 
 	field.append(actionDiv);
@@ -540,7 +540,7 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 
 async function handleNetworkConfig() {
 	let netID = this.dataset.network;
-	let netDetails = this.dataset.netvals;
+	let netDetails = this.dataset.values;
 	let header = `Edit net${netID}`;
 	let body = `<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">`;
 
@@ -694,11 +694,105 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceData) {
 	field.append(actionDiv);
 }
 
-async function handleDeviceDelete() { } // TODO
+async function handleDeviceConfig() {
+	let deviceID = this.dataset.device;
+	let deviceDetails = this.dataset.values;
+	let header = `Edit Device ${deviceID}`;
+	let body = `<label for="device">Device</label><select id="device" name="device"></select><label for="allfn">All Functions</label><input type="checkbox" id="allfn" name="allfn" class="w3-input w3-border"><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">`;
 
-async function handleDeviceConfig() { } // TODO
+	let d = dialog(header, body, async (result, form) => {
+		if (result === "confirm") {
+			document.querySelector(`img[data-device="${deviceID}"]`).src = "images/status/loading.svg";
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				deviceid: deviceID,
+				device: form.get("device"),
+				allfn: form.get("allfn"),
+				pcie: form.get("pcie")
+			}
+			let result = await requestAPI("/instance/pci/modify", "POST", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateDevices();
+			}
+			else {
+				alert(result.error);
+				await getConfig();
+				populateDevices();
+			}
+		}
+	});
 
-async function handleDeviceAdd() { } // TODO
+	let availDevices = await requestAPI(`/nodes/pci?node=${node}`, "GET");
+	for (let availDevice of availDevices) {
+		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.id));
+	}
+	d.querySelector("#allfn").checked = !(deviceDetails.split(",")[0].includes("."));
+	d.querySelector("#pcie").checked = deviceDetails.includes("pcie=1");
+}
+
+async function handleDeviceDelete() {
+	let deviceID = this.dataset.device;
+	let header = `Delete Device ${deviceID}`;
+	let body = ``;
+
+	let d = dialog(header, body, async (result, form) => {
+		if (result === "confirm") {
+			document.querySelector(`img[data-device="${deviceID}"]`).src = "images/status/loading.svg";
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				deviceid: deviceID
+			}
+			let result = await requestAPI("/instance/pci/delete", "DELETE", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateDevices();
+			}
+			else {
+				alert(result.error);
+				await getConfig();
+				populateDevices();
+			}
+		}
+	});
+}
+
+async function handleDeviceAdd() {
+	let header = `Create Device`;
+	let body = `<label for="device">Device</label><select id="device" name="device"></select><label for="allfn">All Functions</label><input type="checkbox" id="allfn" name="allfn" class="w3-input w3-border"><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">`;
+
+	let d = dialog(header, body, async (result, form) => {
+		if (result === "confirm") {
+			let body = {
+				node: node,
+				type: type,
+				vmid: vmid,
+				device: form.get("device"),
+				allfn: form.get("allfn"),
+				pcie: form.get("pcie")
+			}
+			let result = await requestAPI("/instance/pci/create", "POST", body);
+			if (result.status === 200) {
+				await getConfig();
+				populateDevices();
+			}
+			else {
+				alert(result.error);
+				await getConfig();
+				populateDevices();
+			}
+		}
+	});
+	
+	let availDevices = await requestAPI(`/nodes/pci?node=${node}`, "GET");
+	for (let availDevice of availDevices) {
+		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.id));
+	}
+}
 
 async function handleFormExit() {
 	let body = {
