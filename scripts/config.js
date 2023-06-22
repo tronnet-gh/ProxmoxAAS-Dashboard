@@ -645,14 +645,14 @@ async function populateDevices() {
 		let ordered_keys = getOrdered(devices);
 		ordered_keys.forEach(async (element) => {
 			let deviceData = await requestAPI(`/instance/pci?node=${node}&type=${type}&vmid=${vmid}&hostpci=${element}`, "GET");
-			addDeviceLine("devices", prefix, element, devices[element], deviceData);
+			addDeviceLine("devices", prefix, element, devices[element], deviceData.device_name);
 		});
 
 		document.querySelector("#device-add").addEventListener("click", handleDeviceAdd)
 	}
 }
 
-function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceData) {
+function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	let field = document.querySelector(`#${fieldset}`);
 
 	let icon = document.createElement("img");
@@ -660,13 +660,15 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceData) {
 	icon.alt = `${prefix}${deviceID}`;
 	icon.dataset.device = deviceID;
 	icon.dataset.values = deviceDetails;
+	icon.dataset.name = deviceName;
 	field.appendChild(icon);
 
 	let deviceLabel = document.createElement("p");
-	let deviceNames = Array.from(deviceData, element => element.device_name);
-	deviceLabel.innerText = deviceNames.toString();
+	
+	deviceLabel.innerText = deviceName;
 	deviceLabel.dataset.device = deviceID;
 	deviceLabel.dataset.values = deviceDetails;
+	deviceLabel.dataset.name = deviceName;
 	deviceLabel.style.overflowX = "hidden";
 	deviceLabel.style.whiteSpace = "nowrap";
 	field.append(deviceLabel);
@@ -680,6 +682,7 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceData) {
 	configBtn.addEventListener("click", handleDeviceConfig);
 	configBtn.dataset.device = deviceID;
 	configBtn.dataset.values = deviceDetails;
+	configBtn.dataset.name = deviceName;
 	actionDiv.appendChild(configBtn);
 
 	let deleteBtn = document.createElement("img");
@@ -687,8 +690,9 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceData) {
 	deleteBtn.src = `images/actions/delete-active.svg`;
 	deleteBtn.title = "Delete Device";
 	deleteBtn.addEventListener("click", handleDeviceDelete);
-	configBtn.dataset.device = deviceID;
-	configBtn.dataset.values = deviceDetails;
+	deleteBtn.dataset.device = deviceID;
+	deleteBtn.dataset.values = deviceDetails;
+	deleteBtn.dataset.name = deviceName;
 	actionDiv.appendChild(deleteBtn);
 
 	field.append(actionDiv);
@@ -697,8 +701,9 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceData) {
 async function handleDeviceConfig() {
 	let deviceID = this.dataset.device;
 	let deviceDetails = this.dataset.values;
-	let header = `Edit Device ${deviceID}`;
-	let body = `<label for="device">Device</label><select id="device" name="device"></select><label for="allfn">All Functions</label><input type="checkbox" id="allfn" name="allfn" class="w3-input w3-border"><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">`;
+	let deviceName = this.dataset.name;
+	let header = `Edit Expansion Card ${deviceID}`;
+	let body = `<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border" required>`;
 
 	let d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
@@ -707,9 +712,8 @@ async function handleDeviceConfig() {
 				node: node,
 				type: type,
 				vmid: vmid,
-				deviceid: deviceID,
+				hostpci: deviceID,
 				device: form.get("device"),
-				allfn: form.get("allfn"),
 				pcie: form.get("pcie")
 			}
 			let result = await requestAPI("/instance/pci/modify", "POST", body);
@@ -729,13 +733,13 @@ async function handleDeviceConfig() {
 	for (let availDevice of availDevices) {
 		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.id));
 	}
-	d.querySelector("#allfn").checked = !(deviceDetails.split(",")[0].includes("."));
+	d.querySelector("#device").append(new Option(deviceName, deviceID));
 	d.querySelector("#pcie").checked = deviceDetails.includes("pcie=1");
 }
 
 async function handleDeviceDelete() {
 	let deviceID = this.dataset.device;
-	let header = `Delete Device ${deviceID}`;
+	let header = `Remove Expansion Card ${deviceID}`;
 	let body = ``;
 
 	let d = dialog(header, body, async (result, form) => {
@@ -745,7 +749,7 @@ async function handleDeviceDelete() {
 				node: node,
 				type: type,
 				vmid: vmid,
-				deviceid: deviceID
+				hostpci: deviceID
 			}
 			let result = await requestAPI("/instance/pci/delete", "DELETE", body);
 			if (result.status === 200) {
@@ -762,8 +766,8 @@ async function handleDeviceDelete() {
 }
 
 async function handleDeviceAdd() {
-	let header = `Create Device`;
-	let body = `<label for="device">Device</label><select id="device" name="device"></select><label for="allfn">All Functions</label><input type="checkbox" id="allfn" name="allfn" class="w3-input w3-border"><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">`;
+	let header = `Add Expansion Card`;
+	let body = `<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border" required>`;
 
 	let d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
@@ -772,8 +776,7 @@ async function handleDeviceAdd() {
 				type: type,
 				vmid: vmid,
 				device: form.get("device"),
-				allfn: form.get("allfn"),
-				pcie: form.get("pcie")
+				pcie: form.get("pcie") ? 1 : 0
 			}
 			let result = await requestAPI("/instance/pci/create", "POST", body);
 			if (result.status === 200) {
@@ -787,11 +790,12 @@ async function handleDeviceAdd() {
 			}
 		}
 	});
-	
+
 	let availDevices = await requestAPI(`/nodes/pci?node=${node}`, "GET");
 	for (let availDevice of availDevices) {
 		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.id));
 	}
+	d.querySelector("#pcie").checked = true;
 }
 
 async function handleFormExit() {
