@@ -714,7 +714,7 @@ async function handleDeviceConfig() {
 				vmid: vmid,
 				hostpci: deviceID,
 				device: form.get("device"),
-				pcie: form.get("pcie")
+				pcie: form.get("pcie") ? 1 : 0
 			}
 			let result = await requestAPI("/instance/pci/modify", "POST", body);
 			if (result.status === 200) {
