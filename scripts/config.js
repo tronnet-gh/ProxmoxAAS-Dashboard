@@ -703,7 +703,7 @@ async function handleDeviceConfig() {
 	let deviceDetails = this.dataset.values;
 	let deviceName = this.dataset.name;
 	let header = `Edit Expansion Card ${deviceID}`;
-	let body = `<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border" required>`;
+	let body = `<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">`;
 
 	let d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
@@ -730,10 +730,10 @@ async function handleDeviceConfig() {
 	});
 
 	let availDevices = await requestAPI(`/nodes/pci?node=${node}`, "GET");
+	d.querySelector("#device").append(new Option(deviceName, deviceDetails.split(",")[0]));
 	for (let availDevice of availDevices) {
 		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.id));
 	}
-	d.querySelector("#device").append(new Option(deviceName, deviceID));
 	d.querySelector("#pcie").checked = deviceDetails.includes("pcie=1");
 }
 
@@ -767,7 +767,7 @@ async function handleDeviceDelete() {
 
 async function handleDeviceAdd() {
 	let header = `Add Expansion Card`;
-	let body = `<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border" required>`;
+	let body = `<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">`;
 
 	let d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
