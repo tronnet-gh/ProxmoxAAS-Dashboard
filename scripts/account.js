@@ -26,12 +26,11 @@ async function init() {
 		goToPage("login.html");
 	}
 	let resources = await requestAPI("/user/resources");
-	let instances = await requestAPI("/user/config/instances");
+	let instances = await requestAPI("/user/config/cluster");
 	let nodes = await requestAPI("/user/config/nodes");
 	document.querySelector("#username").innerText = `Username: ${getCookie("username")}`;
 	document.querySelector("#pool").innerText = `Pool: ${instances.pool}`;
 	document.querySelector("#vmid").innerText = `VMID Range: ${instances.vmid.min} - ${instances.vmid.max}`;
-	document.querySelector("#vlan").innerText = `VLAN Tag: ${instances.vlan}`;
 	document.querySelector("#nodes").innerText = `Nodes: ${nodes.toString()}`;
 	buildResourceTable(resources, "#resource-table");
 }
