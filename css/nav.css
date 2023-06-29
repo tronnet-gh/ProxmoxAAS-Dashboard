@@ -29,7 +29,7 @@ header {
 
 header h1 {
 	font-size: 18px;
-	margin: 0px;
+	margin: 0;
 	background-color: var(--nav-header-bg-color);
 	color: var(--nav-header-text-color);
 }
@@ -50,8 +50,8 @@ label[for="navtoggle"], #navtoggle {
 	display: none;
 }
 
-@media screen and (min-width: 600px){
-	nav a:hover, nav a[aria-current="true"], nav:hover a[aria-current="true"]:hover {
+@media screen and (width >= 600px){
+	nav a:hover, nav a[aria-current="true"] {
 		color: var(--nav-link-active-text-color);
 		background-color: var(--nav-link-active-bg-color);
 	}
@@ -61,17 +61,18 @@ label[for="navtoggle"], #navtoggle {
 		background-color: var(--nav-bg-color);
 	}
 
+	nav:hover a[aria-current="true"]:hover {
+		color: var(--nav-link-active-text-color);
+		background-color: var(--nav-link-active-bg-color);
+	}
+
 	nav {
 		display: flex;
 		align-items: center;
 	}
-
-	nav {
-		display: flex;
-	}
 }
 
-@media screen and (max-width: 600px){
+@media screen and (width <= 600px){
 	header {
 		display: grid;
 		grid-template-columns: 1fr auto;

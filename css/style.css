@@ -5,7 +5,7 @@
 	--main-bg-color: #404040;
 	--main-text-color: white;
 	--main-card-bg-color: #202020;
-	--main-card-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.8), 0 2px 10px 0 rgba(0,0,0,0.8);
+	--main-card-box-shadow: 0 2px 5px 0 rgb(0 0 0 / 80%), 0 2px 10px 0 rgb(0 0 0 / 80%);
 	--main-table-header-bg-color: black;
 	--main-input-bg-color: #404040;
 }
@@ -15,7 +15,7 @@
 		--main-bg-color: white;
 		--main-text-color: black;
 		--main-card-bg-color: white;
-		--main-card-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.2), 0 2px 10px 0 rgba(0,0,0,0.2);
+		--main-card-box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%), 0 2px 10px 0 rgb(0 0 0 / 20%);
 		--main-table-header-bg-color: #808080;
 		--main-input-bg-color: white;
 	}
@@ -25,7 +25,7 @@ html {
 	box-sizing: border-box;
 }
 
-h1, h2, h3, h3, h4, h5, h6, p, a, label, button, input, select, td {
+h1, h2, h3, h4, h5, h6, p, a, label, button, input, select, td {
 	font-family: monospace;
 }
 
