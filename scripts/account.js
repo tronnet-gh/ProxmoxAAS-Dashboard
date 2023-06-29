@@ -42,8 +42,6 @@ function buildResourceTable (resources, tableid) {
 		Object.keys(resources.resources).forEach((element) => {
 			if (resources.resources[element].display) {
 				if (resources.resources[element].type === "list") {
-					// TODO
-					console.error("Unimplemented");
 				}
 				else {
 					const row = tbody.insertRow();
