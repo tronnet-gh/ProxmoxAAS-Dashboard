@@ -37,6 +37,7 @@ header h1 {
 nav {
 	overflow: hidden;
 	font-size: larger;
+	width: fit-content;
 }
 
 nav a, header h1, label[for="navtoggle"] {
