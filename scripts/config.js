@@ -1,25 +1,25 @@
-import { requestPVE, requestAPI, goToPage, getURIData, resources_config, setTitleAndHeader } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, getURIData, resourcesConfig, setTitleAndHeader } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
 
-let diskMetaData = resources_config.disk;
-let networkMetaData = resources_config.network;
-let pcieMetaData = resources_config.pcie;
+const diskMetaData = resourcesConfig.disk;
+const networkMetaData = resourcesConfig.network;
+const pcieMetaData = resourcesConfig.pcie;
 
 let node;
 let type;
 let vmid;
 let config;
 
-async function init() {
+async function init () {
 	setTitleAndHeader();
-	let cookie = document.cookie;
+	const cookie = document.cookie;
 	if (cookie === "") {
 		goToPage("login.html");
 	}
 
-	let uriData = getURIData();
+	const uriData = getURIData();
 	node = uriData.node;
 	type = uriData.type;
 	vmid = uriData.vmid;
@@ -34,37 +34,43 @@ async function init() {
 	document.querySelector("#exit").addEventListener("click", handleFormExit);
 }
 
-function getOrdered(keys) {
-	let ordered_keys = Object.keys(keys).sort((a, b) => { parseInt(a) - parseInt(b) }); // ordered integer list
-	return ordered_keys;
+function getOrdered (keys) {
+	const orderedKeys = Object.keys(keys).sort((a, b) => {
+		return parseInt(a) - parseInt(b);
+	}); // ordered integer list
+	return orderedKeys;
 }
 
-async function getConfig() {
+async function getConfig () {
 	config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
 }
 
-async function populateResources() {
-	let name = type === "qemu" ? "name" : "hostname";
+async function populateResources () {
+	const name = type === "qemu" ? "name" : "hostname";
 	document.querySelector("#name").innerHTML = document.querySelector("#name").innerHTML.replace("%{vmname}", config.data[name]);
 	if (type === "qemu") {
-		let global = await requestAPI("/global/config/resources");
-		let user = await requestAPI("/user/config/resources");
+		const global = await requestAPI("/global/config/resources");
+		const user = await requestAPI("/user/config/resources");
 		let options = [];
 		if (global.cpu.whitelist) {
-			options = user.max.cpu.sort((a, b) => { return a.localeCompare(b) });
+			options = user.max.cpu.sort((a, b) => {
+				return a.localeCompare(b);
+			});
 		}
 		else {
-			let supported = await requestPVE(`/nodes/${node}/capabilities/qemu/cpu`);
+			const supported = await requestPVE(`/nodes/${node}/capabilities/qemu/cpu`);
 			supported.data.forEach((element) => {
 				if (!user.max.cpu.includes(element.name)) {
 					options.push(element.name);
 				}
 			});
-			options = options.sort((a, b) => { return a.localeCompare(b) })
+			options = options.sort((a, b) => {
+				return a.localeCompare(b);
+			});
 			console.log(options);
-			console.log("blacklist not yet supported")
+			console.log("blacklist not yet supported");
 		}
-		addResourceLine("resources", "images/resources/cpu.svg", "select", "CPU Type", "proctype", { value: config.data.cpu, options: options });
+		addResourceLine("resources", "images/resources/cpu.svg", "select", "CPU Type", "proctype", { value: config.data.cpu, options });
 	}
 	addResourceLine("resources", "images/resources/cpu.svg", "input", "CPU Amount", "cores", { type: "number", value: config.data.cores, min: 1, max: 8192 }, "Cores");
 	addResourceLine("resources", "images/resources/ram.svg", "input", "Memory", "ram", { type: "number", value: config.data.memory, min: 16, step: 1 }, "MiB");
@@ -73,23 +79,23 @@ async function populateResources() {
 	}
 }
 
-function addResourceLine(fieldset, iconHref, type, labelText, id, attributes, unitText = null) {
-	let field = document.querySelector(`#${fieldset}`);
+function addResourceLine (fieldset, iconHref, type, labelText, id, attributes, unitText = null) {
+	const field = document.querySelector(`#${fieldset}`);
 
-	let icon = document.createElement("img");
+	const icon = document.createElement("img");
 	icon.src = iconHref;
 	icon.alt = labelText;
 	field.append(icon);
 
-	let label = document.createElement("label");
+	const label = document.createElement("label");
 	label.innerText = labelText;
 	label.htmlFor = labelText;
 	field.append(label);
 
 	if (type === "input") {
-		let input = document.createElement("input");
-		for (let k in attributes) {
-			input.setAttribute(k, attributes[k])
+		const input = document.createElement("input");
+		for (const k in attributes) {
+			input.setAttribute(k, attributes[k]);
 		}
 		input.id = id;
 		input.name = id;
@@ -99,8 +105,8 @@ function addResourceLine(fieldset, iconHref, type, labelText, id, attributes, un
 		field.append(input);
 	}
 	else if (type === "select") {
-		let select = document.createElement("select");
-		for (let option of attributes.options) {
+		const select = document.createElement("select");
+		for (const option of attributes.options) {
 			select.append(new Option(option));
 		}
 		select.value = attributes.value;
@@ -113,31 +119,31 @@ function addResourceLine(fieldset, iconHref, type, labelText, id, attributes, un
 	}
 
 	if (unitText) {
-		let unit = document.createElement("p");
+		const unit = document.createElement("p");
 		unit.innerText = unitText;
 		field.append(unit);
 	}
 	else {
-		let unit = document.createElement("div");
+		const unit = document.createElement("div");
 		unit.classList.add("hidden");
 		field.append(unit);
 	}
 }
 
-async function populateDisk() {
+async function populateDisk () {
 	document.querySelector("#disks").innerHTML = "";
 	for (let i = 0; i < diskMetaData[type].prefixOrder.length; i++) {
-		let prefix = diskMetaData[type].prefixOrder[i];
-		let busName = diskMetaData[type][prefix].name;
-		let disks = {};
+		const prefix = diskMetaData[type].prefixOrder[i];
+		const busName = diskMetaData[type][prefix].name;
+		const disks = {};
 		Object.keys(config.data).forEach((element) => {
 			if (element.startsWith(prefix)) {
 				disks[element.replace(prefix, "")] = config.data[element];
 			}
 		});
-		let ordered_keys = getOrdered(disks);
-		ordered_keys.forEach((element) => {
-			let disk = disks[element];
+		const orderedKeys = getOrdered(disks);
+		orderedKeys.forEach((element) => {
+			const disk = disks[element];
 			addDiskLine("disks", prefix, busName, element, disk);
 		});
 	}
@@ -149,36 +155,36 @@ async function populateDisk() {
 	}
 }
 
-function addDiskLine(fieldset, busPrefix, busName, device, diskDetails) {
-	let field = document.querySelector(`#${fieldset}`);
+function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
+	const field = document.querySelector(`#${fieldset}`);
 
-	let diskName = `${busName} ${device}`;
-	let diskID = `${busPrefix}${device}`;
+	const diskName = `${busName} ${device}`;
+	const diskID = `${busPrefix}${device}`;
 
 	// Set the disk icon, either drive.svg or disk.svg
-	let icon = document.createElement("img");
+	const icon = document.createElement("img");
 	icon.src = diskMetaData[type][busPrefix].icon;
 	icon.alt = diskName;
 	icon.dataset.disk = diskID;
 	field.append(icon);
 
 	// Add a label for the disk bus and device number
-	let diskLabel = document.createElement("label");
+	const diskLabel = document.createElement("label");
 	diskLabel.innerText = diskName;
 	diskLabel.dataset.disk = diskID;
 	field.append(diskLabel);
 
 	// Add text of the disk configuration
-	let diskDesc = document.createElement("p");
+	const diskDesc = document.createElement("p");
 	diskDesc.innerText = diskDetails;
 	diskDesc.dataset.disk = diskID;
 	diskDesc.style.overflowX = "hidden";
 	diskDesc.style.whiteSpace = "nowrap";
 	field.append(diskDesc);
 
-	let actionDiv = document.createElement("div");
+	const actionDiv = document.createElement("div");
 	diskMetaData.actionBarOrder.forEach((element) => {
-		let action = document.createElement("img");
+		const action = document.createElement("img");
 		if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")) { // attach
 			action.src = "images/actions/disk/attach.svg";
 			action.title = "Attach Disk";
@@ -192,7 +198,7 @@ function addDiskLine(fieldset, busPrefix, busName, device, diskDetails) {
 			action.classList.add("clickable");
 		}
 		else if (element === "delete") {
-			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
+			const active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
 			action.src = `images/actions/delete-${active}.svg`;
 			action.title = "Delete Disk";
 			if (active === "active") {
@@ -201,7 +207,7 @@ function addDiskLine(fieldset, busPrefix, busName, device, diskDetails) {
 			}
 		}
 		else {
-			let active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
+			const active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
 			action.src = `images/actions/disk/${element}-${active}.svg`;
 			if (active === "active") {
 				action.title = `${element.charAt(0).toUpperCase()}${element.slice(1)} Disk`;
@@ -221,19 +227,19 @@ function addDiskLine(fieldset, busPrefix, busName, device, diskDetails) {
 	field.append(actionDiv);
 }
 
-async function handleDiskDetach() {
-	let header = `Detach ${this.dataset.disk}`;
-	let body = `<p>Are you sure you want to detach disk</p><p>${this.dataset.disk}</p>`;
+async function handleDiskDetach () {
+	const header = `Detach ${this.dataset.disk}`;
+	const body = `<p>Are you sure you want to detach disk</p><p>${this.dataset.disk}</p>`;
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				disk: this.dataset.disk
 			};
-			let result = await requestAPI("/instance/disk/detach", "POST", body);
+			const result = await requestAPI("/instance/disk/detach", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -247,22 +253,22 @@ async function handleDiskDetach() {
 	});
 }
 
-async function handleDiskAttach() {
-	let header = `Attach ${this.dataset.disk}`;
-	let body = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required></input>`;
+async function handleDiskAttach () {
+	const header = `Attach ${this.dataset.disk}`;
+	const body = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required></input>`;
 
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			let device = form.get("device");
+			const device = form.get("device");
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				disk: `${type === "qemu" ? "sata" : "mp"}${device}`,
 				source: this.dataset.disk.replace("unused", "")
-			}
-			let result = await requestAPI("/instance/disk/attach", "POST", body);
+			};
+			const result = await requestAPI("/instance/disk/attach", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -276,21 +282,21 @@ async function handleDiskAttach() {
 	});
 }
 
-async function handleDiskResize() {
-	let header = `Resize ${this.dataset.disk}`;
-	let body = `<label for="size-increment">Size Increment (GiB)</label><input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072"></input>`;
+async function handleDiskResize () {
+	const header = `Resize ${this.dataset.disk}`;
+	const body = "<label for=\"size-increment\">Size Increment (GiB)</label><input class=\"w3-input w3-border\" name=\"size-increment\" id=\"size-increment\" type=\"number\" min=\"0\" max=\"131072\"></input>";
 
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				disk: this.dataset.disk,
 				size: form.get("size-increment")
-			}
-			let result = await requestAPI("/instance/disk/resize", "POST", body);
+			};
+			const result = await requestAPI("/instance/disk/resize", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -304,11 +310,11 @@ async function handleDiskResize() {
 	});
 }
 
-async function handleDiskMove() {
-	let content = type === "qemu" ? "images" : "rootdir";
-	let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
+async function handleDiskMove () {
+	const content = type === "qemu" ? "images" : "rootdir";
+	const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
 
-	let header = `Move ${this.dataset.disk}`;
+	const header = `Move ${this.dataset.disk}`;
 
 	let options = "";
 	storage.data.forEach((element) => {
@@ -316,9 +322,9 @@ async function handleDiskMove() {
 			options += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	let select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select"><option hidden disabled selected value></option>${options}</select>`;
+	const select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select"><option hidden disabled selected value></option>${options}</select>`;
 
-	let body = `
+	const body = `
 		${select}
 		<label for="delete-check">Delete Source</label><input class="w3-input w3-border" name="delete-check" id="delete-check" type="checkbox" checked required>
 	`;
@@ -326,15 +332,15 @@ async function handleDiskMove() {
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				disk: this.dataset.disk,
 				storage: form.get("storage-select"),
 				delete: form.get("delete-check") === "on" ? "1" : "0"
-			}
-			let result = await requestAPI("/instance/disk/move", "POST", body);
+			};
+			const result = await requestAPI("/instance/disk/move", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -348,20 +354,20 @@ async function handleDiskMove() {
 	});
 }
 
-async function handleDiskDelete() {
-	let header = `Delete ${this.dataset.disk}`;
-	let body = `<p>Are you sure you want to <strong>delete</strong> disk</p><p>${this.dataset.disk}</p>`;
+async function handleDiskDelete () {
+	const header = `Delete ${this.dataset.disk}`;
+	const body = `<p>Are you sure you want to <strong>delete</strong> disk</p><p>${this.dataset.disk}</p>`;
 
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				disk: this.dataset.disk
 			};
-			let result = await requestAPI("/instance/disk/delete", "DELETE", body);
+			const result = await requestAPI("/instance/disk/delete", "DELETE", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -375,11 +381,11 @@ async function handleDiskDelete() {
 	});
 }
 
-async function handleDiskAdd() {
-	let content = type === "qemu" ? "images" : "rootdir";
-	let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
+async function handleDiskAdd () {
+	const content = type === "qemu" ? "images" : "rootdir";
+	const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
 
-	let header = "Create New Disk";
+	const header = "Create New Disk";
 
 	let options = "";
 	storage.data.forEach((element) => {
@@ -387,9 +393,9 @@ async function handleDiskAdd() {
 			options += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	let select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required><option hidden disabled selected value></option>${options}</select>`;
+	const select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required><option hidden disabled selected value></option>${options}</select>`;
 
-	let body = `
+	const body = `
 		<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required></input>
 		${select}
 		<label for="size">Size (GiB)</label><input class="w3-input w3-border" name="size" id="size" type="number" min="0" max="131072" required></input>
@@ -397,15 +403,15 @@ async function handleDiskAdd() {
 
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				disk: `${type === "qemu" ? "sata" : "mp"}${form.get("device")}`,
 				storage: form.get("storage-select"),
 				size: form.get("size")
 			};
-			let result = await requestAPI("/instance/disk/create", "POST", body);
+			const result = await requestAPI("/instance/disk/create", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -419,11 +425,11 @@ async function handleDiskAdd() {
 	});
 }
 
-async function handleCDAdd() {
-	let content = "iso";
-	let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
+async function handleCDAdd () {
+	const content = "iso";
+	const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
 
-	let header = `Add a CDROM`;
+	const header = "Add a CDROM";
 
 	let storageOptions = "";
 	storage.data.forEach((element) => {
@@ -431,24 +437,24 @@ async function handleCDAdd() {
 			storageOptions += `<option value="${element.storage}">${element.storage}</option>"`;
 		}
 	});
-	let storageSelect = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required><option hidden disabled selected value></option>${storageOptions}</select>`;
+	const storageSelect = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required><option hidden disabled selected value></option>${storageOptions}</select>`;
 
-	let body = `
+	const body = `
 		<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required></input>
 		${storageSelect}
 		<label for="iso-select">Image</label><select class="w3-select w3-border" name="iso-select" id="iso-select" required></select>
 	`;
 
-	let d = dialog(header, body, async (result, form) => {
+	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				disk: `ide${form.get("device")}`,
 				iso: form.get("iso-select")
 			};
-			let result = await requestAPI("/instance/disk/create", "POST", body);
+			const result = await requestAPI("/instance/disk/create", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -462,10 +468,10 @@ async function handleCDAdd() {
 	});
 
 	d.querySelector("#storage-select").addEventListener("change", async () => {
-		let storage = document.querySelector("#storage-select").value;
-		let ISOSelect = document.querySelector("#iso-select");
-		ISOSelect.innerHTML = `<option hidden disabled selected value></option>`;
-		let isos = await requestPVE(`/nodes/${node}/storage/${storage}/content`, "GET", { content: content });
+		const storage = document.querySelector("#storage-select").value;
+		const ISOSelect = document.querySelector("#iso-select");
+		ISOSelect.innerHTML = "<option hidden disabled selected value></option>";
+		const isos = await requestPVE(`/nodes/${node}/storage/${storage}/content`, "GET", { content });
 		isos.data.forEach((element) => {
 			if (element.content.includes(content)) {
 				ISOSelect.append(new Option(element.volid.replace(`${storage}:${content}/`, ""), element.volid));
@@ -474,40 +480,40 @@ async function handleCDAdd() {
 	});
 }
 
-async function populateNetworks() {
+async function populateNetworks () {
 	document.querySelector("#networks").innerHTML = "";
-	let networks = {};
-	let prefix = networkMetaData.prefix;
+	const networks = {};
+	const prefix = networkMetaData.prefix;
 	Object.keys(config.data).forEach((element) => {
 		if (element.startsWith(prefix)) {
 			networks[element.replace(prefix, "")] = config.data[element];
 		}
 	});
-	let ordered_keys = getOrdered(networks);
-	ordered_keys.forEach((element) => {
+	const orderedKeys = getOrdered(networks);
+	orderedKeys.forEach((element) => {
 		addNetworkLine("networks", prefix, element, networks[element]);
 	});
 
-	document.querySelector("#network-add").addEventListener("click", handleNetworkAdd)
+	document.querySelector("#network-add").addEventListener("click", handleNetworkAdd);
 }
 
-function addNetworkLine(fieldset, prefix, netID, netDetails) {
-	let field = document.querySelector(`#${fieldset}`);
+function addNetworkLine (fieldset, prefix, netID, netDetails) {
+	const field = document.querySelector(`#${fieldset}`);
 
-	let icon = document.createElement("img");
+	const icon = document.createElement("img");
 	icon.src = "images/resources/network.svg";
 	icon.alt = `${prefix}${netID}`;
 	icon.dataset.network = netID;
 	icon.dataset.values = netDetails;
 	field.appendChild(icon);
 
-	let netLabel = document.createElement("label");
+	const netLabel = document.createElement("label");
 	netLabel.innerText = `${prefix}${netID}`;
 	netLabel.dataset.network = netID;
 	netLabel.dataset.values = netDetails;
 	field.append(netLabel);
 
-	let netDesc = document.createElement("p");
+	const netDesc = document.createElement("p");
 	netDesc.innerText = netDetails;
 	netDesc.dataset.network = netID;
 	netDesc.dataset.values = netDetails;
@@ -515,20 +521,20 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 	netDesc.style.whiteSpace = "nowrap";
 	field.append(netDesc);
 
-	let actionDiv = document.createElement("div");
+	const actionDiv = document.createElement("div");
 
-	let configBtn = document.createElement("img");
+	const configBtn = document.createElement("img");
 	configBtn.classList.add("clickable");
-	configBtn.src = `images/actions/network/config.svg`;
+	configBtn.src = "images/actions/network/config.svg";
 	configBtn.title = "Config Interface";
 	configBtn.addEventListener("click", handleNetworkConfig);
 	configBtn.dataset.network = netID;
 	configBtn.dataset.values = netDetails;
 	actionDiv.appendChild(configBtn);
 
-	let deleteBtn = document.createElement("img");
+	const deleteBtn = document.createElement("img");
 	deleteBtn.classList.add("clickable");
-	deleteBtn.src = `images/actions/delete-active.svg`;
+	deleteBtn.src = "images/actions/delete-active.svg";
 	deleteBtn.title = "Delete Interface";
 	deleteBtn.addEventListener("click", handleNetworkDelete);
 	deleteBtn.dataset.network = netID;
@@ -538,23 +544,23 @@ function addNetworkLine(fieldset, prefix, netID, netDetails) {
 	field.append(actionDiv);
 }
 
-async function handleNetworkConfig() {
-	let netID = this.dataset.network;
-	let netDetails = this.dataset.values;
-	let header = `Edit net${netID}`;
-	let body = `<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">`;
+async function handleNetworkConfig () {
+	const netID = this.dataset.network;
+	const netDetails = this.dataset.values;
+	const header = `Edit net${netID}`;
+	const body = "<label for=\"rate\">Rate Limit (MB/s)</label><input type=\"number\" id=\"rate\" name=\"rate\" class=\"w3-input w3-border\">";
 
-	let d = dialog(header, body, async (result, form) => {
+	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-network="${netID}"]`).src = "images/status/loading.svg";
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				netid: netID,
 				rate: form.get("rate")
-			}
-			let result = await requestAPI("/instance/network/modify", "POST", body);
+			};
+			const result = await requestAPI("/instance/network/modify", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateNetworks();
@@ -570,21 +576,21 @@ async function handleNetworkConfig() {
 	d.querySelector("#rate").value = netDetails.split("rate=")[1].split(",")[0];
 }
 
-async function handleNetworkDelete() {
-	let netID = this.dataset.network;
-	let header = `Delete net${netID}`;
-	let body = ``;
+async function handleNetworkDelete () {
+	const netID = this.dataset.network;
+	const header = `Delete net${netID}`;
+	const body = "";
 
-	let d = dialog(header, body, async (result, form) => {
+	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-network="${netID}"]`).src = "images/status/loading.svg";
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				netid: netID
-			}
-			let result = await requestAPI("/instance/network/delete", "DELETE", body);
+			};
+			const result = await requestAPI("/instance/network/delete", "DELETE", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateNetworks();
@@ -598,26 +604,26 @@ async function handleNetworkDelete() {
 	});
 }
 
-async function handleNetworkAdd() {
-	let header = `Create Network Interface`;
-	let body = `<label for="netid">Interface ID</label><input type="number" id="netid" name="netid" class="w3-input w3-border"><label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">`;
+async function handleNetworkAdd () {
+	const header = "Create Network Interface";
+	let body = "<label for=\"netid\">Interface ID</label><input type=\"number\" id=\"netid\" name=\"netid\" class=\"w3-input w3-border\"><label for=\"rate\">Rate Limit (MB/s)</label><input type=\"number\" id=\"rate\" name=\"rate\" class=\"w3-input w3-border\">";
 	if (type === "lxc") {
-		body += `<label for="name">Interface Name</label><input type="text" id="name" name="name" class="w3-input w3-border"></input>`;
+		body += "<label for=\"name\">Interface Name</label><input type=\"text\" id=\"name\" name=\"name\" class=\"w3-input w3-border\"></input>";
 	}
 
-	let d = dialog(header, body, async (result, form) => {
+	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				netid: form.get("netid"),
 				rate: form.get("rate")
-			}
+			};
 			if (type === "lxc") {
-				body.name = form.get("name")
+				body.name = form.get("name");
 			}
-			let result = await requestAPI("/instance/network/create", "POST", body);
+			const result = await requestAPI("/instance/network/create", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateNetworks();
@@ -631,31 +637,31 @@ async function handleNetworkAdd() {
 	});
 }
 
-async function populateDevices() {
+async function populateDevices () {
 	if (type === "qemu") {
 		document.querySelector("#devices-card").classList.remove("none");
 		document.querySelector("#devices").innerHTML = "";
-		let devices = {};
-		let prefix = pcieMetaData.prefix;
+		const devices = {};
+		const prefix = pcieMetaData.prefix;
 		Object.keys(config.data).forEach((element) => {
 			if (element.startsWith(prefix)) {
 				devices[element.replace(prefix, "")] = config.data[element];
 			}
 		});
-		let ordered_keys = getOrdered(devices);
-		ordered_keys.forEach(async (element) => {
-			let deviceData = await requestAPI(`/instance/pci?node=${node}&type=${type}&vmid=${vmid}&hostpci=${element}`, "GET");
+		const orderedKeys = getOrdered(devices);
+		orderedKeys.forEach(async (element) => {
+			const deviceData = await requestAPI(`/instance/pci?node=${node}&type=${type}&vmid=${vmid}&hostpci=${element}`, "GET");
 			addDeviceLine("devices", prefix, element, devices[element], deviceData.device_name);
 		});
 
-		document.querySelector("#device-add").addEventListener("click", handleDeviceAdd)
+		document.querySelector("#device-add").addEventListener("click", handleDeviceAdd);
 	}
 }
 
-function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceName) {
-	let field = document.querySelector(`#${fieldset}`);
+function addDeviceLine (fieldset, prefix, deviceID, deviceDetails, deviceName) {
+	const field = document.querySelector(`#${fieldset}`);
 
-	let icon = document.createElement("img");
+	const icon = document.createElement("img");
 	icon.src = "images/resources/device.svg";
 	icon.alt = `${prefix}${deviceID}`;
 	icon.dataset.device = deviceID;
@@ -663,8 +669,8 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	icon.dataset.name = deviceName;
 	field.appendChild(icon);
 
-	let deviceLabel = document.createElement("p");
-	
+	const deviceLabel = document.createElement("p");
+
 	deviceLabel.innerText = deviceName;
 	deviceLabel.dataset.device = deviceID;
 	deviceLabel.dataset.values = deviceDetails;
@@ -673,11 +679,11 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	deviceLabel.style.whiteSpace = "nowrap";
 	field.append(deviceLabel);
 
-	let actionDiv = document.createElement("div");
+	const actionDiv = document.createElement("div");
 
-	let configBtn = document.createElement("img");
+	const configBtn = document.createElement("img");
 	configBtn.classList.add("clickable");
-	configBtn.src = `images/actions/device/config.svg`;
+	configBtn.src = "images/actions/device/config.svg";
 	configBtn.title = "Config Device";
 	configBtn.addEventListener("click", handleDeviceConfig);
 	configBtn.dataset.device = deviceID;
@@ -685,9 +691,9 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	configBtn.dataset.name = deviceName;
 	actionDiv.appendChild(configBtn);
 
-	let deleteBtn = document.createElement("img");
+	const deleteBtn = document.createElement("img");
 	deleteBtn.classList.add("clickable");
-	deleteBtn.src = `images/actions/delete-active.svg`;
+	deleteBtn.src = "images/actions/delete-active.svg";
 	deleteBtn.title = "Delete Device";
 	deleteBtn.addEventListener("click", handleDeviceDelete);
 	deleteBtn.dataset.device = deviceID;
@@ -698,25 +704,25 @@ function addDeviceLine(fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	field.append(actionDiv);
 }
 
-async function handleDeviceConfig() {
-	let deviceID = this.dataset.device;
-	let deviceDetails = this.dataset.values;
-	let deviceName = this.dataset.name;
-	let header = `Edit Expansion Card ${deviceID}`;
-	let body = `<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">`;
+async function handleDeviceConfig () {
+	const deviceID = this.dataset.device;
+	const deviceDetails = this.dataset.values;
+	const deviceName = this.dataset.name;
+	const header = `Edit Expansion Card ${deviceID}`;
+	const body = "<label for=\"device\">Device</label><select id=\"device\" name=\"device\" required></select><label for=\"pcie\">PCI-Express</label><input type=\"checkbox\" id=\"pcie\" name=\"pcie\" class=\"w3-input w3-border\">";
 
-	let d = dialog(header, body, async (result, form) => {
+	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-device="${deviceID}"]`).src = "images/status/loading.svg";
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				hostpci: deviceID,
 				device: form.get("device"),
 				pcie: form.get("pcie") ? 1 : 0
-			}
-			let result = await requestAPI("/instance/pci/modify", "POST", body);
+			};
+			const result = await requestAPI("/instance/pci/modify", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDevices();
@@ -729,29 +735,29 @@ async function handleDeviceConfig() {
 		}
 	});
 
-	let availDevices = await requestAPI(`/nodes/pci?node=${node}`, "GET");
+	const availDevices = await requestAPI(`/nodes/pci?node=${node}`, "GET");
 	d.querySelector("#device").append(new Option(deviceName, deviceDetails.split(",")[0]));
-	for (let availDevice of availDevices) {
+	for (const availDevice of availDevices) {
 		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.id));
 	}
 	d.querySelector("#pcie").checked = deviceDetails.includes("pcie=1");
 }
 
-async function handleDeviceDelete() {
-	let deviceID = this.dataset.device;
-	let header = `Remove Expansion Card ${deviceID}`;
-	let body = ``;
+async function handleDeviceDelete () {
+	const deviceID = this.dataset.device;
+	const header = `Remove Expansion Card ${deviceID}`;
+	const body = "";
 
-	let d = dialog(header, body, async (result, form) => {
+	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-device="${deviceID}"]`).src = "images/status/loading.svg";
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				hostpci: deviceID
-			}
-			let result = await requestAPI("/instance/pci/delete", "DELETE", body);
+			};
+			const result = await requestAPI("/instance/pci/delete", "DELETE", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDevices();
@@ -765,20 +771,20 @@ async function handleDeviceDelete() {
 	});
 }
 
-async function handleDeviceAdd() {
-	let header = `Add Expansion Card`;
-	let body = `<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">`;
+async function handleDeviceAdd () {
+	const header = "Add Expansion Card";
+	const body = "<label for=\"device\">Device</label><select id=\"device\" name=\"device\" required></select><label for=\"pcie\">PCI-Express</label><input type=\"checkbox\" id=\"pcie\" name=\"pcie\" class=\"w3-input w3-border\">";
 
-	let d = dialog(header, body, async (result, form) => {
+	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			let body = {
-				node: node,
-				type: type,
-				vmid: vmid,
+			const body = {
+				node,
+				type,
+				vmid,
 				device: form.get("device"),
 				pcie: form.get("pcie") ? 1 : 0
-			}
-			let result = await requestAPI("/instance/pci/create", "POST", body);
+			};
+			const result = await requestAPI("/instance/pci/create", "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDevices();
@@ -791,28 +797,28 @@ async function handleDeviceAdd() {
 		}
 	});
 
-	let availDevices = await requestAPI(`/nodes/pci?node=${node}`, "GET");
-	for (let availDevice of availDevices) {
+	const availDevices = await requestAPI(`/nodes/pci?node=${node}`, "GET");
+	for (const availDevice of availDevices) {
 		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.id));
 	}
 	d.querySelector("#pcie").checked = true;
 }
 
-async function handleFormExit() {
-	let body = {
-		node: node,
-		type: type,
-		vmid: vmid,
+async function handleFormExit () {
+	const body = {
+		node,
+		type,
+		vmid,
 		cores: document.querySelector("#cores").value,
 		memory: document.querySelector("#ram").value
-	}
+	};
 	if (type === "lxc") {
 		body.swap = document.querySelector("#swap").value;
 	}
 	else if (type === "qemu") {
 		body.proctype = document.querySelector("#proctype").value;
 	}
-	let result = await requestAPI("/instance/resources", "POST", body);
+	const result = await requestAPI("/instance/resources", "POST", body);
 	if (result.status === 200) {
 		await getConfig();
 		populateDisk();

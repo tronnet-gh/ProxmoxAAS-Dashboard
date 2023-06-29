@@ -2,7 +2,7 @@ import { requestAPI, goToPage, getCookie, setTitleAndHeader } from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
-let prefixes = {
+const prefixes = {
 	1024: [
 		"",
 		"Ki",
@@ -17,17 +17,17 @@ let prefixes = {
 		"G",
 		"T"
 	]
-}
+};
 
-async function init() {
+async function init () {
 	setTitleAndHeader();
-	let cookie = document.cookie;
+	const cookie = document.cookie;
 	if (cookie === "") {
 		goToPage("login.html");
 	}
-	let resources = await requestAPI("/user/resources");
-	let instances = await requestAPI("/user/config/cluster");
-	let nodes = await requestAPI("/user/config/nodes");
+	const resources = await requestAPI("/user/resources");
+	const instances = await requestAPI("/user/config/cluster");
+	const nodes = await requestAPI("/user/config/nodes");
 	document.querySelector("#username").innerText = `Username: ${getCookie("username")}`;
 	document.querySelector("#pool").innerText = `Pool: ${instances.pool}`;
 	document.querySelector("#vmid").innerText = `VMID Range: ${instances.vmid.min} - ${instances.vmid.max}`;
@@ -35,24 +35,25 @@ async function init() {
 	buildResourceTable(resources, "#resource-table");
 }
 
-function buildResourceTable(resources, tableid) {
+function buildResourceTable (resources, tableid) {
 	if (resources instanceof Object) {
-		let table = document.querySelector(tableid);
-		let tbody = table.querySelector("tbody");
+		const table = document.querySelector(tableid);
+		const tbody = table.querySelector("tbody");
 		Object.keys(resources.resources).forEach((element) => {
 			if (resources.resources[element].display) {
 				if (resources.resources[element].type === "list") {
-
+					// TODO
+					console.error("Unimplemented");
 				}
 				else {
-					let row = tbody.insertRow();
-					let key = row.insertCell();
+					const row = tbody.insertRow();
+					const key = row.insertCell();
 					key.innerText = `${element}`;
-					let used = row.insertCell();
+					const used = row.insertCell();
 					used.innerText = `${parseNumber(resources.used[element], resources.resources[element])}`;
-					let val = row.insertCell();
+					const val = row.insertCell();
 					val.innerText = `${parseNumber(resources.avail[element], resources.resources[element])}`;
-					let total = row.insertCell();
+					const total = row.insertCell();
 					total.innerText = `${parseNumber(resources.max[element], resources.resources[element])}`;
 				}
 			}
@@ -60,20 +61,20 @@ function buildResourceTable(resources, tableid) {
 	}
 }
 
-function parseNumber(value, unitData) {
-	let compact = unitData.compact;
-	let multiplier = unitData.multiplier;
-	let base = unitData.base;
-	let unit = unitData.unit;
+function parseNumber (value, unitData) {
+	const compact = unitData.compact;
+	const multiplier = unitData.multiplier;
+	const base = unitData.base;
+	const unit = unitData.unit;
 	value = multiplier * value;
 	if (value <= 0) {
 		return `0 ${unit}`;
 	}
 	else if (compact) {
-		let exponent = Math.floor(Math.log(value) / Math.log(base));
+		const exponent = Math.floor(Math.log(value) / Math.log(base));
 		value = value / base ** exponent;
-		let unitPrefix = prefixes[base][exponent];
-		return `${value} ${unitPrefix}${unit}`
+		const unitPrefix = prefixes[base][exponent];
+		return `${value} ${unitPrefix}${unit}`;
 	}
 	else {
 		return `${value} ${unit}`;

@@ -1,31 +1,31 @@
-import { requestPVE, requestAPI, goToPage, goToURL, instances_config, nodes_config, setTitleAndHeader } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, goToURL, instancesConfig, nodesConfig, setTitleAndHeader } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
-import { PVE } from "../vars.js"
+import { PVE } from "../vars.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
-async function init() {
+async function init () {
 	setTitleAndHeader();
-	let cookie = document.cookie;
+	const cookie = document.cookie;
 	if (cookie === "") {
 		goToPage("login.html");
 	}
 
 	await populateInstances();
 
-	let addInstanceBtn = document.querySelector("#instance-add");
+	const addInstanceBtn = document.querySelector("#instance-add");
 	addInstanceBtn.addEventListener("click", handleInstanceAdd);
 }
 
-async function populateInstances() {
-	let resources = await requestPVE("/cluster/resources", "GET");
-	let instanceContainer = document.getElementById("instance-container");
-	let instances = [];
+async function populateInstances () {
+	const resources = await requestPVE("/cluster/resources", "GET");
+	const instanceContainer = document.getElementById("instance-container");
+	const instances = [];
 
 	resources.data.forEach((element) => {
 		if (element.type === "lxc" || element.type === "qemu") {
-			let nodeName = element.node;
-			let nodeStatus = resources.data.find(item => item.node === nodeName && item.type === "node").status;
+			const nodeName = element.node;
+			const nodeStatus = resources.data.find(item => item.node === nodeName && item.type === "node").status;
 			element.node = { name: nodeName, status: nodeStatus };
 			instances.push(element);
 		}
@@ -59,16 +59,16 @@ async function populateInstances() {
 		</div>
 	`;
 	for (let i = 0; i < instances.length; i++) {
-		let newInstance = new Instance();
+		const newInstance = new Instance();
 		newInstance.data = instances[i];
 		instanceContainer.append(newInstance.shadowElement);
 	}
 }
 
-async function handleInstanceAdd() {
-	let header = "Create New Instance";
+async function handleInstanceAdd () {
+	const header = "Create New Instance";
 
-	let body = `
+	const body = `
 		<label for="type">Instance Type</label>
 		<select class="w3-select w3-border" name="type" id="type" required>
 			<option value="lxc">Container</option>
@@ -92,16 +92,16 @@ async function handleInstanceAdd() {
 		<label class="container-specific none" for="template-image">Template Image</label>
 		<select class="w3-select w3-border container-specific none" name="template-image" id="template-image" required disabled></select>
 		<label class="container-specific none" for="rootfs-storage">ROOTFS Storage</label>
-		<select class="w3-select w3-border container-specific none" name="rootfs-storage" id="rootfs-storage" required disabled></select>				
+		<select class="w3-select w3-border container-specific none" name="rootfs-storage" id="rootfs-storage" required disabled></select>
 		<label class="container-specific none" for="rootfs-size">ROOTFS Size (GiB)</label>
 		<input class="w3-input w3-border container-specific none" name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled></input>
 		<label class="container-specific none" for="password">Password</label>
 		<input class="w3-input w3-border container-specific none" name="password" id="password" type="password" required disabled></input>
 	`;
 
-	let d = dialog(header, body, async (result, form) => {
+	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			let body = {
+			const body = {
 				node: form.get("node"),
 				type: form.get("type"),
 				name: form.get("name"),
@@ -116,7 +116,7 @@ async function handleInstanceAdd() {
 				body.rootfslocation = form.get("rootfs-storage");
 				body.rootfssize = form.get("rootfs-size");
 			}
-			let result = await requestAPI("/instance", "POST", body);
+			const result = await requestAPI("/instance", "POST", body);
 			if (result.status === 200) {
 				populateInstances();
 			}
@@ -127,7 +127,7 @@ async function handleInstanceAdd() {
 		}
 	});
 
-	let typeSelect = d.querySelector("#type");
+	const typeSelect = d.querySelector("#type");
 	typeSelect.selectedIndex = -1;
 	typeSelect.addEventListener("change", () => {
 		if (typeSelect.value === "qemu") {
@@ -144,17 +144,17 @@ async function handleInstanceAdd() {
 		}
 	});
 
-	let templateContent = "iso";
-	let templateStorage = d.querySelector("#template-storage");
+	const templateContent = "iso";
+	const templateStorage = d.querySelector("#template-storage");
 	templateStorage.selectedIndex = -1;
 
-	let rootfsContent = "rootdir";
-	let rootfsStorage = d.querySelector("#rootfs-storage");
+	const rootfsContent = "rootdir";
+	const rootfsStorage = d.querySelector("#rootfs-storage");
 	rootfsStorage.selectedIndex = -1;
 
-	let nodeSelect = d.querySelector("#node");
-	let clusterNodes = await requestPVE("/nodes", "GET");
-	let allowedNodes = await requestAPI("/user/config/nodes", "GET");
+	const nodeSelect = d.querySelector("#node");
+	const clusterNodes = await requestPVE("/nodes", "GET");
+	const allowedNodes = await requestAPI("/user/config/nodes", "GET");
 	clusterNodes.data.forEach((element) => {
 		if (element.status === "online" && allowedNodes.includes(element.node)) {
 			nodeSelect.add(new Option(element.node));
@@ -162,8 +162,8 @@ async function handleInstanceAdd() {
 	});
 	nodeSelect.selectedIndex = -1;
 	nodeSelect.addEventListener("change", async () => { // change template and rootfs storage based on node
-		let node = nodeSelect.value;
-		let storage = await requestPVE(`/nodes/${node}/storage`, "GET");
+		const node = nodeSelect.value;
+		const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
 		storage.data.forEach((element) => {
 			if (element.content.includes(templateContent)) {
 				templateStorage.add(new Option(element.storage));
@@ -176,11 +176,11 @@ async function handleInstanceAdd() {
 		rootfsStorage.selectedIndex = -1;
 	});
 
-	let templateImage = d.querySelector("#template-image"); // populate templateImage depending on selected image storage
+	const templateImage = d.querySelector("#template-image"); // populate templateImage depending on selected image storage
 	templateStorage.addEventListener("change", async () => {
-		templateImage.innerHTML = ``;
-		let content = "vztmpl";
-		let images = await requestPVE(`/nodes/${nodeSelect.value}/storage/${templateStorage.value}/content`, "GET");
+		templateImage.innerHTML = "";
+		const content = "vztmpl";
+		const images = await requestPVE(`/nodes/${nodeSelect.value}/storage/${templateStorage.value}/content`, "GET");
 		images.data.forEach((element) => {
 			if (element.content.includes(content)) {
 				templateImage.append(new Option(element.volid.replace(`${templateStorage.value}:${content}/`, ""), element.volid));
@@ -189,8 +189,8 @@ async function handleInstanceAdd() {
 		templateImage.selectedIndex = -1;
 	});
 
-	let userResources = await requestAPI("/user/resources", "GET");
-	let userInstances = await requestAPI("/user/config/instances", "GET");
+	const userResources = await requestAPI("/user/resources", "GET");
+	const userInstances = await requestAPI("/user/config/instances", "GET");
 	d.querySelector("#cores").max = userResources.avail.cores;
 	d.querySelector("#memory").max = userResources.avail.memory;
 	d.querySelector("#vmid").min = userInstances.vmid.min;
@@ -198,8 +198,8 @@ async function handleInstanceAdd() {
 }
 
 class Instance {
-	constructor() {
-		let shadowRoot = document.createElement("div");
+	constructor () {
+		const shadowRoot = document.createElement("div");
 		shadowRoot.classList.add("w3-row");
 
 		shadowRoot.innerHTML = `
@@ -235,7 +235,17 @@ class Instance {
 		this.actionLock = false;
 	}
 
-	set data(data) {
+	get data () {
+		return {
+			type: this.type,
+			status: this.status,
+			vmid: this.status,
+			name: this.name,
+			node: this.node
+		};
+	}
+
+	set data (data) {
 		if (data.status === "unknown") {
 			data.status = "stopped";
 		}
@@ -247,65 +257,65 @@ class Instance {
 		this.update();
 	}
 
-	update() {
-		let vmidParagraph = this.shadowElement.querySelector("#instance-id");
+	update () {
+		const vmidParagraph = this.shadowElement.querySelector("#instance-id");
 		vmidParagraph.innerText = this.vmid;
 
-		let nameParagraph = this.shadowElement.querySelector("#instance-name");
+		const nameParagraph = this.shadowElement.querySelector("#instance-name");
 		nameParagraph.innerText = this.name ? this.name : "";
 
-		let typeParagraph = this.shadowElement.querySelector("#instance-type");
+		const typeParagraph = this.shadowElement.querySelector("#instance-type");
 		typeParagraph.innerText = this.type;
 
-		let statusParagraph = this.shadowElement.querySelector("#instance-status");
+		const statusParagraph = this.shadowElement.querySelector("#instance-status");
 		statusParagraph.innerText = this.status;
 
-		let statusIcon = this.shadowElement.querySelector("#instance-status-icon");
-		statusIcon.src = instances_config[this.status].status.src;
-		statusIcon.alt = instances_config[this.status].status.alt;
+		const statusIcon = this.shadowElement.querySelector("#instance-status-icon");
+		statusIcon.src = instancesConfig[this.status].status.src;
+		statusIcon.alt = instancesConfig[this.status].status.alt;
 
-		let nodeNameParagraph = this.shadowElement.querySelector("#node-name");
+		const nodeNameParagraph = this.shadowElement.querySelector("#node-name");
 		nodeNameParagraph.innerText = this.node.name;
 
-		let nodeStatusParagraph = this.shadowElement.querySelector("#node-status");
+		const nodeStatusParagraph = this.shadowElement.querySelector("#node-status");
 		nodeStatusParagraph.innerText = this.node.status;
 
-		let nodeStatusIcon = this.shadowElement.querySelector("#node-status-icon");
-		nodeStatusIcon.src = nodes_config[this.node.status].status.src;
-		nodeStatusIcon.alt = nodes_config[this.node.status].status.src;
+		const nodeStatusIcon = this.shadowElement.querySelector("#node-status-icon");
+		nodeStatusIcon.src = nodesConfig[this.node.status].status.src;
+		nodeStatusIcon.alt = nodesConfig[this.node.status].status.src;
 
-		let powerButton = this.shadowElement.querySelector("#power-btn");
-		powerButton.src = instances_config[this.status].power.src;
-		powerButton.alt = instances_config[this.status].power.alt;
-		powerButton.title = instances_config[this.status].power.alt;
-		if (instances_config[this.status].power.clickable) {
+		const powerButton = this.shadowElement.querySelector("#power-btn");
+		powerButton.src = instancesConfig[this.status].power.src;
+		powerButton.alt = instancesConfig[this.status].power.alt;
+		powerButton.title = instancesConfig[this.status].power.alt;
+		if (instancesConfig[this.status].power.clickable) {
 			powerButton.classList.add("clickable");
-			powerButton.onclick = this.handlePowerButton.bind(this)
+			powerButton.onclick = this.handlePowerButton.bind(this);
 		}
 
-		let configButton = this.shadowElement.querySelector("#configure-btn");
-		configButton.src = instances_config[this.status].config.src;
-		configButton.alt = instances_config[this.status].config.alt;
-		configButton.title = instances_config[this.status].config.alt;
-		if (instances_config[this.status].config.clickable) {
+		const configButton = this.shadowElement.querySelector("#configure-btn");
+		configButton.src = instancesConfig[this.status].config.src;
+		configButton.alt = instancesConfig[this.status].config.alt;
+		configButton.title = instancesConfig[this.status].config.alt;
+		if (instancesConfig[this.status].config.clickable) {
 			configButton.classList.add("clickable");
 			configButton.onclick = this.handleConfigButton.bind(this);
 		}
 
-		let consoleButton = this.shadowElement.querySelector("#console-btn");
-		consoleButton.src = instances_config[this.status].console.src;
-		consoleButton.alt = instances_config[this.status].console.alt;
-		consoleButton.title = instances_config[this.status].console.alt;
-		if (instances_config[this.status].console.clickable) {
+		const consoleButton = this.shadowElement.querySelector("#console-btn");
+		consoleButton.src = instancesConfig[this.status].console.src;
+		consoleButton.alt = instancesConfig[this.status].console.alt;
+		consoleButton.title = instancesConfig[this.status].console.alt;
+		if (instancesConfig[this.status].console.clickable) {
 			consoleButton.classList.add("clickable");
 			consoleButton.onclick = this.handleConsoleButton.bind(this);
 		}
 
-		let deleteButton = this.shadowElement.querySelector("#delete-btn");
-		deleteButton.src = instances_config[this.status].delete.src;
-		deleteButton.alt = instances_config[this.status].delete.alt;
-		deleteButton.title = instances_config[this.status].delete.alt;
-		if (instances_config[this.status].delete.clickable) {
+		const deleteButton = this.shadowElement.querySelector("#delete-btn");
+		deleteButton.src = instancesConfig[this.status].delete.src;
+		deleteButton.alt = instancesConfig[this.status].delete.alt;
+		deleteButton.title = instancesConfig[this.status].delete.alt;
+		if (instancesConfig[this.status].delete.clickable) {
 			deleteButton.classList.add("clickable");
 			deleteButton.onclick = this.handleDeleteButton.bind(this);
 		}
@@ -318,27 +328,27 @@ class Instance {
 		}
 	}
 
-	async handlePowerButton() {
+	async handlePowerButton () {
 		if (!this.actionLock) {
-			let header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
-			let body = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"} VM</p><p>${this.vmid}</p>`
+			const header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
+			const body = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"} VM</p><p>${this.vmid}</p>`;
 
 			dialog(header, body, async (result, form) => {
 				if (result === "confirm") {
 					this.actionLock = true;
-					let targetAction = this.status === "running" ? "stop" : "start";
-					let targetStatus = this.status === "running" ? "stopped" : "running";
-					let prevStatus = this.status;
+					const targetAction = this.status === "running" ? "stop" : "start";
+					const targetStatus = this.status === "running" ? "stopped" : "running";
+					const prevStatus = this.status;
 					this.status = "loading";
 
 					this.update();
 
-					let result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", { node: this.node.name, vmid: this.vmid });
+					const result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", { node: this.node.name, vmid: this.vmid });
 
 					const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
 
 					while (true) {
-						let taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`, "GET");
+						const taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`, "GET");
 						if (taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
 							this.status = targetStatus;
 							this.update();
@@ -361,45 +371,43 @@ class Instance {
 		}
 	}
 
-	handleConfigButton() {
+	handleConfigButton () {
 		if (!this.actionLock && this.status === "stopped") { // if the action lock is false, and the node is stopped, then navigate to the conig page with the node infor in the search query
 			goToPage("config.html", { node: this.node.name, type: this.type, vmid: this.vmid });
 		}
 	}
 
-	handleConsoleButton() {
+	handleConsoleButton () {
 		if (!this.actionLock && this.status === "running") {
-			let data = { console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node.name, resize: "off", cmd: "" };
+			const data = { console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node.name, resize: "off", cmd: "" };
 			data[`${this.type === "qemu" ? "novnc" : "xtermjs"}`] = 1;
 			goToURL(PVE, data, true);
 		}
 	}
 
-	handleDeleteButton() {
+	handleDeleteButton () {
 		if (!this.actionLock && this.status === "stopped") {
-
-			let header = `Delete VM ${this.vmid}`;
-			let body = `<p>Are you sure you want to <strong>delete</strong> VM </p><p>${this.vmid}</p>`
+			const header = `Delete VM ${this.vmid}`;
+			const body = `<p>Are you sure you want to <strong>delete</strong> VM </p><p>${this.vmid}</p>`;
 
 			dialog(header, body, async (result, form) => {
 				if (result === "confirm") {
 					this.actionLock = true;
-					let prevStatus = this.status;
 					this.status = "loading";
 					this.update();
 
-					let action = {};
+					const action = {};
 					action.purge = 1;
 					action["destroy-unreferenced-disks"] = 1;
 
-					let body = {
+					const body = {
 						node: this.node.name,
 						type: this.type,
 						vmid: this.vmid,
 						action: JSON.stringify(action)
 					};
 
-					let result = await requestAPI("/instance", "DELETE", body);
+					const result = await requestAPI("/instance", "DELETE", body);
 					if (result.status === 200) {
 						this.shadowElement.parentElement.removeChild(this.shadowElement);
 					}

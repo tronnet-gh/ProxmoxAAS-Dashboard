@@ -1,6 +1,6 @@
-import { API, organization } from "/vars.js";
+import { API, organization } from "../../../../../vars.js";
 
-export const resources_config = {
+export const resourcesConfig = {
 	disk: {
 		actionBarOrder: ["move", "resize", "detach_attach", "delete"],
 		lxc: {
@@ -22,9 +22,9 @@ export const resources_config = {
 	pcie: {
 		prefix: "hostpci"
 	}
-}
+};
 
-export const instances_config = {
+export const instancesConfig = {
 	running: {
 		status: {
 			src: "images/status/active.svg",
@@ -34,22 +34,22 @@ export const instances_config = {
 		power: {
 			src: "images/actions/instance/stop.svg",
 			alt: "Shutdown Instance",
-			clickable: true,
+			clickable: true
 		},
 		config: {
 			src: "images/actions/instance/config-inactive.svg",
 			alt: "Change Configuration (Inactive)",
-			clickable: false,
+			clickable: false
 		},
 		console: {
 			src: "images/actions/instance/console-active.svg",
 			alt: "Open Console",
-			clickable: true,
+			clickable: true
 		},
 		delete: {
 			src: "images/actions/delete-inactive.svg",
 			alt: "Delete Instance (Inactive)",
-			clickable: false,
+			clickable: false
 		}
 	},
 	stopped: {
@@ -61,22 +61,22 @@ export const instances_config = {
 		power: {
 			src: "images/actions/instance/start.svg",
 			alt: "Start Instance",
-			clickable: true,
+			clickable: true
 		},
 		config: {
 			src: "images/actions/instance/config-active.svg",
 			alt: "Change Configuration",
-			clickable: true,
+			clickable: true
 		},
 		console: {
 			src: "images/actions/instance/console-inactive.svg",
 			alt: "Open Console (Inactive)",
-			clickable: false,
+			clickable: false
 		},
 		delete: {
 			src: "images/actions/delete-active.svg",
 			alt: "Delete Instance",
-			clickable: true,
+			clickable: true
 		}
 	},
 	loading: {
@@ -88,27 +88,27 @@ export const instances_config = {
 		power: {
 			src: "images/status/loading.svg",
 			alt: "Loading Instance",
-			clickable: false,
+			clickable: false
 		},
 		config: {
 			src: "images/actions/instance/config-inactive.svg",
 			alt: "Change Configuration (Inactive)",
-			clickable: false,
+			clickable: false
 		},
 		console: {
 			src: "images/actions/instance/console-inactive.svg",
 			alt: "Open Console (Inactive)",
-			clickable: false,
+			clickable: false
 		},
 		delete: {
 			src: "images/actions/delete-inactive.svg",
 			alt: "Delete Instance (Inactive)",
-			clickable: false,
+			clickable: false
 		}
 	}
-}
+};
 
-export const nodes_config = {
+export const nodesConfig = {
 	online: {
 		status: {
 			src: "images/status/active.svg",
@@ -127,12 +127,12 @@ export const nodes_config = {
 			alt: "Node is offline"
 		}
 	}
-}
+};
 
-export function getCookie(cname) {
-	let name = cname + "=";
-	let decodedCookie = decodeURIComponent(document.cookie);
-	let ca = decodedCookie.split(";");
+export function getCookie (cname) {
+	const name = cname + "=";
+	const decodedCookie = decodeURIComponent(document.cookie);
+	const ca = decodedCookie.split(";");
 	for (let i = 0; i < ca.length; i++) {
 		let c = ca[i];
 		while (c.charAt(0) === " ") {
@@ -145,40 +145,40 @@ export function getCookie(cname) {
 	return "";
 }
 
-export async function requestTicket(username, password, realm) {
-	let response = await requestAPI("/ticket", "POST", { username: `${username}@${realm}`, password: password }, false);
+export async function requestTicket (username, password, realm) {
+	const response = await requestAPI("/ticket", "POST", { username: `${username}@${realm}`, password }, false);
 	return response;
 }
 
-export async function requestPVE(path, method, body = null) {
-	let prms = new URLSearchParams(body);
-	let content = {
-		method: method,
+export async function requestPVE (path, method, body = null) {
+	const prms = new URLSearchParams(body);
+	const content = {
+		method,
 		mode: "cors",
 		credentials: "include",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded"
 		}
-	}
+	};
 	if (method === "POST") {
 		content.body = prms.toString();
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
 
-	let response = await request(`${API}/proxmox${path}`, content);
+	const response = await request(`${API}/proxmox${path}`, content);
 	return response;
 }
 
-export async function requestAPI(path, method, body = null) {
-	let prms = new URLSearchParams(body);
-	let content = {
-		method: method,
+export async function requestAPI (path, method, body = null) {
+	const prms = new URLSearchParams(body);
+	const content = {
+		method,
 		mode: "cors",
 		credentials: "include",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded"
 		}
-	}
+	};
 	if (method === "POST" || method === "DELETE") {
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
@@ -186,12 +186,12 @@ export async function requestAPI(path, method, body = null) {
 		content.body = prms.toString();
 	}
 
-	let response = await request(`${API}${path}`, content);
+	const response = await request(`${API}${path}`, content);
 	return response;
 }
 
-async function request(url, content) {
-	let response = await fetch(url, content);
+async function request (url, content) {
+	const response = await fetch(url, content);
 	let data = null;
 	try {
 		data = await response.json();
@@ -206,13 +206,13 @@ async function request(url, content) {
 	}
 	else {
 		data.status = response.status;
-		return data ? data : response;
+		return data || response;
 	}
 }
 
-export function goToPage(page, data = {}, newwindow = false) {
-	let url = new URL(`https://${window.location.host}/${page}`);
-	for (let k in data) {
+export function goToPage (page, data = {}, newwindow = false) {
+	const url = new URL(`https://${window.location.host}/${page}`);
+	for (const k in data) {
 		url.searchParams.append(k, data[k]);
 	}
 
@@ -224,9 +224,9 @@ export function goToPage(page, data = {}, newwindow = false) {
 	}
 }
 
-export function goToURL(href, data = {}, newwindow = false) {
-	let url = new URL(href);
-	for (let k in data) {
+export function goToURL (href, data = {}, newwindow = false) {
+	const url = new URL(href);
+	for (const k in data) {
 		url.searchParams.append(k, data[k]);
 	}
 
@@ -238,16 +238,16 @@ export function goToURL(href, data = {}, newwindow = false) {
 	}
 }
 
-export function getURIData() {
-	let url = new URL(window.location.href);
+export function getURIData () {
+	const url = new URL(window.location.href);
 	return Object.fromEntries(url.searchParams);
 }
 
-export async function deleteAllCookies() {
+export async function deleteAllCookies () {
 	await requestAPI("/ticket", "DELETE");
 }
 
-export function setTitleAndHeader() {
+export function setTitleAndHeader () {
 	document.title = `${organization} - client`;
 	document.querySelector("h1").innerText = organization;
 }

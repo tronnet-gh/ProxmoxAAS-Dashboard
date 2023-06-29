@@ -1,5 +1,5 @@
-export function dialog(header, body, callback = async (result, form) => { }) {
-	let dialog = document.createElement("dialog");
+export function dialog (header, body, callback = async (result, form) => { }) {
+	const dialog = document.createElement("dialog");
 	dialog.innerHTML = `
 		<p class="w3-large" id="prompt" style="text-align: center;"></p>
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form"></form>
@@ -23,8 +23,8 @@ export function dialog(header, body, callback = async (result, form) => { }) {
 	return dialog;
 }
 
-export function alert(message) {
-	let dialog = document.createElement("dialog");
+export function alert (message) {
+	const dialog = document.createElement("dialog");
 	dialog.innerHTML = `
 		<form method="dialog">
 			<p class="w3-center" style="margin-bottom: 0px;">${message}</p>
@@ -40,7 +40,7 @@ export function alert(message) {
 
 	dialog.addEventListener("close", () => {
 		dialog.parentElement.removeChild(dialog);
-	})
+	});
 
 	return dialog;
 }
