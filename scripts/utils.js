@@ -1,4 +1,4 @@
-import { API, organization } from "../../../../../vars.js";
+import { API, organization } from "../vars.js";
 
 export const resourcesConfig = {
 	disk: {
