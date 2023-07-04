@@ -102,10 +102,7 @@ async function handleInstanceAdd () {
 	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			const body = {
-				node: form.get("node"),
-				type: form.get("type"),
 				name: form.get("name"),
-				vmid: form.get("vmid"),
 				cores: form.get("cores"),
 				memory: form.get("memory")
 			};
@@ -116,7 +113,10 @@ async function handleInstanceAdd () {
 				body.rootfslocation = form.get("rootfs-storage");
 				body.rootfssize = form.get("rootfs-size");
 			}
-			const result = await requestAPI("/instance", "POST", body);
+			const node = form.get("node");
+			const type = form.get("type");
+			const vmid = form.get("vmid");
+			const result = await requestAPI(`/${node}/${type}/${vmid}/create`, "POST", body);
 			if (result.status === 200) {
 				populateInstances();
 			}
@@ -190,11 +190,11 @@ async function handleInstanceAdd () {
 	});
 
 	const userResources = await requestAPI("/user/resources", "GET");
-	const userInstances = await requestAPI("/user/config/instances", "GET");
+	const userCluster = await requestAPI("/user/config/cluster", "GET");
 	d.querySelector("#cores").max = userResources.avail.cores;
 	d.querySelector("#memory").max = userResources.avail.memory;
-	d.querySelector("#vmid").min = userInstances.vmid.min;
-	d.querySelector("#vmid").max = userInstances.vmid.max;
+	d.querySelector("#vmid").min = userCluster.vmid.min;
+	d.querySelector("#vmid").max = userCluster.vmid.max;
 }
 
 class Instance {
@@ -400,14 +400,7 @@ class Instance {
 					action.purge = 1;
 					action["destroy-unreferenced-disks"] = 1;
 
-					const body = {
-						node: this.node.name,
-						type: this.type,
-						vmid: this.vmid,
-						action: JSON.stringify(action)
-					};
-
-					const result = await requestAPI("/instance", "DELETE", body);
+					const result = await requestAPI(`/${this.node.name}/${this.type}/${this.vmid}/delete`, "DELETE");
 					if (result.status === 200) {
 						this.shadowElement.parentElement.removeChild(this.shadowElement);
 					}
