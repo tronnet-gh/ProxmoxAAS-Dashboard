@@ -25,7 +25,7 @@ async function init () {
 	if (cookie === "") {
 		goToPage("login.html");
 	}
-	const resources = await requestAPI("/user/resources");
+	const resources = await requestAPI("/user/dynamic/resources");
 	const instances = await requestAPI("/user/config/cluster");
 	const nodes = await requestAPI("/user/config/nodes");
 	document.querySelector("#username").innerText = `Username: ${getCookie("username")}`;
