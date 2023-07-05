@@ -146,7 +146,7 @@ export function getCookie (cname) {
 }
 
 export async function requestTicket (username, password, realm) {
-	const response = await requestAPI("/ticket", "POST", { username: `${username}@${realm}`, password }, false);
+	const response = await requestAPI("/auth/ticket", "POST", { username: `${username}@${realm}`, password }, false);
 	return response;
 }
 
@@ -244,7 +244,7 @@ export function getURIData () {
 }
 
 export async function deleteAllCookies () {
-	await requestAPI("/ticket", "DELETE");
+	await requestAPI("/auth/ticket", "DELETE");
 }
 
 export function setTitleAndHeader () {
