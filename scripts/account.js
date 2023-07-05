@@ -42,6 +42,15 @@ function buildResourceTable (resources, tableid) {
 		Object.keys(resources.resources).forEach((element) => {
 			if (resources.resources[element].display) {
 				if (resources.resources[element].type === "list") {
+					const row = tbody.insertRow();
+					const key = row.insertCell();
+					key.innerHTML = `${element}`;
+					const used = row.insertCell();
+					parseList(used, resources.used[element]);
+					const avail = row.insertCell();
+					parseList(avail, resources.avail[element]);
+					const total = row.insertCell();
+					parseList(total, resources.max[element]);
 				}
 				else {
 					const row = tbody.insertRow();
@@ -77,4 +86,15 @@ function parseNumber (value, unitData) {
 	else {
 		return `${value} ${unit}`;
 	}
+}
+
+function parseList (cell, list) {
+	const listElem = document.createElement("ul");
+	listElem.style = "list-style-type: none; padding: 0; margin: 0;";
+	for (const item of list) {
+		const itemElem = document.createElement("li");
+		itemElem.innerText = item;
+		listElem.append(itemElem);
+	}
+	cell.append(listElem);
 }
