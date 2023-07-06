@@ -548,7 +548,7 @@ async function handleNetworkDelete () {
 	const header = `Delete net${netID}`;
 	const body = "";
 
-	const d = dialog(header, body, async (result, form) => {
+	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-network="${netID}"]`).src = "images/status/loading.svg";
 			const result = await requestAPI(`/${node}/${type}/${vmid}/net/net${netID}/delete`, "DELETE");
@@ -572,7 +572,7 @@ async function handleNetworkAdd () {
 		body += "<label for=\"name\">Interface Name</label><input type=\"text\" id=\"name\" name=\"name\" class=\"w3-input w3-border\"></input>";
 	}
 
-	const d = dialog(header, body, async (result, form) => {
+	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			const body = {
 				rate: form.get("rate")
@@ -702,7 +702,7 @@ async function handleDeviceDelete () {
 	const header = `Remove Expansion Card ${deviceID}`;
 	const body = "";
 
-	const d = dialog(header, body, async (result, form) => {
+	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-device="${deviceID}"]`).src = "images/status/loading.svg";
 			const result = await requestAPI(`/${node}/${type}/${vmid}/pci/hostpci${deviceID}/delete`, "DELETE");

@@ -11,15 +11,12 @@ export function dialog (header, body, callback = async (result, form) => { }) {
 	dialog.className = "w3-container w3-card w3-border-0";
 	dialog.querySelector("#prompt").innerText = header;
 	dialog.querySelector("form").innerHTML = body;
-
-	document.body.append(dialog);
-	dialog.showModal();
-
 	dialog.addEventListener("close", async () => {
 		await callback(dialog.returnValue, new FormData(dialog.querySelector("form")));
 		dialog.parentElement.removeChild(dialog);
 	});
-
+	document.body.append(dialog);
+	dialog.showModal();
 	return dialog;
 }
 
