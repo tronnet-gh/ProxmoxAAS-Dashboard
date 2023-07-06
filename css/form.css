@@ -1,4 +1,5 @@
 .input-grid {
+	float: left;
 	display: grid;
 	column-gap: 10px;
 	row-gap: 5px;
@@ -15,6 +16,10 @@
 }
 
 legend {
+	float: left;
+	width: 100%;
+	margin: 0;
+	padding: 0;
 	line-height: 1.5em;
 	margin-top: 0.25lh;
 	margin-bottom: 0.25lh;
