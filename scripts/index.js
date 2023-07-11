@@ -4,6 +4,9 @@ import { PVE } from "../vars.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
+let currentHash;
+const refreshRate = 5000;
+
 async function init () {
 	setTitleAndHeader();
 	const cookie = document.cookie;
@@ -11,13 +14,24 @@ async function init () {
 		goToPage("login.html");
 	}
 
+	currentHash = (await requestAPI("/cluster/statushash")).data;
 	await populateInstances();
 
 	const addInstanceBtn = document.querySelector("#instance-add");
 	addInstanceBtn.addEventListener("click", handleInstanceAdd);
+
+	window.setInterval(async () => {
+		const newHash = (await requestAPI("/cluster/statushash")).data;
+		if (currentHash !== newHash) {
+			currentHash = newHash;
+			populateInstances();
+		}
+	}, refreshRate);
 }
 
 async function populateInstances () {
+	const newHash = (await requestAPI("/cluster/statushash")).data;
+	currentHash = newHash;
 	const resources = await requestPVE("/cluster/resources", "GET");
 	const instanceContainer = document.getElementById("instance-container");
 	const instances = [];
