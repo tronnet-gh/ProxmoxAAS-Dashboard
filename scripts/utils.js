@@ -192,13 +192,18 @@ export async function requestAPI (path, method, body = null) {
 
 async function request (url, content) {
 	const response = await fetch(url, content);
+	const contentType = response.headers.get("Content-Type");
 	let data = null;
-	try {
+	if (contentType.includes("application/json")) {
 		data = await response.json();
 		data.status = response.status;
 	}
-	catch {
-		data = null;
+	else if (contentType.includes("text/html")) {
+		data = { data: await response.text() };
+		data.status = response.status;
+	}
+	else {
+		data = response;
 	}
 
 	if (!response.ok) {
