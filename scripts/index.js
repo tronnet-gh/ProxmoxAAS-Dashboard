@@ -189,7 +189,7 @@ async function handleInstanceAdd () {
 		templateImage.selectedIndex = -1;
 	});
 
-	const userResources = await requestAPI("/user/resources", "GET");
+	const userResources = await requestAPI("/user/dynamic/resources", "GET");
 	const userCluster = await requestAPI("/user/config/cluster", "GET");
 	d.querySelector("#cores").max = userResources.avail.cores;
 	d.querySelector("#memory").max = userResources.avail.memory;
