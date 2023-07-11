@@ -14,14 +14,14 @@ async function init () {
 		goToPage("login.html");
 	}
 
-	currentHash = (await requestAPI("/cluster/statushash")).data;
+	currentHash = (await requestAPI("/sync/hash")).data;
 	await populateInstances();
 
 	const addInstanceBtn = document.querySelector("#instance-add");
 	addInstanceBtn.addEventListener("click", handleInstanceAdd);
 
 	window.setInterval(async () => {
-		const newHash = (await requestAPI("/cluster/statushash")).data;
+		const newHash = (await requestAPI("/sync/hash")).data;
 		if (currentHash !== newHash) {
 			currentHash = newHash;
 			populateInstances();
@@ -30,7 +30,7 @@ async function init () {
 }
 
 async function populateInstances () {
-	const newHash = (await requestAPI("/cluster/statushash")).data;
+	const newHash = (await requestAPI("/sync/hash")).data;
 	currentHash = newHash;
 	const resources = await requestPVE("/cluster/resources", "GET");
 	const instanceContainer = document.getElementById("instance-container");
