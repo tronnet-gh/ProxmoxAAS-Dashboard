@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>proxmox - client</title>
+		<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/nav.css">
+		<link rel="stylesheet" href="css/form.css">
+		<script src="scripts/settings.js" type="module"></script>
+	</head>
+	<body>
+		<header>
+			<h1>proxmox</h1>
+			<label for="navtoggle">&#9776;</label>
+			<input type="checkbox" id="navtoggle">
+			<nav>
+				<a href="index.html">Instances</a>
+				<a href="account.html">Account</a>
+				<a href="settings.html" aria-current="true">Settings</a>
+				<a href="login.html">Logout</a>
+			</nav>
+		</header>
+		<main>
+			<section class="w3-container">
+				<h2>Settings</h2>
+				<form>
+					<div class="w3-card w3-padding">
+						<h3>Synchronization Settings</h3>
+						<fieldset>
+							<legend>App Sync Method</legend>
+							<div class="input-grid mobile-linear" style="grid-template-columns: auto auto auto 1fr;">
+								<input class="w3-radio" type="radio" id="sync-always" name="sync-scheme" value="always">
+								<label for="sync-always">Always Sync</label>
+								<p>App will periodically synchronize with Proxmox</p>
+								<p>High resource usage</p>
+								<input class="w3-radio" type="radio" id="sync-hash" name="sync-scheme" value="always">
+								<label for="sync-hash">Check For Sync</label>
+								<p>App will periodically synchronize only if there have been change</p>
+								<p>Medium resource usage.</p>
+								<input class="w3-radio" type="radio" id="sync-interrupt" name="sync-scheme" value="always">
+								<label for="sync-interrupt">Sync When Needed</label>
+								<p>App will react to changes and synchronize when changes are made.</p>
+								<p>Low resource usage.</p>
+							</div>
+						</fieldset>
+						<fieldset>
+							<legend>App Sync Frequency</legend>
+							<div class="input-grid" style="grid-template-columns: auto auto 1fr;">
+								<p>Sync every</p><input class="w3-input w3-border" type="number" id="sync-rate" name="sync-rate" min="1"><p>Second(s)</p>
+							</div>
+						</fieldset>
+					</div>
+					<div class="w3-container w3-center" id="form-actions">
+						<button class="w3-button w3-margin" id="exit" type="button">SAVE</button>
+					</div>
+				</form>
+			</section>
+		</main>
+	</body>
+</html>
