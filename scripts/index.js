@@ -1,11 +1,9 @@
 import { requestPVE, requestAPI, goToPage, goToURL, instancesConfig, nodesConfig, setTitleAndHeader } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 import { PVE } from "../vars.js";
+import { setupClientSync } from "./clientsync.js"
 
 window.addEventListener("DOMContentLoaded", init);
-
-let currentHash;
-const refreshRate = 5000;
 
 async function init () {
 	setTitleAndHeader();
@@ -13,25 +11,14 @@ async function init () {
 	if (cookie === "") {
 		goToPage("login.html");
 	}
-
-	currentHash = (await requestAPI("/sync/hash")).data;
-	await populateInstances();
-
+	
 	const addInstanceBtn = document.querySelector("#instance-add");
 	addInstanceBtn.addEventListener("click", handleInstanceAdd);
 
-	window.setInterval(async () => {
-		const newHash = (await requestAPI("/sync/hash")).data;
-		if (currentHash !== newHash) {
-			currentHash = newHash;
-			populateInstances();
-		}
-	}, refreshRate);
+	setupClientSync(localStorage.getItem("sync-scheme"), Number(localStorage.getItem("sync-rate")) * 1000, populateInstances);
 }
 
 async function populateInstances () {
-	const newHash = (await requestAPI("/sync/hash")).data;
-	currentHash = newHash;
 	const resources = await requestPVE("/cluster/resources", "GET");
 	const instanceContainer = document.getElementById("instance-container");
 	const instances = [];
