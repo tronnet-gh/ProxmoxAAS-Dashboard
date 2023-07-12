@@ -15,7 +15,7 @@ async function init () {
 	const addInstanceBtn = document.querySelector("#instance-add");
 	addInstanceBtn.addEventListener("click", handleInstanceAdd);
 
-	setupClientSync(localStorage.getItem("sync-scheme"), Number(localStorage.getItem("sync-rate")) * 1000, populateInstances);
+	setupClientSync(populateInstances);
 }
 
 async function populateInstances () {
