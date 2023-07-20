@@ -11,6 +11,9 @@
 		<link rel="stylesheet" href="css/form.css">
 		<script src="scripts/settings.js" type="module"></script>
 		<style>
+			legend {
+				margin-bottom: 25px;
+			}
 			label {
 				display: flex;
 				height: fit-content;
@@ -18,6 +21,13 @@
 				align-items: center;
 				justify-content: left;
 				column-gap: 10px;
+			}
+			label + p {
+				margin-top: 5px;
+				margin-bottom: 25px;
+			}
+			p:last-child {
+				margin-bottom: 0px;
 			}
 		</style>
 	</head>
@@ -41,14 +51,12 @@
 						<h3>Synchronization Settings</h3>
 						<fieldset>
 							<legend>App Sync Method</legend>
-							<div>
-								<label><input class="w3-radio" type="radio" id="sync-always" name="sync-scheme" value="always" required><span>Always Sync</span></label>
-								<p>App will periodically synchronize with Proxmox. High resource usage.</p>
-								<label><input class="w3-radio" type="radio" id="sync-hash" name="sync-scheme" value="hash" required>Check For Sync</label>
-								<p>App will periodically synchronize only if there have been change. Medium resource usage.</p>
-								<label><input class="w3-radio" type="radio" id="sync-interrupt" name="sync-scheme" value="interrupt" required>Sync When Needed</label>
-								<p>App will react to changes and synchronize when changes are made. Low resource usage.</p>
-							</div>
+							<label><input class="w3-radio" type="radio" id="sync-always" name="sync-scheme" value="always" required><span>Always Sync</span></label>
+							<p>App will always periodically synchronize with Proxmox. High resource usage.</p>
+							<label><input class="w3-radio" type="radio" id="sync-hash" name="sync-scheme" value="hash" required>Check For Sync</label>
+							<p>App will periodically synchronize only if there have been change. Medium resource usage.</p>
+							<label><input class="w3-radio" type="radio" id="sync-interrupt" name="sync-scheme" value="interrupt" required>Sync When Needed</label>
+							<p>App will react to changes and synchronize when changes are made. Low resource usage.</p>
 						</fieldset>
 						<fieldset>
 							<legend>App Sync Frequency</legend>
