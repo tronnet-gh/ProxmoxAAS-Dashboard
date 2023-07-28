@@ -10,7 +10,7 @@ export async function setupClientSync (callback) {
 	}
 	if (!rate) {
 		rate = "5";
-		localStorage.setItem("sync-rate", "5")
+		localStorage.setItem("sync-rate", "5");
 	}
 
 	if (scheme === "always") {
@@ -36,17 +36,17 @@ export async function setupClientSync (callback) {
 			socket.send(`rate ${rate}`);
 		});
 		socket.addEventListener("message", (event) => {
-			let message = event.data.toString();
+			const message = event.data.toString();
 			if (message === "sync") {
 				callback();
 			}
 			else {
-				console.error("clientsync: recieved unexpected message from server, closing socket.")
+				console.error("clientsync: recieved unexpected message from server, closing socket.");
 				socket.close();
 			}
 		});
 	}
 	else {
-		console.error(`clientsync: unsupported scheme ${scheme} selected.`)
+		console.error(`clientsync: unsupported scheme ${scheme} selected.`);
 	}
-} 
+}

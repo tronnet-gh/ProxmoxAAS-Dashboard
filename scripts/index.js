@@ -1,7 +1,7 @@
 import { requestPVE, requestAPI, goToPage, goToURL, instancesConfig, nodesConfig, setTitleAndHeader } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 import { PVE } from "../vars.js";
-import { setupClientSync } from "./clientsync.js"
+import { setupClientSync } from "./clientsync.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -11,7 +11,7 @@ async function init () {
 	if (cookie === "") {
 		goToPage("login.html");
 	}
-	
+
 	const addInstanceBtn = document.querySelector("#instance-add");
 	addInstanceBtn.addEventListener("click", handleInstanceAdd);
 
