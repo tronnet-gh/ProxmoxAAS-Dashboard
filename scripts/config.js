@@ -233,7 +233,7 @@ async function handleDiskDetach () {
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
-			const result = await requestAPI(`/${node}/${type}/${vmid}/disk/${this.dataset.disk}/detach`, "POST");
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${this.dataset.disk}/detach`, "POST");
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -259,7 +259,7 @@ async function handleDiskAttach () {
 				source: this.dataset.disk.replace("unused", "")
 			};
 			const disk = `${type === "qemu" ? "sata" : "mp"}${device}`;
-			const result = await requestAPI(`/${node}/${type}/${vmid}/disk/${disk}/attach`, "POST", body);
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/attach`, "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -283,7 +283,7 @@ async function handleDiskResize () {
 			const body = {
 				size: form.get("size-increment")
 			};
-			const result = await requestAPI(`/${node}/${type}/${vmid}/disk/${this.dataset.disk}/resize`, "POST", body);
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${this.dataset.disk}/resize`, "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -323,7 +323,7 @@ async function handleDiskMove () {
 				storage: form.get("storage-select"),
 				delete: form.get("delete-check") === "on" ? "1" : "0"
 			};
-			const result = await requestAPI(`/${node}/${type}/${vmid}/disk/${this.dataset.disk}/move`, "POST", body);
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${this.dataset.disk}/move`, "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -344,7 +344,7 @@ async function handleDiskDelete () {
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
-			const result = await requestAPI(`/${node}/${type}/${vmid}/disk/${this.dataset.disk}/delete`, "DELETE");
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${this.dataset.disk}/delete`, "DELETE");
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -385,7 +385,7 @@ async function handleDiskAdd () {
 				size: form.get("size")
 			};
 			const disk = `${type === "qemu" ? "sata" : "mp"}${form.get("device")}`;
-			const result = await requestAPI(`/${node}/${type}/${vmid}/disk/${disk}/create`, "POST", body);
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/create`, "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -425,7 +425,7 @@ async function handleCDAdd () {
 				iso: form.get("iso-select")
 			};
 			const disk = `ide${form.get("device")}`;
-			const result = await requestAPI(`/${node}/${type}/${vmid}/disk/${disk}/create`, "POST", body);
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/create`, "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDisk();
@@ -527,7 +527,7 @@ async function handleNetworkConfig () {
 			const body = {
 				rate: form.get("rate")
 			};
-			const result = await requestAPI(`/${node}/${type}/${vmid}/net/net${netID}/modify`, "POST", body);
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/net${netID}/modify`, "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateNetworks();
@@ -551,7 +551,7 @@ async function handleNetworkDelete () {
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-network="${netID}"]`).src = "images/status/loading.svg";
-			const result = await requestAPI(`/${node}/${type}/${vmid}/net/net${netID}/delete`, "DELETE");
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/net${netID}/delete`, "DELETE");
 			if (result.status === 200) {
 				await getConfig();
 				populateNetworks();
@@ -581,7 +581,7 @@ async function handleNetworkAdd () {
 				body.name = form.get("name");
 			}
 			const netID = form.get("netid");
-			const result = await requestAPI(`/${node}/${type}/${vmid}/net/net${netID}/create`, "POST", body);
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/net${netID}/create`, "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateNetworks();
@@ -608,7 +608,7 @@ async function populateDevices () {
 		});
 		const orderedKeys = getOrdered(devices);
 		orderedKeys.forEach(async (element) => {
-			const deviceData = await requestAPI(`/${node}/${type}/${vmid}/pci/hostpci${element}`, "GET");
+			const deviceData = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/hostpci${element}`, "GET");
 			addDeviceLine("devices", prefix, element, devices[element], deviceData.device_name);
 		});
 
@@ -676,7 +676,7 @@ async function handleDeviceConfig () {
 				device: form.get("device"),
 				pcie: form.get("pcie") ? 1 : 0
 			};
-			const result = await requestAPI(`/${node}/${type}/${vmid}/pci/hostpci${deviceID}/modify`, "POST", body);
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/hostpci${deviceID}/modify`, "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDevices();
@@ -689,7 +689,7 @@ async function handleDeviceConfig () {
 		}
 	});
 
-	const availDevices = await requestAPI(`/${node}/pci`, "GET");
+	const availDevices = await requestAPI(`/cluster/${node}/pci`, "GET");
 	d.querySelector("#device").append(new Option(deviceName, deviceDetails.split(",")[0]));
 	for (const availDevice of availDevices) {
 		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.id));
@@ -705,7 +705,7 @@ async function handleDeviceDelete () {
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-device="${deviceID}"]`).src = "images/status/loading.svg";
-			const result = await requestAPI(`/${node}/${type}/${vmid}/pci/hostpci${deviceID}/delete`, "DELETE");
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/hostpci${deviceID}/delete`, "DELETE");
 			if (result.status === 200) {
 				await getConfig();
 				populateDevices();
@@ -729,7 +729,7 @@ async function handleDeviceAdd () {
 				device: form.get("device"),
 				pcie: form.get("pcie") ? 1 : 0
 			};
-			const result = await requestAPI(`/${node}/${type}/${vmid}/pci/create`, "POST", body);
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/create`, "POST", body);
 			if (result.status === 200) {
 				await getConfig();
 				populateDevices();
@@ -742,7 +742,7 @@ async function handleDeviceAdd () {
 		}
 	});
 
-	const availDevices = await requestAPI(`/${node}/pci`, "GET");
+	const availDevices = await requestAPI(`/cluster/${node}/pci`, "GET");
 	for (const availDevice of availDevices) {
 		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.id));
 	}
@@ -760,7 +760,7 @@ async function handleFormExit () {
 	else if (type === "qemu") {
 		body.proctype = document.querySelector("#proctype").value;
 	}
-	const result = await requestAPI(`/${node}/${type}/${vmid}/resources`, "POST", body);
+	const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/resources`, "POST", body);
 	if (result.status === 200) {
 		await getConfig();
 		populateDisk();
