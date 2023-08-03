@@ -117,7 +117,7 @@ async function handleInstanceAdd () {
 			const node = form.get("node");
 			const type = form.get("type");
 			const vmid = form.get("vmid");
-			const result = await requestAPI(`/${node}/${type}/${vmid}/create`, "POST", body);
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/create`, "POST", body);
 			if (result.status === 200) {
 				populateInstances();
 			}
@@ -401,7 +401,7 @@ class Instance {
 					action.purge = 1;
 					action["destroy-unreferenced-disks"] = 1;
 
-					const result = await requestAPI(`/${this.node.name}/${this.type}/${this.vmid}/delete`, "DELETE");
+					const result = await requestAPI(`/cluster/${this.node.name}/${this.type}/${this.vmid}/delete`, "DELETE");
 					if (result.status === 200) {
 						this.shadowElement.parentElement.removeChild(this.shadowElement);
 					}
