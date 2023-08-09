@@ -1,6 +1,9 @@
+import { setTitleAndHeader } from "./utils.js";
+
 window.addEventListener("DOMContentLoaded", init);
 
 function init () {
+	setTitleAndHeader();
 	const scheme = localStorage.getItem("sync-scheme");
 	if (scheme) {
 		document.querySelector(`#sync-${scheme}`).checked = true;
