@@ -30,6 +30,7 @@ async function init () {
 	populateDisk();
 	populateNetworks();
 	populateDevices();
+	populateBoot();
 
 	document.querySelector("#exit").addEventListener("click", handleFormExit);
 }
@@ -613,6 +614,12 @@ async function populateDevices () {
 		});
 
 		document.querySelector("#device-add").addEventListener("click", handleDeviceAdd);
+	}
+}
+
+async function populateBoot () {
+	if (type === "qemu") {
+		document.querySelector("#boot-card").classList.remove("none");
 	}
 }
 
