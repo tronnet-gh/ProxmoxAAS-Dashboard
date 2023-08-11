@@ -103,3 +103,7 @@ hr, * {
 .none {
 	display: none;
 }
+
+.spacer {
+	min-height: 1em;
+}

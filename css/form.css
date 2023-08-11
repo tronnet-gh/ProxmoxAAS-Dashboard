@@ -47,3 +47,7 @@ input[type="checkbox"] {
 input[type="radio"] {
 	position: inherit;
 }
+
+div[draggable="true"] {
+	cursor: grab;
+}

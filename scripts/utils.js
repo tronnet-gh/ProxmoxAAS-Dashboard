@@ -129,6 +129,19 @@ export const nodesConfig = {
 	}
 };
 
+export const bootConfig = {
+	eligiblePrefixes: ["ide", "sata", "net"],
+	ide: {
+		icon: "images/resources/disk.svg"
+	},
+	sata: {
+		icon: "images/resources/drive.svg"
+	},
+	net: {
+		icon: "images/resources/network.svg"
+	}
+};
+
 export function getCookie (cname) {
 	const name = cname + "=";
 	const decodedCookie = decodeURIComponent(document.cookie);

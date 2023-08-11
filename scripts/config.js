@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, goToPage, getURIData, resourcesConfig, setTitleAndHeader } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, getURIData, resourcesConfig, setTitleAndHeader, bootConfig } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
@@ -6,6 +6,7 @@ window.addEventListener("DOMContentLoaded", init); // do the dumb thing where th
 const diskMetaData = resourcesConfig.disk;
 const networkMetaData = resourcesConfig.network;
 const pcieMetaData = resourcesConfig.pcie;
+const bootMetaData = bootConfig;
 
 let node;
 let type;
@@ -617,12 +618,6 @@ async function populateDevices () {
 	}
 }
 
-async function populateBoot () {
-	if (type === "qemu") {
-		document.querySelector("#boot-card").classList.remove("none");
-	}
-}
-
 function addDeviceLine (fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	const field = document.querySelector(`#${fieldset}`);
 
@@ -755,6 +750,124 @@ async function handleDeviceAdd () {
 	}
 	d.querySelector("#pcie").checked = true;
 }
+
+async function populateBoot () {
+	if (type === "qemu") {
+		document.querySelector("#boot-card").classList.remove("none");
+		document.querySelectorAll(".drop-target").forEach((element) => {
+			element.addEventListener("dragenter", (event) => {
+				event.target.style.borderTop = "1px dotted";
+				event.preventDefault();
+			});
+			element.addEventListener("dragleave", (event) => {
+				event.target.attributeStyleMap.clear();
+				event.preventDefault();
+			});
+			element.addEventListener("dragover", (event) => {
+				event.preventDefault();
+			});
+			element.addEventListener("drop", (event) => {
+				const data = event.dataTransfer.getData("text/plain");
+				event.target.attributeStyleMap.clear();
+				addBootLine(element.parentElement.id, JSON.parse(data), element);
+				event.preventDefault();
+			});
+		});
+		const order = config.data.boot.replace("order=", "").split(";");
+		const bootable = { disabled: [] };
+		const eligible = bootMetaData.eligiblePrefixes;
+		for (let i = 0; i < order.length; i++) {
+			const prefix = eligible.find((pref) => order[i].startsWith(pref));
+			bootable[i] = { id: order[i], prefix };
+		}
+		Object.keys(config.data).forEach((element) => {
+			const prefix = eligible.find((pref) => element.startsWith(pref));
+			if (prefix && !order.includes(element)) {
+				bootable.disabled.push({ id: element, prefix });
+			}
+		});
+		Object.keys(bootable).sort();
+		Object.keys(bootable).forEach((element) => {
+			if (element !== "disabled") {
+				addBootLine("enabled", bootable[element], document.querySelector("#enabled-spacer"));
+			}
+			else {
+				bootable.disabled.forEach((item) => {
+					addBootLine("disabled", item, document.querySelector("#disabled-spacer"));
+				});
+			}
+		});
+	}
+}
+
+function addBootLine (fieldset, bootable, before = null) {
+	const box = document.createElement("div");
+	const icon = document.createElement("img");
+	icon.src = bootMetaData[bootable.prefix].icon;
+	box.append(icon);
+	const label = document.createElement("p");
+	label.innerText = bootable.id;
+	label.style.margin = "0px";
+	box.append(label);
+	box.draggable = true;
+	box.classList.add("flex");
+	box.classList.add("row");
+	box.classList.add("drop-target");
+	box.id = `boot-${bootable.id}`;
+	// setup draggable event listeners
+	box.addEventListener("dragstart", (event) => {
+		event.target.style.opacity = "0.5";
+		event.dataTransfer.setData("text/plain", JSON.stringify(bootable));
+		event.dataTransfer.effectAllowed = "move";
+	});
+	box.addEventListener("dragend", (event) => {
+		if (event.dataTransfer.dropEffect === "move") {
+			box.parentElement.removeChild(box);
+		}
+		else {
+			event.target.attributeStyleMap.clear();
+		}
+	});
+	box.addEventListener("dragenter", (event) => {
+		if (event.target.parentElement.classList.contains("drop-target")) {
+			event.target.parentElement.style.borderTop = "1px dotted";
+		}
+		event.preventDefault();
+	});
+	box.addEventListener("dragleave", (event) => {
+		if (event.target.parentElement.classList.contains("drop-target")) {
+			event.target.parentElement.style.borderTop = "";
+		}
+		event.preventDefault();
+	});
+	box.addEventListener("dragover", (event) => {
+		event.preventDefault();
+	});
+	box.addEventListener("drop", (event) => {
+		event.preventDefault();
+		const data = event.dataTransfer.getData("text/plain");
+		if (event.target.parentElement.classList.contains("drop-target")) {
+			event.target.parentElement.attributeStyleMap.clear();
+		}
+		addBootLine(box.parentElement.id, JSON.parse(data), box);
+	});
+	if (before) {
+		document.querySelector(`#${fieldset}`).insertBefore(box, before);
+	}
+	else {
+		document.querySelector(`#${fieldset}`).append(box);
+	}
+}
+
+class DraggableItem extends HTMLElement {
+	constructor () {
+		super();
+	}
+}
+
+customElements.define("draggable-item", DraggableItem);
+
+window.customElement
 
 async function handleFormExit () {
 	const body = {
