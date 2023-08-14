@@ -754,25 +754,8 @@ async function handleDeviceAdd () {
 async function populateBoot () {
 	if (type === "qemu") {
 		document.querySelector("#boot-card").classList.remove("none");
-		document.querySelectorAll(".drop-target").forEach((element) => {
-			element.addEventListener("dragenter", (event) => {
-				event.target.style.borderTop = "1px dotted";
-				event.preventDefault();
-			});
-			element.addEventListener("dragleave", (event) => {
-				event.target.attributeStyleMap.clear();
-				event.preventDefault();
-			});
-			element.addEventListener("dragover", (event) => {
-				event.preventDefault();
-			});
-			element.addEventListener("drop", (event) => {
-				const data = event.dataTransfer.getData("text/plain");
-				event.target.attributeStyleMap.clear();
-				addBootLine(element.parentElement.id, JSON.parse(data), element);
-				event.preventDefault();
-			});
-		});
+		document.querySelector("#enabled").title = "Enabled";
+		document.querySelector("#disabled").title = "Disabled";
 		const order = config.data.boot.replace("order=", "").split(";");
 		const bootable = { disabled: [] };
 		const eligible = bootMetaData.eligiblePrefixes;
@@ -801,73 +784,21 @@ async function populateBoot () {
 }
 
 function addBootLine (fieldset, bootable, before = null) {
-	const box = document.createElement("div");
-	const icon = document.createElement("img");
-	icon.src = bootMetaData[bootable.prefix].icon;
-	box.append(icon);
-	const label = document.createElement("p");
-	label.innerText = bootable.id;
-	label.style.margin = "0px";
-	box.append(label);
-	box.draggable = true;
-	box.classList.add("flex");
-	box.classList.add("row");
-	box.classList.add("drop-target");
-	box.id = `boot-${bootable.id}`;
-	// setup draggable event listeners
-	box.addEventListener("dragstart", (event) => {
-		event.target.style.opacity = "0.5";
-		event.dataTransfer.setData("text/plain", JSON.stringify(bootable));
-		event.dataTransfer.effectAllowed = "move";
-	});
-	box.addEventListener("dragend", (event) => {
-		if (event.dataTransfer.dropEffect === "move") {
-			box.parentElement.removeChild(box);
-		}
-		else {
-			event.target.attributeStyleMap.clear();
-		}
-	});
-	box.addEventListener("dragenter", (event) => {
-		if (event.target.parentElement.classList.contains("drop-target")) {
-			event.target.parentElement.style.borderTop = "1px dotted";
-		}
-		event.preventDefault();
-	});
-	box.addEventListener("dragleave", (event) => {
-		if (event.target.parentElement.classList.contains("drop-target")) {
-			event.target.parentElement.style.borderTop = "";
-		}
-		event.preventDefault();
-	});
-	box.addEventListener("dragover", (event) => {
-		event.preventDefault();
-	});
-	box.addEventListener("drop", (event) => {
-		event.preventDefault();
-		const data = event.dataTransfer.getData("text/plain");
-		if (event.target.parentElement.classList.contains("drop-target")) {
-			event.target.parentElement.attributeStyleMap.clear();
-		}
-		addBootLine(box.parentElement.id, JSON.parse(data), box);
-	});
+	const item = document.createElement("draggable-item");
+	item.bootable = bootable;
+	item.innerHTML = `
+		<img src="${bootMetaData[bootable.prefix].icon}">
+		<p style="margin: 0px;">${bootable.id}</p>
+	`;
+	item.draggable = true;
+	item.classList.add("drop-target");
 	if (before) {
-		document.querySelector(`#${fieldset}`).insertBefore(box, before);
+		document.querySelector(`#${fieldset}`).insertBefore(item, before);
 	}
 	else {
-		document.querySelector(`#${fieldset}`).append(box);
+		document.querySelector(`#${fieldset}`).append(item);
 	}
 }
-
-class DraggableItem extends HTMLElement {
-	constructor () {
-		super();
-	}
-}
-
-customElements.define("draggable-item", DraggableItem);
-
-window.customElement
 
 async function handleFormExit () {
 	const body = {

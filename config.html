@@ -10,6 +10,7 @@
 		<link rel="stylesheet" href="css/nav.css">
 		<link rel="stylesheet" href="css/form.css">
 		<script src="scripts/config.js" type="module"></script>
+		<script src="scripts/draggable.js" type="module"></script>
 	</head>
 	<body>
 		<header>
@@ -55,15 +56,9 @@
 					</fieldset>
 					<fieldset class="w3-card w3-padding none" id="boot-card">
 						<legend>Boot Order</legend>
-						<div id="enabled">
-							<label>Enabled</label>
-							<div class="drop-target spacer" id="enabled-spacer"></div>
-						</div>
-						<hr style="margin: 0.5em 0px;">
-						<div id="disabled">
-							<label>Disabled</label>
-							<div class="drop-target spacer" id="disabled-spacer"></div>
-						</div>
+						<draggable-container id="enabled"></draggable-container>
+						<hr style="padding: 0; margin: 0;">
+						<draggable-container id="disabled"></draggable-container>
 					</fieldset>
 					<div class="w3-container w3-center" id="form-actions">
 						<button class="w3-button w3-margin" id="exit" type="button">EXIT</button>
