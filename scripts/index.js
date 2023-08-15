@@ -60,9 +60,9 @@ async function populateInstances () {
 		</div>
 	`;
 	for (let i = 0; i < instances.length; i++) {
-		const newInstance = new Instance();
+		const newInstance = document.createElement("instance-card");
 		newInstance.data = instances[i];
-		instanceContainer.append(newInstance.shadowElement);
+		instanceContainer.append(newInstance);
 	}
 }
 
@@ -198,41 +198,42 @@ async function handleInstanceAdd () {
 	d.querySelector("#vmid").max = userCluster.vmid.max;
 }
 
-class Instance {
+class InstanceCard extends HTMLElement {
 	constructor () {
-		const shadowRoot = document.createElement("div");
-		shadowRoot.classList.add("w3-row");
-
-		shadowRoot.innerHTML = `
-			<div class="w3-col l1 m2 s6">
-				<p id="instance-id"></p>
-			</div>
-			<div class="w3-col l2 m3 s6">
-				<p id="instance-name"></p>
-			</div>
-			<div class="w3-col l1 m2 w3-hide-small">
-				<p id="instance-type"></p>
-			</div>
-			<div class="w3-col l2 m3 s6 flex row nowrap">
-				<img id="instance-status-icon">
-				<p id="instance-status"></p>
-			</div>
-			<div class="w3-col l2 w3-hide-medium w3-hide-small">
-				<p id="node-name"></p>
-			</div>
-			<div class="w3-col l2 w3-hide-medium w3-hide-small flex row nowrap">
-				<img id="node-status-icon">
-				<p id="node-status"></p>
-			</div>
-			<div class="w3-col l2 m2 s6 flex row nowrap" style="height: 1lh; margin-top: 15px; margin-bottom: 15px;">
-				<img id="power-btn">
-				<img id="console-btn">
-				<img id="configure-btn">
-				<img id="delete-btn">
+		super();
+		this.attachShadow({ mode: "open" });
+		this.shadowRoot.innerHTML = `
+			<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+			<link rel="stylesheet" href="css/style.css">
+			<div class="w3-row">
+				<div class="w3-col l1 m2 s6">
+					<p id="instance-id"></p>
+				</div>
+				<div class="w3-col l2 m3 s6">
+					<p id="instance-name"></p>
+				</div>
+				<div class="w3-col l1 m2 w3-hide-small">
+					<p id="instance-type"></p>
+				</div>
+				<div class="w3-col l2 m3 s6 flex row nowrap">
+					<img id="instance-status-icon">
+					<p id="instance-status"></p>
+				</div>
+				<div class="w3-col l2 w3-hide-medium w3-hide-small">
+					<p id="node-name"></p>
+				</div>
+				<div class="w3-col l2 w3-hide-medium w3-hide-small flex row nowrap">
+					<img id="node-status-icon">
+					<p id="node-status"></p>
+				</div>
+				<div class="w3-col l2 m2 s6 flex row nowrap" style="height: 1lh; margin-top: 15px; margin-bottom: 15px;">
+					<img id="power-btn">
+					<img id="console-btn">
+					<img id="configure-btn">
+					<img id="delete-btn">
+				</div>
 			</div>
 		`;
-
-		this.shadowElement = shadowRoot;
 		this.actionLock = false;
 	}
 
@@ -259,33 +260,33 @@ class Instance {
 	}
 
 	update () {
-		const vmidParagraph = this.shadowElement.querySelector("#instance-id");
+		const vmidParagraph = this.shadowRoot.querySelector("#instance-id");
 		vmidParagraph.innerText = this.vmid;
 
-		const nameParagraph = this.shadowElement.querySelector("#instance-name");
+		const nameParagraph = this.shadowRoot.querySelector("#instance-name");
 		nameParagraph.innerText = this.name ? this.name : "";
 
-		const typeParagraph = this.shadowElement.querySelector("#instance-type");
+		const typeParagraph = this.shadowRoot.querySelector("#instance-type");
 		typeParagraph.innerText = this.type;
 
-		const statusParagraph = this.shadowElement.querySelector("#instance-status");
+		const statusParagraph = this.shadowRoot.querySelector("#instance-status");
 		statusParagraph.innerText = this.status;
 
-		const statusIcon = this.shadowElement.querySelector("#instance-status-icon");
+		const statusIcon = this.shadowRoot.querySelector("#instance-status-icon");
 		statusIcon.src = instancesConfig[this.status].status.src;
 		statusIcon.alt = instancesConfig[this.status].status.alt;
 
-		const nodeNameParagraph = this.shadowElement.querySelector("#node-name");
+		const nodeNameParagraph = this.shadowRoot.querySelector("#node-name");
 		nodeNameParagraph.innerText = this.node.name;
 
-		const nodeStatusParagraph = this.shadowElement.querySelector("#node-status");
+		const nodeStatusParagraph = this.shadowRoot.querySelector("#node-status");
 		nodeStatusParagraph.innerText = this.node.status;
 
-		const nodeStatusIcon = this.shadowElement.querySelector("#node-status-icon");
+		const nodeStatusIcon = this.shadowRoot.querySelector("#node-status-icon");
 		nodeStatusIcon.src = nodesConfig[this.node.status].status.src;
 		nodeStatusIcon.alt = nodesConfig[this.node.status].status.src;
 
-		const powerButton = this.shadowElement.querySelector("#power-btn");
+		const powerButton = this.shadowRoot.querySelector("#power-btn");
 		powerButton.src = instancesConfig[this.status].power.src;
 		powerButton.alt = instancesConfig[this.status].power.alt;
 		powerButton.title = instancesConfig[this.status].power.alt;
@@ -294,7 +295,7 @@ class Instance {
 			powerButton.onclick = this.handlePowerButton.bind(this);
 		}
 
-		const configButton = this.shadowElement.querySelector("#configure-btn");
+		const configButton = this.shadowRoot.querySelector("#configure-btn");
 		configButton.src = instancesConfig[this.status].config.src;
 		configButton.alt = instancesConfig[this.status].config.alt;
 		configButton.title = instancesConfig[this.status].config.alt;
@@ -303,7 +304,7 @@ class Instance {
 			configButton.onclick = this.handleConfigButton.bind(this);
 		}
 
-		const consoleButton = this.shadowElement.querySelector("#console-btn");
+		const consoleButton = this.shadowRoot.querySelector("#console-btn");
 		consoleButton.src = instancesConfig[this.status].console.src;
 		consoleButton.alt = instancesConfig[this.status].console.alt;
 		consoleButton.title = instancesConfig[this.status].console.alt;
@@ -312,7 +313,7 @@ class Instance {
 			consoleButton.onclick = this.handleConsoleButton.bind(this);
 		}
 
-		const deleteButton = this.shadowElement.querySelector("#delete-btn");
+		const deleteButton = this.shadowRoot.querySelector("#delete-btn");
 		deleteButton.src = instancesConfig[this.status].delete.src;
 		deleteButton.alt = instancesConfig[this.status].delete.alt;
 		deleteButton.title = instancesConfig[this.status].delete.alt;
@@ -403,7 +404,7 @@ class Instance {
 
 					const result = await requestAPI(`/cluster/${this.node.name}/${this.type}/${this.vmid}/delete`, "DELETE");
 					if (result.status === 200) {
-						this.shadowElement.parentElement.removeChild(this.shadowElement);
+						this.parentElement.removeChild(this);
 					}
 					else {
 						alert(result.error);
@@ -416,3 +417,5 @@ class Instance {
 		}
 	}
 }
+
+customElements.define("instance-card", InstanceCard);
