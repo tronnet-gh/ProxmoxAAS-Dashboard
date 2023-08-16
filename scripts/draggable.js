@@ -3,7 +3,6 @@ class DraggableContainer extends HTMLElement {
 		super();
 		this.attachShadow({ mode: "open" });
 		this.shadowRoot.innerHTML = `
-			<link rel="stylesheet" href="css/style.css">
 			<label id="title"></label>
 			<div id="wrapper">
 				<draggable-item id="bottom" class="drop-target"></draggable-item>
@@ -29,20 +28,40 @@ class DraggableContainer extends HTMLElement {
 	insertBefore (newNode, referenceNode) {
 		this.content.insertBefore(newNode, referenceNode);
 	}
+
+	deleteItemByID (nodeid) {
+		const node = this.content.querySelector(`#${nodeid}`);
+		if (node) {
+			this.content.removeChild(node);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }
 
 class DraggableItem extends HTMLElement {
 	constructor () {
 		super();
 		this.attachShadow({ mode: "open" });
+		// for whatever reason, only grid layout seems to respect the parent's content bounds
 		this.shadowRoot.innerHTML = `
-			<link rel="stylesheet" href="css/style.css">
 			<style>
 				#wrapper {
-					min-height: 1.5em;
+					grid-template-columns: auto 8ch 1fr;
+					display: grid;
+					column-gap: 10px;
+					align-items: center;
+				}
+				img {
+					height: 1em;
+					width: 1em;
 				}
 			</style>
-			<div id="wrapper" class="flex row"></div>
+			<div id="wrapper">
+				<div style="min-height: 1.5em;"></div>
+			</div>
 		`;
 		this.content = this.shadowRoot.querySelector("#wrapper");
 		// add drag and drop listeners
@@ -83,13 +102,14 @@ class DraggableItem extends HTMLElement {
 				event.target.borderTop = false;
 			}
 			if (event.target.classList.contains("drop-target")) {
-				const data = event.dataTransfer.getData("application/json");
+				const data = JSON.parse(event.dataTransfer.getData("application/json"));
 				const content = event.dataTransfer.getData("text/html");
 				const item = document.createElement("draggable-item");
-				item.bootable = data;
+				item.data = data;
 				item.innerHTML = content;
 				item.draggable = true;
 				item.classList.add("drop-target");
+				item.id = `boot-${data.id}`;
 				event.target.parentElement.insertBefore(item, event.target);
 			}
 			this.content.attributeStyleMap.clear();
@@ -103,14 +123,6 @@ class DraggableItem extends HTMLElement {
 
 	set innerHTML (innerHTML) {
 		this.content.innerHTML = innerHTML;
-	}
-
-	get bootable () {
-		return this.data;
-	}
-
-	set bootable (bootable) {
-		this.data = bootable;
 	}
 
 	get borderTop () {
