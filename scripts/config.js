@@ -12,6 +12,7 @@ let node;
 let type;
 let vmid;
 let config;
+const bootEntries = {};
 
 async function init () {
 	setTitleAndHeader();
@@ -230,21 +231,19 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 }
 
 async function handleDiskDetach () {
-	const header = `Detach ${this.dataset.disk}`;
-	const body = `<p>Are you sure you want to detach disk</p><p>${this.dataset.disk}</p>`;
+	const disk = this.dataset.disk;
+	const header = `Detach ${disk}`;
+	const body = `<p>Are you sure you want to detach disk</p><p>${disk}</p>`;
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${this.dataset.disk}/detach`, "POST");
-			if (result.status === 200) {
-				await getConfig();
-				populateDisk();
-			}
-			else {
+			document.querySelector(`img[data-disk="${disk}"]`).src = "images/status/loading.svg";
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/detach`, "POST");
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateDisk();
 			}
+			await getConfig();
+			populateDisk();
+			deleteBootLine(`boot-${disk}`);
 		}
 	});
 }
@@ -260,17 +259,15 @@ async function handleDiskAttach () {
 			const body = {
 				source: this.dataset.disk.replace("unused", "")
 			};
-			const disk = `${type === "qemu" ? "sata" : "mp"}${device}`;
+			const prefix = type === "qemu" ? "sata" : "mp";
+			const disk = `${prefix}${device}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/attach`, "POST", body);
-			if (result.status === 200) {
-				await getConfig();
-				populateDisk();
-			}
-			else {
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateDisk();
 			}
+			await getConfig();
+			populateDisk();
+			addBootLine("disabled", { id: disk, prefix, value: config.data[disk] });
 		}
 	});
 }
@@ -281,20 +278,19 @@ async function handleDiskResize () {
 
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
+			const disk = this.dataset.disk;
+			document.querySelector(`img[data-disk="${disk}"]`).src = "images/status/loading.svg";
 			const body = {
 				size: form.get("size-increment")
 			};
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${this.dataset.disk}/resize`, "POST", body);
-			if (result.status === 200) {
-				await getConfig();
-				populateDisk();
-			}
-			else {
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/resize`, "POST", body);
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateDisk();
 			}
+			await getConfig();
+			populateDisk();
+			const prefix = bootMetaData.eligiblePrefixes.find((pref) => disk.startsWith(pref));
+			updateBootLine(`boot-${disk}`, { id: disk, prefix, value: config.data[disk] });
 		}
 	});
 }
@@ -320,42 +316,38 @@ async function handleDiskMove () {
 
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
+			const disk = this.dataset.disk;
+			document.querySelector(`img[data-disk="${disk}"]`).src = "images/status/loading.svg";
 			const body = {
 				storage: form.get("storage-select"),
 				delete: form.get("delete-check") === "on" ? "1" : "0"
 			};
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${this.dataset.disk}/move`, "POST", body);
-			if (result.status === 200) {
-				await getConfig();
-				populateDisk();
-			}
-			else {
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/move`, "POST", body);
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateDisk();
 			}
+			await getConfig();
+			populateDisk();
+			const prefix = bootMetaData.eligiblePrefixes.find((pref) => disk.startsWith(pref));
+			updateBootLine(`boot-${disk}`, { id: disk, prefix, value: config.data[disk] });
 		}
 	});
 }
 
 async function handleDiskDelete () {
-	const header = `Delete ${this.dataset.disk}`;
-	const body = `<p>Are you sure you want to <strong>delete</strong> disk</p><p>${this.dataset.disk}</p>`;
-
+	const disk = this.dataset.disk;
+	const header = `Delete ${disk}`;
+	const body = `<p>Are you sure you want to <strong>delete</strong> disk</p><p>${disk}</p>`;
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${this.dataset.disk}/delete`, "DELETE");
-			if (result.status === 200) {
-				await getConfig();
-				populateDisk();
-			}
-			else {
+			document.querySelector(`img[data-disk="${disk}"]`).src = "images/status/loading.svg";
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/delete`, "DELETE");
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateDisk();
 			}
+			await getConfig();
+			populateDisk();
+			deleteBootLine(`boot-${disk}`);
 		}
 	});
 }
@@ -386,17 +378,16 @@ async function handleDiskAdd () {
 				storage: form.get("storage-select"),
 				size: form.get("size")
 			};
-			const disk = `${type === "qemu" ? "sata" : "mp"}${form.get("device")}`;
+			const id = form.get("device");
+			const prefix = type === "qemu" ? "sata" : "mp";
+			const disk = `${prefix}${id}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/create`, "POST", body);
-			if (result.status === 200) {
-				await getConfig();
-				populateDisk();
-			}
-			else {
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateDisk();
 			}
+			await getConfig();
+			populateDisk();
+			addBootLine("disabled", { id: disk, prefix, value: config.data[disk] });
 		}
 	});
 }
@@ -428,15 +419,12 @@ async function handleCDAdd () {
 			};
 			const disk = `ide${form.get("device")}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/create`, "POST", body);
-			if (result.status === 200) {
-				await getConfig();
-				populateDisk();
-			}
-			else {
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateDisk();
 			}
+			await getConfig();
+			populateDisk();
+			addBootLine("disabled", { id: disk, prefix: "ide", value: config.data[disk] });
 		}
 	});
 
@@ -530,15 +518,12 @@ async function handleNetworkConfig () {
 				rate: form.get("rate")
 			};
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/net${netID}/modify`, "POST", body);
-			if (result.status === 200) {
-				await getConfig();
-				populateNetworks();
-			}
-			else {
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateNetworks();
 			}
+			await getConfig();
+			populateNetworks();
+			updateBootLine(`boot-net${netID}`, { id: `net${netID}`, prefix: "net", value: config.data[`net${netID}`] });
 		}
 	});
 
@@ -554,15 +539,12 @@ async function handleNetworkDelete () {
 		if (result === "confirm") {
 			document.querySelector(`img[data-network="${netID}"]`).src = "images/status/loading.svg";
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/net${netID}/delete`, "DELETE");
-			if (result.status === 200) {
-				await getConfig();
-				populateNetworks();
-			}
-			else {
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateNetworks();
 			}
+			await getConfig();
+			populateNetworks();
+			deleteBootLine(`boot-net${netID}`);
 		}
 	});
 }
@@ -584,15 +566,12 @@ async function handleNetworkAdd () {
 			}
 			const netID = form.get("netid");
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/net${netID}/create`, "POST", body);
-			if (result.status === 200) {
-				await getConfig();
-				populateNetworks();
-			}
-			else {
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateNetworks();
 			}
+			await getConfig();
+			populateNetworks();
+			addBootLine("disabled", { id: `net${netID}`, prefix: "net", value: config.data[`net${netID}`] });
 		}
 	});
 }
@@ -679,15 +658,11 @@ async function handleDeviceConfig () {
 				pcie: form.get("pcie") ? 1 : 0
 			};
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/hostpci${deviceID}/modify`, "POST", body);
-			if (result.status === 200) {
-				await getConfig();
-				populateDevices();
-			}
-			else {
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateDevices();
 			}
+			await getConfig();
+			populateDevices();
 		}
 	});
 
@@ -708,15 +683,11 @@ async function handleDeviceDelete () {
 		if (result === "confirm") {
 			document.querySelector(`img[data-device="${deviceID}"]`).src = "images/status/loading.svg";
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/hostpci${deviceID}/delete`, "DELETE");
-			if (result.status === 200) {
-				await getConfig();
-				populateDevices();
-			}
-			else {
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateDevices();
 			}
+			await getConfig();
+			populateDevices();
 		}
 	});
 }
@@ -732,15 +703,11 @@ async function handleDeviceAdd () {
 				pcie: form.get("pcie") ? 1 : 0
 			};
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/create`, "POST", body);
-			if (result.status === 200) {
-				await getConfig();
-				populateDevices();
-			}
-			else {
+			if (result.status !== 200) {
 				alert(result.error);
-				await getConfig();
-				populateDevices();
 			}
+			await getConfig();
+			populateDevices();
 		}
 	});
 
@@ -756,17 +723,23 @@ async function populateBoot () {
 		document.querySelector("#boot-card").classList.remove("none");
 		document.querySelector("#enabled").title = "Enabled";
 		document.querySelector("#disabled").title = "Disabled";
-		const order = config.data.boot.replace("order=", "").split(";");
+		let order = [];
+		if (config.data.boot.startsWith("order=")) {
+			order = config.data.boot.replace("order=", "").split(";");
+		}
 		const bootable = { disabled: [] };
 		const eligible = bootMetaData.eligiblePrefixes;
 		for (let i = 0; i < order.length; i++) {
+			const element = order[i];
 			const prefix = eligible.find((pref) => order[i].startsWith(pref));
-			bootable[i] = { id: order[i], prefix };
+			const value = config.data[element];
+			bootable[i] = { id: element, prefix, value };
 		}
 		Object.keys(config.data).forEach((element) => {
 			const prefix = eligible.find((pref) => element.startsWith(pref));
+			const value = config.data[element];
 			if (prefix && !order.includes(element)) {
-				bootable.disabled.push({ id: element, prefix });
+				bootable.disabled.push({ id: element, prefix, value });
 			}
 		});
 		Object.keys(bootable).sort();
@@ -783,20 +756,42 @@ async function populateBoot () {
 	}
 }
 
-function addBootLine (fieldset, bootable, before = null) {
+function addBootLine (container, data, before = null) {
 	const item = document.createElement("draggable-item");
-	item.bootable = bootable;
+	item.data = data;
 	item.innerHTML = `
-		<img src="${bootMetaData[bootable.prefix].icon}">
-		<p style="margin: 0px;">${bootable.id}</p>
+		<img src="${bootMetaData[data.prefix].icon}">
+		<p style="margin: 0px;">${data.id}</p>
+		<p style="margin: 0px; overflow-x: hidden; white-space: nowrap;">${data.value}</p>
 	`;
 	item.draggable = true;
 	item.classList.add("drop-target");
+	item.id = `boot-${data.id}`;
 	if (before) {
-		document.querySelector(`#${fieldset}`).insertBefore(item, before);
+		document.querySelector(`#${container}`).insertBefore(item, before);
 	}
 	else {
-		document.querySelector(`#${fieldset}`).append(item);
+		document.querySelector(`#${container}`).append(item);
+	}
+	item.container = container;
+	bootEntries[item.id] = item;
+}
+
+function deleteBootLine (id) {
+	bootEntries[id].parentElement.removeChild(bootEntries[id]);
+}
+
+function updateBootLine (id, newData) {
+	const element = bootEntries[id];
+	if (element) {
+		const container = element.container;
+		const before = element.nextSibling;
+		deleteBootLine(id);
+		addBootLine(container, newData, before);
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 
