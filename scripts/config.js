@@ -732,14 +732,14 @@ async function populateBoot () {
 		for (let i = 0; i < order.length; i++) {
 			const element = order[i];
 			const prefix = eligible.find((pref) => order[i].startsWith(pref));
-			const value = config.data[element];
-			bootable[i] = { id: element, prefix, value };
+			const detail = config.data[element];
+			bootable[i] = { id: element, prefix, detail };
 		}
 		Object.keys(config.data).forEach((element) => {
 			const prefix = eligible.find((pref) => element.startsWith(pref));
-			const value = config.data[element];
+			const detail = config.data[element];
 			if (prefix && !order.includes(element)) {
-				bootable.disabled.push({ id: element, prefix, value });
+				bootable.disabled.push({ id: element, prefix, detail });
 			}
 		});
 		Object.keys(bootable).sort();
@@ -760,9 +760,10 @@ function addBootLine (container, data, before = null) {
 	const item = document.createElement("draggable-item");
 	item.data = data;
 	item.innerHTML = `
+		<img src="images/actions/drag.svg" id="drag">
 		<img src="${bootMetaData[data.prefix].icon}">
 		<p style="margin: 0px;">${data.id}</p>
-		<p style="margin: 0px; overflow-x: hidden; white-space: nowrap;">${data.value}</p>
+		<p style="margin: 0px; overflow-x: hidden; white-space: nowrap;">${data.detail}</p>
 	`;
 	item.draggable = true;
 	item.classList.add("drop-target");
@@ -774,6 +775,7 @@ function addBootLine (container, data, before = null) {
 		document.querySelector(`#${container}`).append(item);
 	}
 	item.container = container;
+	item.value = data.id;
 	bootEntries[item.id] = item;
 }
 
@@ -805,6 +807,7 @@ async function handleFormExit () {
 	}
 	else if (type === "qemu") {
 		body.proctype = document.querySelector("#proctype").value;
+		body.boot = document.querySelector("#enabled").value;
 	}
 	const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/resources`, "POST", body);
 	if (result.status === 200) {

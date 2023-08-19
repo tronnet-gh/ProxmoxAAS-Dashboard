@@ -39,6 +39,18 @@ class DraggableContainer extends HTMLElement {
 			return false;
 		}
 	}
+
+	set value (value) {}
+
+	get value () {
+		const value = [];
+		this.content.childNodes.forEach((element) => {
+			if (element.value) {
+				value.push(element.value);
+			}
+		});
+		return value;
+	}
 }
 
 class DraggableItem extends HTMLElement {
@@ -49,10 +61,13 @@ class DraggableItem extends HTMLElement {
 		this.shadowRoot.innerHTML = `
 			<style>
 				#wrapper {
-					grid-template-columns: auto 8ch 1fr;
+					grid-template-columns: auto auto 8ch 1fr;
 					display: grid;
 					column-gap: 10px;
 					align-items: center;
+				}
+				#drag {
+					cursor: move;
 				}
 				img {
 					height: 1em;
@@ -67,8 +82,8 @@ class DraggableItem extends HTMLElement {
 		// add drag and drop listeners
 		this.addEventListener("dragstart", (event) => {
 			this.content.style.opacity = "0.5";
-			event.dataTransfer.setData("application/json", JSON.stringify(this.data));
-			event.dataTransfer.setData("text/html", this.content.innerHTML);
+			const data = { data: this.data, content: this.content.innerHTML, value: this.value };
+			event.dataTransfer.setData("application/json", JSON.stringify(data));
 			event.dataTransfer.effectAllowed = "move";
 		});
 		this.addEventListener("dragend", (event) => {
@@ -103,13 +118,13 @@ class DraggableItem extends HTMLElement {
 			}
 			if (event.target.classList.contains("drop-target")) {
 				const data = JSON.parse(event.dataTransfer.getData("application/json"));
-				const content = event.dataTransfer.getData("text/html");
 				const item = document.createElement("draggable-item");
-				item.data = data;
-				item.innerHTML = content;
+				item.data = data.data;
+				item.innerHTML = data.content;
 				item.draggable = true;
 				item.classList.add("drop-target");
 				item.id = `boot-${data.id}`;
+				item.value = data.value;
 				event.target.parentElement.insertBefore(item, event.target);
 			}
 			this.content.attributeStyleMap.clear();
