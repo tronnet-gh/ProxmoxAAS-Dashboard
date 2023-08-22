@@ -12,7 +12,6 @@ let node;
 let type;
 let vmid;
 let config;
-const bootEntries = {};
 
 async function init () {
 	setTitleAndHeader();
@@ -267,7 +266,7 @@ async function handleDiskAttach () {
 			}
 			await getConfig();
 			populateDisk();
-			addBootLine("disabled", { id: disk, prefix, value: config.data[disk] });
+			addBootLine("disabled", { id: disk, prefix, value: disk, detail: config.data[disk] });
 		}
 	});
 }
@@ -290,7 +289,7 @@ async function handleDiskResize () {
 			await getConfig();
 			populateDisk();
 			const prefix = bootMetaData.eligiblePrefixes.find((pref) => disk.startsWith(pref));
-			updateBootLine(`boot-${disk}`, { id: disk, prefix, value: config.data[disk] });
+			updateBootLine(`boot-${disk}`, { id: disk, prefix, value: disk, detail: config.data[disk] });
 		}
 	});
 }
@@ -387,7 +386,7 @@ async function handleDiskAdd () {
 			}
 			await getConfig();
 			populateDisk();
-			addBootLine("disabled", { id: disk, prefix, value: config.data[disk] });
+			addBootLine("disabled", { id: disk, prefix, value: disk, detail: config.data[disk] });
 		}
 	});
 }
@@ -424,7 +423,7 @@ async function handleCDAdd () {
 			}
 			await getConfig();
 			populateDisk();
-			addBootLine("disabled", { id: disk, prefix: "ide", value: config.data[disk] });
+			addBootLine("disabled", { id: disk, prefix: "ide", value: disk, detail: config.data[disk] });
 		}
 	});
 
@@ -571,7 +570,8 @@ async function handleNetworkAdd () {
 			}
 			await getConfig();
 			populateNetworks();
-			addBootLine("disabled", { id: `net${netID}`, prefix: "net", value: config.data[`net${netID}`] });
+			const id = `net${netID}`;
+			addBootLine("disabled", { id, prefix: "net", value: id, detail: config.data[`net${netID}`] });
 		}
 	});
 }
@@ -733,13 +733,13 @@ async function populateBoot () {
 			const element = order[i];
 			const prefix = eligible.find((pref) => order[i].startsWith(pref));
 			const detail = config.data[element];
-			bootable[i] = { id: element, prefix, detail };
+			bootable[i] = { id: element, value: element, prefix, detail };
 		}
 		Object.keys(config.data).forEach((element) => {
 			const prefix = eligible.find((pref) => element.startsWith(pref));
 			const detail = config.data[element];
 			if (prefix && !order.includes(element)) {
-				bootable.disabled.push({ id: element, prefix, detail });
+				bootable.disabled.push({ id: element, value: element, prefix, detail });
 			}
 		});
 		Object.keys(bootable).sort();
@@ -775,16 +775,30 @@ function addBootLine (container, data, before = null) {
 		document.querySelector(`#${container}`).append(item);
 	}
 	item.container = container;
-	item.value = data.id;
-	bootEntries[item.id] = item;
+	item.value = data.value;
 }
 
 function deleteBootLine (id) {
-	bootEntries[id].parentElement.removeChild(bootEntries[id]);
+	let enabled = document.querySelector("#enabled");
+	let disabled = document.querySelector("#disabled");
+	if (enabled.getItemByID(id)) {
+		enabled.deleteItemByID(id);
+	}
+	if (disabled.getItemByID(id)) {
+		disabled.deleteItemByID(id);
+	}
 }
 
 function updateBootLine (id, newData) {
-	const element = bootEntries[id];
+	let enabled = document.querySelector("#enabled");
+	let disabled = document.querySelector("#disabled");
+	let element = null;
+	if (enabled.getItemByID(id)) {
+		element = enabled.getItemByID(id);
+	}
+	if (disabled.getItemByID(id)) {
+		element = disabled.getItemByID(id)
+	}
 	if (element) {
 		const container = element.container;
 		const before = element.nextSibling;

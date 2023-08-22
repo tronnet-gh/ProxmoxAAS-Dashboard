@@ -29,6 +29,10 @@ class DraggableContainer extends HTMLElement {
 		this.content.insertBefore(newNode, referenceNode);
 	}
 
+	getItemByID (nodeid) {
+		return this.content.querySelector(`#${nodeid}`);
+	}
+
 	deleteItemByID (nodeid) {
 		const node = this.content.querySelector(`#${nodeid}`);
 		if (node) {
@@ -117,14 +121,14 @@ class DraggableItem extends HTMLElement {
 				event.target.borderTop = false;
 			}
 			if (event.target.classList.contains("drop-target")) {
-				const data = JSON.parse(event.dataTransfer.getData("application/json"));
+				const transfer = JSON.parse(event.dataTransfer.getData("application/json"));
 				const item = document.createElement("draggable-item");
-				item.data = data.data;
-				item.innerHTML = data.content;
+				item.data = transfer.data;
+				item.innerHTML = transfer.content;
 				item.draggable = true;
 				item.classList.add("drop-target");
-				item.id = `boot-${data.id}`;
-				item.value = data.value;
+				item.id = `boot-${transfer.data.id}`;
+				item.value = transfer.data.value;
 				event.target.parentElement.insertBefore(item, event.target);
 			}
 			this.content.attributeStyleMap.clear();
