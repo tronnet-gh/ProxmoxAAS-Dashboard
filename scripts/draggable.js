@@ -64,12 +64,6 @@ class DraggableItem extends HTMLElement {
 		// for whatever reason, only grid layout seems to respect the parent's content bounds
 		this.shadowRoot.innerHTML = `
 			<style>
-				#wrapper {
-					grid-template-columns: auto auto 8ch 1fr;
-					display: grid;
-					column-gap: 10px;
-					align-items: center;
-				}
 				#drag {
 					cursor: move;
 				}
@@ -86,7 +80,7 @@ class DraggableItem extends HTMLElement {
 		// add drag and drop listeners
 		this.addEventListener("dragstart", (event) => {
 			this.content.style.opacity = "0.5";
-			const data = { data: this.data, content: this.content.innerHTML, value: this.value };
+			const data = { id: this.id, data: this.data, content: this.content.innerHTML, value: this.value };
 			event.dataTransfer.setData("application/json", JSON.stringify(data));
 			event.dataTransfer.effectAllowed = "move";
 		});
@@ -127,7 +121,7 @@ class DraggableItem extends HTMLElement {
 				item.innerHTML = transfer.content;
 				item.draggable = true;
 				item.classList.add("drop-target");
-				item.id = `boot-${transfer.data.id}`;
+				item.id = transfer.id;
 				item.value = transfer.data.value;
 				event.target.parentElement.insertBefore(item, event.target);
 			}

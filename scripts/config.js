@@ -760,10 +760,12 @@ function addBootLine (container, data, before = null) {
 	const item = document.createElement("draggable-item");
 	item.data = data;
 	item.innerHTML = `
-		<img src="images/actions/drag.svg" id="drag">
-		<img src="${bootMetaData[data.prefix].icon}">
-		<p style="margin: 0px;">${data.id}</p>
-		<p style="margin: 0px; overflow-x: hidden; white-space: nowrap;">${data.detail}</p>
+		<div style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
+			<img src="images/actions/drag.svg" id="drag">
+			<img src="${bootMetaData[data.prefix].icon}">
+			<p style="margin: 0px;">${data.id}</p>
+			<p style="margin: 0px; overflow-x: hidden; white-space: nowrap;">${data.detail}</p>
+		</div>
 	`;
 	item.draggable = true;
 	item.classList.add("drop-target");
