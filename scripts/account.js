@@ -32,40 +32,73 @@ async function init () {
 	document.querySelector("#pool").innerText = `Pool: ${instances.pool}`;
 	document.querySelector("#vmid").innerText = `VMID Range: ${instances.vmid.min} - ${instances.vmid.max}`;
 	document.querySelector("#nodes").innerText = `Nodes: ${nodes.toString()}`;
-	buildResourceTable(resources, "#resource-table");
+	buildResourceTable("#resource-container", resources);
 }
 
-function buildResourceTable (resources, tableid) {
+function buildResourceTable (containerID, resources) {
 	if (resources instanceof Object) {
-		const table = document.querySelector(tableid);
-		const tbody = table.querySelector("tbody");
+		const container = document.querySelector(containerID);
 		Object.keys(resources.resources).forEach((element) => {
 			if (resources.resources[element].display) {
 				if (resources.resources[element].type === "list") {
-					const row = tbody.insertRow();
-					const key = row.insertCell();
-					key.innerHTML = `${element}`;
-					const used = row.insertCell();
-					parseList(used, resources.used[element]);
-					const avail = row.insertCell();
-					parseList(avail, resources.avail[element]);
-					const total = row.insertCell();
-					parseList(total, resources.max[element]);
 				}
 				else {
-					const row = tbody.insertRow();
-					const key = row.insertCell();
-					key.innerText = `${element}`;
-					const used = row.insertCell();
-					used.innerText = `${parseNumber(resources.used[element], resources.resources[element])}`;
-					const val = row.insertCell();
-					val.innerText = `${parseNumber(resources.avail[element], resources.resources[element])}`;
-					const total = row.insertCell();
-					total.innerText = `${parseNumber(resources.max[element], resources.resources[element])}`;
+					const chart = createResourceUsageChart(resources.resources[element].title, resources.avail[element], resources.used[element], resources.max[element], resources.resources[element]);
+					container.append(chart);
 				}
 			}
 		});
 	}
+}
+
+function createResourceUsageChart (resourceName, resourceAvail, resourceUsed, resourceMax, resourceUnitData) {
+	const container = document.createElement("div");
+	// layout fits 6 resources per row on large screens
+	// max width = (100% [parent] - 50px [5 flexbox col gap]) / 6
+	container.style = "position: relative; min-width: 200px; width: 100%; max-width: calc((100% - 50px) / 6); aspect-ratio: 1;";
+	const canvas = document.createElement("canvas");
+	container.append(canvas);
+	const maxStr = parseNumber(resourceMax, resourceUnitData);
+	const usedStr = parseNumber(resourceUsed, resourceUnitData);
+	const usedRatio = resourceUsed / resourceMax;
+	const R = Math.min(usedRatio * 510, 255);
+	const G = Math.min((1 - usedRatio) * 510, 255);
+	const usedColor = `rgb(${R}, ${G}, 0)`;
+	new Chart(canvas, {
+		type: "pie",
+		data: {
+			labels: [
+				"Used",
+				"Available"
+			],
+			datasets: [{
+				label: resourceName,
+				data: [resourceUsed, resourceAvail],
+				backgroundColor: [
+					usedColor,
+					"rgb(140, 140, 140)"
+				],
+				borderWidth: 0,
+				hoverOffset: 4
+			}]
+		},
+		options: {
+			plugins: {
+				title: {
+					display: true,
+					position: "bottom",
+					text: [resourceName, `Used ${usedStr} of ${maxStr}`],
+					color: "white"
+				},
+				legend: {
+					display: false
+				}
+			}
+		}
+	});
+	canvas.role = "img";
+	canvas.ariaLabel = `${resourceName} used ${usedStr} of ${maxStr}`;
+	return container;
 }
 
 function parseNumber (value, unitData) {
@@ -86,15 +119,4 @@ function parseNumber (value, unitData) {
 	else {
 		return `${value} ${unit}`;
 	}
-}
-
-function parseList (cell, list) {
-	const listElem = document.createElement("ul");
-	listElem.style = "list-style-type: none; padding: 0; margin: 0;";
-	for (const item of list) {
-		const itemElem = document.createElement("li");
-		itemElem.innerText = item;
-		listElem.append(itemElem);
-	}
-	cell.append(listElem);
 }

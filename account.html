@@ -9,6 +9,7 @@
 		<link rel="stylesheet" href="css/style.css">
 		<link rel="stylesheet" href="css/nav.css">
 		<script src="scripts/account.js" type="module"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js" type="module"></script>
 	</head>
 	<body>
 		<header>
@@ -34,17 +35,7 @@
 				</div>
 				<div class="w3-card w3-padding">
 					<h3>Cluster Resources</h3>
-					<table id="resource-table" class="w3-table w3-table-all w3-mobile" style="overflow-x: auto; margin-bottom: 1em;">
-						<thead>
-							<tr class="w3-black">
-								<th>Resource</th>
-								<th>Used</th>
-								<th>Free</th>
-								<th>Total</th>
-							</tr>
-						</thead>
-						<tbody></tbody>
-					</table>
+					<div id="resource-container" style="display: flex; flex-direction: row; flex-wrap: wrap; column-gap: 10px; row-gap: 10px;"></div>
 				</div>
 			</section>
 		</main>
