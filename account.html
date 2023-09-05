@@ -9,7 +9,41 @@
 		<link rel="stylesheet" href="css/style.css">
 		<link rel="stylesheet" href="css/nav.css">
 		<script src="scripts/account.js" type="module"></script>
-		<script src="https://cdn.jsdelivr.net/npm/chart.js" type="module"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<style>
+			@media screen and (width >= 1264px){
+				#resource-container {
+					display: flex; 
+					flex-direction: row; 
+					gap: 0px;
+					flex-wrap: nowrap;
+					justify-content: left;
+				}
+				#resource-container > * {
+					position: relative;
+					min-width: 200px;
+					width: 100%;
+					aspect-ratio: 1 / 1;
+				}
+			}
+			@media screen and (width <= 1264px) and (width >= 480px) {
+				#resource-container {
+					display: grid;
+					grid-template-columns: repeat(auto-fill, 200px);
+					grid-gap: 0px;
+					justify-content: space-between;
+				}
+			}
+			@media screen and (width <= 480px) {
+				#resource-container {
+					display: flex;
+					flex-direction: column;
+					gap: 0px;
+					flex-wrap: nowrap;
+					justify-content: center;
+				}
+			}
+		</style>
 	</head>
 	<body>
 		<header>
@@ -35,7 +69,7 @@
 				</div>
 				<div class="w3-card w3-padding">
 					<h3>Cluster Resources</h3>
-					<div id="resource-container" style="display: flex; flex-direction: row; flex-wrap: wrap; column-gap: 10px; row-gap: 10px;"></div>
+					<div id="resource-container"></div>
 				</div>
 			</section>
 		</main>
