@@ -53,9 +53,6 @@ function buildResourceTable (containerID, resources) {
 
 function createResourceUsageChart (resourceName, resourceAvail, resourceUsed, resourceMax, resourceUnitData) {
 	const container = document.createElement("div");
-	// layout fits 6 resources per row on large screens
-	// max width = (100% [parent] - 50px [5 flexbox col gap]) / 6
-	container.style = "position: relative; min-width: 200px; width: 100%; max-width: calc((100% - 50px) / 6); aspect-ratio: 1;";
 	const canvas = document.createElement("canvas");
 	container.append(canvas);
 	const maxStr = parseNumber(resourceMax, resourceUnitData);
