@@ -91,7 +91,7 @@ function addResourceLine (fieldset, iconHref, type, labelText, id, attributes, u
 
 	const label = document.createElement("label");
 	label.innerText = labelText;
-	label.htmlFor = labelText;
+	label.htmlFor = id;
 	field.append(label);
 
 	if (type === "input") {
@@ -171,7 +171,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 	field.append(icon);
 
 	// Add a label for the disk bus and device number
-	const diskLabel = document.createElement("label");
+	const diskLabel = document.createElement("p");
 	diskLabel.innerText = diskName;
 	diskLabel.dataset.disk = diskID;
 	field.append(diskLabel);
@@ -467,7 +467,7 @@ function addNetworkLine (fieldset, prefix, netID, netDetails) {
 	icon.dataset.values = netDetails;
 	field.appendChild(icon);
 
-	const netLabel = document.createElement("label");
+	const netLabel = document.createElement("p");
 	netLabel.innerText = `${prefix}${netID}`;
 	netLabel.dataset.network = netID;
 	netLabel.dataset.values = netDetails;
@@ -609,7 +609,6 @@ function addDeviceLine (fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	field.appendChild(icon);
 
 	const deviceLabel = document.createElement("p");
-
 	deviceLabel.innerText = deviceName;
 	deviceLabel.dataset.device = deviceID;
 	deviceLabel.dataset.values = deviceDetails;
