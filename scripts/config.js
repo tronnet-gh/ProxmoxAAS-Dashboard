@@ -780,13 +780,16 @@ function addBootLine (container, data, before = null) {
 }
 
 function deleteBootLine (id) {
+	const query = `#${id}`;
 	const enabled = document.querySelector("#enabled");
 	const disabled = document.querySelector("#disabled");
-	if (enabled.getItemByID(id)) {
-		enabled.deleteItemByID(id);
+	const inEnabled = enabled.querySelector(query);
+	const inDisabled = disabled.querySelector(query);
+	if (inEnabled) {
+		enabled.removeChild(inEnabled);
 	}
-	if (disabled.getItemByID(id)) {
-		disabled.deleteItemByID(id);
+	if (inDisabled) {
+		disabled.removeChild(inDisabled);
 	}
 }
 

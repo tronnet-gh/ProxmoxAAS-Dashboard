@@ -29,13 +29,12 @@ class DraggableContainer extends HTMLElement {
 		this.content.insertBefore(newNode, referenceNode);
 	}
 
-	getItemByID (nodeid) {
-		return this.content.querySelector(`#${nodeid}`);
+	querySelector (query) {
+		return this.content.querySelector(query);
 	}
 
-	deleteItemByID (nodeid) {
-		const node = this.content.querySelector(`#${nodeid}`);
-		if (node) {
+	removeChild (node) {
+		if (node && this.content.contains(node)) {
 			this.content.removeChild(node);
 			return true;
 		}
@@ -93,16 +92,14 @@ class DraggableItem extends HTMLElement {
 			}
 		});
 		this.addEventListener("dragenter", (event) => {
-			if (event.target.classList.contains("drop-target")) {
-				event.target.classList.add("drag-over");
-				event.target.borderTop = true;
+			if (event.target.dropTarget) {
+				event.target.dragOver = true;
 			}
 			event.preventDefault();
 		});
 		this.addEventListener("dragleave", (event) => {
-			if (event.target.classList.contains("drag-over")) {
-				event.target.classList.remove("drag-over");
-				event.target.borderTop = false;
+			if (event.target.dragOver) {
+				event.target.dragOver = false;
 			}
 			event.preventDefault();
 		});
@@ -110,17 +107,16 @@ class DraggableItem extends HTMLElement {
 			event.preventDefault();
 		});
 		this.addEventListener("drop", (event) => {
-			if (event.target.classList.contains("drag-over")) {
-				event.target.classList.remove("drag-over");
-				event.target.borderTop = false;
+			if (event.target.dragOver) {
+				event.target.dragOver = false;
 			}
-			if (event.target.classList.contains("drop-target")) {
+			if (event.target.dropTarget) {
 				const transfer = JSON.parse(event.dataTransfer.getData("application/json"));
 				const item = document.createElement("draggable-item");
 				item.data = transfer.data;
 				item.innerHTML = transfer.content;
 				item.draggable = true;
-				item.classList.add("drop-target");
+				item.dropTarget = true;
 				item.id = transfer.id;
 				item.value = transfer.data.value;
 				event.target.parentElement.insertBefore(item, event.target);
@@ -138,15 +134,32 @@ class DraggableItem extends HTMLElement {
 		this.content.innerHTML = innerHTML;
 	}
 
-	get borderTop () {
-		return this.content.style.borderTop === "";
+	get dropTarget () {
+		return this.classList.contains("drop-target");
 	}
 
-	set borderTop (borderTop) {
-		if (borderTop) {
+	set dropTarget (dropTarget) {
+		if (dropTarget) {
+			this.classList.add("drop-target");
+		}
+		else {
+			this.classList.remove("drop-target");
+		}
+	}
+
+	get dragOver () {
+		return this.classList.contains("drag-over");
+	}
+
+	set dragOver (dragOver) {
+		if (dragOver) {
+			this.classList.add("drag-over");
+			// temp hover over effect
 			this.content.style.borderTop = "1px dotted";
 		}
 		else {
+			this.classList.remove("drag-over");
+			// temp hover over effect
 			this.content.style.borderTop = "";
 		}
 	}
