@@ -55,22 +55,23 @@ async function populateResources () {
 		const user = await requestAPI("/user/config/resources");
 		let options = [];
 		if (global.cpu.whitelist) {
-			options = user.max.cpu.sort((a, b) => {
+			user.cpu.forEach((userType) => {
+				options.push(userType.name);
+			});
+			options = options.sort((a, b) => {
 				return a.localeCompare(b);
 			});
 		}
 		else {
 			const supported = await requestPVE(`/nodes/${node}/capabilities/qemu/cpu`);
-			supported.data.forEach((element) => {
-				if (!user.max.cpu.includes(element.name)) {
-					options.push(element.name);
+			supported.data.forEach((supportedType) => {
+				if (!user.cpu.some((userType) => supportedType.name === userType.name)) {
+					options.push(supportedType.name);
 				}
 			});
 			options = options.sort((a, b) => {
 				return a.localeCompare(b);
 			});
-			console.log(options);
-			console.log("blacklist not yet supported");
 		}
 		addResourceLine("resources", "images/resources/cpu.svg", "select", "CPU Type", "proctype", { value: config.data.cpu, options });
 	}

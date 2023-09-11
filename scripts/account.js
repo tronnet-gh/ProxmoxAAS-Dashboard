@@ -26,24 +26,29 @@ async function init () {
 		goToPage("login.html");
 	}
 	const resources = await requestAPI("/user/dynamic/resources");
+	const meta = await requestAPI("/global/config/resources");
 	const instances = await requestAPI("/user/config/cluster");
 	const nodes = await requestAPI("/user/config/nodes");
 	document.querySelector("#username").innerText = `Username: ${getCookie("username")}`;
 	document.querySelector("#pool").innerText = `Pool: ${instances.pool}`;
 	document.querySelector("#vmid").innerText = `VMID Range: ${instances.vmid.min} - ${instances.vmid.max}`;
 	document.querySelector("#nodes").innerText = `Nodes: ${nodes.toString()}`;
-	buildResourceTable("#resource-container", resources);
+	populateResources("#resource-container", meta, resources);
 }
 
-function buildResourceTable (containerID, resources) {
+function populateResources (containerID, meta, resources) {
 	if (resources instanceof Object) {
 		const container = document.querySelector(containerID);
-		Object.keys(resources.resources).forEach((element) => {
-			if (resources.resources[element].display) {
-				if (resources.resources[element].type === "list") {
+		Object.keys(meta).forEach((resourceType) => {
+			if (meta[resourceType].display) {
+				if (meta[resourceType].type === "list") {
+					resources[resourceType].forEach((listResource) => {
+						const chart = createResourceUsageChart(listResource.name, listResource.avail, listResource.used, listResource.max, null);
+						container.append(chart);
+					});
 				}
 				else {
-					const chart = createResourceUsageChart(resources.resources[element].title, resources.avail[element], resources.used[element], resources.max[element], resources.resources[element]);
+					const chart = createResourceUsageChart(meta[resourceType].name, resources[resourceType].avail, resources[resourceType].used, resources[resourceType].max, meta[resourceType]);
 					container.append(chart);
 				}
 			}
@@ -99,6 +104,9 @@ function createResourceUsageChart (resourceName, resourceAvail, resourceUsed, re
 }
 
 function parseNumber (value, unitData) {
+	if (!unitData) {
+		return `${value}`;
+	}
 	const compact = unitData.compact;
 	const multiplier = unitData.multiplier;
 	const base = unitData.base;
