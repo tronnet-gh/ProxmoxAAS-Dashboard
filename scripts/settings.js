@@ -18,7 +18,6 @@ function init () {
 function handleSaveSettings (event) {
 	event.preventDefault();
 	const form = new FormData(document.querySelector("#settings"));
-	console.log(form.get("sync-scheme"));
 	localStorage.setItem("sync-scheme", form.get("sync-scheme"));
 	localStorage.setItem("sync-rate", form.get("sync-rate"));
 	window.location.reload();

@@ -192,8 +192,8 @@ async function handleInstanceAdd () {
 
 	const userResources = await requestAPI("/user/dynamic/resources", "GET");
 	const userCluster = await requestAPI("/user/config/cluster", "GET");
-	d.querySelector("#cores").max = userResources.avail.cores;
-	d.querySelector("#memory").max = userResources.avail.memory;
+	d.querySelector("#cores").max = userResources.cores.avail;
+	d.querySelector("#memory").max = userResources.memory.avail;
 	d.querySelector("#vmid").min = userCluster.vmid.min;
 	d.querySelector("#vmid").max = userCluster.vmid.max;
 }
