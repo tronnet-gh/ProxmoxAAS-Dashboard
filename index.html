@@ -33,11 +33,17 @@
 		</header>
 		<main>
 			<section class="w3-container">
-				<div class="flex row nowrap" style="justify-content: space-between;">
-					<h2>Instances</h2>
-					<button type="button" id="instance-add" class="w3-button">Create Instance</button>
+				<h2>Instances</h2>
+				<div class="w3-card w3-padding">
+					<div class="flex row nowrap" style="justify-content: space-between;">
+						<form role="search" class="flex row nowrap">
+							<img src="images/static/search.svg">
+							<input type="search" id="search" class="w3-input w3-border" style="height: 1lh;">
+						</form>
+						<button type="button" id="instance-add" class="w3-button">Create Instance</button>						
+					</div>
+					<div id="instance-container"></div>
 				</div>
-				<div id="instance-container" class="w3-card w3-padding"></div>
 			</section>
 		</main>
 	</body>
