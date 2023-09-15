@@ -3,19 +3,42 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>proxmox - client</title>
+		<title>proxmox - dashboard</title>
 		<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
 		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<link rel="stylesheet" href="css/style.css">
 		<link rel="stylesheet" href="css/nav.css">
 		<link rel="stylesheet" href="css/form.css">
 		<script src="scripts/index.js" type="module"></script>
+		<script src="scripts/instance.js" type="module"></script>
 		<style>
 			#instance-container > div {
 				border-bottom: 1px solid white;
 			}
 			#instance-container > div:last-child {
 				border-bottom: none;
+			}
+			@media screen and (width >= 440px) {
+				#vm-search {
+					max-width: calc(100% - 10px - 152px);
+				}
+				button .large {
+					display: block;
+				}
+				button .small {
+					display: none;
+				}
+			}
+			@media screen and (width <= 440px) {
+				#vm-search {
+					max-width: calc(100% - 10px - 47px);
+				}
+				button .large {
+					display: none;
+				}
+				button .small {
+					display: block;
+				}
 			}
 		</style>
 	</head>
@@ -35,12 +58,15 @@
 			<section class="w3-container">
 				<h2>Instances</h2>
 				<div class="w3-card w3-padding">
-					<div class="flex row nowrap" style="justify-content: space-between;">
-						<form role="search" class="flex row nowrap">
-							<img src="images/static/search.svg">
-							<input type="search" id="search" class="w3-input w3-border" style="height: 1lh;">
+					<div class="flex row nowrap" style="margin-top: 1em; justify-content: space-between;">
+						<form id="vm-search" role="search" class="flex row nowrap">
+							<img src="images/static/search.svg" alt="Search VMs">
+							<input type="search" id="search" class="w3-input w3-border" style="height: 1lh; max-width: fit-content;">
 						</form>
-						<button type="button" id="instance-add" class="w3-button">Create Instance</button>						
+						<button type="button" id="instance-add" class="w3-button" aria-label="Create New Instance">
+							<span class="large" style="margin: 0;">Create Instance</span>
+							<img class="small" style="height: 1lh; width: 1lh;" src="images/actions/instance/add.svg" alt="Create New Instance">
+						</button>
 					</div>
 					<div id="instance-container"></div>
 				</div>

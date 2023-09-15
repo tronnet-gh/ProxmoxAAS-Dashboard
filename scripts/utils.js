@@ -235,7 +235,7 @@ export function goToPage (page, data = {}, newwindow = false) {
 	}
 
 	if (newwindow) {
-		window.open(url, `${organization} - client`, "height=480,width=848");
+		window.open(url, `${organization} - dashboard`, "height=480,width=848");
 	}
 	else {
 		window.location.assign(url.toString());
@@ -249,7 +249,7 @@ export function goToURL (href, data = {}, newwindow = false) {
 	}
 
 	if (newwindow) {
-		window.open(url, `${organization} - client`, "height=480,width=848");
+		window.open(url, `${organization} - dashboard`, "height=480,width=848");
 	}
 	else {
 		window.location.assign(url.toString());
@@ -266,6 +266,6 @@ export async function deleteAllCookies () {
 }
 
 export function setTitleAndHeader () {
-	document.title = `${organization} - client`;
+	document.title = `${organization} - dashboard`;
 	document.querySelector("h1").innerText = organization;
 }
