@@ -4,6 +4,8 @@ import { setupClientSync } from "./clientsync.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
+let instances = [];
+
 async function init () {
 	setTitleAndHeader();
 	const cookie = document.cookie;
@@ -12,19 +14,19 @@ async function init () {
 	}
 
 	document.querySelector("#instance-add").addEventListener("click", handleInstanceAdd);
+	document.querySelector("#vm-search").addEventListener("input", populateInstances);
 
-	setupClientSync(populateInstances);
-
-	document.querySelector("#vm-search").addEventListener("input", () => {
-
-	});
+	setupClientSync(refreshInstances);
 }
 
-async function populateInstances () {
-	const resources = await requestPVE("/cluster/resources", "GET");
-	const instanceContainer = document.getElementById("instance-container");
-	const instances = [];
+async function refreshInstances () {
+	await getInstances();
+	await populateInstances();
+}
 
+async function getInstances () {
+	const resources = await requestPVE("/cluster/resources", "GET");
+	instances = [];
 	resources.data.forEach((element) => {
 		if (element.type === "lxc" || element.type === "qemu") {
 			const nodeName = element.node;
@@ -33,34 +35,38 @@ async function populateInstances () {
 			instances.push(element);
 		}
 	});
+}
 
-	instances.sort((a, b) => (a.vmid > b.vmid) ? 1 : -1);
-
-	instanceContainer.innerHTML = `
-		<div class="w3-row w3-hide-small" style="border-bottom: 1px solid;">
-			<div class="w3-col l1 m2">
-				<p>VM ID</p>
-			</div>
-			<div class="w3-col l2 m3">
-				<p>VM Name</p>
-			</div>
-			<div class="w3-col l1 m2">
-				<p>VM Type</p>
-			</div>
-			<div class="w3-col l2 m3">
-				<p>VM Status</p>
-			</div>
-			<div class="w3-col l2 w3-hide-medium">
-				<p>Host Name</p>
-			</div>
-			<div class="w3-col l2 w3-hide-medium">
-				<p>Host Status</p>
-			</div>
-			<div class="w3-col l2 m2">
-				<p>Actions</p>
-			</div>
-		</div>
-	`;
+async function populateInstances () {
+	const searchQuery = document.querySelector("#search").value;
+	let criteria;
+	if (searchQuery === "") {
+		criteria = (a, b) => {
+			return (a.vmid > b.vmid) ? 1 : -1;
+		};
+	}
+	else {
+		criteria = (a, b) => {
+			const a_inc = a.name.includes(searchQuery);
+			const b_inc = b.name.includes(searchQuery);
+			if (a_inc && b_inc) {
+				return a.vmid > b.vmid ? 1 : -1;
+			}
+			else if (a_inc && !b_inc) {
+				return -1;
+			}
+			else if (!a_inc && b_inc) {
+				return 1;
+			}
+			else {
+				return a.vmid > b.vmid ? 1 : -1;
+			}
+		};
+	}
+	instances.sort(criteria);
+	//console.log(instances)
+	const instanceContainer = document.querySelector("#instance-container");
+	instanceContainer.innerHTML = ``;
 	for (let i = 0; i < instances.length; i++) {
 		const newInstance = document.createElement("instance-card");
 		newInstance.data = instances[i];
