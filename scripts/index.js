@@ -47,15 +47,15 @@ async function populateInstances () {
 	}
 	else {
 		criteria = (a, b) => {
-			const a_inc = a.name.includes(searchQuery);
-			const b_inc = b.name.includes(searchQuery);
-			if (a_inc && b_inc) {
+			const aInc = a.name.includes(searchQuery);
+			const bInc = b.name.includes(searchQuery);
+			if (aInc && bInc) {
 				return a.vmid > b.vmid ? 1 : -1;
 			}
-			else if (a_inc && !b_inc) {
+			else if (aInc && !bInc) {
 				return -1;
 			}
-			else if (!a_inc && b_inc) {
+			else if (!aInc && bInc) {
 				return 1;
 			}
 			else {
@@ -64,9 +64,9 @@ async function populateInstances () {
 		};
 	}
 	instances.sort(criteria);
-	//console.log(instances)
+	// console.log(instances)
 	const instanceContainer = document.querySelector("#instance-container");
-	instanceContainer.innerHTML = ``;
+	instanceContainer.innerHTML = "";
 	for (let i = 0; i < instances.length; i++) {
 		const newInstance = document.createElement("instance-card");
 		newInstance.data = instances[i];

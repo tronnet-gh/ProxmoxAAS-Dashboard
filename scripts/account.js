@@ -66,7 +66,7 @@ function createResourceUsageChart (resourceName, resourceAvail, resourceUsed, re
 	const R = Math.min(usedRatio * 510, 255);
 	const G = Math.min((1 - usedRatio) * 510, 255);
 	const usedColor = `rgb(${R}, ${G}, 0)`;
-	new Chart(canvas, {
+	createChart(canvas, {
 		type: "pie",
 		data: {
 			labels: [
@@ -101,6 +101,10 @@ function createResourceUsageChart (resourceName, resourceAvail, resourceUsed, re
 	canvas.role = "img";
 	canvas.ariaLabel = `${resourceName} used ${usedStr} of ${maxStr}`;
 	return container;
+}
+
+function createChart (ctx, data) {
+	return new window.Chart(ctx, data);
 }
 
 function parseNumber (value, unitData) {
