@@ -1,6 +1,7 @@
 :root {
 	--negative-color: #f00;
 	--positive-color: #0f0;
+	--highlight-color: yellow;
 	--lightbg-text-color: black;
 	--main-bg-color: #404040;
 	--main-text-color: white;
