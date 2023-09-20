@@ -53,7 +53,8 @@ class InstanceCard extends HTMLElement {
 			status: this.status,
 			vmid: this.status,
 			name: this.name,
-			node: this.node
+			node: this.node,
+			searchQuery: this.searchQuery
 		};
 	}
 
@@ -66,6 +67,7 @@ class InstanceCard extends HTMLElement {
 		this.vmid = data.vmid;
 		this.name = data.name;
 		this.node = data.node;
+		this.searchQuery = data.searchQuery;
 		this.update();
 	}
 
@@ -74,7 +76,16 @@ class InstanceCard extends HTMLElement {
 		vmidParagraph.innerText = this.vmid;
 
 		const nameParagraph = this.shadowRoot.querySelector("#instance-name");
-		nameParagraph.innerText = this.name ? this.name : "";
+		if (this.searchQuery) {
+			const nameParts = this.name.split(this.searchQuery);
+			nameParagraph.innerHTML += `<span>${nameParts[0]}</span>`;
+			for (let i = 1; i < nameParts.length; i++) {
+				nameParagraph.innerHTML += `<span style="color: var(--lightbg-text-color); background-color: var(--highlight-color);">${this.searchQuery}</span><span>${nameParts[i]}</span>`;
+			}
+		}
+		else {
+			nameParagraph.innerText = this.name ? this.name : "";
+		}
 
 		const typeParagraph = this.shadowRoot.querySelector("#instance-type");
 		typeParagraph.innerText = this.type;

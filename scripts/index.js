@@ -38,9 +38,9 @@ async function getInstances () {
 }
 
 async function populateInstances () {
-	const searchQuery = document.querySelector("#search").value;
+	const searchQuery = document.querySelector("#search").value || null;
 	let criteria;
-	if (searchQuery === "") {
+	if (!searchQuery) {
 		criteria = (a, b) => {
 			return (a.vmid > b.vmid) ? 1 : -1;
 		};
@@ -64,11 +64,11 @@ async function populateInstances () {
 		};
 	}
 	instances.sort(criteria);
-	// console.log(instances)
 	const instanceContainer = document.querySelector("#instance-container");
 	instanceContainer.innerHTML = "";
 	for (let i = 0; i < instances.length; i++) {
 		const newInstance = document.createElement("instance-card");
+		instances[i].searchQuery = searchQuery;
 		newInstance.data = instances[i];
 		instanceContainer.append(newInstance);
 	}
