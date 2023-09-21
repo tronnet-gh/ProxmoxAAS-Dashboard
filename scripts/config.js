@@ -761,8 +761,8 @@ function addBootLine (container, data, before = null) {
 	item.data = data;
 	item.innerHTML = `
 		<div style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
-			<img src="images/actions/drag.svg" id="drag">
-			<img src="${bootMetaData[data.prefix].icon}">
+			<img src="images/actions/drag.svg" id="drag" alt="drag icon">
+			<img src="${bootMetaData[data.prefix].icon}" alt="${bootMetaData[data.prefix].alt}">
 			<p style="margin: 0px;">${data.id}</p>
 			<p style="margin: 0px; overflow-x: hidden; white-space: nowrap;">${data.detail}</p>
 		</div>

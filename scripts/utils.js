@@ -132,13 +132,16 @@ export const nodesConfig = {
 export const bootConfig = {
 	eligiblePrefixes: ["ide", "sata", "net"],
 	ide: {
-		icon: "images/resources/disk.svg"
+		icon: "images/resources/disk.svg",
+		alt: "IDE Bootable Icon"
 	},
 	sata: {
-		icon: "images/resources/drive.svg"
+		icon: "images/resources/drive.svg",
+		alt: "SATA Bootable Icon"
 	},
 	net: {
-		icon: "images/resources/network.svg"
+		icon: "images/resources/network.svg",
+		alt: "NET Bootable Icon"
 	}
 };
 
