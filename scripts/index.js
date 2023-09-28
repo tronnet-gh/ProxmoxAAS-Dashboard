@@ -47,8 +47,8 @@ async function populateInstances () {
 	}
 	else {
 		criteria = (a, b) => {
-			const aInc = a.name.includes(searchQuery);
-			const bInc = b.name.includes(searchQuery);
+			const aInc = a.name.toLowerCase().includes(searchQuery.toLowerCase());
+			const bInc = b.name.toLowerCase().includes(searchQuery.toLowerCase());
 			if (aInc && bInc) {
 				return a.vmid > b.vmid ? 1 : -1;
 			}

@@ -77,10 +77,15 @@ class InstanceCard extends HTMLElement {
 
 		const nameParagraph = this.shadowRoot.querySelector("#instance-name");
 		if (this.searchQuery) {
-			const nameParts = this.name.split(this.searchQuery);
-			nameParagraph.innerHTML += `<span>${nameParts[0]}</span>`;
-			for (let i = 1; i < nameParts.length; i++) {
-				nameParagraph.innerHTML += `<span style="color: var(--lightbg-text-color); background-color: var(--highlight-color);">${this.searchQuery}</span><span>${nameParts[i]}</span>`;
+			const regEscape = v => v.replace("[-[\]{}()*+?.,\\^$|#\s]", "\\$&");
+			const nameParts = this.name.split(new RegExp(regEscape(`(${this.searchQuery})`), "ig"));
+			for (let i = 0; i < nameParts.length; i++) {
+				const part = document.createElement("span");
+				part.innerText = nameParts[i];
+				if (nameParts[i].toLowerCase() === this.searchQuery.toLowerCase()) {
+					part.style = "color: var(--lightbg-text-color); background-color: var(--highlight-color);";
+				}
+				nameParagraph.append(part);
 			}
 		}
 		else {
