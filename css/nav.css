@@ -68,15 +68,15 @@ label[for="navtoggle"], #navtoggle {
 		color: var(--nav-link-active-text-color);
 		background-color: var(--nav-link-active-bg-color);
 	}
-	
-	nav:hover a[aria-current="page"]:has(~ a:hover) {
-		color: var(--nav-text-color);
-		background-color: var(--nav-bg-color);
-	}
 
 	nav:hover a[aria-current="page"]:hover {
 		color: var(--nav-link-active-text-color);
 		background-color: var(--nav-link-active-bg-color);
+	}
+	
+	nav:hover a[aria-current="page"]:has(~ a:hover) {
+		color: var(--nav-text-color);
+		background-color: var(--nav-bg-color);
 	}
 }
 
