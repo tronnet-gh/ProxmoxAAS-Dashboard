@@ -2,10 +2,10 @@
 const draggableItemUUIDs = {};
 
 /**
- * Validate a data transfer object through its data types. Valid draggable-item events have one type of the format `application/json/${uuid}`.
- * The function takes the entire type list from event.dataTransfer.types and returns true if the dataTransfer object is likely to be valid.
- * @param {*} formatList from event.dataTransfer.types
- * @returns {Boolean} true if dataTransfer is valid (from a draggable-item source on this page), false otherwise
+ * Get the data transfer source object by parsing its types. Valid draggable-item events have one type of the format `application/json/${uuid}`.
+ * The function takes the entire type list from event.dataTransfer.types and returns the source object if valid, or null if invalid.
+ * @param {*} typesList from event.dataTransfer.types
+ * @returns {Object} Object containing the type, uuid, and element of the dataTransfer source or null 
  */
 function getDragSource (typesList) {
 	if (typesList.length !== 1) {
