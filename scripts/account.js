@@ -43,68 +43,61 @@ function populateResources (containerID, meta, resources) {
 			if (meta[resourceType].display) {
 				if (meta[resourceType].type === "list") {
 					resources[resourceType].forEach((listResource) => {
-						const chart = createResourceUsageChart(listResource.name, listResource.avail, listResource.used, listResource.max, null);
-						container.append(chart);
+						createResourceUsageChart(container, listResource.name, listResource.avail, listResource.used, listResource.max, null);
 					});
 				}
 				else {
-					const chart = createResourceUsageChart(meta[resourceType].name, resources[resourceType].avail, resources[resourceType].used, resources[resourceType].max, meta[resourceType]);
-					container.append(chart);
+					createResourceUsageChart(container, meta[resourceType].name, resources[resourceType].avail, resources[resourceType].used, resources[resourceType].max, meta[resourceType]);
 				}
 			}
 		});
 	}
 }
 
-function createResourceUsageChart (resourceName, resourceAvail, resourceUsed, resourceMax, resourceUnitData) {
-	const container = document.createElement("div");
-	const canvas = document.createElement("canvas");
-	container.append(canvas);
+function createResourceUsageChart (container, resourceName, resourceAvail, resourceUsed, resourceMax, resourceUnitData) {
+	const chart = document.createElement("custom-chart");
+	container.append(chart);
 	const maxStr = parseNumber(resourceMax, resourceUnitData);
 	const usedStr = parseNumber(resourceUsed, resourceUnitData);
 	const usedRatio = resourceUsed / resourceMax;
 	const R = Math.min(usedRatio * 510, 255);
 	const G = Math.min((1 - usedRatio) * 510, 255);
 	const usedColor = `rgb(${R}, ${G}, 0)`;
-	createChart(canvas, {
-		type: "pie",
-		data: {
-			labels: [
-				"Used",
-				"Available"
-			],
-			datasets: [{
-				label: resourceName,
-				data: [resourceUsed, resourceAvail],
-				backgroundColor: [
-					usedColor,
-					"rgb(140, 140, 140)"
+	chart.data = {
+		chart: {
+			type: "pie",
+			data: {
+				labels: [
+					"Used",
+					"Available"
 				],
-				borderWidth: 0,
-				hoverOffset: 4
-			}]
-		},
-		options: {
-			plugins: {
-				title: {
-					display: true,
-					position: "bottom",
-					text: [resourceName, `Used ${usedStr} of ${maxStr}`],
-					color: "white"
-				},
-				legend: {
-					display: false
+				datasets: [{
+					label: resourceName,
+					data: [resourceUsed, resourceAvail],
+					backgroundColor: [
+						usedColor,
+						"rgb(140, 140, 140)"
+					],
+					borderWidth: 0,
+					hoverOffset: 4
+				}]
+			},
+			options: {
+				plugins: {
+					title: {
+						display: true,
+						position: "bottom",
+						text: [resourceName, `Used ${usedStr} of ${maxStr}`],
+						color: "white"
+					},
+					legend: {
+						display: false
+					}
 				}
 			}
-		}
-	});
-	canvas.role = "img";
-	canvas.ariaLabel = `${resourceName} used ${usedStr} of ${maxStr}`;
-	return container;
-}
-
-function createChart (ctx, data) {
-	return new window.Chart(ctx, data);
+		},
+		ariaLabel: `${resourceName} used ${usedStr} of ${maxStr}`
+	};
 }
 
 function parseNumber (value, unitData) {
