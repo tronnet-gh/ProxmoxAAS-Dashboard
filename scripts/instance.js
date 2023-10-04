@@ -77,8 +77,10 @@ class InstanceCard extends HTMLElement {
 
 		const nameParagraph = this.shadowRoot.querySelector("#instance-name");
 		if (this.searchQuery) {
-			const regEscape = v => v.replace("[-[\]{}()*+?.,\\^$|#\s]", "\\$&");
-			const nameParts = this.name.split(new RegExp(regEscape(`(${this.searchQuery})`), "ig"));
+			const regExpEscape = v => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+			const escapedQuery = regExpEscape(this.searchQuery);
+			const searchRegExp = new RegExp(`(${escapedQuery})`, "gi");
+			const nameParts = this.name.split(searchRegExp);
 			for (let i = 0; i < nameParts.length; i++) {
 				const part = document.createElement("span");
 				part.innerText = nameParts[i];
