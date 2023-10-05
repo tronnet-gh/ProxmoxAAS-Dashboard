@@ -98,6 +98,8 @@ function createResourceUsageChart (container, resourceName, resourceAvail, resou
 		},
 		ariaLabel: `${resourceName} used ${usedStr} of ${maxStr}`
 	};
+	chart.style = "margin: 10px;";
+	chart.responsive = "680px";
 }
 
 function parseNumber (value, unitData) {
