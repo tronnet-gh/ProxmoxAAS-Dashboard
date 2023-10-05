@@ -37,4 +37,4 @@ After this step, the Dashboard should be available on the `Dashboard Host` at po
 
 ## Installation - API
 
-To install the API, go to [ProxmoxAAS API](https://github.com/tronnet-gh/ProxmoxAAS-API). This is required for the app to function. The API installation will also have steps for setting up the reverse proxy server.  
+To install the API, go to [ProxmoxAAS API](https://git.tronnet.net/tronnet/ProxmoxAAS-API). This is required for the app to function. The API installation will also have steps for setting up the reverse proxy server.  
