@@ -55,7 +55,7 @@ function populateResources (containerID, meta, resources) {
 }
 
 function createResourceUsageChart (container, resourceName, resourceAvail, resourceUsed, resourceMax, resourceUnitData) {
-	const chart = document.createElement("custom-chart");
+	const chart = document.createElement("resource-chart");
 	container.append(chart);
 	const maxStr = parseNumber(resourceMax, resourceUnitData);
 	const usedStr = parseNumber(resourceUsed, resourceUnitData);
@@ -64,42 +64,27 @@ function createResourceUsageChart (container, resourceName, resourceAvail, resou
 	const G = Math.min((1 - usedRatio) * 510, 255);
 	const usedColor = `rgb(${R}, ${G}, 0)`;
 	chart.data = {
-		chart: {
-			type: "pie",
-			data: {
-				labels: [
-					"Used",
-					"Available"
+		title: [resourceName, `Used ${usedStr} of ${maxStr}`],
+		ariaLabel: `${resourceName} used ${usedStr} of ${maxStr}`,
+		data: {
+			labels: [
+				"Used",
+				"Available"
+			],
+			datasets: [{
+				label: resourceName,
+				data: [resourceUsed, resourceAvail],
+				backgroundColor: [
+					usedColor,
+					"rgb(140, 140, 140)"
 				],
-				datasets: [{
-					label: resourceName,
-					data: [resourceUsed, resourceAvail],
-					backgroundColor: [
-						usedColor,
-						"rgb(140, 140, 140)"
-					],
-					borderWidth: 0,
-					hoverOffset: 4
-				}]
-			},
-			options: {
-				plugins: {
-					title: {
-						display: true,
-						position: "bottom",
-						text: [resourceName, `Used ${usedStr} of ${maxStr}`],
-						color: "white"
-					},
-					legend: {
-						display: false
-					}
-				}
-			}
+				borderWidth: 0,
+				hoverOffset: 4
+			}]
 		},
-		ariaLabel: `${resourceName} used ${usedStr} of ${maxStr}`
-	};
+		breakpoint: "680px"
+	}
 	chart.style = "margin: 10px;";
-	chart.responsive = "680px";
 }
 
 function parseNumber (value, unitData) {

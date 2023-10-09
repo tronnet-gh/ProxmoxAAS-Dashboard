@@ -1,4 +1,4 @@
-class CustomChart extends HTMLElement {
+class ResourceChart extends HTMLElement {
 	constructor () {
 		super();
 		this.attachShadow({ mode: "open" });
@@ -44,7 +44,7 @@ class CustomChart extends HTMLElement {
 			</style>
 			<figure>
 				<div>
-					<canvas>
+					<canvas></canvas>
 				</div>
 				<figcaption></figcaption>
 			</figure>
@@ -55,35 +55,43 @@ class CustomChart extends HTMLElement {
 	}
 
 	set data (data) {
-		if (data.chart?.options?.plugins?.title.display) {
-			data.chart.options.plugins.title.display = false;
-			for (let line of data.chart.options.plugins.title.text) {
-				this.caption.innerHTML += `<span>${line}</span>`
-			}
+		for (let line of data.title) {
+			this.caption.innerHTML += `<span>${line}</span>`
 		}
+
 		this.canvas.role = "img";
 		this.canvas.ariaLabel = data.ariaLabel;
-		createChart(this.canvas, data.chart);
-		
-		
-	}
 
-	get data () {
-		return null;
-	}
+		const chartData = {
+			type: "pie",
+			data: data.data,
+			options: {
+				plugins: {
+					title: {
+						display: false
+					},
+					legend: {
+						display: false
+					},
+					tooltip: {
+						enabled: true
+					}
+				}
+			},
+		}
 
-	set responsive (breakpoint) {
-		this.breakpoint = breakpoint;
-		if (breakpoint) {
-			this.responsiveStyle.media = `screen and (width <= ${breakpoint})`;
+		createChart(this.canvas, chartData);
+
+		if (data.breakpoint) {
+			this.responsiveStyle.media = `screen and (width <= ${data.breakpoint})`;
 		}
 		else {
 			this.responsiveStyle.media = "not all";
 		}
 	}
 
-	get responsive () {
-		return this.breakpoint;
+	get data () {
+		return null;
 	}
 }
 
@@ -91,4 +99,4 @@ function createChart (ctx, data) {
 	return new Chart(ctx, data);
 }
 
-customElements.define("custom-chart", CustomChart);
+customElements.define("resource-chart", ResourceChart);
