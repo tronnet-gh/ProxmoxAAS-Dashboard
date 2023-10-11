@@ -83,7 +83,7 @@ function createResourceUsageChart (container, resourceName, resourceAvail, resou
 			}]
 		},
 		breakpoint: 680
-	}
+	};
 	chart.style = "margin: 10px;";
 }
 

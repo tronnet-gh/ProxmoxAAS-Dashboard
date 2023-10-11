@@ -50,13 +50,13 @@ class ResourceChart extends HTMLElement {
 			</figure>
         `;
 		this.responsiveStyle = this.shadowRoot.querySelector("#responsive-style");
-        this.canvas = this.shadowRoot.querySelector("canvas");
+		this.canvas = this.shadowRoot.querySelector("canvas");
 		this.caption = this.shadowRoot.querySelector("figcaption");
 	}
 
 	set data (data) {
-		for (let line of data.title) {
-			this.caption.innerHTML += `<span>${line}</span>`
+		for (const line of data.title) {
+			this.caption.innerHTML += `<span>${line}</span>`;
 		}
 
 		this.canvas.role = "img";
@@ -80,16 +80,16 @@ class ResourceChart extends HTMLElement {
 				interaction: {
 					mode: "nearest"
 				},
-				onHover: function(e, activeElements) {
-						if (window.innerWidth <= data.breakpoint) {
-							updateTooltipShow(e.chart, false);
-						}
-						else {
-							updateTooltipShow(e.chart, true);
-						}
-				  },
-			},
-		}
+				onHover: function (e, activeElements) {
+					if (window.innerWidth <= data.breakpoint) {
+						updateTooltipShow(e.chart, false);
+					}
+					else {
+						updateTooltipShow(e.chart, true);
+					}
+				}
+			}
+		};
 
 		this.chart = createChart(this.canvas, chartData);
 
@@ -107,10 +107,10 @@ class ResourceChart extends HTMLElement {
 }
 
 function createChart (ctx, data) {
-	return new Chart(ctx, data);
+	return new window.Chart(ctx, data);
 }
 
-// this is a really bad way to do this, but chartjs api does not expose many ways to dynamically set hover and tooltip options 
+// this is a really bad way to do this, but chartjs api does not expose many ways to dynamically set hover and tooltip options
 function updateTooltipShow (chart, enabled) {
 	chart.options.plugins.tooltip.enabled = enabled;
 	chart.options.interaction.mode = enabled ? "nearest" : null;
