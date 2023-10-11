@@ -76,14 +76,25 @@ class ResourceChart extends HTMLElement {
 					tooltip: {
 						enabled: true
 					}
-				}
+				},
+				interaction: {
+					mode: "nearest"
+				},
+				onHover: function(e, activeElements) {
+						if (window.innerWidth <= data.breakpoint) {
+							updateTooltipShow(e.chart, false);
+						}
+						else {
+							updateTooltipShow(e.chart, true);
+						}
+				  },
 			},
 		}
 
-		createChart(this.canvas, chartData);
+		this.chart = createChart(this.canvas, chartData);
 
 		if (data.breakpoint) {
-			this.responsiveStyle.media = `screen and (width <= ${data.breakpoint})`;
+			this.responsiveStyle.media = `screen and (width <= ${data.breakpoint}px)`;
 		}
 		else {
 			this.responsiveStyle.media = "not all";
@@ -97,6 +108,13 @@ class ResourceChart extends HTMLElement {
 
 function createChart (ctx, data) {
 	return new Chart(ctx, data);
+}
+
+// this is a really bad way to do this, but chartjs api does not expose many ways to dynamically set hover and tooltip options 
+function updateTooltipShow (chart, enabled) {
+	chart.options.plugins.tooltip.enabled = enabled;
+	chart.options.interaction.mode = enabled ? "nearest" : null;
+	chart.update();
 }
 
 customElements.define("resource-chart", ResourceChart);
