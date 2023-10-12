@@ -7,6 +7,7 @@ class InstanceCard extends HTMLElement {
 		super();
 		this.attachShadow({ mode: "open" });
 		this.shadowRoot.innerHTML = `
+			<link rel="stylesheet" href="w3.css">
 			<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 			<link rel="stylesheet" href="css/style.css">
 			<style>

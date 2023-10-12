@@ -231,18 +231,9 @@ async function request (url, content) {
 	}
 }
 
-export function goToPage (page, data = {}, newwindow = false) {
-	const url = new URL(`https://${window.location.host}/${page}`);
-	for (const k in data) {
-		url.searchParams.append(k, data[k]);
-	}
-
-	if (newwindow) {
-		window.open(url, `${organization} - dashboard`, "height=480,width=848");
-	}
-	else {
-		window.location.assign(url.toString());
-	}
+export function goToPage (page, data = null) {
+	const params = data ? (new URLSearchParams(data)).toString() : "";
+	window.location.href = `${page}${data ? "?" : ""}${params}`;
 }
 
 export function goToURL (href, data = {}, newwindow = false) {
