@@ -33,7 +33,7 @@ After this step, the Dashboard should be available on the `Dashboard Host` at po
 
 ## Configuration - Dashboard
 1. In `Dashboard Host`, navigate to this repo's root folder
-2. Rename `template.vars.js` to `vars.js` and assign the `API` variable with the value of the API's URL. This will likely be `dashboard.<FQDN>/api`
+2. Rename `template.vars.js` to `vars.js` and assign the `API` variable with the value of the API's URL. This will likely be `paas.<FQDN>/api`
 
 ## Installation - API
 
