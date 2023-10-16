@@ -92,7 +92,7 @@ class InstanceCard extends HTMLElement {
 			}
 		}
 		else {
-			nameParagraph.innerText = this.name ? this.name : "";
+			nameParagraph.innerHTML = this.name ? this.name : "&nbsp;";
 		}
 
 		const typeParagraph = this.shadowRoot.querySelector("#instance-type");
