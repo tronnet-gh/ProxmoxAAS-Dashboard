@@ -25,14 +25,22 @@ async function init () {
 	if (cookie === "") {
 		goToPage("login.html");
 	}
-	const resources = await requestAPI("/user/dynamic/resources");
-	const meta = await requestAPI("/global/config/resources");
-	const instances = await requestAPI("/user/config/cluster");
-	const nodes = await requestAPI("/user/config/nodes");
+
+	let resources = requestAPI("/user/dynamic/resources");
+	let meta = requestAPI("/global/config/resources");
+	let instances = requestAPI("/user/config/cluster");
+	let nodes = requestAPI("/user/config/nodes");
+
+	resources = await resources;
+	meta = await meta;
+	instances = await instances;
+	nodes = await nodes;
+
 	document.querySelector("#username").innerText = `Username: ${getCookie("username")}`;
 	document.querySelector("#pool").innerText = `Pool: ${instances.pool}`;
 	document.querySelector("#vmid").innerText = `VMID Range: ${instances.vmid.min} - ${instances.vmid.max}`;
 	document.querySelector("#nodes").innerText = `Nodes: ${nodes.toString()}`;
+
 	populateResources("#resource-container", meta, resources);
 }
 
