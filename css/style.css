@@ -43,6 +43,10 @@ main, dialog {
 	color: var(--main-text-color);
 }
 
+main {
+	padding: 0 16px 16px 16px;
+}
+
 .w3-card {
 	background-color: var(--main-card-bg-color);
 	box-shadow: var(--main-card-box-shadow);
