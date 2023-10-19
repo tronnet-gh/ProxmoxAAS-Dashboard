@@ -32,6 +32,7 @@ header h1 {
 	margin: 0;
 	background-color: var(--nav-header-bg-color);
 	color: var(--nav-header-text-color);
+	width: fit-content;
 }
 
 nav {
@@ -64,19 +65,19 @@ label[for="navtoggle"], #navtoggle {
 		align-items: center;
 	}
 
-	nav a[aria-current="page"], nav a:hover {
+	nav a:hover, nav a[aria-current="page"] {
 		color: var(--nav-link-active-text-color);
 		background-color: var(--nav-link-active-bg-color);
+	}
+	
+	nav:hover a[aria-current="page"] {
+		color: var(--nav-text-color);
+		background-color: var(--nav-bg-color);
 	}
 
 	nav:hover a[aria-current="page"]:hover {
 		color: var(--nav-link-active-text-color);
 		background-color: var(--nav-link-active-bg-color);
-	}
-	
-	nav:hover a[aria-current="page"]:has(~ a:hover) {
-		color: var(--nav-text-color);
-		background-color: var(--nav-bg-color);
 	}
 }
 

@@ -231,7 +231,7 @@ async function request (url, content) {
 		}
 	}
 	catch (error) {
-		return {status: 400, error: error};
+		return { status: 400, error };
 	}
 }
 
