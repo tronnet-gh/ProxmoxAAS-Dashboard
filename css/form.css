@@ -1,5 +1,4 @@
 .input-grid {
-	float: left;
 	display: grid;
 	column-gap: 10px;
 	row-gap: 5px;
@@ -32,6 +31,10 @@ fieldset {
 
 fieldset > *:last-child {
 	margin-bottom: 8px;
+}
+
+fieldset > .input-grid {
+	float: left;
 }
 
 body:not(:-moz-handler-blocked) fieldset {

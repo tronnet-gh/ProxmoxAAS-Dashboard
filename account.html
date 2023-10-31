@@ -9,6 +9,7 @@
 		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<link rel="stylesheet" href="css/style.css">
 		<link rel="stylesheet" href="css/nav.css">
+		<link rel="stylesheet" href="css/form.css">
 		<script src="scripts/account.js" type="module"></script>
 		<script src="scripts/chart.js" type="module"></script>
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -61,6 +62,19 @@
 					<p id="pool">Pool:</p>
 					<p id="vmid">VMID Range:</p>
 					<p id="nodes">Nodes:</p>
+				</div>
+				<div class="w3-card w3-padding">
+					<h3>Password</h3>
+					<form id="password-form">
+						<div class="input-grid" style="grid-template-columns: auto auto 1fr;">
+							<label for="new-password">New Password</label>
+							<input class="w3-input w3-border" type="password" id="new-password">
+							<span></span>
+							<label for="confirm-password">Confirm Password</label>
+							<input class="w3-input w3-border" type="password" id="confirm-password">
+							<span></span>
+						</div>
+					</form>
 				</div>
 				<div class="w3-card w3-padding">
 					<h3>Cluster Resources</h3>
