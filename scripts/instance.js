@@ -233,7 +233,9 @@ class InstanceCard extends HTMLElement {
 
 					const result = await requestAPI(`/cluster/${this.node.name}/${this.type}/${this.vmid}/delete`, "DELETE");
 					if (result.status === 200) {
-						this.parentElement.removeChild(this);
+						if (this.parentElement) {
+							this.parentElement.removeChild(this);
+						}
 					}
 					else {
 						alert(result.error);
