@@ -1,3 +1,4 @@
+import { dialog } from "./dialog.js";
 import { requestAPI, goToPage, getCookie, setTitleAndHeader } from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
@@ -42,6 +43,8 @@ async function init () {
 	document.querySelector("#nodes").innerText = `Nodes: ${nodes.toString()}`;
 
 	populateResources("#resource-container", meta, resources);
+
+	document.querySelector("#change-password").addEventListener("click", handlePasswordChangeForm);
 }
 
 function populateResources (containerID, meta, resources) {
@@ -116,4 +119,34 @@ function parseNumber (value, unitData) {
 	else {
 		return `${value} ${unit}`;
 	}
+}
+
+function handlePasswordChangeForm () {
+	const body = `
+		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+			<label for="new-password">New Password</label>
+			<input class="w3-input w3-border" type="password" id="new-password" name="new-password">
+			<label for="confirm-password">Confirm Password</label>
+			<input class="w3-input w3-border" type="password" id="confirm-password" name="confirm-password">
+		</form>
+		<p class="w3-large" id="error-message" style="text-align: center; color: var(--negative-color); margin-top: 0.5em; margin-bottom: 0;"></p>
+	`;
+	dialog("Change Password", body, async (result, form) => {
+		if (result === "confirm") {
+			const result = await requestAPI("/auth/password", "POST", {password: form.get("new-password")});
+			if (result.status !== 200) {
+				alert(result.error);
+			}
+		}
+	}, (dialog, form) => {
+		const pass = form.get("new-password");
+		const conf = form.get("confirm-password");
+		if (pass !== conf) {
+			dialog.querySelector("#error-message").innerText = "Passwords must match";
+			return false;
+		}
+		else {
+			return true;
+		}
+	});
 }
