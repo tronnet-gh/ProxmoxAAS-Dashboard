@@ -233,7 +233,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 async function handleDiskDetach () {
 	const disk = this.dataset.disk;
 	const header = `Detach ${disk}`;
-	const body = `<p>Are you sure you want to detach disk</p><p>${disk}</p>`;
+	const body = `<p>Are you sure you want to detach disk ${disk}</p>`;
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${disk}"]`).src = "images/status/loading.svg";
@@ -250,7 +250,12 @@ async function handleDiskDetach () {
 
 async function handleDiskAttach () {
 	const header = `Attach ${this.dataset.disk}`;
-	const body = `<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required></input>`;
+	const body = `
+		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+			<label for="device">${type === "qemu" ? "SATA" : "MP"}</label>
+			<input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required></input>
+		</form>
+	`;
 
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
@@ -274,7 +279,12 @@ async function handleDiskAttach () {
 
 async function handleDiskResize () {
 	const header = `Resize ${this.dataset.disk}`;
-	const body = "<label for=\"size-increment\">Size Increment (GiB)</label><input class=\"w3-input w3-border\" name=\"size-increment\" id=\"size-increment\" type=\"number\" min=\"0\" max=\"131072\"></input>";
+	const body = `
+		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+			<label for="size-increment">Size Increment (GiB)</label>
+			<input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072"></input>
+		</form>
+		`;
 
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
@@ -310,8 +320,10 @@ async function handleDiskMove () {
 	const select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select"><option hidden disabled selected value></option>${options}</select>`;
 
 	const body = `
-		${select}
-		<label for="delete-check">Delete Source</label><input class="w3-input w3-border" name="delete-check" id="delete-check" type="checkbox" checked required>
+		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+			${select}
+			<label for="delete-check">Delete Source</label><input class="w3-input w3-border" name="delete-check" id="delete-check" type="checkbox" checked required>
+		</form>
 	`;
 
 	dialog(header, body, async (result, form) => {
@@ -337,7 +349,7 @@ async function handleDiskMove () {
 async function handleDiskDelete () {
 	const disk = this.dataset.disk;
 	const header = `Delete ${disk}`;
-	const body = `<p>Are you sure you want to <strong>delete</strong> disk</p><p>${disk}</p>`;
+	const body = `<p>Are you sure you want to <strong>delete</strong> disk${disk}</p>`;
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			document.querySelector(`img[data-disk="${disk}"]`).src = "images/status/loading.svg";
@@ -367,9 +379,11 @@ async function handleDiskAdd () {
 	const select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required><option hidden disabled selected value></option>${options}</select>`;
 
 	const body = `
-		<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required></input>
-		${select}
-		<label for="size">Size (GiB)</label><input class="w3-input w3-border" name="size" id="size" type="number" min="0" max="131072" required></input>
+		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+			<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required></input>
+			${select}
+			<label for="size">Size (GiB)</label><input class="w3-input w3-border" name="size" id="size" type="number" min="0" max="131072" required></input>
+		</form>
 	`;
 
 	dialog(header, body, async (result, form) => {
@@ -407,9 +421,11 @@ async function handleCDAdd () {
 	const storageSelect = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required><option hidden disabled selected value></option>${storageOptions}</select>`;
 
 	const body = `
-		<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required></input>
-		${storageSelect}
-		<label for="iso-select">Image</label><select class="w3-select w3-border" name="iso-select" id="iso-select" required></select>
+		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+			<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required></input>
+			${storageSelect}
+			<label for="iso-select">Image</label><select class="w3-select w3-border" name="iso-select" id="iso-select" required></select>
+		</form>
 	`;
 
 	const d = dialog(header, body, async (result, form) => {
@@ -509,7 +525,11 @@ async function handleNetworkConfig () {
 	const netID = this.dataset.network;
 	const netDetails = this.dataset.values;
 	const header = `Edit net${netID}`;
-	const body = "<label for=\"rate\">Rate Limit (MB/s)</label><input type=\"number\" id=\"rate\" name=\"rate\" class=\"w3-input w3-border\">";
+	const body = `
+		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+			<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">
+		</form>
+	`;
 
 	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
@@ -523,7 +543,8 @@ async function handleNetworkConfig () {
 			}
 			await getConfig();
 			populateNetworks();
-			updateBootLine(`boot-net${netID}`, { id: `net${netID}`, prefix: "net", value: config.data[`net${netID}`] });
+			const id = `net${netID}`;
+			updateBootLine(`boot-net${netID}`, { id, prefix: "net", value: id, detail: config.data[`net${netID}`] });
 		}
 	});
 
@@ -551,10 +572,15 @@ async function handleNetworkDelete () {
 
 async function handleNetworkAdd () {
 	const header = "Create Network Interface";
-	let body = "<label for=\"netid\">Interface ID</label><input type=\"number\" id=\"netid\" name=\"netid\" class=\"w3-input w3-border\"><label for=\"rate\">Rate Limit (MB/s)</label><input type=\"number\" id=\"rate\" name=\"rate\" class=\"w3-input w3-border\">";
+	let body = `
+		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+			<label for="netid">Interface ID</label><input type="number" id="netid" name="netid" class="w3-input w3-border">
+			<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">
+	`;
 	if (type === "lxc") {
 		body += "<label for=\"name\">Interface Name</label><input type=\"text\" id=\"name\" name=\"name\" class=\"w3-input w3-border\"></input>";
 	}
+	body += "</form>";
 
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
@@ -648,7 +674,11 @@ async function handleDeviceConfig () {
 	const deviceDetails = this.dataset.values;
 	const deviceName = this.dataset.name;
 	const header = `Edit Expansion Card ${deviceID}`;
-	const body = "<label for=\"device\">Device</label><select id=\"device\" name=\"device\" required></select><label for=\"pcie\">PCI-Express</label><input type=\"checkbox\" id=\"pcie\" name=\"pcie\" class=\"w3-input w3-border\">";
+	const body = `
+		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+			<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">
+		</form>
+	`;
 
 	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
@@ -694,7 +724,11 @@ async function handleDeviceDelete () {
 
 async function handleDeviceAdd () {
 	const header = "Add Expansion Card";
-	const body = "<label for=\"device\">Device</label><select id=\"device\" name=\"device\" required></select><label for=\"pcie\">PCI-Express</label><input type=\"checkbox\" id=\"pcie\" name=\"pcie\" class=\"w3-input w3-border\">";
+	const body = `
+		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+			<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">
+		</form>
+	`;
 
 	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
@@ -798,11 +832,11 @@ function updateBootLine (id, newData) {
 	const enabled = document.querySelector("#enabled");
 	const disabled = document.querySelector("#disabled");
 	let element = null;
-	if (enabled.getItemByID(id)) {
-		element = enabled.getItemByID(id);
+	if (enabled.querySelector(`#${id}`)) {
+		element = enabled.querySelector(`#${id}`);
 	}
-	if (disabled.getItemByID(id)) {
-		element = disabled.getItemByID(id);
+	if (disabled.querySelector(`#${id}`)) {
+		element = disabled.querySelector(`#${id}`);
 	}
 	if (element) {
 		const container = element.container;
