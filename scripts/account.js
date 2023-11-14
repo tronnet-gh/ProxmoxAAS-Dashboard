@@ -133,7 +133,7 @@ function handlePasswordChangeForm () {
 	`;
 	dialog("Change Password", body, async (result, form) => {
 		if (result === "confirm") {
-			const result = await requestAPI("/auth/password", "POST", {password: form.get("new-password")});
+			const result = await requestAPI("/auth/password", "POST", { password: form.get("new-password") });
 			if (result.status !== 200) {
 				alert(result.error);
 			}
