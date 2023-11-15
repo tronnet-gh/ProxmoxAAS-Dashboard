@@ -53,12 +53,12 @@ function populateResources (containerID, meta, resources) {
 		Object.keys(meta).forEach((resourceType) => {
 			if (meta[resourceType].display) {
 				if (meta[resourceType].type === "list") {
-					resources[resourceType].forEach((listResource) => {
+					resources[resourceType].total.forEach((listResource) => {
 						createResourceUsageChart(container, listResource.name, listResource.avail, listResource.used, listResource.max, null);
 					});
 				}
 				else {
-					createResourceUsageChart(container, meta[resourceType].name, resources[resourceType].avail, resources[resourceType].used, resources[resourceType].max, meta[resourceType]);
+					createResourceUsageChart(container, meta[resourceType].name, resources[resourceType].total.avail, resources[resourceType].total.used, resources[resourceType].total.max, meta[resourceType]);
 				}
 			}
 		});
@@ -124,29 +124,29 @@ function parseNumber (value, unitData) {
 function handlePasswordChangeForm () {
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="new-password">New Password</label>
-			<input class="w3-input w3-border" type="password" id="new-password" name="new-password">
-			<label for="confirm-password">Confirm Password</label>
-			<input class="w3-input w3-border" type="password" id="confirm-password" name="confirm-password">
+		<label for="new-password">New Password</label>
+		<input class="w3-input w3-border" id="new-password" name="new-password" type="password"required>
+		<label for="confirm-password">Confirm Password</label>
+		<input class="w3-input w3-border" id="confirm-password" name="confirm-password" type="password" required>
 		</form>
-		<p class="w3-large" id="error-message" style="text-align: center; color: var(--negative-color); margin-top: 0.5em; margin-bottom: 0;"></p>
 	`;
-	dialog("Change Password", body, async (result, form) => {
+	const d = dialog("Change Password", body, async (result, form) => {
 		if (result === "confirm") {
 			const result = await requestAPI("/auth/password", "POST", { password: form.get("new-password") });
 			if (result.status !== 200) {
 				alert(result.error);
 			}
 		}
-	}, (dialog, form) => {
-		const pass = form.get("new-password");
-		const conf = form.get("confirm-password");
-		if (pass !== conf) {
-			dialog.querySelector("#error-message").innerText = "Passwords must match";
-			return false;
-		}
-		else {
-			return true;
-		}
 	});
+
+	var password = d.querySelector("#new-password")
+	var confirm_password = d.querySelector("#confirm-password");
+    
+	function validatePassword(){
+		confirm_password.setCustomValidity( password.value != 
+		confirm_password.value ? "Passwords Don't Match" : '');
+	}
+	
+	password.addEventListener("change", validatePassword);
+	confirm_password.addEventListener("keyup", validatePassword);
 }

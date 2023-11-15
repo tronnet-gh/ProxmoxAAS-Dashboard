@@ -54,8 +54,10 @@ async function populateResources () {
 		const global = await requestAPI("/global/config/resources");
 		const user = await requestAPI("/user/config/resources");
 		let options = [];
-		if (global.cpu.whitelist) {
-			user.cpu.forEach((userType) => {
+		const globalCPU = global.cpu;
+		const userCPU = node in user.cpu.nodes ? user.cpu.nodes[node] : user.cpu.global;
+		if (globalCPU.whitelist) {
+			userCPU.forEach((userType) => {
 				options.push(userType.name);
 			});
 			options = options.sort((a, b) => {
@@ -65,7 +67,7 @@ async function populateResources () {
 		else {
 			const supported = await requestPVE(`/nodes/${node}/capabilities/qemu/cpu`);
 			supported.data.forEach((supportedType) => {
-				if (!user.cpu.some((userType) => supportedType.name === userType.name)) {
+				if (!userCPU.some((userType) => supportedType.name === userType.name)) {
 					options.push(supportedType.name);
 				}
 			});
