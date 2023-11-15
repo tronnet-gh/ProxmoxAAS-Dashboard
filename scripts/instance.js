@@ -219,7 +219,7 @@ class InstanceCard extends HTMLElement {
 	handleDeleteButton () {
 		if (!this.actionLock && this.status === "stopped") {
 			const header = `Delete VM ${this.vmid}`;
-			const body = `<p>Are you sure you want to <strong>delete</strong> VM </p><p>${this.vmid}</p>`;
+			const body = `<p>Are you sure you want to <strong>delete</strong> VM ${this.vmid}</p>`;
 
 			dialog(header, body, async (result, form) => {
 				if (result === "confirm") {

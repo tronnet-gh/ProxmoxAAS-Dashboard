@@ -1,6 +1,4 @@
-export function dialog (header, body, onclose = async (result, form) => { }, validate = async (dialog, form) => {
-	return true;
-}) {
+export function dialog (header, body, onclose = async (result, form) => { }) {
 	const dialog = document.createElement("dialog");
 	dialog.innerHTML = `
 		<p class="w3-large" id="prompt" style="text-align: center;"></p>
@@ -15,29 +13,20 @@ export function dialog (header, body, onclose = async (result, form) => { }, val
 	dialog.querySelector("#body").innerHTML = body;
 	dialog.addEventListener("close", async () => {
 		const formElem = dialog.querySelector("form");
-		let formData = null;
-		if (formElem) {
-			formData = new FormData(formElem);
-		}
+		const formData = formElem ? new FormData(formElem) : null;
 		await onclose(dialog.returnValue, formData);
 		dialog.parentElement.removeChild(dialog);
 	});
-	dialog.querySelector("#confirm").addEventListener("click", async (e) => {
-		e.preventDefault();
-		let valid = true;
-		const formElem = dialog.querySelector("form");
-		if (formElem) {
-			const form = new FormData(formElem);
-			valid = await validate(dialog, form);
-		}
-		if (valid) {
+	if (!dialog.querySelector("form")) {
+		dialog.querySelector("#confirm").addEventListener("click", async (e) => {
+			e.preventDefault();
 			dialog.close(e.target.value);
-		}
-	});
-	dialog.querySelector("#cancel").addEventListener("click", async (e) => {
-		e.preventDefault();
-		dialog.close(e.target.value);
-	});
+		});
+		dialog.querySelector("#cancel").addEventListener("click", async (e) => {
+			e.preventDefault();
+			dialog.close(e.target.value);
+		});
+	}
 	document.body.append(dialog);
 	dialog.showModal();
 	return dialog;

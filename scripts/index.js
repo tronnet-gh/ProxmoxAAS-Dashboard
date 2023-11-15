@@ -163,6 +163,9 @@ async function handleInstanceAdd () {
 	const rootfsStorage = d.querySelector("#rootfs-storage");
 	rootfsStorage.selectedIndex = -1;
 
+	const userResources = await requestAPI("/user/dynamic/resources", "GET");
+	const userCluster = await requestAPI("/user/config/cluster", "GET");
+
 	const nodeSelect = d.querySelector("#node");
 	const clusterNodes = await requestPVE("/nodes", "GET");
 	const allowedNodes = await requestAPI("/user/config/nodes", "GET");
@@ -185,6 +188,23 @@ async function handleInstanceAdd () {
 		});
 		templateStorage.selectedIndex = -1;
 		rootfsStorage.selectedIndex = -1;
+
+		if (node in userResources.cores.nodes) {
+			d.querySelector("#cores").max = userResources.cores.nodes[node].avail;
+		}
+		else {
+			d.querySelector("#cores").max = userResources.cores.global.avail;
+		}
+
+		if (node in userResources.memory.nodes) {
+			d.querySelector("#memory").max = userResources.memory.nodes[node].avail;
+		}
+		else {
+			d.querySelector("#memory").max = userResources.memory.global.avail;
+		}
+
+		d.querySelector("#vmid").min = userCluster.vmid.min;
+		d.querySelector("#vmid").max = userCluster.vmid.max;
 	});
 
 	const templateImage = d.querySelector("#template-image"); // populate templateImage depending on selected image storage
@@ -199,11 +219,4 @@ async function handleInstanceAdd () {
 		});
 		templateImage.selectedIndex = -1;
 	});
-
-	const userResources = await requestAPI("/user/dynamic/resources", "GET");
-	const userCluster = await requestAPI("/user/config/cluster", "GET");
-	d.querySelector("#cores").max = userResources.cores.avail;
-	d.querySelector("#memory").max = userResources.memory.avail;
-	d.querySelector("#vmid").min = userCluster.vmid.min;
-	d.querySelector("#vmid").max = userCluster.vmid.max;
 }
