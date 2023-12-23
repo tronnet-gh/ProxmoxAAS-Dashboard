@@ -162,7 +162,7 @@ class InstanceCard extends HTMLElement {
 	async handlePowerButton () {
 		if (!this.actionLock) {
 			const header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
-			const body = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"} VM</p><p>${this.vmid}</p>`;
+			const body = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"} VM ${this.vmid}</p>`;
 
 			dialog(header, body, async (result, form) => {
 				if (result === "confirm") {
