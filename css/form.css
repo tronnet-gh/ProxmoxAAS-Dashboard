@@ -1,7 +1,6 @@
 .input-grid {
 	display: grid;
-	column-gap: 10px;
-	row-gap: 5px;
+	gap: 5px 10px;
 	align-items: center;
 	width: 100%;
 }
