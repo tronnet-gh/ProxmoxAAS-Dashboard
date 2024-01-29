@@ -139,14 +139,13 @@ function handlePasswordChangeForm () {
 		}
 	});
 
-	var password = d.querySelector("#new-password")
-	var confirm_password = d.querySelector("#confirm-password");
-    
-	function validatePassword(){
-		confirm_password.setCustomValidity( password.value != 
-		confirm_password.value ? "Passwords Don't Match" : '');
+	const password = d.querySelector("#new-password");
+	const confirmPassword = d.querySelector("#confirm-password");
+
+	function validatePassword () {
+		confirmPassword.setCustomValidity(password.value !== confirmPassword.value ? "Passwords Don't Match" : "");
 	}
-	
+
 	password.addEventListener("change", validatePassword);
-	confirm_password.addEventListener("keyup", validatePassword);
+	confirmPassword.addEventListener("keyup", validatePassword);
 }
