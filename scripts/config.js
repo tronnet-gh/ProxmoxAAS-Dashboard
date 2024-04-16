@@ -409,23 +409,13 @@ async function handleDiskAdd () {
 }
 
 async function handleCDAdd () {
-	const content = "iso";
-	const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
+	const isos = await requestAPI("/user/vm-isos", "GET");
 
 	const header = "Add a CDROM";
-
-	let storageOptions = "";
-	storage.data.forEach((element) => {
-		if (element.content.includes(content)) {
-			storageOptions += `<option value="${element.storage}">${element.storage}</option>"`;
-		}
-	});
-	const storageSelect = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required><option hidden disabled selected value></option>${storageOptions}</select>`;
 
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
 			<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required></input>
-			${storageSelect}
 			<label for="iso-select">Image</label><select class="w3-select w3-border" name="iso-select" id="iso-select" required></select>
 		</form>
 	`;
@@ -446,17 +436,12 @@ async function handleCDAdd () {
 		}
 	});
 
-	d.querySelector("#storage-select").addEventListener("change", async () => {
-		const storage = document.querySelector("#storage-select").value;
-		const ISOSelect = document.querySelector("#iso-select");
-		ISOSelect.innerHTML = "<option hidden disabled selected value></option>";
-		const isos = await requestPVE(`/nodes/${node}/storage/${storage}/content`, "GET", { content });
-		isos.data.forEach((element) => {
-			if (element.content.includes(content)) {
-				ISOSelect.append(new Option(element.volid.replace(`${storage}:${content}/`, ""), element.volid));
-			}
-		});
-	});
+	const isoSelect = d.querySelector("#iso-select");
+
+	for (const iso of isos) {
+		isoSelect.append(new Option(iso.name, iso.volid))
+	}
+	isoSelect.selectedIndex = -1;
 }
 
 async function populateNetworks () {
