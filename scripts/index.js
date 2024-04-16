@@ -90,6 +90,8 @@ async function handleInstanceAdd () {
 			<input class="w3-input w3-border" name="name" id="name" required></input>
 			<label for="vmid">ID</label>
 			<input class="w3-input w3-border" name="vmid" id="vmid" type="number" required></input>
+			<label for="pool">Pool</label>
+			<select class="w3-select w3-border" name="pool" id="pool" required></select>
 			<label for="cores">Cores (Threads)</label>
 			<input class="w3-input w3-border" name="cores" id="cores" type="number" min="1" max="8192" required></input>
 			<label for="memory">Memory (MiB)</label>
@@ -97,8 +99,6 @@ async function handleInstanceAdd () {
 			<p class="container-specific none" style="grid-column: 1 / span 2; text-align: center;">Container Options</p>
 			<label class="container-specific none" for="swap">Swap (MiB)</label>
 			<input class="w3-input w3-border container-specific none" name="swap" id="swap" type="number" min="0" step="1" required disabled></input>
-			<label class="container-specific none" for="template-storage">Template Storage</label>
-			<select class="w3-select w3-border container-specific none" name="template-storage" id="template-storage" required disabled></select>
 			<label class="container-specific none" for="template-image">Template Image</label>
 			<select class="w3-select w3-border container-specific none" name="template-image" id="template-image" required disabled></select>
 			<label class="container-specific none" for="rootfs-storage">ROOTFS Storage</label>
@@ -110,12 +110,15 @@ async function handleInstanceAdd () {
 		</form>
 	`;
 
+	const templates = await requestAPI("/user/ct-templates", "GET");
+
 	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			const body = {
 				name: form.get("name"),
 				cores: form.get("cores"),
-				memory: form.get("memory")
+				memory: form.get("memory"),
+				pool: form.get("pool")
 			};
 			if (form.get("type") === "lxc") {
 				body.swap = form.get("swap");
@@ -155,10 +158,6 @@ async function handleInstanceAdd () {
 		}
 	});
 
-	const templateContent = "iso";
-	const templateStorage = d.querySelector("#template-storage");
-	templateStorage.selectedIndex = -1;
-
 	const rootfsContent = "rootdir";
 	const rootfsStorage = d.querySelector("#rootfs-storage");
 	rootfsStorage.selectedIndex = -1;
@@ -168,27 +167,24 @@ async function handleInstanceAdd () {
 
 	const nodeSelect = d.querySelector("#node");
 	const clusterNodes = await requestPVE("/nodes", "GET");
-	const allowedNodes = await requestAPI("/user/config/nodes", "GET");
+	const allowedNodes = Object.keys(userCluster.nodes)
 	clusterNodes.data.forEach((element) => {
 		if (element.status === "online" && allowedNodes.includes(element.node)) {
 			nodeSelect.add(new Option(element.node));
 		}
 	});
 	nodeSelect.selectedIndex = -1;
-	nodeSelect.addEventListener("change", async () => { // change template and rootfs storage based on node
+	nodeSelect.addEventListener("change", async () => { // change rootfs storage based on node
 		const node = nodeSelect.value;
 		const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
 		storage.data.forEach((element) => {
-			if (element.content.includes(templateContent)) {
-				templateStorage.add(new Option(element.storage));
-			}
 			if (element.content.includes(rootfsContent)) {
 				rootfsStorage.add(new Option(element.storage));
 			}
 		});
-		templateStorage.selectedIndex = -1;
 		rootfsStorage.selectedIndex = -1;
 
+		// set core and memory min/max depending on node selected
 		if (node in userResources.cores.nodes) {
 			d.querySelector("#cores").max = userResources.cores.nodes[node].avail;
 		}
@@ -202,21 +198,24 @@ async function handleInstanceAdd () {
 		else {
 			d.querySelector("#memory").max = userResources.memory.global.avail;
 		}
-
-		d.querySelector("#vmid").min = userCluster.vmid.min;
-		d.querySelector("#vmid").max = userCluster.vmid.max;
 	});
 
+	// set vmid min/max
+	d.querySelector("#vmid").min = userCluster.vmid.min;
+	d.querySelector("#vmid").max = userCluster.vmid.max;
+
+	// add user pools to selector
+	const poolSelect = d.querySelector("#pool");
+	const userPools = Object.keys(userCluster.pools);
+	userPools.forEach((element) => {
+		poolSelect.add(new Option(element));
+	});
+	poolSelect.selectedIndex = -1;
+
+	// add template images to selector
 	const templateImage = d.querySelector("#template-image"); // populate templateImage depending on selected image storage
-	templateStorage.addEventListener("change", async () => {
-		templateImage.innerHTML = "";
-		const content = "vztmpl";
-		const images = await requestPVE(`/nodes/${nodeSelect.value}/storage/${templateStorage.value}/content`, "GET");
-		images.data.forEach((element) => {
-			if (element.content.includes(content)) {
-				templateImage.append(new Option(element.volid.replace(`${templateStorage.value}:${content}/`, ""), element.volid));
-			}
-		});
-		templateImage.selectedIndex = -1;
-	});
+	for (const template of templates) {
+		templateImage.append(new Option(template.name, template.volid))
+	}
+	templateImage.selectedIndex = -1;
 }
