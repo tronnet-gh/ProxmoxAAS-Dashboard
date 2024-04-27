@@ -439,7 +439,7 @@ async function handleCDAdd () {
 	const isoSelect = d.querySelector("#iso-select");
 
 	for (const iso of isos) {
-		isoSelect.append(new Option(iso.name, iso.volid))
+		isoSelect.append(new Option(iso.name, iso.volid));
 	}
 	isoSelect.selectedIndex = -1;
 }
