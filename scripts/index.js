@@ -167,7 +167,7 @@ async function handleInstanceAdd () {
 
 	const nodeSelect = d.querySelector("#node");
 	const clusterNodes = await requestPVE("/nodes", "GET");
-	const allowedNodes = Object.keys(userCluster.nodes)
+	const allowedNodes = Object.keys(userCluster.nodes);
 	clusterNodes.data.forEach((element) => {
 		if (element.status === "online" && allowedNodes.includes(element.node)) {
 			nodeSelect.add(new Option(element.node));
@@ -215,7 +215,7 @@ async function handleInstanceAdd () {
 	// add template images to selector
 	const templateImage = d.querySelector("#template-image"); // populate templateImage depending on selected image storage
 	for (const template of templates) {
-		templateImage.append(new Option(template.name, template.volid))
+		templateImage.append(new Option(template.name, template.volid));
 	}
 	templateImage.selectedIndex = -1;
 }
