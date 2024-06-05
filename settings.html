@@ -51,10 +51,10 @@
 						<h3>Synchronization Settings</h3>
 						<fieldset>
 							<legend>App Sync Method</legend>
-							<label><input class="w3-radio" type="radio" id="sync-always" name="sync-scheme" value="always" required><span>Always Sync</span></label>
+							<label><input class="w3-radio" type="radio" id="sync-always" name="sync-scheme" value="always" required>Always Sync</label>
 							<p>App will always periodically synchronize with Proxmox. High resource usage.</p>
 							<label><input class="w3-radio" type="radio" id="sync-hash" name="sync-scheme" value="hash" required>Check For Sync</label>
-							<p>App will periodically synchronize only if there have been change. Medium resource usage.</p>
+							<p>App will periodically check for updates and synchronize only if needed. Medium resource usage.</p>
 							<label><input class="w3-radio" type="radio" id="sync-interrupt" name="sync-scheme" value="interrupt" required>Sync When Needed</label>
 							<p>App will react to changes and synchronize when changes are made. Low resource usage.</p>
 						</fieldset>
@@ -63,6 +63,16 @@
 							<div class="input-grid" style="grid-template-columns: auto auto 1fr;">
 								<p>Sync every</p><input aria-label="sync rate in seconds" class="w3-input w3-border" type="number" id="sync-rate" name="sync-rate" min="1" required><p>Second(s)</p>
 							</div>
+						</fieldset>
+					</div>
+					<div class="w3-card w3-padding">
+						<h3>Search Settings</h3>
+						<fieldset>
+							<legend>Instance Search Criteria</legend>
+							<label><input class="w3-radio" type="radio" id="search-exact" name="search-criteria" value="exact" required>Exact Match</label>
+							<p>Sorts by exact query match in instance name.</p>
+							<label><input class="w3-radio" type="radio" id="search-fuzzy" name="search-criteria" value="fuzzy" required>Fuzzy Match</label>
+							<p>Sorts by best matching to worst matching.</p>
 						</fieldset>
 					</div>
 					<div class="w3-container w3-center" id="form-actions">
