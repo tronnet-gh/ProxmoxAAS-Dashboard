@@ -112,3 +112,15 @@ hr, * {
 .spacer {
 	min-height: 1em;
 }
+
+.w3-select, select {
+	padding: 8px;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	appearance: none;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cstyle%3E:root%7Bcolor:%23fff%7D@media (prefers-color-scheme:light)%7B:root%7Bcolor:%23000%7D%7D%3C/style%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M12.707 14.707a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L12 12.586l4.293-4.293a1 1 0 111.414 1.414l-5 5z' fill='currentColor'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 8px top 50%;
+	background-size: 1em auto;
+}
