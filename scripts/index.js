@@ -1,6 +1,7 @@
 import { requestPVE, requestAPI, goToPage, setTitleAndHeader } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
+import wf_align from "../modules/wfa.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -38,6 +39,11 @@ async function getInstances () {
 }
 
 async function populateInstances () {
+	let searchCriteria = localStorage.getItem("search-criteria");
+	if (!searchCriteria) {
+		searchCriteria = "fuzzy";
+		localStorage.setItem("search-criteria", "fuzzy");
+	}
 	const searchQuery = document.querySelector("#search").value || null;
 	let criteria;
 	if (!searchQuery) {
@@ -45,7 +51,7 @@ async function populateInstances () {
 			return (a.vmid > b.vmid) ? 1 : -1;
 		};
 	}
-	else {
+	else if (searchCriteria === "exact") {
 		criteria = (a, b) => {
 			const aInc = a.name.toLowerCase().includes(searchQuery.toLowerCase());
 			const bInc = b.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -60,6 +66,27 @@ async function populateInstances () {
 			}
 			else {
 				return a.vmid > b.vmid ? 1 : -1;
+			}
+		};
+	}
+	else if (searchCriteria === "fuzzy") {
+		const penalties = {
+			m: 0,
+			x: 1,
+			o: 1,
+			e: 1
+		};
+		criteria = (a, b) => {
+			// lower is better
+			const aAlign = wf_align(a.name.toLowerCase(), searchQuery.toLowerCase(), penalties);
+			const aScore = aAlign.score / a.name.length;
+			const bAlign = wf_align(b.name.toLowerCase(), searchQuery.toLowerCase(), penalties);
+			const bScore = bAlign.score / b.name.length;
+			if (aScore === bScore) {
+				return a.vmid > b.vmid ? 1 : -1;
+			}
+			else {
+				return aScore - bScore;
 			}
 		};
 	}
