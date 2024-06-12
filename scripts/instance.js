@@ -38,10 +38,10 @@ class InstanceCard extends HTMLElement {
 					<p id="node-status"></p>
 				</div>
 				<div class="w3-col l2 m2 s6 flex row nowrap" style="height: 1lh;">
-					<img id="power-btn">
-					<img id="console-btn">
-					<img id="configure-btn">
-					<img id="delete-btn">
+					<img id="power-btn" tabindex="0" role="button">
+					<img id="console-btn" tabindex="0" role="button">
+					<img id="configure-btn" tabindex="0" role="button">
+					<img id="delete-btn" tabindex="0" role="button">
 				</div>
 			</div>
 		`;
