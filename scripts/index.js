@@ -1,13 +1,14 @@
-import { requestPVE, requestAPI, goToPage, setTitleAndHeader } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, setTitleAndHeader, setAppearance } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
-import wf_align from "../modules/wfa.js";
+import wfAlign from "../modules/wfa.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
 let instances = [];
 
 async function init () {
+	setAppearance();
 	setTitleAndHeader();
 	const cookie = document.cookie;
 	if (cookie === "") {
@@ -78,9 +79,9 @@ async function populateInstances () {
 		};
 		criteria = (a, b) => {
 			// lower is better
-			const aAlign = wf_align(a.name.toLowerCase(), searchQuery.toLowerCase(), penalties);
+			const aAlign = wfAlign(a.name.toLowerCase(), searchQuery.toLowerCase(), penalties);
 			const aScore = aAlign.score / a.name.length;
-			const bAlign = wf_align(b.name.toLowerCase(), searchQuery.toLowerCase(), penalties);
+			const bAlign = wfAlign(b.name.toLowerCase(), searchQuery.toLowerCase(), penalties);
 			const bScore = bAlign.score / b.name.length;
 			if (aScore === bScore) {
 				return a.vmid > b.vmid ? 1 : -1;

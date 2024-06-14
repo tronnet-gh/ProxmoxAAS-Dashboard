@@ -267,3 +267,23 @@ export function setTitleAndHeader () {
 	document.title = `${organization} - dashboard`;
 	document.querySelector("h1").innerText = organization;
 }
+
+export function setAppearance () {
+	let theme = localStorage.getItem("appearance-theme");
+	if (!theme) {
+		theme = "auto";
+		localStorage.setItem("appearance-theme", "auto");
+	}
+
+	if (theme === "auto") {
+		document.querySelector(":root").classList.remove("dark-theme", "light-theme");
+	}
+	else if (theme === "dark") {
+		document.querySelector(":root").classList.remove("light-theme");
+		document.querySelector(":root").classList.add("dark-theme");
+	}
+	else if (theme === "light") {
+		document.querySelector(":root").classList.add("light-theme");
+		document.querySelector(":root").classList.remove("dark-theme");
+	}
+}

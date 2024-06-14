@@ -1,8 +1,9 @@
-import { setTitleAndHeader } from "./utils.js";
+import { setTitleAndHeader, setAppearance } from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
 function init () {
+	setAppearance();
 	setTitleAndHeader();
 	const scheme = localStorage.getItem("sync-scheme");
 	if (scheme) {
@@ -16,6 +17,10 @@ function init () {
 	if (search) {
 		document.querySelector(`#search-${search}`).checked = true;
 	}
+	const theme = localStorage.getItem("appearance-theme");
+	if (theme) {
+		document.querySelector("#appearance-theme").value = theme;
+	}
 	document.querySelector("#settings").addEventListener("submit", handleSaveSettings, false);
 }
 
@@ -25,5 +30,6 @@ function handleSaveSettings (event) {
 	localStorage.setItem("sync-scheme", form.get("sync-scheme"));
 	localStorage.setItem("sync-rate", form.get("sync-rate"));
 	localStorage.setItem("search-criteria", form.get("search-criteria"));
+	localStorage.setItem("appearance-theme", form.get("appearance-theme"));
 	window.location.reload();
 }

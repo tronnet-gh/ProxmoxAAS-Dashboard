@@ -1,9 +1,10 @@
-import { requestTicket, goToPage, deleteAllCookies, requestPVE, setTitleAndHeader } from "./utils.js";
+import { requestTicket, goToPage, deleteAllCookies, requestPVE, setTitleAndHeader, setAppearance } from "./utils.js";
 import { alert } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
+	setAppearance();
 	setTitleAndHeader();
 	await deleteAllCookies();
 	const formSubmitButton = document.querySelector("#submit");
