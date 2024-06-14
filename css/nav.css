@@ -1,21 +1,46 @@
 :root {
-	--nav-bg-color: black;
-	--nav-text-color: white;
-	--nav-header-bg-color: #0f0;
-	--nav-header-text-color: black;
-	--nav-link-active-text-color: white;
-	--nav-link-active-bg-color: var(--main-bg-color, #404040);
 	--nav-transition-speed: 250ms;
 }
 
-@media screen and (prefers-color-scheme: light) {
-	:root {
+@media screen and (prefers-color-scheme: dark) {
+	:root, :root.dark-theme {
+		--nav-bg-color: black;
+		--nav-text-color: white;
+		--nav-header-bg-color: #0f0;
+		--nav-header-text-color: black;
+		--nav-link-active-text-color: white;
+		--nav-link-active-bg-color: var(--main-bg-color, #404040);
+		
+	}
+
+	:root.light-theme {
 		--nav-bg-color: black;
 		--nav-text-color: white;
 		--nav-header-bg-color: #0f0;
 		--nav-header-text-color: black;
 		--nav-link-active-text-color: black;
 		--nav-link-active-bg-color: var(--main-bg-color, white);
+	}
+}
+
+@media screen and (prefers-color-scheme: light) {
+	:root, :root.light-theme {
+		--nav-bg-color: black;
+		--nav-text-color: white;
+		--nav-header-bg-color: #0f0;
+		--nav-header-text-color: black;
+		--nav-link-active-text-color: black;
+		--nav-link-active-bg-color: var(--main-bg-color, white);
+	}
+
+	:root.dark-theme {
+		--nav-bg-color: black;
+		--nav-text-color: white;
+		--nav-header-bg-color: #0f0;
+		--nav-header-text-color: black;
+		--nav-link-active-text-color: white;
+		--nav-link-active-bg-color: var(--main-bg-color, #404040);
+		
 	}
 }
 

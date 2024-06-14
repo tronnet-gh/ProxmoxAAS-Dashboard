@@ -1,5 +1,5 @@
 import { dialog } from "./dialog.js";
-import { requestAPI, goToPage, getCookie, setTitleAndHeader } from "./utils.js";
+import { requestAPI, goToPage, getCookie, setTitleAndHeader, setAppearance } from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -21,6 +21,7 @@ const prefixes = {
 };
 
 async function init () {
+	setAppearance();
 	setTitleAndHeader();
 	const cookie = document.cookie;
 	if (cookie === "") {
