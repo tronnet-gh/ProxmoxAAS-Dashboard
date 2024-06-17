@@ -268,11 +268,41 @@ export function setTitleAndHeader () {
 	document.querySelector("h1").innerText = organization;
 }
 
+const settingsDefault = {
+	"sync-scheme": "always",
+	"sync-rate": 5,
+	"search-criteria": "fuzzy",
+	"appearance-theme": "auto"
+};
+
+export function getSyncSettings () {
+	let scheme = localStorage.getItem("sync-scheme");
+	let rate = Number(localStorage.getItem("sync-rate"));
+	if (!scheme) {
+		scheme = settingsDefault["sync-scheme"];
+		localStorage.setItem("sync-scheme", scheme);
+	}
+	if (!rate) {
+		rate = settingsDefault["sync-rate"];
+		localStorage.setItem("sync-rate", rate);
+	}
+	return { scheme, rate };
+}
+
+export function getSearchSettings () {
+	let searchCriteria = localStorage.getItem("search-criteria");
+	if (!searchCriteria) {
+		searchCriteria = settingsDefault["search-criteria"];
+		localStorage.setItem("search-criteria", searchCriteria);
+	}
+	return searchCriteria;
+}
+
 export function setAppearance () {
 	let theme = localStorage.getItem("appearance-theme");
 	if (!theme) {
-		theme = "auto";
-		localStorage.setItem("appearance-theme", "auto");
+		theme = settingsDefault["appearance-theme"];
+		localStorage.setItem("appearance-theme", theme);
 	}
 
 	if (theme === "auto") {

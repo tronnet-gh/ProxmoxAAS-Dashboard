@@ -1,17 +1,8 @@
-import { requestAPI } from "./utils.js";
+import { getSyncSettings, requestAPI } from "./utils.js";
 import { API } from "../vars.js";
 
 export async function setupClientSync (callback) {
-	let scheme = localStorage.getItem("sync-scheme");
-	let rate = Number(localStorage.getItem("sync-rate"));
-	if (!scheme) {
-		scheme = "always";
-		localStorage.setItem("sync-scheme", "always");
-	}
-	if (!rate) {
-		rate = "5";
-		localStorage.setItem("sync-rate", "5");
-	}
+	const { scheme, rate } = getSyncSettings();
 
 	if (scheme === "always") {
 		callback();
