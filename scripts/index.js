@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, goToPage, setTitleAndHeader, setAppearance } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, setTitleAndHeader, setAppearance, getSearchSettings } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfAlign from "../modules/wfa.js";
@@ -40,11 +40,7 @@ async function getInstances () {
 }
 
 async function populateInstances () {
-	let searchCriteria = localStorage.getItem("search-criteria");
-	if (!searchCriteria) {
-		searchCriteria = "fuzzy";
-		localStorage.setItem("search-criteria", "fuzzy");
-	}
+	const searchCriteria = getSearchSettings();
 	const searchQuery = document.querySelector("#search").value || null;
 	let criteria;
 	if (!searchQuery) {
