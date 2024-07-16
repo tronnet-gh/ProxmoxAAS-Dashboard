@@ -1,12 +1,12 @@
-import { requestTicket, goToPage, deleteAllCookies, requestPVE, setTitleAndHeader, setAppearance } from "./utils.js";
+import { goToPage, requestPVE, setTitleAndHeader, setAppearance, requestAPI } from "./utils.js";
 import { alert } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
+	await deleteAllCookies();
 	setAppearance();
 	setTitleAndHeader();
-	await deleteAllCookies();
 	const formSubmitButton = document.querySelector("#submit");
 	const realms = await requestPVE("/access/domains", "GET");
 	const realmSelect = document.querySelector("#realm");
@@ -41,4 +41,13 @@ async function init () {
 			console.error(ticket.error);
 		}
 	});
+}
+
+async function requestTicket (username, password, realm) {
+	const response = await requestAPI("/access/ticket", "POST", { username: `${username}@${realm}`, password }, false);
+	return response;
+}
+
+async function deleteAllCookies () {
+	await requestAPI("/access/ticket", "DELETE");
 }

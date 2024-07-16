@@ -161,11 +161,6 @@ export function getCookie (cname) {
 	return "";
 }
 
-export async function requestTicket (username, password, realm) {
-	const response = await requestAPI("/auth/ticket", "POST", { username: `${username}@${realm}`, password }, false);
-	return response;
-}
-
 export async function requestPVE (path, method, body = null) {
 	const prms = new URLSearchParams(body);
 	const content = {
@@ -259,13 +254,18 @@ export function getURIData () {
 	return Object.fromEntries(url.searchParams);
 }
 
-export async function deleteAllCookies () {
-	await requestAPI("/auth/ticket", "DELETE");
-}
-
-export function setTitleAndHeader () {
+export async function setTitleAndHeader () {
 	document.title = `${organization} - dashboard`;
 	document.querySelector("h1").innerText = organization;
+	if (getCookie("auth") === "1") {
+		const userIsAdmin = (await requestAPI("/user/config/cluster")).admin;
+		if (userIsAdmin) {
+			const adminNavLink = document.querySelector("#navigation #admin-link");
+			adminNavLink.href = "admin.html";
+			adminNavLink.classList.remove("none");
+			adminNavLink.ariaDisabled = false;
+		}
+	}
 }
 
 const settingsDefault = {
