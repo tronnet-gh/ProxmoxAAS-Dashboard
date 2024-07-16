@@ -24,22 +24,10 @@
 				#vm-search {
 					max-width: calc(100% - 10px - 152px);
 				}
-				button .large {
-					display: block;
-				}
-				button .small {
-					display: none;
-				}
 			}
 			@media screen and (width <= 440px) {
 				#vm-search {
 					max-width: calc(100% - 10px - 47px);
-				}
-				button .large {
-					display: none;
-				}
-				button .small {
-					display: block;
 				}
 			}
 		</style>
@@ -49,10 +37,11 @@
 			<h1>proxmox</h1>
 			<label for="navtoggle">&#9776;</label>
 			<input type="checkbox" id="navtoggle">
-			<nav>
+			<nav id="navigation">
 				<a href="index.html" aria-current="page">Instances</a>
 				<a href="account.html">Account</a>
 				<a href="settings.html">Settings</a>
+				<a id="admin-link" aria-disabled="true" class="none">Admin</a>
 				<a href="login.html">Logout</a>
 			</nav>
 		</header>
@@ -72,27 +61,13 @@
 					</div>
 					<div>
 						<div class="w3-row w3-hide-small" style="border-bottom: 1px solid;">
-							<div class="w3-col l1 m2">
-								<p>ID</p>
-							</div>
-							<div class="w3-col l2 m3">
-								<p>Name</p>
-							</div>
-							<div class="w3-col l1 m2">
-								<p>Type</p>
-							</div>
-							<div class="w3-col l2 m3">
-								<p>Status</p>
-							</div>
-							<div class="w3-col l2 w3-hide-medium">
-								<p>Host Name</p>
-							</div>
-							<div class="w3-col l2 w3-hide-medium">
-								<p>Host Status</p>
-							</div>
-							<div class="w3-col l2 m2">
-								<p>Actions</p>
-							</div>
+							<p class="w3-col l1 m2 w3-hide-small">ID</p>
+							<p class="w3-col l2 m3 w3-hide-small">Name</p>
+							<p class="w3-col l1 m2 w3-hide-small">Type</p>
+							<p class="w3-col l2 m3 w3-hide-small">Status</p>
+							<p class="w3-col l2 w3-hide-medium w3-hide-small">Host Name</p>
+							<p class="w3-col l2 w3-hide-medium w3-hide-small">Host Status</p>
+							<p class="w3-col l2 m2 w3-hide-small">Actions</p>
 						</div>
 						<div id="instance-container"></div>
 					</div>

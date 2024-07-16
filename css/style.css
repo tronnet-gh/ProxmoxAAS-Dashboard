@@ -136,6 +136,26 @@ hr, * {
 	min-height: 1em;
 }
 
+@media screen and (width >= 440px) {
+	button .large {
+		display: block;
+	}
+
+	button .small {
+		display: none;
+	}
+}
+
+@media screen and (width <= 440px) {
+	button .large {
+		display: none;
+	}
+
+	button .small {
+		display: block;
+	}
+}
+
 .w3-select, select {
 	padding: 8px;
 	appearance: none;
@@ -143,4 +163,10 @@ hr, * {
 	background-repeat: no-repeat;
 	background-position: right 8px top 50%;
 	background-size: 1em auto;
+}
+
+@media (width >=993px) {
+	.w3-hide-large {
+		display: none !important;
+	}
 }

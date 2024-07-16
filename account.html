@@ -46,33 +46,32 @@
 			<h1>proxmox</h1>
 			<label for="navtoggle">&#9776;</label>
 			<input type="checkbox" id="navtoggle">
-			<nav>
+			<nav id="navigation">
 				<a href="index.html">Instances</a>
 				<a href="account.html" aria-current="page">Account</a>
 				<a href="settings.html">Settings</a>
+				<a id="admin-link" aria-disabled="true" class="none">Admin</a>
 				<a href="login.html">Logout</a>
 			</nav>
 		</header>
 		<main>
-			<section>
-				<h2>Account</h2>
-				<div class="w3-card w3-padding">
-					<h3>Account Details</h3>
-					<p id="username">Username:</p>
-					<p id="pool">Pools:</p>
-					<p id="vmid">VMID Range:</p>
-					<p id="nodes">Nodes:</p>
-				</div>
-				<div class="w3-card w3-padding">
-					<div class="flex row nowrap">
-						<h3>Password</h3>
-						<button class="w3-button w3-margin" id="change-password">Change Password</button>
-					</div>	
-				</div>
-				<div class="w3-card w3-padding">
-					<h3>Cluster Resources</h3>
-					<div id="resource-container"></div>
-				</div>
+			<h2>Account</h2>
+			<section class="w3-card w3-padding">
+				<h3>Account Details</h3>
+				<p id="username">Username:</p>
+				<p id="pool">Pools:</p>
+				<p id="vmid">VMID Range:</p>
+				<p id="nodes">Nodes:</p>
+			</section>
+			<section class="w3-card w3-padding">
+				<div class="flex row nowrap">
+					<h3>Password</h3>
+					<button class="w3-button w3-margin" id="change-password">Change Password</button>
+				</div>	
+			</section>
+			<section class="w3-card w3-padding">
+				<h3>Cluster Resources</h3>
+				<div id="resource-container"></div>
 			</section>
 		</main>
 	</body>
