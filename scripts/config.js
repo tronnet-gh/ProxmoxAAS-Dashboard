@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, goToPage, getURIData, resourcesConfig, setTitleAndHeader, bootConfig } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, getURIData, resourcesConfig, setTitleAndHeader, bootConfig, setAppearance } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
@@ -14,6 +14,7 @@ let vmid;
 let config;
 
 async function init () {
+	setAppearance();
 	setTitleAndHeader();
 	const cookie = document.cookie;
 	if (cookie === "") {
