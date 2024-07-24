@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, goToPage, goToURL, instancesConfig, nodesConfig } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, goToURL, instancesConfig, nodesConfig, setSVGSrc, setSVGAlt } from "./utils.js";
 import { PVE } from "../vars.js";
 import { dialog } from "./dialog.js";
 
@@ -27,21 +27,21 @@ class InstanceCard extends HTMLElement {
 					<p id="instance-type"></p>
 				</div>
 				<div class="w3-col l2 m3 s6 flex row nowrap">
-					<img id="instance-status-icon">
+					<svg id="instance-status-icon"></svg>
 					<p id="instance-status"></p>
 				</div>
 				<div class="w3-col l2 w3-hide-medium w3-hide-small">
 					<p id="node-name"></p>
 				</div>
 				<div class="w3-col l2 w3-hide-medium w3-hide-small flex row nowrap">
-					<img id="node-status-icon">
+					<svg id="node-status-icon"></svg>
 					<p id="node-status"></p>
 				</div>
 				<div class="w3-col l2 m2 s6 flex row nowrap" style="height: 1lh;">
-					<img id="power-btn" tabindex="0" role="button">
-					<img id="console-btn" tabindex="0" role="button">
-					<img id="configure-btn" tabindex="0" role="button">
-					<img id="delete-btn" tabindex="0" role="button">
+					<svg id="power-btn" tabindex="0" role="button"></svg>
+					<svg id="console-btn" tabindex="0" role="button"></svg>
+					<svg id="configure-btn" tabindex="0" role="button"></svg>
+					<svg id="delete-btn" tabindex="0" role="button"></svg>
 				</div>
 			</div>
 		`;
@@ -102,8 +102,8 @@ class InstanceCard extends HTMLElement {
 		statusParagraph.innerText = this.status;
 
 		const statusIcon = this.shadowRoot.querySelector("#instance-status-icon");
-		statusIcon.src = instancesConfig[this.status].status.src;
-		statusIcon.alt = instancesConfig[this.status].status.alt;
+		setSVGSrc(statusIcon, instancesConfig[this.status].status.src);
+		setSVGAlt(statusIcon, instancesConfig[this.status].status.alt);
 
 		const nodeNameParagraph = this.shadowRoot.querySelector("#node-name");
 		nodeNameParagraph.innerText = this.node.name;
@@ -112,40 +112,36 @@ class InstanceCard extends HTMLElement {
 		nodeStatusParagraph.innerText = this.node.status;
 
 		const nodeStatusIcon = this.shadowRoot.querySelector("#node-status-icon");
-		nodeStatusIcon.src = nodesConfig[this.node.status].status.src;
-		nodeStatusIcon.alt = nodesConfig[this.node.status].status.src;
+		setSVGSrc(nodeStatusIcon, nodesConfig[this.node.status].status.src);
+		setSVGAlt(nodeStatusIcon, nodesConfig[this.node.status].status.alt);
 
 		const powerButton = this.shadowRoot.querySelector("#power-btn");
-		powerButton.src = instancesConfig[this.status].power.src;
-		powerButton.alt = instancesConfig[this.status].power.alt;
-		powerButton.title = instancesConfig[this.status].power.alt;
+		setSVGSrc(powerButton, instancesConfig[this.status].power.src);
+		setSVGAlt(powerButton, instancesConfig[this.status].power.alt);
 		if (instancesConfig[this.status].power.clickable) {
 			powerButton.classList.add("clickable");
 			powerButton.onclick = this.handlePowerButton.bind(this);
 		}
 
 		const configButton = this.shadowRoot.querySelector("#configure-btn");
-		configButton.src = instancesConfig[this.status].config.src;
-		configButton.alt = instancesConfig[this.status].config.alt;
-		configButton.title = instancesConfig[this.status].config.alt;
+		setSVGSrc(configButton, instancesConfig[this.status].config.src);
+		setSVGAlt(configButton, instancesConfig[this.status].config.alt);
 		if (instancesConfig[this.status].config.clickable) {
 			configButton.classList.add("clickable");
 			configButton.onclick = this.handleConfigButton.bind(this);
 		}
 
 		const consoleButton = this.shadowRoot.querySelector("#console-btn");
-		consoleButton.src = instancesConfig[this.status].console.src;
-		consoleButton.alt = instancesConfig[this.status].console.alt;
-		consoleButton.title = instancesConfig[this.status].console.alt;
+		setSVGSrc(consoleButton, instancesConfig[this.status].console.src);
+		setSVGAlt(consoleButton, instancesConfig[this.status].console.alt);
 		if (instancesConfig[this.status].console.clickable) {
 			consoleButton.classList.add("clickable");
 			consoleButton.onclick = this.handleConsoleButton.bind(this);
 		}
 
 		const deleteButton = this.shadowRoot.querySelector("#delete-btn");
-		deleteButton.src = instancesConfig[this.status].delete.src;
-		deleteButton.alt = instancesConfig[this.status].delete.alt;
-		deleteButton.title = instancesConfig[this.status].delete.alt;
+		setSVGSrc(deleteButton, instancesConfig[this.status].delete.src);
+		setSVGAlt(deleteButton, instancesConfig[this.status].delete.alt);
 		if (instancesConfig[this.status].delete.clickable) {
 			deleteButton.classList.add("clickable");
 			deleteButton.onclick = this.handleDeleteButton.bind(this);

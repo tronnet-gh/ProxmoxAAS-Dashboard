@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, goToPage, getURIData, resourcesConfig, setTitleAndHeader, bootConfig, setAppearance } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, getURIData, resourcesConfig, setTitleAndHeader, bootConfig, setAppearance, setSVGSrc, setSVGAlt } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
@@ -88,9 +88,9 @@ async function populateResources () {
 function addResourceLine (fieldset, iconHref, type, labelText, id, attributes, unitText = null) {
 	const field = document.querySelector(`#${fieldset}`);
 
-	const icon = document.createElement("img");
-	icon.src = iconHref;
-	icon.alt = labelText;
+	const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	setSVGSrc(icon, iconHref);
+	setSVGAlt(icon, labelText);
 	field.append(icon);
 
 	const label = document.createElement("label");
@@ -168,9 +168,9 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 	const diskID = `${busPrefix}${device}`;
 
 	// Set the disk icon, either drive.svg or disk.svg
-	const icon = document.createElement("img");
-	icon.src = diskMetaData[type][busPrefix].icon;
-	icon.alt = diskName;
+	const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	setSVGSrc(icon, diskMetaData[type][busPrefix].icon);
+	setSVGAlt(icon, diskName);
 	icon.dataset.disk = diskID;
 	field.append(icon);
 
@@ -190,23 +190,24 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 
 	const actionDiv = document.createElement("div");
 	diskMetaData.actionBarOrder.forEach((element) => {
-		const action = document.createElement("img");
+		const action = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")) { // attach
-			action.src = "images/actions/disk/attach.svg";
+			setSVGSrc(action, diskMetaData.actions.attach.src);
+			setSVGAlt(action, diskMetaData.actions.attach.title);
 			action.title = "Attach Disk";
 			action.addEventListener("click", handleDiskAttach);
 			action.classList.add("clickable");
 		}
 		else if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")) { // detach
-			action.src = "images/actions/disk/detach.svg";
-			action.title = "Detach Disk";
+			setSVGSrc(action, diskMetaData.actions.detach.src);
+			setSVGAlt(action, diskMetaData.actions.detach.title);
 			action.addEventListener("click", handleDiskDetach);
 			action.classList.add("clickable");
 		}
 		else if (element === "delete") {
 			const active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
-			action.src = `images/actions/delete-${active}.svg`;
-			action.title = "Delete Disk";
+			setSVGSrc(action, `images/actions/delete-${active}.svg`);
+			setSVGAlt(action, "Delete Disk");
 			if (active === "active") {
 				action.addEventListener("click", handleDiskDelete);
 				action.classList.add("clickable");
@@ -214,9 +215,9 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 		}
 		else {
 			const active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
-			action.src = `images/actions/disk/${element}-${active}.svg`;
+			setSVGSrc(action, `images/actions/disk/${element}-${active}.svg`);
 			if (active === "active") {
-				action.title = `${element.charAt(0).toUpperCase()}${element.slice(1)} Disk`;
+				setSVGAlt(action, `${element.charAt(0).toUpperCase()}${element.slice(1)} Disk`);
 				if (element === "move") {
 					action.addEventListener("click", handleDiskMove);
 				}
@@ -227,7 +228,6 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 			}
 		}
 		action.dataset.disk = diskID;
-		action.alt = action.title;
 		actionDiv.append(action);
 	});
 	field.append(actionDiv);
@@ -239,7 +239,7 @@ async function handleDiskDetach () {
 	const body = `<p>Are you sure you want to detach disk ${disk}</p>`;
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-disk="${disk}"]`).src = "images/status/loading.svg";
+			setSVGSrc(document.querySelector(`svg[data-disk="${disk}"]`), "images/status/loading.svg");
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/detach`, "POST");
 			if (result.status !== 200) {
 				alert(result.error);
@@ -263,7 +263,7 @@ async function handleDiskAttach () {
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			const device = form.get("device");
-			document.querySelector(`img[data-disk="${this.dataset.disk}"]`).src = "images/status/loading.svg";
+			setSVGSrc(document.querySelector(`svg[data-disk="${this.dataset.disk}"]`), "images/status/loading.svg");
 			const body = {
 				source: this.dataset.disk.replace("unused", "")
 			};
@@ -292,7 +292,7 @@ async function handleDiskResize () {
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			const disk = this.dataset.disk;
-			document.querySelector(`img[data-disk="${disk}"]`).src = "images/status/loading.svg";
+			setSVGSrc(document.querySelector(`svg[data-disk="${disk}"]`), "images/status/loading.svg");
 			const body = {
 				size: form.get("size-increment")
 			};
@@ -332,7 +332,7 @@ async function handleDiskMove () {
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			const disk = this.dataset.disk;
-			document.querySelector(`img[data-disk="${disk}"]`).src = "images/status/loading.svg";
+			setSVGSrc(document.querySelector(`svg[data-disk="${disk}"]`), "images/status/loading.svg");
 			const body = {
 				storage: form.get("storage-select"),
 				delete: form.get("delete-check") === "on" ? "1" : "0"
@@ -355,7 +355,7 @@ async function handleDiskDelete () {
 	const body = `<p>Are you sure you want to <strong>delete</strong> disk${disk}</p>`;
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-disk="${disk}"]`).src = "images/status/loading.svg";
+			setSVGSrc(document.querySelector(`svg[data-disk="${disk}"]`), "images/status/loading.svg");
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/delete`, "DELETE");
 			if (result.status !== 200) {
 				alert(result.error);
@@ -465,9 +465,9 @@ async function populateNetworks () {
 function addNetworkLine (fieldset, prefix, netID, netDetails) {
 	const field = document.querySelector(`#${fieldset}`);
 
-	const icon = document.createElement("img");
-	icon.src = "images/resources/network.svg";
-	icon.alt = `${prefix}${netID}`;
+	const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	setSVGSrc(icon, "images/resources/network.svg");
+	setSVGAlt(icon, `${prefix}${netID}`);
 	icon.dataset.network = netID;
 	icon.dataset.values = netDetails;
 	field.appendChild(icon);
@@ -488,19 +488,19 @@ function addNetworkLine (fieldset, prefix, netID, netDetails) {
 
 	const actionDiv = document.createElement("div");
 
-	const configBtn = document.createElement("img");
+	const configBtn = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	configBtn.classList.add("clickable");
-	configBtn.src = "images/actions/network/config.svg";
-	configBtn.title = "Config Interface";
+	setSVGSrc(configBtn, "images/actions/network/config.svg");
+	setSVGAlt(configBtn, "Config Interface");
 	configBtn.addEventListener("click", handleNetworkConfig);
 	configBtn.dataset.network = netID;
 	configBtn.dataset.values = netDetails;
 	actionDiv.appendChild(configBtn);
 
-	const deleteBtn = document.createElement("img");
+	const deleteBtn = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	deleteBtn.classList.add("clickable");
-	deleteBtn.src = "images/actions/delete-active.svg";
-	deleteBtn.title = "Delete Interface";
+	setSVGSrc(deleteBtn, "images/actions/delete-active.svg");
+	setSVGAlt(deleteBtn, "Delete Interface");
 	deleteBtn.addEventListener("click", handleNetworkDelete);
 	deleteBtn.dataset.network = netID;
 	deleteBtn.dataset.values = netDetails;
@@ -521,7 +521,7 @@ async function handleNetworkConfig () {
 
 	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-network="${netID}"]`).src = "images/status/loading.svg";
+			setSVGSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
 			const body = {
 				rate: form.get("rate")
 			};
@@ -546,7 +546,7 @@ async function handleNetworkDelete () {
 
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-network="${netID}"]`).src = "images/status/loading.svg";
+			setSVGSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/net${netID}/delete`, "DELETE");
 			if (result.status !== 200) {
 				alert(result.error);
@@ -615,9 +615,9 @@ async function populateDevices () {
 function addDeviceLine (fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	const field = document.querySelector(`#${fieldset}`);
 
-	const icon = document.createElement("img");
-	icon.src = "images/resources/device.svg";
-	icon.alt = `${prefix}${deviceID}`;
+	const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	setSVGSrc(icon, "images/resources/device.svg");
+	setSVGAlt(icon, `${prefix}${deviceID}`);
 	icon.dataset.device = deviceID;
 	icon.dataset.values = deviceDetails;
 	icon.dataset.name = deviceName;
@@ -634,20 +634,20 @@ function addDeviceLine (fieldset, prefix, deviceID, deviceDetails, deviceName) {
 
 	const actionDiv = document.createElement("div");
 
-	const configBtn = document.createElement("img");
+	const configBtn = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	configBtn.classList.add("clickable");
-	configBtn.src = "images/actions/device/config.svg";
-	configBtn.title = "Config Device";
+	setSVGSrc(configBtn, "images/actions/device/config.svg");
+	setSVGAlt(configBtn, "Config Device");
 	configBtn.addEventListener("click", handleDeviceConfig);
 	configBtn.dataset.device = deviceID;
 	configBtn.dataset.values = deviceDetails;
 	configBtn.dataset.name = deviceName;
 	actionDiv.appendChild(configBtn);
 
-	const deleteBtn = document.createElement("img");
+	const deleteBtn = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	deleteBtn.classList.add("clickable");
-	deleteBtn.src = "images/actions/delete-active.svg";
-	deleteBtn.title = "Delete Device";
+	setSVGSrc(deleteBtn, "images/actions/delete-active.svg");
+	setSVGAlt(deleteBtn, "Delete Device");
 	deleteBtn.addEventListener("click", handleDeviceDelete);
 	deleteBtn.dataset.device = deviceID;
 	deleteBtn.dataset.values = deviceDetails;
@@ -670,7 +670,7 @@ async function handleDeviceConfig () {
 
 	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-device="${deviceID}"]`).src = "images/status/loading.svg";
+			setSVGSrc(document.querySelector(`svg[data-device="${deviceID}"]`), "images/status/loading.svg");
 			const body = {
 				device: form.get("device"),
 				pcie: form.get("pcie") ? 1 : 0
@@ -699,7 +699,7 @@ async function handleDeviceDelete () {
 
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
-			document.querySelector(`img[data-device="${deviceID}"]`).src = "images/status/loading.svg";
+			setSVGSrc(document.querySelector(`svg[data-device="${deviceID}"]`), "images/status/loading.svg");
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/hostpci${deviceID}/delete`, "DELETE");
 			if (result.status !== 200) {
 				alert(result.error);
@@ -783,14 +783,12 @@ function addBootLine (container, data, before = null) {
 	item.data = data;
 	item.innerHTML = `
 		<div style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
-			<img src="images/actions/drag.svg" id="drag" alt="drag icon">
-			<img src="${bootMetaData[data.prefix].icon}" alt="${bootMetaData[data.prefix].alt}">
+			<svg id="drag" role="application" aria-label="drag icon"><title>drag icon</title><use xlink:href="images/actions/drag.svg#symb"></use></svg>
+			<svg role="application" aria-label="${bootMetaData[data.prefix].alt}"><title>${bootMetaData[data.prefix].alt}</title><use xlink:href="${bootMetaData[data.prefix].icon}#symb"></use></svg>
 			<p style="margin: 0px;">${data.id}</p>
 			<p style="margin: 0px; overflow-x: hidden; white-space: nowrap;">${data.detail}</p>
 		</div>
 	`;
-	item.draggable = true;
-	item.classList.add("drop-target");
 	item.id = `boot-${data.id}`;
 	if (before) {
 		document.querySelector(`#${container}`).insertBefore(item, before);

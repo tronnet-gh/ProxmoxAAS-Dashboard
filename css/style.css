@@ -92,13 +92,14 @@ input, select, textarea {
 	color: var(--main-text-color);
 }
 
-img.clickable {
+img.clickable, svg.clickable {
 	cursor: pointer;
 }
 
-img {
+img, svg {
 	height: 1em;
 	width: 1em;
+	color: var(--main-text-color)
 }
 
 hr, * {
@@ -165,8 +166,19 @@ hr, * {
 	background-size: 1em auto;
 }
 
+/* add hide large class similar to w3-hide-medium and w3-hide-small */
 @media (width >=993px) {
 	.w3-hide-large {
 		display: none !important;
 	}
+}
+
+/* fix edge case in w3-hide-medium where width between 992 and 993 */
+@media (width <=993px) and (width >=601px){
+	.w3-hide-medium{display:none!important}
+}
+
+/* fix edge case in w3-hide-small when width between 600 and 601 */
+@media (width <=601px) {
+	.w3-hide-small{display:none!important}
 }

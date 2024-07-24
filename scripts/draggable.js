@@ -11,6 +11,9 @@ class DraggableContainer extends HTMLElement {
 					border-radius: 5px;
 					margin: -1px;
 				}
+				draggable-item::part(wrapper) {
+					cursor: grab;
+				}
 			</style>
 			<label id="title"></label>
 			<div id="wrapper" style="padding-bottom: 1em;"></div>
@@ -78,7 +81,7 @@ class DraggableItem extends HTMLElement {
 		// for whatever reason, only grid layout seems to respect the parent's content bounds
 		this.shadowRoot.innerHTML = `
 			<style>
-				img {
+				img, svg {
 					height: 1em;
 					width: 1em;
 				}
