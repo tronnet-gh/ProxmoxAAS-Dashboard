@@ -14,6 +14,17 @@ export const resourcesConfig = {
 			ide: { name: "IDE", icon: "images/resources/disk.svg", actions: ["delete"] },
 			sata: { name: "SATA", icon: "images/resources/drive.svg", actions: ["detach", "move", "reassign", "resize"] },
 			unused: { name: "UNUSED", icon: "images/resources/drive.svg", actions: ["attach", "delete", "reassign"] }
+		},
+		actions: {
+			attach: {
+				src: "images/actions/disk/attach.svg",
+				title: "Attach Disk"
+			},
+			detach: {
+				src: "images/actions/disk/detach.svg",
+				title: "Detach Disk"
+			},
+			delete: null
 		}
 	},
 	network: {
@@ -316,4 +327,18 @@ export function setAppearance () {
 		document.querySelector(":root").classList.add("light-theme");
 		document.querySelector(":root").classList.remove("dark-theme");
 	}
+}
+
+// assumes href is path to svg, and id to grab is #symb
+export function setSVGSrc (svgElem, href) {
+	let useElem = svgElem.querySelector("use");
+	if (!useElem) {
+		useElem = document.createElementNS("http://www.w3.org/2000/svg", "use");
+	}
+	useElem.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `${href}#symb`);
+	svgElem.append(useElem);
+}
+
+export function setSVGAlt (svgElem, alt) {
+	svgElem.setAttribute("aria-label", alt);
 }
