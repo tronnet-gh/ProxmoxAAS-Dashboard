@@ -4,7 +4,7 @@
 	"description": "Front-end for ProxmoxAAS",
 	"type": "module",
 	"scripts": {
-		"lint": "html-validator --continue; stylelint --formatter verbose --fix **/*.css; DEBUG=eslint:cli-engine eslint --fix scripts/"
+		"lint": "html-validator --continue; stylelint --formatter verbose --fix css/*.css; DEBUG=eslint:cli-engine eslint --fix scripts/"
 	},
 	"devDependencies": {
 		"eslint": "^8.43.0",
