@@ -193,7 +193,7 @@ class InstanceCard extends HTMLElement {
 	}
 
 	handleConfigButton () {
-		if (!this.actionLock && this.status === "stopped") { // if the action lock is false, and the node is stopped, then navigate to the conig page with the node infor in the search query
+		if (!this.actionLock && this.status === "stopped") { // if the action lock is false, and the node is stopped, then navigate to the config page with the node info in the search query
 			goToPage("config.html", { node: this.node.name, type: this.type, vmid: this.vmid });
 		}
 	}
@@ -349,26 +349,28 @@ async function handleInstanceAdd () {
 			<label for="node">Node</label>
 			<select class="w3-select w3-border" name="node" id="node" required></select>
 			<label for="name">Name</label>
-			<input class="w3-input w3-border" name="name" id="name" required></input>
+			<input class="w3-input w3-border" name="name" id="name" required>
 			<label for="vmid">ID</label>
-			<input class="w3-input w3-border" name="vmid" id="vmid" type="number" required></input>
+			<input class="w3-input w3-border" name="vmid" id="vmid" type="number" required>
 			<label for="pool">Pool</label>
 			<select class="w3-select w3-border" name="pool" id="pool" required></select>
 			<label for="cores">Cores (Threads)</label>
-			<input class="w3-input w3-border" name="cores" id="cores" type="number" min="1" max="8192" required></input>
+			<input class="w3-input w3-border" name="cores" id="cores" type="number" min="1" max="8192" required>
 			<label for="memory">Memory (MiB)</label>
-			<input class="w3-input w3-border" name="memory" id="memory" type="number" min="16", step="1" required></input>
+			<input class="w3-input w3-border" name="memory" id="memory" type="number" min="16", step="1" required>
 			<p class="container-specific none" style="grid-column: 1 / span 2; text-align: center;">Container Options</p>
 			<label class="container-specific none" for="swap">Swap (MiB)</label>
-			<input class="w3-input w3-border container-specific none" name="swap" id="swap" type="number" min="0" step="1" required disabled></input>
+			<input class="w3-input w3-border container-specific none" name="swap" id="swap" type="number" min="0" step="1" required disabled>
 			<label class="container-specific none" for="template-image">Template Image</label>
 			<select class="w3-select w3-border container-specific none" name="template-image" id="template-image" required disabled></select>
 			<label class="container-specific none" for="rootfs-storage">ROOTFS Storage</label>
 			<select class="w3-select w3-border container-specific none" name="rootfs-storage" id="rootfs-storage" required disabled></select>
 			<label class="container-specific none" for="rootfs-size">ROOTFS Size (GiB)</label>
-			<input class="w3-input w3-border container-specific none" name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled></input>
+			<input class="w3-input w3-border container-specific none" name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled>
 			<label class="container-specific none" for="password">Password</label>
-			<input class="w3-input w3-border container-specific none" name="password" id="password" type="password" required disabled></input>
+			<input class="w3-input w3-border container-specific none" name="password" id="password" type="password" required disabled>
+			<label for="confirm-password">Confirm Password</label>
+			<input class="w3-input w3-border container-specific none" name="confirm-password" id="confirm-password" type="password" required disabled>
 		</form>
 	`;
 
@@ -480,4 +482,14 @@ async function handleInstanceAdd () {
 		templateImage.append(new Option(template.name, template.volid));
 	}
 	templateImage.selectedIndex = -1;
+
+	const password = d.querySelector("#password");
+	const confirmPassword = d.querySelector("#confirm-password");
+
+	function validatePassword () {
+		confirmPassword.setCustomValidity(password.value !== confirmPassword.value ? "Passwords Don't Match" : "");
+	}
+
+	password.addEventListener("change", validatePassword);
+	confirmPassword.addEventListener("keyup", validatePassword);
 }
