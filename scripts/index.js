@@ -62,7 +62,7 @@ class InstanceCard extends HTMLElement {
 		this.vmid = data.vmid;
 		this.name = data.name;
 		this.node = data.node;
-		this.searchQuery = data.searchQuery;
+		this.searchQueryResult = data.searchQueryResult;
 		this.update();
 	}
 
@@ -71,18 +71,36 @@ class InstanceCard extends HTMLElement {
 		vmidParagraph.innerText = this.vmid;
 
 		const nameParagraph = this.shadowRoot.querySelector("#instance-name");
-		if (this.searchQuery) {
-			const regExpEscape = v => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-			const escapedQuery = regExpEscape(this.searchQuery);
-			const searchRegExp = new RegExp(`(${escapedQuery})`, "gi");
-			const nameParts = this.name.split(searchRegExp);
-			for (let i = 0; i < nameParts.length; i++) {
-				const part = document.createElement("span");
-				part.innerText = nameParts[i];
-				if (nameParts[i].toLowerCase() === this.searchQuery.toLowerCase()) {
+		if (this.searchQueryResult.alignment) {
+			let i = 0; // name index
+			let c = 0; // alignment index
+			const alignment = this.searchQueryResult.alignment;
+			while (i < this.name.length && c < alignment.length) {
+				if (alignment[c] === "M") {
+					const part = document.createElement("span");
+					part.innerText = this.name[i];
 					part.style = "color: var(--lightbg-text-color); background-color: var(--highlight-color);";
+					nameParagraph.append(part);
+					i++;
+					c++;
 				}
-				nameParagraph.append(part);
+				else if (alignment[c] === "I") {
+					const part = document.createElement("span");
+					part.innerText = this.name[i];
+					nameParagraph.append(part);
+					i++;
+					c++;
+				}
+				else if (alignment[c] === "D") {
+					c++;
+				}
+				else if (alignment[c] === "X") {
+					const part = document.createElement("span");
+					part.innerText = this.name[i];
+					nameParagraph.append(part);
+					i++;
+					c++;
+				}
 			}
 		}
 		else {
@@ -282,25 +300,23 @@ async function populateInstances () {
 	const searchQuery = document.querySelector("#search").value || null;
 	let criteria;
 	if (!searchQuery) {
-		criteria = (a, b) => {
-			return (a.vmid > b.vmid) ? 1 : -1;
+		criteria = (item, query = null) => {
+			return { score: item.vmid, alignment: null };
 		};
 	}
 	else if (searchCriteria === "exact") {
-		criteria = (a, b) => {
-			const aInc = a.name.toLowerCase().includes(searchQuery.toLowerCase());
-			const bInc = b.name.toLowerCase().includes(searchQuery.toLowerCase());
-			if (aInc && bInc) {
-				return a.vmid > b.vmid ? 1 : -1;
-			}
-			else if (aInc && !bInc) {
-				return -1;
-			}
-			else if (!aInc && bInc) {
-				return 1;
+		criteria = (item, query) => {
+			const substrInc = item.includes(query);
+			if (substrInc) {
+				const substrStartIndex = item.indexOf(query);
+				const queryLength = query.length;
+				const remaining = item.length - substrInc - queryLength;
+				const alignment = `${"X".repeat(substrStartIndex)}${"M".repeat(queryLength)}${"X".repeat(remaining)}`;
+				return { score: 1, alignment };
 			}
 			else {
-				return a.vmid > b.vmid ? 1 : -1;
+				const alignment = `${"X".repeat(item.length)}`;
+				return { score: 0, alignment };
 			}
 		};
 	}
@@ -308,32 +324,41 @@ async function populateInstances () {
 		const penalties = {
 			m: 0,
 			x: 1,
-			o: 1,
+			o: 0,
 			e: 1
 		};
-		criteria = (a, b) => {
+		criteria = (item, query) => {
 			// lower is better
-			const aAlign = wfAlign(a.name.toLowerCase(), searchQuery.toLowerCase(), penalties);
-			const aScore = aAlign.score / a.name.length;
-			const bAlign = wfAlign(b.name.toLowerCase(), searchQuery.toLowerCase(), penalties);
-			const bScore = bAlign.score / b.name.length;
-			if (aScore === bScore) {
-				return a.vmid > b.vmid ? 1 : -1;
-			}
-			else {
-				return aScore - bScore;
-			}
+			const { score, CIGAR } = wfAlign(query, item, penalties, true);
+			return { score: score / item.length, alignment: CIGAR };
 		};
 	}
-	instances.sort(criteria);
+	sortInstances(criteria, searchQuery);
 	const instanceContainer = document.querySelector("#instance-container");
 	instanceContainer.innerHTML = "";
 	for (let i = 0; i < instances.length; i++) {
 		const newInstance = document.createElement("instance-card");
-		instances[i].searchQuery = searchQuery;
 		newInstance.data = instances[i];
 		instanceContainer.append(newInstance);
 	}
+}
+
+function sortInstances (criteria, searchQuery) {
+	for (let i = 0; i < instances.length; i++) {
+		const { score, alignment } = criteria(instances[i].name.toLowerCase(), searchQuery ? searchQuery.toLowerCase() : "");
+		instances[i].searchQueryResult = { score, alignment };
+	}
+	const sortCriteria = (a, b) => {
+		const aScore = a.searchQueryResult.score;
+		const bScore = b.searchQueryResult.score;
+		if (aScore === bScore) {
+			return a.vmid > b.vmid ? 1 : -1;
+		}
+		else {
+			return aScore - bScore;
+		}
+	};
+	instances.sort(sortCriteria);
 }
 
 async function handleInstanceAdd () {
