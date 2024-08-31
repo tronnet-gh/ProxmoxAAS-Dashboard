@@ -1,17 +1,44 @@
-import { requestPVE, requestAPI, goToPage, getURIData, resourcesConfig, setTitleAndHeader, bootConfig, setAppearance, setSVGSrc, setSVGAlt } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, getURIData, resourcesConfig, setTitleAndHeader, bootConfig, setAppearance, setSVGSrc, setSVGAlt, mergeDeep, addResourceLine } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
 
 const diskMetaData = resourcesConfig.disk;
 const networkMetaData = resourcesConfig.network;
-const pcieMetaData = resourcesConfig.pcie;
+const pcieMetaData = resourcesConfig.pci;
 const bootMetaData = bootConfig;
 
 let node;
 let type;
 let vmid;
 let config;
+
+const resourceInputTypes = { // input types for each resource for config page
+	cpu: {
+		element: "select",
+		attributes: {}
+	},
+	cores: {
+		element: "input",
+		attributes: {
+			type: "number"
+		}
+	},
+	memory: {
+		element: "input",
+		attributes: {
+			type: "number"
+		}
+	},
+	swap: {
+		element: "input",
+		attributes: {
+			type: "number"
+		}
+	}
+};
+
+const resourcesConfigPage = mergeDeep({}, resourcesConfig, resourceInputTypes);
 
 async function init () {
 	setAppearance();
@@ -27,6 +54,9 @@ async function init () {
 	vmid = uriData.vmid;
 
 	await getConfig();
+
+	const name = type === "qemu" ? "name" : "hostname";
+	document.querySelector("#name").innerHTML = document.querySelector("#name").innerHTML.replace("%{vmname}", config.data[name]);
 
 	populateResources();
 	populateDisk();
@@ -49,8 +79,7 @@ async function getConfig () {
 }
 
 async function populateResources () {
-	const name = type === "qemu" ? "name" : "hostname";
-	document.querySelector("#name").innerHTML = document.querySelector("#name").innerHTML.replace("%{vmname}", config.data[name]);
+	const field = document.querySelector("#resources");
 	if (type === "qemu") {
 		const global = await requestAPI("/global/config/resources");
 		const user = await requestAPI("/user/config/resources");
@@ -76,63 +105,12 @@ async function populateResources () {
 				return a.localeCompare(b);
 			});
 		}
-		addResourceLine("resources", "images/resources/cpu.svg", "select", "CPU Type", "proctype", { value: config.data.cpu, options });
+		addResourceLine(resourcesConfigPage, field, "cpu", { value: config.data.cpu, options });
 	}
-	addResourceLine("resources", "images/resources/cpu.svg", "input", "CPU Amount", "cores", { type: "number", value: config.data.cores, min: 1, max: 8192 }, "Cores");
-	addResourceLine("resources", "images/resources/ram.svg", "input", "Memory", "ram", { type: "number", value: config.data.memory, min: 16, step: 1 }, "MiB");
+	addResourceLine(resourcesConfigPage, field, "cores", { value: config.data.cores, min: 1, max: 8192 });
+	addResourceLine(resourcesConfigPage, field, "memory", { value: config.data.memory, min: 16, step: 1 });
 	if (type === "lxc") {
-		addResourceLine("resources", "images/resources/swap.svg", "input", "Swap", "swap", { type: "number", value: config.data.swap, min: 0, step: 1 }, "MiB");
-	}
-}
-
-function addResourceLine (fieldset, iconHref, type, labelText, id, attributes, unitText = null) {
-	const field = document.querySelector(`#${fieldset}`);
-
-	const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	setSVGSrc(icon, iconHref);
-	setSVGAlt(icon, labelText);
-	field.append(icon);
-
-	const label = document.createElement("label");
-	label.innerText = labelText;
-	label.htmlFor = id;
-	field.append(label);
-
-	if (type === "input") {
-		const input = document.createElement("input");
-		for (const k in attributes) {
-			input.setAttribute(k, attributes[k]);
-		}
-		input.id = id;
-		input.name = id;
-		input.required = true;
-		input.classList.add("w3-input");
-		input.classList.add("w3-border");
-		field.append(input);
-	}
-	else if (type === "select") {
-		const select = document.createElement("select");
-		for (const option of attributes.options) {
-			select.append(new Option(option));
-		}
-		select.value = attributes.value;
-		select.id = id;
-		select.name = id;
-		select.required = true;
-		select.classList.add("w3-select");
-		select.classList.add("w3-border");
-		field.append(select);
-	}
-
-	if (unitText) {
-		const unit = document.createElement("p");
-		unit.innerText = unitText;
-		field.append(unit);
-	}
-	else {
-		const unit = document.createElement("div");
-		unit.classList.add("hidden");
-		field.append(unit);
+		addResourceLine(resourcesConfigPage, field, "swap", { value: config.data.swap, min: 0, step: 1 });
 	}
 }
 
@@ -256,7 +234,7 @@ async function handleDiskAttach () {
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
 			<label for="device">${type === "qemu" ? "SATA" : "MP"}</label>
-			<input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required></input>
+			<input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required>
 		</form>
 	`;
 
@@ -285,7 +263,7 @@ async function handleDiskResize () {
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
 			<label for="size-increment">Size Increment (GiB)</label>
-			<input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072"></input>
+			<input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072">
 		</form>
 		`;
 
@@ -383,9 +361,9 @@ async function handleDiskAdd () {
 
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required></input>
+			<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required>
 			${select}
-			<label for="size">Size (GiB)</label><input class="w3-input w3-border" name="size" id="size" type="number" min="0" max="131072" required></input>
+			<label for="size">Size (GiB)</label><input class="w3-input w3-border" name="size" id="size" type="number" min="0" max="131072" required>
 		</form>
 	`;
 
@@ -416,7 +394,7 @@ async function handleCDAdd () {
 
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required></input>
+			<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required>
 			<label for="iso-select">Image</label><select class="w3-select w3-border" name="iso-select" id="iso-select" required></select>
 		</form>
 	`;
@@ -466,7 +444,7 @@ function addNetworkLine (fieldset, prefix, netID, netDetails) {
 	const field = document.querySelector(`#${fieldset}`);
 
 	const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	setSVGSrc(icon, "images/resources/network.svg");
+	setSVGSrc(icon, networkMetaData.icon);
 	setSVGAlt(icon, `${prefix}${netID}`);
 	icon.dataset.network = netID;
 	icon.dataset.values = netDetails;
@@ -566,7 +544,7 @@ async function handleNetworkAdd () {
 			<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">
 	`;
 	if (type === "lxc") {
-		body += "<label for=\"name\">Interface Name</label><input type=\"text\" id=\"name\" name=\"name\" class=\"w3-input w3-border\"></input>";
+		body += "<label for=\"name\">Interface Name</label><input type=\"text\" id=\"name\" name=\"name\" class=\"w3-input w3-border\">";
 	}
 	body += "</form>";
 
@@ -616,7 +594,7 @@ function addDeviceLine (fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	const field = document.querySelector(`#${fieldset}`);
 
 	const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	setSVGSrc(icon, "images/resources/device.svg");
+	setSVGSrc(icon, pcieMetaData.icon);
 	setSVGAlt(icon, `${prefix}${deviceID}`);
 	icon.dataset.device = deviceID;
 	icon.dataset.values = deviceDetails;
@@ -783,8 +761,8 @@ function addBootLine (container, data, before = null) {
 	item.data = data;
 	item.innerHTML = `
 		<div style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
-			<svg id="drag" role="application" aria-label="drag icon"><title>drag icon</title><use xlink:href="images/actions/drag.svg#symb"></use></svg>
-			<svg role="application" aria-label="${bootMetaData[data.prefix].alt}"><title>${bootMetaData[data.prefix].alt}</title><use xlink:href="${bootMetaData[data.prefix].icon}#symb"></use></svg>
+			<svg id="drag" role="application" aria-label="drag icon"><title>drag icon</title><use href="images/actions/drag.svg#symb"></use></svg>
+			<svg role="application" aria-label="${bootMetaData[data.prefix].alt}"><title>${bootMetaData[data.prefix].alt}</title><use href="${bootMetaData[data.prefix].icon}#symb"></use></svg>
 			<p style="margin: 0px;">${data.id}</p>
 			<p style="margin: 0px; overflow-x: hidden; white-space: nowrap;">${data.detail}</p>
 		</div>
@@ -850,8 +828,6 @@ async function handleFormExit () {
 	}
 	const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/resources`, "POST", body);
 	if (result.status === 200) {
-		await getConfig();
-		populateDisk();
 		goToPage("index.html");
 	}
 	else {

@@ -1,6 +1,30 @@
 import { API, organization } from "../vars.js";
 
 export const resourcesConfig = {
+	cpu: {
+		name: "CPU Type",
+		icon: "images/resources/cpu.svg",
+		id: "proctype",
+		unitText: null
+	},
+	cores: {
+		name: "CPU Amount",
+		icon: "images/resources/cpu.svg",
+		id: "cores",
+		unitText: "Cores"
+	},
+	memory: {
+		name: "Memory",
+		icon: "images/resources/ram.svg",
+		id: "ram",
+		unitText: "MiB"
+	},
+	swap: {
+		name: "Swap",
+		icon: "images/resources/swap.svg",
+		id: "swap",
+		unitText: "MiB"
+	},
 	disk: {
 		actionBarOrder: ["move", "resize", "detach_attach", "delete"],
 		lxc: {
@@ -28,9 +52,17 @@ export const resourcesConfig = {
 		}
 	},
 	network: {
+		name: "Network",
+		icon: "images/resources/network.svg",
+		id: "network",
+		unitText: "MB/s",
 		prefix: "net"
 	},
-	pcie: {
+	pci: {
+		name: "Devices",
+		icon: "images/resources/device.svg",
+		id: "devices",
+		unitText: null,
 		prefix: "hostpci"
 	}
 };
@@ -335,10 +367,116 @@ export function setSVGSrc (svgElem, href) {
 	if (!useElem) {
 		useElem = document.createElementNS("http://www.w3.org/2000/svg", "use");
 	}
-	useElem.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `${href}#symb`);
+	useElem.setAttribute("href", `${href}#symb`);
 	svgElem.append(useElem);
 }
 
 export function setSVGAlt (svgElem, alt) {
 	svgElem.setAttribute("aria-label", alt);
+}
+
+/**
+ * Simple object check.
+ * @param item
+ * @returns {boolean}
+ */
+export function isObject (item) {
+	return (item && typeof item === "object" && !Array.isArray(item));
+}
+
+/**
+ * Deep merge two objects.
+ * @param target
+ * @param ...sources
+ */
+export function mergeDeep (target, ...sources) {
+	if (!sources.length) return target;
+	const source = sources.shift();
+
+	if (isObject(target) && isObject(source)) {
+		for (const key in source) {
+			if (isObject(source[key])) {
+				if (!target[key]) Object.assign(target, { [key]: {} });
+				mergeDeep(target[key], source[key]);
+			}
+			else {
+				Object.assign(target, { [key]: source[key] });
+			}
+		}
+	}
+
+	return mergeDeep(target, ...sources);
+}
+
+export function addResourceLine (config, field, resourceType, attributesOverride, labelPrefix = null) {
+	const resourceConfig = config[resourceType];
+	const iconHref = resourceConfig.icon;
+	const elementType = resourceConfig.element;
+	const labelText = labelPrefix ? `${labelPrefix} ${resourceConfig.name}` : resourceConfig.name;
+	const id = resourceConfig.id;
+	const unitText = resourceConfig.unitText;
+	const attributes = { ...(resourceConfig.attributes), ...(attributesOverride) };
+
+	const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	setSVGSrc(icon, iconHref);
+	setSVGAlt(icon, labelText);
+	field.append(icon);
+
+	const label = document.createElement("label");
+	label.innerText = labelText;
+	label.htmlFor = id;
+	field.append(label);
+
+	if (elementType === "input") {
+		const input = document.createElement("input");
+		for (const k in attributes) {
+			input.setAttribute(k, attributes[k]);
+		}
+		input.id = id;
+		input.name = id;
+		input.required = true;
+		input.classList.add("w3-input");
+		input.classList.add("w3-border");
+		field.append(input);
+	}
+	else if (elementType === "select" || elementType === "multi-select") {
+		const select = document.createElement("select");
+		for (const option of attributes.options) {
+			select.append(new Option(option));
+		}
+		select.value = attributes.value;
+		select.id = id;
+		select.name = id;
+		select.required = true;
+		select.classList.add("w3-select");
+		select.classList.add("w3-border");
+		if (elementType === "multi-select") {
+			select.setAttribute("multiple", true);
+		}
+		field.append(select);
+	}
+	else if (customElements.get(elementType)) {
+		const elem = document.createElement(elementType);
+		if (attributes.options) {
+			for (const option of attributes.options) {
+				elem.append(new Option(option));
+			}
+		}
+		elem.value = attributes.value;
+		elem.id = id;
+		elem.name = id;
+		elem.required = true;
+		field.append(elem);
+	}
+
+	if (unitText) {
+		const unit = document.createElement("p");
+		unit.innerText = unitText;
+		field.append(unit);
+	}
+	else {
+		const unit = document.createElement("div");
+		unit.classList.add("hidden");
+		field.append(unit);
+	}
 }
