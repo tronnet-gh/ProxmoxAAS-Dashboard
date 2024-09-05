@@ -14,7 +14,8 @@
 	text-align: right;
 }
 
-.input-grid + * {
+/* sibling of input-grid that is not inside another input grid */
+:not(.input-grid) .input-grid + * {
 	display: inline-block;
 	width: 100%;
 	margin-top: 5px;
