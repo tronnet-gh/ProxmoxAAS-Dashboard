@@ -8,17 +8,20 @@
 .input-grid * {
 	margin-top: 0;
 	margin-bottom: 0;
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+.input-grid input {
+	padding: 8px;
+}
+
+.input-grid svg {
+	padding: 0;
 }
 
 .input-grid .last-item {
 	text-align: right;
-}
-
-/* sibling of input-grid that is not inside another input grid */
-:not(.input-grid) .input-grid + * {
-	display: inline-block;
-	width: 100%;
-	margin-top: 5px;
 }
 
 legend {
@@ -57,10 +60,17 @@ input[type="radio"] {
 	position: inherit;
 }
 
-div[draggable="true"] {
-	cursor: grab;
-}
-
 .w3-select, select {
 	padding: 8px;
+}
+
+.w3-check {
+	top: 0;
+}
+
+/* sibling of input-grid that is not inside another input grid */
+:not(.input-grid) .input-grid + * {
+	display: inline-block;
+	width: 100%;
+	margin-top: 5px;
 }
