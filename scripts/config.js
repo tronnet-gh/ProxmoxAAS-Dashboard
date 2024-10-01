@@ -81,7 +81,7 @@ async function getConfig () {
 async function populateResources () {
 	const field = document.querySelector("#resources");
 	if (type === "qemu") {
-		const global = await requestAPI("/global/config/resources");
+		const global = (await requestAPI("/global/config/resources")).resources;
 		const user = await requestAPI("/user/config/resources");
 		let options = [];
 		const globalCPU = global.cpu;
