@@ -150,7 +150,7 @@ async function init () {
 	let userCluster = requestAPI("/user/config/cluster");
 
 	resources = await resources;
-	meta = await meta;
+	meta = (await meta).resources;
 	userCluster = await userCluster;
 
 	document.querySelector("#username").innerText = `Username: ${getCookie("username")}`;
