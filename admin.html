@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
+	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>proxmox - dashboard</title>
 		<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
-		<link rel="stylesheet" href="w3.css">
+		<link rel="stylesheet" href="modules/w3.css">
 		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<link rel="stylesheet" href="css/style.css">
 		<link rel="stylesheet" href="css/nav.css">
 		<script src="scripts/admin.js" type="module"></script>
-    </head>
-    <body>
-        <header>
+	</head>
+	<body>
+		<header>
 			<h1>proxmox</h1>
 			<label for="navtoggle">&#9776;</label>
 			<input type="checkbox" id="navtoggle">
@@ -24,14 +24,14 @@
 				<a href="login.html">Logout</a>
 			</nav>
 		</header>
-        <main>
-			<h2>Cluster Administration</h2>
+		<main>
+			<h2>Admin</h2>
 			<section class="w3-card w3-padding">
 				<div class="flex row nowrap" style="margin-top: 1em; justify-content: space-between;">
 					<h3>Users</h3>
-					<button type="button" id="user-add" class="w3-button" aria-label="create new user">
+					<button type="button" id="user-add" class="w3-button" aria-label="Create New User">
 						<span class="large" style="margin: 0;">Create User</span>
-						<svg class="small" style="height: 1lh; width: 1lh;" role="img" aria-label="Create New User"><use xlink:href="images/actions/user/add.svg#symb"></use></svg>
+						<svg class="small" style="height: 1lh; width: 1lh;" role="img" aria-label="Create New User"><use href="images/actions/user/add.svg#symb"></use></svg>
 					</button>
 				</div>
 				<div>
@@ -41,15 +41,15 @@
 						<p class="w3-col l2 w3-hide-medium w3-hide-small">Admin</p>
 						<p class="w3-col l2 m4 s6">Actions</p>
 					</div>
-					<div id="user-container"></div>
+					<div id="users-container"></div>
 				</div>
 			</section>
 			<section class="w3-card w3-padding">
 				<div class="flex row nowrap" style="margin-top: 1em; justify-content: space-between;">
 					<h3>Groups</h3>
-					<button type="button" id="group-add" class="w3-button" aria-label="create new group">
+					<button type="button" id="group-add" class="w3-button" aria-label="Create New Group">
 						<span class="large" style="margin: 0;">Create Group</span>
-						<svg class="small" style="height: 1lh; width: 1lh;" role="img" aria-label="Create New Group"><use xlink:href="images/actions/group/add.svg#symb"></use></svg>
+						<svg class="small" style="height: 1lh; width: 1lh;" role="img" aria-label="Create New Group"><use href="images/actions/group/add.svg#symb"></use></svg>
 					</button>
 				</div>
 				<div>
@@ -58,9 +58,9 @@
 						<p class="w3-col l6 m4 w3-hide-small">Members</p>
 						<p class="w3-col l2 m4 s6">Actions</p>
 					</div>
-					<div id="group-container"></div>
+					<div id="groups-container"></div>
 				</div>
 			</section>
 		</main>
-    </body>
+	</body>
 </html>
