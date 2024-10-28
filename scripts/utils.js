@@ -408,6 +408,25 @@ export function mergeDeep (target, ...sources) {
 	return mergeDeep(target, ...sources);
 }
 
+/**
+ * Checks if object or array is empty
+ * @param {*} obj
+ * @returns
+ */
+export function isEmpty (obj) {
+	if (obj instanceof Array) {
+		return obj.length === 0;
+	}
+	else {
+		for (const prop in obj) {
+			if (Object.hasOwn(obj, prop)) {
+				return false;
+			}
+		}
+		return true;
+	}
+}
+
 export function addResourceLine (config, field, resourceType, attributesOverride, labelPrefix = null) {
 	const resourceConfig = config[resourceType];
 	const iconHref = resourceConfig.icon;
@@ -427,56 +446,62 @@ export function addResourceLine (config, field, resourceType, attributesOverride
 	label.htmlFor = id;
 	field.append(label);
 
+	let element;
+
 	if (elementType === "input") {
-		const input = document.createElement("input");
+		element = document.createElement("input");
 		for (const k in attributes) {
-			input.setAttribute(k, attributes[k]);
+			element.setAttribute(k, attributes[k]);
 		}
-		input.id = id;
-		input.name = id;
-		input.required = true;
-		input.classList.add("w3-input");
-		input.classList.add("w3-border");
-		field.append(input);
+		element.id = id;
+		element.name = id;
+		element.required = true;
+		element.classList.add("w3-input");
+		element.classList.add("w3-border");
+		field.append(element);
 	}
 	else if (elementType === "select" || elementType === "multi-select") {
-		const select = document.createElement("select");
+		element = document.createElement("select");
 		for (const option of attributes.options) {
-			select.append(new Option(option));
+			element.append(new Option(option));
 		}
-		select.value = attributes.value;
-		select.id = id;
-		select.name = id;
-		select.required = true;
-		select.classList.add("w3-select");
-		select.classList.add("w3-border");
+		element.value = attributes.value;
+		element.id = id;
+		element.name = id;
+		element.required = true;
+		element.classList.add("w3-select");
+		element.classList.add("w3-border");
 		if (elementType === "multi-select") {
-			select.setAttribute("multiple", true);
+			element.setAttribute("multiple", true);
 		}
-		field.append(select);
+		field.append(element);
 	}
 	else if (customElements.get(elementType)) {
-		const elem = document.createElement(elementType);
+		element = document.createElement(elementType);
 		if (attributes.options) {
 			for (const option of attributes.options) {
-				elem.append(new Option(option));
+				element.append(new Option(option));
 			}
 		}
-		elem.value = attributes.value;
-		elem.id = id;
-		elem.name = id;
-		elem.required = true;
-		field.append(elem);
+		element.value = attributes.value;
+		element.id = id;
+		element.name = id;
+		element.required = true;
+		field.append(element);
 	}
 
+	let unit;
+
 	if (unitText) {
-		const unit = document.createElement("p");
+		unit = document.createElement("p");
 		unit.innerText = unitText;
 		field.append(unit);
 	}
 	else {
-		const unit = document.createElement("div");
+		unit = document.createElement("div");
 		unit.classList.add("hidden");
 		field.append(unit);
 	}
+
+	return { icon, label, element, unit };
 }

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>proxmox - dashboard</title>
+		<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
+		<link rel="stylesheet" href="modules/w3.css">
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/nav.css">
+		<link rel="stylesheet" href="css/form.css">
+		<script src="scripts/user.js" type="module"></script>
+		<script src="scripts/draggable.js" type="module"></script>
+		<script src="modules/Sortable.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+		<style>
+			div.two-columns {
+				display: grid;
+				grid-template-columns: 50% 50%;
+			}
+			div.two-columns * {
+				padding: 0;
+				margin: 0;
+			}
+			draggable-container {
+				height: 100%
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>proxmox</h1>
+			<label for="navtoggle">&#9776;</label>
+			<input type="checkbox" id="navtoggle">
+			<nav id="navigation">
+				<a href="index.html">Instances</a>
+				<a href="account.html">Account</a>
+				<a href="settings.html">Settings</a>
+				<a id="admin-link" href="admin.html" aria-current="page">Admin</a>
+				<a href="login.html">Logout</a>
+			</nav>
+		</header>
+		<main>
+			<section>
+				<h2 id="name"><a href="admin.html">Admin</a> / Users / %{username}</h2>
+				<form>
+					<fieldset class="w3-card w3-padding">
+						<legend>Groups</legend>
+						<div class="input-grid two-columns">
+							<p>Member Of</p>
+							<p>Not Member Of</p>
+							<draggable-container id="groups-enabled"></draggable-container>
+							<draggable-container id="groups-disabled"></draggable-container>
+						</div>
+					</fieldset>
+					<fieldset class="w3-card w3-padding">
+						<legend>Resources</legend>
+						<div id="resources" class="input-grid" style="grid-template-columns: auto auto auto auto 1fr;"></div>
+						<div class="w3-container w3-center">
+							<button type="button" id="resource-add" class="w3-button" aria-label="Add New Resource Constraint">
+								<span class="large" style="margin: 0;">Add Resource</span>
+								<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New Resource Constraint"><use href="images/actions/user/add.svg#symb"></use></svg>
+							</button>
+						</div>
+					</fieldset>
+					<fieldset class="w3-card w3-padding">
+						<legend>Cluster</legend>
+						<div class="input-grid" style="grid-template-columns: auto auto 1fr;">
+							<label for="admin">Admin</label>
+							<input class="w3-check w3-border" type="checkbox" id="admin" name="admin">
+							<div></div>
+							<label style="align-self: start;">Nodes</label>
+							<div class="grid two-columns" style="grid-column: 2 / span 2">
+								<p>Allowed</p>
+								<p>Not Allowed</p>
+								<draggable-container id="nodes-enabled"></draggable-container>
+								<draggable-container id="nodes-disabled"></draggable-container>
+							</div>
+							<label style="align-self: start;">Pools</label>
+							<div class="grid two-columns" style="grid-column: 2 / span 2">
+								<p>Allowed</p>
+								<p>Not Allowed</p>
+								<draggable-container id="pools-enabled"></draggable-container>
+								<draggable-container id="pools-disabled"></draggable-container>
+							</div>
+							<label for="vmid-min">VMID Min</label>
+							<input class="w3-input w3-border" type="number" id="vmid-min" name="vmid-min">
+							<div></div>
+							<label for="vmid-max">VMID Max</label>
+							<input class="w3-input w3-border" type="number" id="vmid-max" name="vmid-max">
+							<div></div>
+						</div>
+					</fieldset>
+					<div class="w3-container w3-center" id="form-actions">
+						<button class="w3-button w3-margin" id="exit" type="button">EXIT</button>
+					</div>
+				</form>
+			</section>
+		</main>
+	</body>
+</html>

@@ -1,4 +1,4 @@
-import { setTitleAndHeader, setAppearance, requestAPI, goToPage } from "./utils.js";
+import { setTitleAndHeader, setAppearance, requestAPI, goToPage, isEmpty } from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -52,6 +52,9 @@ class UserCard extends HTMLElement {
 				* {
 					margin: 0;
 				}
+				p {
+					width: 100%;
+				}
 			</style>
 			<div class="w3-row" style="margin-top: 1em; margin-bottom: 1em;">
 				<p class="w3-col l4 m4 s6" id="user-name">
@@ -95,7 +98,12 @@ class UserCard extends HTMLElement {
 		nameParagraph.innerText = this.username;
 
 		const groupsParagraph = this.shadowRoot.querySelector("#user-groups");
-		groupsParagraph.innerText = `${this.groups.toString()}`;
+		if (isEmpty(this.groups)) {
+			groupsParagraph.innerHTML = "&nbsp;";
+		}
+		else {
+			groupsParagraph.innerText = this.groups.toString();
+		}
 
 		const adminParagraph = this.shadowRoot.querySelector("#user-admin");
 		adminParagraph.innerText = this.admin;
