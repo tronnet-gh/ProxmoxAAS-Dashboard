@@ -332,8 +332,8 @@ async function populateInstances () {
 		criteria = (item, query) => {
 			// lower is better
 			const { score, CIGAR } = global.wfAlign(query, item, penalties, true);
-			const alignment = global.DecodeCIGAR(CIGAR)
-			return { score: score / item.length, alignment: alignment };
+			const alignment = global.DecodeCIGAR(CIGAR);
+			return { score: score / item.length, alignment };
 		};
 	}
 	sortInstances(criteria, searchQuery);

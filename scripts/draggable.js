@@ -109,9 +109,9 @@ class DraggableItem extends HTMLElement {
 		return this.#value;
 	}
 
-	 set value (value) {
+	set value (value) {
 		this.#value = value;
-	 }
+	}
 }
 
 customElements.define("draggable-container", DraggableContainer);
