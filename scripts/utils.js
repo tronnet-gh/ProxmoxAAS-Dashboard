@@ -427,8 +427,7 @@ export function isEmpty (obj) {
 	}
 }
 
-export function addResourceLine (config, field, resourceType, attributesOverride, labelPrefix = null) {
-	const resourceConfig = config[resourceType];
+export function addResourceLine (resourceConfig, field, attributesOverride, labelPrefix = null) {
 	const iconHref = resourceConfig.icon;
 	const elementType = resourceConfig.element;
 	const labelText = labelPrefix ? `${labelPrefix} ${resourceConfig.name}` : resourceConfig.name;

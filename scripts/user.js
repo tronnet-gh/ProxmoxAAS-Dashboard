@@ -10,36 +10,53 @@ let allNodes;
 let allPools;
 let clusterResourceConfig;
 
+const resourceRulesLines = {}; // list of all resource rules fieldsets on the page
+
 const resourceInputTypes = { // input types for each resource for config page
 	cpu: {
+		type: "list",
 		element: "interactive-list",
 		align: "start"
 	},
 	cores: {
+		type: "numeric",
 		element: "input",
 		attributes: {
 			type: "number"
 		}
 	},
 	memory: {
+		type: "numeric",
 		element: "input",
 		attributes: {
 			type: "number"
 		}
 	},
 	swap: {
+		type: "numeric",
 		element: "input",
 		attributes: {
 			type: "number"
 		}
 	},
 	network: {
+		type: "numeric",
 		element: "input",
 		attributes: {
 			type: "number"
 		}
 	},
+	storage: {
+		type: "numeric",
+		icon: "images/resources/disk.svg",
+		element: "input",
+		unitText: "B",
+		attributes: {
+			type: "number"
+		}
+	},
 	pci: {
+		type: "list",
 		element: "interactive-list",
 		align: "start"
 	}
@@ -91,10 +108,15 @@ class InteractiveList extends HTMLElement {
 	}
 
 	get value () {
-
+		const ret = [];
+		for (const elem of this.container.childNodes) {
+			ret.push(elem.value);
+		}
+		return ret;
 	}
 
 	set value (value) {
+		this.container.innerHTML = "";
 		for (const item of value) {
 			this.#addItem(item);
 		}
@@ -151,28 +173,56 @@ class InteractiveListMatchItem extends HTMLElement {
 			<link rel="stylesheet" href="modules/w3.css">
 			<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 			<link rel="stylesheet" href="css/style.css">
+			<link rel="stylesheet" href="css/form.css">
 			<style>
 				#container {
 					text-align: left;
+					display: grid;
 				}
 				p {
-					margin: 0;
 					padding: 0;
+					margin: 0;
+					white-space: nowrap;
+					overflow: hidden;
 				}
 				svg {
 					margin-top: calc(-0.5em + 0.5lh);
 				}
+
+				@media (width >= 993px) {
+					#container {
+						grid-template-columns: 15% 1fr 15% auto;
+					}
+				}
+				@media (width <= 993px) and (width >= 601px) {
+					#container {
+						grid-template-columns: 1fr 15% auto;
+					}
+				}
+				@media (width <= 601px) {
+					#container {
+						grid-template-columns: 1fr auto;
+					}
+				}
 			</style>
-			<div id="container" class="w3-row">
-				<p class="w3-col l2 w3-hide-medium w3-hide-small"><span id="name"></span></p>
-				<p class="w3-col l7 m9 s11">match="<span id="match"></span>"</p>
-				<p class="w3-col l2 m2 w3-hide-small">max=<span id="max"></span></p>
-				<svg id="delete-btn" class="w3-col l1 m1 s1 clickable" tabindex="0" role="button"><use></use></svg>
+			<div id="container">
+				<p class="w3-hide-medium w3-hide-small" id="name"></p>
+				<p id="match"></p>
+				<p class="w3-hide-small" id="max"></p>
+				<div>
+					<svg id="config-btn" class="clickable" tabindex="0" role="button"><use></use></svg>
+					<svg id="delete-btn" class="clickable" tabindex="0" role="button"><use></use></svg>
+				</div>
 			</div>
 		`;
 		this.#nameElem = this.shadowRoot.querySelector("#name");
 		this.#matchElem = this.shadowRoot.querySelector("#match");
 		this.#maxElem = this.shadowRoot.querySelector("#max");
+
+		this.configBtn = this.shadowRoot.querySelector("#config-btn");
+		this.configBtn.onclick = this.#handleConfig.bind(this);
+		setSVGSrc(this.configBtn, "images/common/config.svg");
+		setSVGAlt(this.configBtn, "Config Item");
 
 		this.deleteBtn = this.shadowRoot.querySelector("#delete-btn");
 		this.deleteBtn.onclick = this.#handleDelete.bind(this);
@@ -182,8 +232,8 @@ class InteractiveListMatchItem extends HTMLElement {
 
 	#update () {
 		this.#nameElem.innerText = this.#name;
-		this.#matchElem.innerText = this.#match;
-		this.#maxElem.innerText = this.#max;
+		this.#matchElem.innerText = `match="${this.#match}"`;
+		this.#maxElem.innerText = `max=${this.#max}`;
 	}
 
 	get name () {
@@ -211,6 +261,51 @@ class InteractiveListMatchItem extends HTMLElement {
 	set max (max) {
 		this.#max = max;
 		this.#update();
+	}
+
+	get value () {
+		return {
+			name: this.#name,
+			match: this.#match,
+			max: this.#max
+		};
+	}
+
+	set value (value) {
+		this.#name = value.name;
+		this.#match = value.match;
+		this.#max = value.max;
+		this.#update();
+	}
+
+	#handleConfig () {
+		const header = `Edit ${this.#name} Rule`;
+
+		const body = `
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+				<label for="name">Rule Name</label>
+				<input class="w3-input w3-border" name="name" id="name" type="text" required>
+				<label for="match">Matching Pattern</label>
+				<input class="w3-input w3-border" name="match" id="match" type="text" required>
+				<label for="max">Max Resource</label>
+				<input class="w3-input w3-border" name="max" id="max" type="number" required>
+			</form>
+		`;
+
+		const d = dialog(header, body, async (result, form) => {
+			if (result === "confirm") {
+				const newItem = {
+					name: form.get("name"),
+					match: form.get("match"),
+					max: form.get("max")
+				};
+				this.value = newItem;
+			}
+		});
+
+		d.querySelector("#name").value = this.#name;
+		d.querySelector("#match").value = this.#match;
+		d.querySelector("#max").value = this.#max;
 	}
 
 	#handleDelete () {
@@ -269,7 +364,7 @@ async function populateGroups () {
 	for (const groupName of Object.keys(allGroups)) {
 		const group = allGroups[groupName];
 		const item = document.createElement("draggable-item");
-		item.data = group;
+		item.value = group;
 		item.innerHTML = `
 			<div style="display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: center;">
 				<svg id="drag" role="application" aria-label="drag icon"><title>drag icon</title><use href="images/actions/drag.svg#symb"></use></svg>
@@ -291,27 +386,45 @@ async function populateResources () {
 	const field = document.querySelector("#resources");
 	for (const resourceName of Object.keys(userData.resources)) {
 		const resource = userData.resources[resourceName];
-		if (resourcesConfigPage[resourceName]) {
-			const resourceConfig = resourcesConfigPage[resourceName];
-			let resourceLine;
+		let resourceLine;
+		let resourceConfig;
 
-			if (resourceName === "cpu" || resourceName === "pci") {
-				resourceLine = addResourceLine(resourcesConfigPage, field, resourceName, { value: resource.global }, "(Global)");
+		if (resourcesConfigPage[resourceName]) {
+			resourceConfig = resourcesConfigPage[resourceName];
+			resourceConfig.id = `${resourceName}-global`;
+
+			if (resourceConfig.type === "list") {
+				resourceLine = addResourceLine(resourceConfig, field, { value: resource.global }, "(Global)");
 			}
 			else {
-				resourceLine = addResourceLine(resourcesConfigPage, field, resourceName, { value: resource.global.max }, "(Global)");
+				resourceLine = addResourceLine(resourceConfig, field, { value: resource.global.max }, "(Global)");
 			}
 
 			postPopulateResourceLine(field, resourceName, "global", resourceConfig, resourceLine);
 
 			for (const nodeSpecificName of Object.keys(resource.nodes)) { // for each node specific, add a line with the node name as a prefix
-				if (resourceName === "cpu" || resourceName === "pci") {
-					resourceLine = addResourceLine(resourcesConfigPage, field, resourceName, { value: resource.nodes[nodeSpecificName] }, `(${nodeSpecificName})`);
+				resourceConfig.id = `${resourceName}-${nodeSpecificName}`;
+				if (resourceConfig.type === "list") {
+					resourceLine = addResourceLine(resourceConfig, field, { value: resource.nodes[nodeSpecificName] }, `(${nodeSpecificName})`);
 				}
 				else {
-					resourceLine = addResourceLine(resourcesConfigPage, field, resourceName, { value: resource.nodes[nodeSpecificName].max }, `(${nodeSpecificName})`);
+					resourceLine = addResourceLine(resourceConfig, field, { value: resource.nodes[nodeSpecificName].max }, `(${nodeSpecificName})`);
 				}
 
+				postPopulateResourceLine(field, resourceName, nodeSpecificName, resourceConfig, resourceLine);
+			}
+		}
+		else {
+			resourceConfig = resourcesConfigPage.storage;
+			resourceConfig.id = `${resourceName}-global`;
+			resourceConfig.name = resourceName;
+			resourceLine = addResourceLine(resourceConfig, field, { value: resource.global.max }, "(Global)");
+
+			postPopulateResourceLine(field, resourceName, "global", resourceConfig, resourceLine);
+
+			for (const nodeSpecificName of Object.keys(resource.nodes)) { // for each node specific, add a line with the node name as a prefix
+				resourceConfig.id = `${resourceName}-${nodeSpecificName}`;
+				resourceLine = addResourceLine(resourceConfig, field, { value: resource.nodes[nodeSpecificName].max }, `(${nodeSpecificName})`);
 				postPopulateResourceLine(field, resourceName, nodeSpecificName, resourceConfig, resourceLine);
 			}
 		}
@@ -338,6 +451,9 @@ function postPopulateResourceLine (field, resourceName, resourceScope, resourceC
 
 	resourceLine.resourceName = resourceName;
 	resourceLine.resourceScope = resourceScope;
+	resourceLine.resourceType = resourceConfig.type;
+
+	resourceRulesLines[resourceLine.element.id] = resourceLine;
 }
 
 async function handleResourceAdd () {
@@ -351,15 +467,13 @@ async function handleResourceAdd () {
 				<option value="global">Global</option>
 			</select>
 		</form>
-	`;
+    `;
 
 	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			const name = form.get("name");
 			const type = clusterResourceConfig[name].type;
 			const scope = form.get("scope");
-
-			console.log(name, type, scope);
 
 			// check if the resource name is not in the cluster config resources
 			if (!clusterResourceConfig[name]) {
@@ -384,23 +498,24 @@ async function handleResourceAdd () {
 				}
 
 				const field = document.querySelector("#resources");
+				const resourceConfig = resourcesConfigPage[name];
 				let resourceLine;
 
 				if (scope === "global" && type === "numeric") {
 					userData.resources[name].global = { max: 0 };
-					resourceLine = addResourceLine(resourcesConfigPage, field, name, { value: userData.resources[name].global.max }, "(Global)");
+					resourceLine = addResourceLine(resourceConfig, field, { value: userData.resources[name].global.max }, "(Global)");
 				}
 				else if (scope === "global" && type === "list") {
 					userData.resources[name].global = [];
-					resourceLine = addResourceLine(resourcesConfigPage, field, name, { value: userData.resources[name].global }, "(Global)");
+					resourceLine = addResourceLine(resourceConfig, field, { value: userData.resources[name].global }, "(Global)");
 				}
 				else if (scope !== "global" && type === "numeric") {
 					userData.resources[name].nodes[scope] = { max: 0 };
-					resourceLine = addResourceLine(resourcesConfigPage, field, name, { value: userData.resources[name].nodes[scope].max }, `(${scope})`);
+					resourceLine = addResourceLine(resourceConfig, field, { value: userData.resources[name].nodes[scope].max }, `(${scope})`);
 				}
 				else if (scope !== "global" && type === "list") {
 					userData.resources[name].nodes[scope] = [];
-					resourceLine = addResourceLine(resourcesConfigPage, field, name, { value: userData.resources[name].nodes[scope] }, `(${scope})`);
+					resourceLine = addResourceLine(resourceConfig, field, { value: userData.resources[name].nodes[scope] }, `(${scope})`);
 				}
 
 				postPopulateResourceLine(field, name, scope, resourcesConfigPage[name], resourceLine);
@@ -437,6 +552,8 @@ async function handleResourceDelete () {
 			else {
 				userData.resources[this.resourceName].nodes[this.resourceScope] = false;
 			}
+
+			delete resourceRulesLines[this.element.id];
 		}
 	});
 }
@@ -449,7 +566,7 @@ async function populateCluster () {
 
 	for (const node of allNodes) { // for each node of all cluster nodes
 		const item = document.createElement("draggable-item");
-		item.data = node;
+		item.value = node;
 		item.innerHTML = `
 			<div style="display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: center;">
 				<svg id="drag" role="application" aria-label="drag icon"><title>drag icon</title><use href="images/actions/drag.svg#symb"></use></svg>
@@ -466,7 +583,7 @@ async function populateCluster () {
 
 	for (const pool of allPools) { // for each pool of all cluster pools
 		const item = document.createElement("draggable-item");
-		item.data = pool;
+		item.value = pool;
 		item.innerHTML = `
 			<div style="display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: center;">
 				<svg id="drag" role="application" aria-label="drag icon"><title>drag icon</title><use href="images/actions/drag.svg#symb"></use></svg>
@@ -492,5 +609,73 @@ async function populateCluster () {
 }
 
 async function handleFormExit () {
-	// TODO
+	const body = {
+		attributes: {
+			memberOf: []
+		},
+		resources: {},
+		cluster: {
+			admin: document.querySelector("#admin").checked,
+			nodes: {},
+			pools: {},
+			vmid: {
+				min: document.querySelector("#vmid-min").value,
+				max: document.querySelector("#vmid-max").value
+			}
+		}
+	};
+
+	for (const group of document.querySelector("#groups-enabled").value) {
+		body.attributes.memberOf.push(group.dn);
+	}
+
+	// populate resources
+	for (const key of Object.keys(resourceRulesLines)) {
+		const resourceLine = resourceRulesLines[key];
+		// if type is numeric
+		if (resourceLine.resourceType === "numeric") {
+			if (body.resources[resourceLine.resourceName] === undefined) {
+				body.resources[resourceLine.resourceName] = {
+					global: {
+						max: 0
+					},
+					nodes: {}
+				};
+			}
+			if (resourceLine.resourceScope === "global") {
+				body.resources[resourceLine.resourceName].global.max = resourceLine.element.value;
+			}
+			else {
+				body.resources[resourceLine.resourceName].nodes[resourceLine.resourceScope].max = resourceLine.element.value;
+			}
+		}
+		else {
+			if (body.resources[resourceLine.resourceName] === undefined) {
+				body.resources[resourceLine.resourceName] = {
+					global: [],
+					nodes: {}
+				};
+			}
+			if (resourceLine.resourceScope === "global") {
+				body.resources[resourceLine.resourceName].global = resourceLine.element.value;
+			}
+			else {
+				body.resources[resourceLine.resourceName].nodes[resourceLine.resourceScope] = resourceLine.element.value;
+			}
+		}
+	}
+
+	// populate nodes
+	for (const node of document.querySelector("#nodes-enabled").value) {
+		body.cluster.nodes[node] = true;
+	}
+
+	// populate pools
+	for (const pool of document.querySelector("#pools-enabled").value) {
+		body.cluster.pools[pool] = true;
+	}
+
+	// TODO post to api
+
+	console.log(body);
 }

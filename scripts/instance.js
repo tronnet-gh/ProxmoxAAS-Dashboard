@@ -105,12 +105,12 @@ async function populateResources () {
 				return a.localeCompare(b);
 			});
 		}
-		addResourceLine(resourcesConfigPage, field, "cpu", { value: config.data.cpu, options });
+		addResourceLine(resourcesConfigPage.cpu, field, { value: config.data.cpu, options });
 	}
-	addResourceLine(resourcesConfigPage, field, "cores", { value: config.data.cores, min: 1, max: 8192 });
-	addResourceLine(resourcesConfigPage, field, "memory", { value: config.data.memory, min: 16, step: 1 });
+	addResourceLine(resourcesConfigPage.cores, field, { value: config.data.cores, min: 1, max: 8192 });
+	addResourceLine(resourcesConfigPage.memory, field, { value: config.data.memory, min: 16, step: 1 });
 	if (type === "lxc") {
-		addResourceLine(resourcesConfigPage, field, "swap", { value: config.data.swap, min: 0, step: 1 });
+		addResourceLine(resourcesConfigPage.swap, field, { value: config.data.swap, min: 0, step: 1 });
 	}
 }
 

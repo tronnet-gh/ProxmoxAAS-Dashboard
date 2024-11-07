@@ -74,6 +74,7 @@ class DraggableContainer extends HTMLElement {
 }
 
 class DraggableItem extends HTMLElement {
+	#value = null;
 	uuid = null;
 	constructor () {
 		super();
@@ -103,6 +104,14 @@ class DraggableItem extends HTMLElement {
 	set innerHTML (innerHTML) {
 		this.content.innerHTML = innerHTML;
 	}
+
+	get value () {
+		return this.#value;
+	}
+
+	 set value (value) {
+		this.#value = value;
+	 }
 }
 
 customElements.define("draggable-container", DraggableContainer);

@@ -4,7 +4,8 @@
 	"description": "Front-end for ProxmoxAAS",
 	"type": "module",
 	"scripts": {
-		"lint": "html-validator --continue; stylelint --formatter verbose --fix css/*.css; DEBUG=eslint:cli-engine eslint --fix scripts/"
+		"lint": "html-validator --continue; stylelint --formatter verbose --fix css/*.css; DEBUG=eslint:cli-engine eslint --fix scripts/",
+		"update-modules": "rm -rf modules/wfa.js modules/wfa.wasm; curl https://git.tronnet.net/alu/WFA-JS/releases/download/latest/wfa.js -o modules/wfa.js; curl https://git.tronnet.net/alu/WFA-JS/releases/download/latest/wfa.wasm -o modules/wfa.wasm"
 	},
 	"devDependencies": {
 		"eslint": "^8.43.0",
