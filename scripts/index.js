@@ -1,7 +1,7 @@
 import { requestPVE, requestAPI, goToPage, setTitleAndHeader, setAppearance, getSearchSettings, goToURL, instancesConfig, nodesConfig, setSVGSrc, setSVGAlt } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
-import wfAlign from "../modules/wfa.js";
+import wfaInit from "../modules/wfa.js";
 import { PVE } from "../vars.js";
 
 class InstanceCard extends HTMLElement {
@@ -212,7 +212,7 @@ class InstanceCard extends HTMLElement {
 
 	handleConfigButton () {
 		if (!this.actionLock && this.status === "stopped") { // if the action lock is false, and the node is stopped, then navigate to the config page with the node info in the search query
-			goToPage("config.html", { node: this.node.name, type: this.type, vmid: this.vmid });
+			goToPage("instance.html", { node: this.node.name, type: this.type, vmid: this.vmid });
 		}
 	}
 
@@ -270,6 +270,8 @@ async function init () {
 	if (cookie === "") {
 		goToPage("login.html");
 	}
+
+	wfaInit("modules/wfa.wasm");
 
 	document.querySelector("#instance-add").addEventListener("click", handleInstanceAdd);
 	document.querySelector("#vm-search").addEventListener("input", populateInstances);
@@ -329,8 +331,9 @@ async function populateInstances () {
 		};
 		criteria = (item, query) => {
 			// lower is better
-			const { score, CIGAR } = wfAlign(query, item, penalties, true);
-			return { score: score / item.length, alignment: CIGAR };
+			const { score, CIGAR } = global.wfAlign(query, item, penalties, true);
+			const alignment = global.DecodeCIGAR(CIGAR)
+			return { score: score / item.length, alignment: alignment };
 		};
 	}
 	sortInstances(criteria, searchQuery);
