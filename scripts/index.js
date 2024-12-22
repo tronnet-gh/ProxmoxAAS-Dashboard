@@ -397,7 +397,7 @@ async function handleInstanceAdd () {
 			<input class="w3-input w3-border container-specific none" name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled>
 			<label class="container-specific none" for="password">Password</label>
 			<input class="w3-input w3-border container-specific none" name="password" id="password" type="password" required disabled>
-			<label for="confirm-password">Confirm Password</label>
+			<label class="container-specific none" for="confirm-password">Confirm Password</label>
 			<input class="w3-input w3-border container-specific none" name="confirm-password" id="confirm-password" type="password" required disabled>
 		</form>
 	`;
