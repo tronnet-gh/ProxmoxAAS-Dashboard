@@ -300,15 +300,6 @@ export function getURIData () {
 export async function setTitleAndHeader () {
 	document.title = `${organization} - dashboard`;
 	document.querySelector("h1").innerText = organization;
-	if (getCookie("auth") === "1") {
-		const userIsAdmin = (await requestAPI("/user/config/cluster")).admin;
-		if (userIsAdmin) {
-			const adminNavLink = document.querySelector("#navigation #admin-link");
-			adminNavLink.href = "admin.html";
-			adminNavLink.classList.remove("none");
-			adminNavLink.ariaDisabled = false;
-		}
-	}
 }
 
 const settingsDefault = {
