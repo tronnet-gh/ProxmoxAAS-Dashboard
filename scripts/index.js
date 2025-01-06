@@ -348,6 +348,9 @@ async function populateInstances () {
 
 function sortInstances (criteria, searchQuery) {
 	for (let i = 0; i < instances.length; i++) {
+		if (!instances[i].name) { // if the instance has no name, assume its just empty string
+			instances[i].name = "";
+		}
 		const { score, alignment } = criteria(instances[i].name.toLowerCase(), searchQuery ? searchQuery.toLowerCase() : "");
 		instances[i].searchQueryResult = { score, alignment };
 	}
