@@ -121,7 +121,7 @@ async function populateDisk () {
 		const busName = diskMetaData[type][prefix].name;
 		const disks = {};
 		Object.keys(config.data).forEach((element) => {
-			if (element.startsWith(prefix)) {
+			if (element.startsWith(prefix) && !isNaN(element.replace(prefix, ""))) {
 				disks[element.replace(prefix, "")] = config.data[element];
 			}
 		});
@@ -233,7 +233,7 @@ async function handleDiskAttach () {
 	const header = `Attach ${this.dataset.disk}`;
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="device">${type === "qemu" ? "SATA" : "MP"}</label>
+			<label for="device">${type === "qemu" ? "SCSI" : "MP"}</label>
 			<input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required>
 		</form>
 	`;
@@ -245,7 +245,7 @@ async function handleDiskAttach () {
 			const body = {
 				source: this.dataset.disk.replace("unused", "")
 			};
-			const prefix = type === "qemu" ? "sata" : "mp";
+			const prefix = type === "qemu" ? "scsi" : "mp";
 			const disk = `${prefix}${device}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/attach`, "POST", body);
 			if (result.status !== 200) {
@@ -361,7 +361,7 @@ async function handleDiskAdd () {
 
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="device">${type === "qemu" ? "SATA" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required>
+			<label for="device">${type === "qemu" ? "SCSI" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required>
 			${select}
 			<label for="size">Size (GiB)</label><input class="w3-input w3-border" name="size" id="size" type="number" min="0" max="131072" required>
 		</form>
@@ -374,7 +374,7 @@ async function handleDiskAdd () {
 				size: form.get("size")
 			};
 			const id = form.get("device");
-			const prefix = type === "qemu" ? "sata" : "mp";
+			const prefix = type === "qemu" ? "scsi" : "mp";
 			const disk = `${prefix}${id}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/create`, "POST", body);
 			if (result.status !== 200) {
@@ -733,12 +733,16 @@ async function populateBoot () {
 			const element = order[i];
 			const prefix = eligible.find((pref) => order[i].startsWith(pref));
 			const detail = config.data[element];
-			bootable[i] = { id: element, value: element, prefix, detail };
+			const num = element.replace(prefix, "");
+			if (!isNaN(num)) {
+				bootable[i] = { id: element, value: element, prefix, detail };
+			}
 		}
 		Object.keys(config.data).forEach((element) => {
 			const prefix = eligible.find((pref) => element.startsWith(pref));
 			const detail = config.data[element];
-			if (prefix && !order.includes(element)) {
+			const num = element.replace(prefix, "");
+			if (prefix && !order.includes(element) && !isNaN(num)) {
 				bootable.disabled.push({ id: element, value: element, prefix, detail });
 			}
 		});

@@ -34,9 +34,10 @@ export const resourcesConfig = {
 			unused: { name: "UNUSED", icon: "images/resources/drive.svg", actions: ["attach", "delete", "reassign"] }
 		},
 		qemu: {
-			prefixOrder: ["ide", "sata", "unused"],
+			prefixOrder: ["ide", "sata", "scsi", "unused"],
 			ide: { name: "IDE", icon: "images/resources/disk.svg", actions: ["delete"] },
 			sata: { name: "SATA", icon: "images/resources/drive.svg", actions: ["detach", "move", "reassign", "resize"] },
+			scsi: { name: "SCSI", icon: "images/resources/drive.svg", actions: ["detach", "move", "reassign", "resize"] },
 			unused: { name: "UNUSED", icon: "images/resources/drive.svg", actions: ["attach", "delete", "reassign"] }
 		},
 		actions: {
@@ -173,7 +174,7 @@ export const nodesConfig = {
 };
 
 export const bootConfig = {
-	eligiblePrefixes: ["ide", "sata", "net"],
+	eligiblePrefixes: ["ide", "sata", "scsi", "net"],
 	ide: {
 		icon: "images/resources/disk.svg",
 		alt: "IDE Bootable Icon"
@@ -181,6 +182,10 @@ export const bootConfig = {
 	sata: {
 		icon: "images/resources/drive.svg",
 		alt: "SATA Bootable Icon"
+	},
+	scsi: {
+		icon: "images/resources/drive.svg",
+		alt: "SCSI Bootable Icon"
 	},
 	net: {
 		icon: "images/resources/network.svg",
