@@ -220,7 +220,7 @@ async function handleDiskDetach () {
 			setSVGSrc(document.querySelector(`svg[data-disk="${disk}"]`), "images/status/loading.svg");
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/detach`, "POST");
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to detach ${disk} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateDisk();
@@ -249,7 +249,7 @@ async function handleDiskAttach () {
 			const disk = `${prefix}${device}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/attach`, "POST", body);
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to attach ${this.dataset.disk} to ${disk} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateDisk();
@@ -276,7 +276,7 @@ async function handleDiskResize () {
 			};
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/resize`, "POST", body);
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to resize ${disk} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateDisk();
@@ -317,7 +317,7 @@ async function handleDiskMove () {
 			};
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/move`, "POST", body);
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to move ${disk} to ${body.storage} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateDisk();
@@ -336,7 +336,7 @@ async function handleDiskDelete () {
 			setSVGSrc(document.querySelector(`svg[data-disk="${disk}"]`), "images/status/loading.svg");
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/delete`, "DELETE");
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to delete ${disk} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateDisk();
@@ -378,7 +378,7 @@ async function handleDiskAdd () {
 			const disk = `${prefix}${id}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/create`, "POST", body);
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to create ${disk} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateDisk();
@@ -390,7 +390,7 @@ async function handleDiskAdd () {
 async function handleCDAdd () {
 	const isos = await requestAPI("/user/vm-isos", "GET");
 
-	const header = "Add a CDROM";
+	const header = "Mount a CDROM";
 
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
@@ -407,7 +407,7 @@ async function handleCDAdd () {
 			const disk = `ide${form.get("device")}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/create`, "POST", body);
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to mount ${body.iso} to ${disk} but got: result.error`);
 			}
 			await getConfig();
 			populateDisk();
@@ -503,14 +503,14 @@ async function handleNetworkConfig () {
 			const body = {
 				rate: form.get("rate")
 			};
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/net${netID}/modify`, "POST", body);
+			const net = `net${netID}`;
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/modify`, "POST", body);
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to change ${net} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateNetworks();
-			const id = `net${netID}`;
-			updateBootLine(`boot-net${netID}`, { id, prefix: "net", value: id, detail: config.data[`net${netID}`] });
+			updateBootLine(`boot-net${netID}`, { id: net, prefix: "net", value: net, detail: config.data[`net${netID}`] });
 		}
 	});
 
@@ -525,13 +525,14 @@ async function handleNetworkDelete () {
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			setSVGSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/net${netID}/delete`, "DELETE");
+			const net = `net${netID}`;
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/delete`, "DELETE");
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to delete ${net} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateNetworks();
-			deleteBootLine(`boot-net${netID}`);
+			deleteBootLine(`boot-${net}`);
 		}
 	});
 }
@@ -557,9 +558,10 @@ async function handleNetworkAdd () {
 				body.name = form.get("name");
 			}
 			const netID = form.get("netid");
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/net${netID}/create`, "POST", body);
+			const net = `net${netID}`;
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/create`, "POST", body);
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to create ${net} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateNetworks();
@@ -653,9 +655,10 @@ async function handleDeviceConfig () {
 				device: form.get("device"),
 				pcie: form.get("pcie") ? 1 : 0
 			};
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/hostpci${deviceID}/modify`, "POST", body);
+			const device = `hostpci${deviceID}`;
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/${device}/modify`, "POST", body);
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to add ${device} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateDevices();
@@ -665,7 +668,7 @@ async function handleDeviceConfig () {
 	const availDevices = await requestAPI(`/cluster/${node}/pci`, "GET");
 	d.querySelector("#device").append(new Option(deviceName, deviceDetails.split(",")[0]));
 	for (const availDevice of availDevices) {
-		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.id));
+		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.device_id));
 	}
 	d.querySelector("#pcie").checked = deviceDetails.includes("pcie=1");
 }
@@ -678,9 +681,10 @@ async function handleDeviceDelete () {
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			setSVGSrc(document.querySelector(`svg[data-device="${deviceID}"]`), "images/status/loading.svg");
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/hostpci${deviceID}/delete`, "DELETE");
+			const device = `hostpci${deviceID}`;
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/${device}/delete`, "DELETE");
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to delete ${device} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateDevices();
@@ -704,7 +708,7 @@ async function handleDeviceAdd () {
 			};
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/create`, "POST", body);
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to add ${body.device} but got: ${result.error}`);
 			}
 			await getConfig();
 			populateDevices();
@@ -713,7 +717,7 @@ async function handleDeviceAdd () {
 
 	const availDevices = await requestAPI(`/cluster/${node}/pci`, "GET");
 	for (const availDevice of availDevices) {
-		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.id));
+		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.device_id));
 	}
 	d.querySelector("#pcie").checked = true;
 }
@@ -835,6 +839,6 @@ async function handleFormExit () {
 		goToPage("index.html");
 	}
 	else {
-		alert(result.error);
+		alert(`Attempted to set basic resources but got: ${result.error}`);
 	}
 }

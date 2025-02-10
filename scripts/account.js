@@ -250,7 +250,7 @@ function handlePasswordChangeForm () {
 		if (result === "confirm") {
 			const result = await requestAPI("/access/password", "POST", { password: form.get("new-password") });
 			if (result.status !== 200) {
-				alert(result.error);
+				alert(`Attempted to change password but got: ${result.error}`);
 			}
 		}
 	});

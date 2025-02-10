@@ -196,7 +196,7 @@ class InstanceCard extends HTMLElement {
 						}
 						else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
 							this.status = prevStatus;
-							alert(`attempted to ${targetAction} ${this.vmid} but process returned stopped:${result.data.exitstatus}`);
+							alert(`Attempted to ${targetAction} ${this.vmid} but got: ${taskStatus.data.exitstatus}`);
 							this.update();
 							this.actionLock = false;
 							break;
@@ -246,7 +246,7 @@ class InstanceCard extends HTMLElement {
 						}
 					}
 					else {
-						alert(result.error);
+						alert(`Attempted to delete ${this.vmid} but got: ${result.error}`);
 						this.status = this.prevStatus;
 						this.update();
 						this.actionLock = false;
@@ -430,7 +430,7 @@ async function handleInstanceAdd () {
 				populateInstances();
 			}
 			else {
-				alert(result.error);
+				alert(`Attempted to create new instance ${vmid} but got: ${result.error}`);
 				populateInstances();
 			}
 		}

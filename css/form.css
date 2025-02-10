@@ -74,3 +74,7 @@ input[type="radio"] {
 	width: 100%;
 	margin-top: 5px;
 }
+
+dialog {
+	max-width: calc(min(50%, 80ch));
+}
