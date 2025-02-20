@@ -150,13 +150,13 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 	setSVGSrc(icon, diskMetaData[type][busPrefix].icon);
 	setSVGAlt(icon, diskName);
 	icon.dataset.disk = diskID;
-	field.append(icon);
+	field.appendChild(icon);
 
 	// Add a label for the disk bus and device number
 	const diskLabel = document.createElement("p");
 	diskLabel.innerText = diskName;
 	diskLabel.dataset.disk = diskID;
-	field.append(diskLabel);
+	field.appendChild(diskLabel);
 
 	// Add text of the disk configuration
 	const diskDesc = document.createElement("p");
@@ -164,7 +164,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 	diskDesc.dataset.disk = diskID;
 	diskDesc.style.overflowX = "hidden";
 	diskDesc.style.whiteSpace = "nowrap";
-	field.append(diskDesc);
+	field.appendChild(diskDesc);
 
 	const actionDiv = document.createElement("div");
 	diskMetaData.actionBarOrder.forEach((element) => {
@@ -208,7 +208,7 @@ function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
 		action.dataset.disk = diskID;
 		actionDiv.append(action);
 	});
-	field.append(actionDiv);
+	field.appendChild(actionDiv);
 }
 
 async function handleDiskDetach () {
@@ -454,7 +454,7 @@ function addNetworkLine (fieldset, prefix, netID, netDetails) {
 	netLabel.innerText = `${prefix}${netID}`;
 	netLabel.dataset.network = netID;
 	netLabel.dataset.values = netDetails;
-	field.append(netLabel);
+	field.appendChild(netLabel);
 
 	const netDesc = document.createElement("p");
 	netDesc.innerText = netDetails;
@@ -462,7 +462,7 @@ function addNetworkLine (fieldset, prefix, netID, netDetails) {
 	netDesc.dataset.values = netDetails;
 	netDesc.style.overflowX = "hidden";
 	netDesc.style.whiteSpace = "nowrap";
-	field.append(netDesc);
+	field.appendChild(netDesc);
 
 	const actionDiv = document.createElement("div");
 
@@ -484,7 +484,7 @@ function addNetworkLine (fieldset, prefix, netID, netDetails) {
 	deleteBtn.dataset.values = netDetails;
 	actionDiv.appendChild(deleteBtn);
 
-	field.append(actionDiv);
+	field.appendChild(actionDiv);
 }
 
 async function handleNetworkConfig () {
@@ -603,6 +603,15 @@ function addDeviceLine (fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	icon.dataset.name = deviceName;
 	field.appendChild(icon);
 
+	const IDLabel = document.createElement("p");
+	IDLabel.innerText = `hostpci${deviceID}`;
+	IDLabel.dataset.device = deviceID;
+	IDLabel.dataset.values = deviceDetails;
+	IDLabel.dataset.name = deviceName;
+	IDLabel.style.overflowX = "hidden";
+	IDLabel.style.whiteSpace = "nowrap";
+	field.appendChild(IDLabel);
+
 	const deviceLabel = document.createElement("p");
 	deviceLabel.innerText = deviceName;
 	deviceLabel.dataset.device = deviceID;
@@ -610,7 +619,7 @@ function addDeviceLine (fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	deviceLabel.dataset.name = deviceName;
 	deviceLabel.style.overflowX = "hidden";
 	deviceLabel.style.whiteSpace = "nowrap";
-	field.append(deviceLabel);
+	field.appendChild(deviceLabel);
 
 	const actionDiv = document.createElement("div");
 
@@ -634,7 +643,7 @@ function addDeviceLine (fieldset, prefix, deviceID, deviceDetails, deviceName) {
 	deleteBtn.dataset.name = deviceName;
 	actionDiv.appendChild(deleteBtn);
 
-	field.append(actionDiv);
+	field.appendChild(actionDiv);
 }
 
 async function handleDeviceConfig () {
@@ -696,17 +705,20 @@ async function handleDeviceAdd () {
 	const header = "Add Expansion Card";
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">
+			<label for="hostpci">Device Bus</label><input type="number" id="hostpci" name="hostpci" class="w3-input w3-border">
+			<label for="device">Device</label><select id="device" name="device" required></select>
+			<label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">
 		</form>
 	`;
 
 	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
+			const hostpci = form.get("hostpci");
 			const body = {
 				device: form.get("device"),
 				pcie: form.get("pcie") ? 1 : 0
 			};
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/create`, "POST", body);
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/hostpci${hostpci}/create`, "POST", body);
 			if (result.status !== 200) {
 				alert(`Attempted to add ${body.device} but got: ${result.error}`);
 			}
