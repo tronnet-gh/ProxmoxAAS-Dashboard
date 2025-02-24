@@ -1,4 +1,4 @@
-import { goToPage, requestPVE, setTitleAndHeader, setAppearance, requestAPI } from "./utils.js";
+import { goToPage, requestPVE, setAppearance, requestAPI } from "./utils.js";
 import { alert } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
@@ -6,7 +6,6 @@ window.addEventListener("DOMContentLoaded", init);
 async function init () {
 	await deleteAllCookies();
 	setAppearance();
-	setTitleAndHeader();
 	const formSubmitButton = document.querySelector("#submit");
 	const realms = await requestPVE("/access/domains", "GET");
 	const realmSelect = document.querySelector("#realm");

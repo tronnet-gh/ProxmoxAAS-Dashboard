@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, goToPage, setTitleAndHeader, setAppearance, getSearchSettings, goToURL, instancesConfig, nodesConfig, setSVGSrc, setSVGAlt } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, setAppearance, getSearchSettings, goToURL, instancesConfig, nodesConfig, setSVGSrc, setSVGAlt } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
@@ -265,7 +265,6 @@ let instances = [];
 
 async function init () {
 	setAppearance();
-	setTitleAndHeader();
 	const cookie = document.cookie;
 	if (cookie === "") {
 		goToPage("login.html");

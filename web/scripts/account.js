@@ -1,5 +1,5 @@
 import { dialog } from "./dialog.js";
-import { requestAPI, goToPage, getCookie, setTitleAndHeader, setAppearance } from "./utils.js";
+import { requestAPI, goToPage, getCookie, setAppearance } from "./utils.js";
 
 class ResourceChart extends HTMLElement {
 	constructor () {
@@ -139,7 +139,6 @@ const prefixes = {
 
 async function init () {
 	setAppearance();
-	setTitleAndHeader();
 	const cookie = document.cookie;
 	if (cookie === "") {
 		goToPage("login.html");

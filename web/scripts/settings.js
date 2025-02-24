@@ -1,10 +1,9 @@
-import { setTitleAndHeader, setAppearance } from "./utils.js";
+import { setAppearance } from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
 function init () {
 	setAppearance();
-	setTitleAndHeader();
 	const scheme = localStorage.getItem("sync-scheme");
 	if (scheme) {
 		document.querySelector(`#sync-${scheme}`).checked = true;

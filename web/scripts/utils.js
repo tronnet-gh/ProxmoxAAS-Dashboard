@@ -1,4 +1,4 @@
-import { API, organization } from "../vars.js";
+import { API } from "../vars.js";
 
 export const resourcesConfig = {
 	cpu: {
@@ -290,7 +290,7 @@ export function goToURL (href, data = {}, newwindow = false) {
 	}
 
 	if (newwindow) {
-		window.open(url, `${organization} - dashboard`, "height=480,width=848");
+		window.open(url, document.title, "height=480,width=848");
 	}
 	else {
 		window.location.assign(url.toString());
@@ -300,11 +300,6 @@ export function goToURL (href, data = {}, newwindow = false) {
 export function getURIData () {
 	const url = new URL(window.location.href);
 	return Object.fromEntries(url.searchParams);
-}
-
-export async function setTitleAndHeader () {
-	document.title = `${organization} - dashboard`;
-	document.querySelector("h1").innerText = organization;
 }
 
 const settingsDefault = {
