@@ -1,25 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>{{.Organization}} - dashboard</title>
-		<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
-		<link rel="stylesheet" href="modules/w3.css">
-		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-		<link rel="stylesheet" href="css/style.css">
-		<link rel="stylesheet" href="css/nav.css">
-		<link rel="stylesheet" href="css/form.css">
+		{{template "head" .}}
 		<script src="scripts/login.js" type="module"></script>
 	</head>
 	<body>
 		<header>
-			<h1>{{.Organization}}</h1>
-			<label for="navtoggle">&#9776;</label>
-			<input type="checkbox" id="navtoggle">
-			<nav id="navigation">
-				<a href="login.html" aria-current="page">Login</a>
-			</nav>
+			{{template "header" .}}
 		</header>
 		<main class="flex" style="justify-content: center; align-items: center;">
 			<div class="w3-container w3-card w3-margin w3-padding" style="height: fit-content;">
@@ -32,7 +19,7 @@
 					<label for="realm">Realm</label>
 					<select class="w3-select w3-border" id="realm" name="realm"></select>
 					<div class="w3-center">
-						<button class="w3-button w3-margin" id="submit">LOGIN</button>
+						<button class="w3-button w3-margin" id="submit" type="submit">LOGIN</button>
 					</div>
 				</form>
 			</div>

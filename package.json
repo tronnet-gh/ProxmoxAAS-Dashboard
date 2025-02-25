@@ -4,8 +4,8 @@
 	"description": "Front-end for ProxmoxAAS",
 	"type": "module",
 	"scripts": {
-		"lint": "html-validator --continue; stylelint --formatter verbose --fix css/*.css; DEBUG=eslint:cli-engine eslint --fix scripts/",
-		"update-modules": "rm -rf modules/wfa.js modules/wfa.wasm; curl https://git.tronnet.net/alu/WFA-JS/releases/download/latest/wfa.js -o modules/wfa.js; curl https://git.tronnet.net/alu/WFA-JS/releases/download/latest/wfa.wasm -o modules/wfa.wasm"
+		"lint": "html-validate --config configs/.htmlvalidate.json web/html/*; stylelint --config configs/.stylelintrc.json --formatter verbose --fix web/css/*.css; DEBUG=eslint:cli-engine eslint --config configs/.eslintrc.json --fix web/scripts/",
+		"update-modules": "rm -rf web/modules/wfa.js web/modules/wfa.wasm; curl https://git.tronnet.net/alu/WFA-JS/releases/download/latest/wfa.js -o web/modules/wfa.js; curl https://git.tronnet.net/alu/WFA-JS/releases/download/latest/wfa.wasm -o web/modules/wfa.wasm"
 	},
 	"devDependencies": {
 		"eslint": "^8.43.0",
@@ -15,6 +15,6 @@
 		"eslint-plugin-promise": "^6.1.1",
 		"stylelint": "^15.9.0",
 		"stylelint-config-standard": "^33.0.0",
-		"w3c-html-validator": "^1.4.0"
+		"html-validate": "^9.4.0"
 	}
 }

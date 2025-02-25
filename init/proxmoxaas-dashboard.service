@@ -1,0 +1,11 @@
+[Unit]
+Description=proxmoxaas-dashboard
+After=network.target
+[Service]
+WorkingDirectory=/<path to dir>
+ExecStart=/<path to dir>/promoxaas-dashboard
+Restart=always
+RestartSec=10
+Type=simple
+[Install]
+WantedBy=default.target

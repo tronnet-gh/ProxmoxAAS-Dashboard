@@ -1,5 +1,4 @@
 import { getSyncSettings, requestAPI } from "./utils.js";
-import { API } from "../vars.js";
 
 export async function setupClientSync (callback) {
 	const { scheme, rate } = getSyncSettings();
@@ -22,7 +21,7 @@ export async function setupClientSync (callback) {
 	}
 	else if (scheme === "interrupt") {
 		callback();
-		const socket = new WebSocket(`wss://${API.replace("https://", "")}/sync/interrupt`);
+		const socket = new WebSocket(`wss://${window.API.replace("https://", "")}/sync/interrupt`);
 		socket.addEventListener("open", (event) => {
 			socket.send(`rate ${rate}`);
 		});

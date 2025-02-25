@@ -1,0 +1,6 @@
+{
+	"listenPort": 8080,
+	"organization": "myorg",
+	"apiurl": "https://paas.mydomain.example/api",
+	"pveurl": "https://pve.mydomain.example"
+}

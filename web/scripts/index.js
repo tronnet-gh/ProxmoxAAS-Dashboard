@@ -2,7 +2,6 @@ import { requestPVE, requestAPI, goToPage, setAppearance, getSearchSettings, goT
 import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
-import { PVE } from "../vars.js";
 
 class InstanceCard extends HTMLElement {
 	constructor () {
@@ -220,7 +219,7 @@ class InstanceCard extends HTMLElement {
 		if (!this.actionLock && this.status === "running") {
 			const data = { console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node.name, resize: "off", cmd: "" };
 			data[`${this.type === "qemu" ? "novnc" : "xtermjs"}`] = 1;
-			goToURL(PVE, data, true);
+			goToURL(window.PVE, data, true);
 		}
 	}
 

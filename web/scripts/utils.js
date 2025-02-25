@@ -1,5 +1,3 @@
-import { API } from "../vars.js";
-
 export const resourcesConfig = {
 	cpu: {
 		name: "CPU Type",
@@ -224,7 +222,7 @@ export async function requestPVE (path, method, body = null) {
 		content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
 	}
 
-	const response = await request(`${API}/proxmox${path}`, content);
+	const response = await request(`${window.API}/proxmox${path}`, content);
 	return response;
 }
 
@@ -245,7 +243,7 @@ export async function requestAPI (path, method, body = null) {
 		content.body = prms.toString();
 	}
 
-	const response = await request(`${API}${path}`, content);
+	const response = await request(`${window.API}${path}`, content);
 	return response;
 }
 

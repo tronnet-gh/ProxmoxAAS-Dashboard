@@ -1,15 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>{{.Organization}} - dashboard</title>
-		<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
-		<link rel="stylesheet" href="modules/w3.css">
-		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-		<link rel="stylesheet" href="css/style.css">
-		<link rel="stylesheet" href="css/nav.css">
-		<link rel="stylesheet" href="css/form.css">
+		{{template "head" .}}
 		<script src="scripts/instance.js" type="module"></script>
 		<script src="scripts/draggable.js" type="module"></script>
 		<script src="modules/Sortable.min.js"></script>
@@ -25,15 +17,7 @@
 	</head>
 	<body>
 		<header>
-			<h1>{{.Organization}}</h1>
-			<label for="navtoggle">&#9776;</label>
-			<input type="checkbox" id="navtoggle">
-			<nav id="navigation">
-				<a href="index.html" aria-current="page">Instances</a>
-				<a href="account.html">Account</a>
-				<a href="settings.html">Settings</a>
-				<a href="login.html">Logout</a>
-			</nav>
+			{{template "header" .}}
 		</header>
 		<main>
 			<section>

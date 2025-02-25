@@ -1,15 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>{{.Organization}} - dashboard</title>
-		<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
-		<link rel="stylesheet" href="modules/w3.css">
-		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-		<link rel="stylesheet" href="css/style.css">
-		<link rel="stylesheet" href="css/nav.css">
-		<link rel="stylesheet" href="css/form.css">
+		{{template "head" .}}
 		<script src="scripts/account.js" type="module"></script>
 		<script src="modules/chart.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -43,15 +35,7 @@
 	</head>
 	<body>
 		<header>
-			<h1>{{.Organization}}</h1>
-			<label for="navtoggle">&#9776;</label>
-			<input type="checkbox" id="navtoggle">
-			<nav id="navigation">
-				<a href="index.html">Instances</a>
-				<a href="account.html" aria-current="page">Account</a>
-				<a href="settings.html">Settings</a>
-				<a href="login.html">Logout</a>
-			</nav>
+			{{template "header" .}}
 		</header>
 		<main>
 			<h2>Account</h2>
@@ -65,8 +49,8 @@
 			<section class="w3-card w3-padding">
 				<div class="flex row nowrap">
 					<h3>Password</h3>
-					<button class="w3-button w3-margin" id="change-password">Change Password</button>
-				</div>	
+					<button class="w3-button w3-margin" id="change-password" type="button">Change Password</button>
+				</div>
 			</section>
 			<section class="w3-card w3-padding">
 				<h3>Cluster Resources</h3>
