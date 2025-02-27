@@ -1,4 +1,4 @@
-package embed
+package web
 
 import (
 	"embed"
@@ -21,23 +21,3 @@ var HTML embed.FS
 
 //go:embed templates/*
 var Templates embed.FS
-
-/*
-//go:embed html/account.html
-var Account string
-
-//go:embed html/index.html
-var Index string
-
-//go:embed html/instance.html
-var Instance string
-
-//go:embed html/login.html
-var Login string
-
-//go:embed html/settings.html
-var Settings string
-
-//go:embed templates/base.html
-var Base string
-*/

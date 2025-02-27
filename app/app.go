@@ -1,61 +1,89 @@
 package app
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
-	embed "proxmoxaas-dashboard/dist/web" // go will complain here until the first build
+	"proxmoxaas-dashboard/dist/web" // go will complain here until the first build
+	"strings"
 	"text/template"
+
+	"github.com/tdewolff/minify"
 )
 
-var html map[string]*template.Template
-
-func ParseTemplates() {
-	html = make(map[string]*template.Template)
-	fs.WalkDir(embed.HTML, ".", func(path string, d fs.DirEntry, err error) error {
+func ParseTemplates() map[string]*template.Template {
+	// create html map which stores html files to parsed templates
+	html := make(map[string]*template.Template)
+	fs.WalkDir(web.HTML, ".", func(path string, html_entry fs.DirEntry, err error) error { // walk the html directory
 		if err != nil {
 			return err
 		}
-		if !d.IsDir() { // if it is a html file, parse with all the template files
-			v, err := fs.ReadFile(embed.HTML, path)
+		if !html_entry.IsDir() { // if it is an html file, parse with all the template files
+			v, err := fs.ReadFile(web.HTML, path)
 			if err != nil {
 				log.Fatalf("error reading html file %s: %s", path, err.Error())
 			}
-			t := template.New(d.Name())
+			t := template.New(html_entry.Name()) // parse the html file
 			t, err = t.Parse(string(v))
 			if err != nil {
 				log.Fatalf("error parsing html file %s: %s", path, err.Error())
 			}
-			fs.WalkDir(embed.Templates, ".", func(path string, e fs.DirEntry, err error) error {
+			// parse the html with every template file
+			fs.WalkDir(web.Templates, ".", func(path string, templates_entry fs.DirEntry, err error) error {
 				if err != nil {
 					return err
 				}
-				if !e.IsDir() { // if it is a template file, parse it
-					v, err = fs.ReadFile(embed.Templates, path)
+				if !templates_entry.IsDir() { // if it is a template file, parse it
+					v, err = fs.ReadFile(web.Templates, path)
 					if err != nil {
 						log.Fatalf("error reading template file %s: %s", path, err.Error())
 					}
-					t, err = t.Parse(string(v))
+					t, err = t.Parse(string(v)) // parse the template file
 					if err != nil {
 						log.Fatalf("error parsing template file %s: %s", path, err.Error())
 					}
 				}
 				return nil
 			})
-			html[d.Name()] = t
+			html[html_entry.Name()] = t
 		}
 		return nil
 	})
-
+	return html
 }
 
-func ServeStatic() {
-	http.Handle("/css/", http.FileServerFS(embed.CSS_fs))
-	http.Handle("/images/", http.FileServerFS(embed.Images_fs))
-	http.Handle("/modules/", http.FileServerFS(embed.Modules_fs))
-	http.Handle("/scripts/", http.FileServerFS(embed.Scripts_fs))
+func ServeStatic(m *minify.M) {
+	css := MinifyStatic(m, web.CSS_fs)
+	http.HandleFunc("/css/", func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/")
+		data := css[path]
+		w.Header().Add("Content-Type", data.MimeType.Type)
+		w.Write([]byte(data.Data))
+	})
+	images := MinifyStatic(m, web.Images_fs)
+	http.HandleFunc("/images/", func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/")
+		data := images[path]
+		w.Header().Add("Content-Type", data.MimeType.Type)
+		w.Write([]byte(data.Data))
+	})
+	modules := MinifyStatic(m, web.Modules_fs)
+	http.HandleFunc("/modules/", func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/")
+		data := modules[path]
+		w.Header().Add("Content-Type", data.MimeType.Type)
+		w.Write([]byte(data.Data))
+	})
+	scripts := MinifyStatic(m, web.Scripts_fs)
+	http.HandleFunc("/scripts/", func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/")
+		data := scripts[path]
+		w.Header().Add("Content-Type", data.MimeType.Type)
+		w.Write([]byte(data.Data))
+	})
 }
 
 func Run() {
@@ -64,57 +92,101 @@ func Run() {
 
 	global := GetConfig(*configPath)
 
-	ParseTemplates()
+	m := InitMinify()
+
+	ServeStatic(m)
+
+	html := ParseTemplates()
 
 	http.HandleFunc("/account.html", func(w http.ResponseWriter, r *http.Request) {
 		global.Page = "account"
-		err := html["account.html"].Execute(w, global)
+		page := bytes.Buffer{}
+		err := html["account.html"].Execute(&page, global)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+		minified := bytes.Buffer{}
+		err = m.Minify("text/html", &minified, &page)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		w.Write(minified.Bytes())
 	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		global.Page = "index"
-		err := html["index.html"].Execute(w, global)
+		page := bytes.Buffer{}
+		err := html["index.html"].Execute(&page, global)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+		minified := bytes.Buffer{}
+		err = m.Minify("text/html", &minified, &page)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		w.Write(minified.Bytes())
 	})
 
 	http.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {
 		global.Page = "index"
-		err := html["index.html"].Execute(w, global)
+		page := bytes.Buffer{}
+		err := html["index.html"].Execute(&page, global)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+		minified := bytes.Buffer{}
+		err = m.Minify("text/html", &minified, &page)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		w.Write(minified.Bytes())
 	})
 
 	http.HandleFunc("/instance.html", func(w http.ResponseWriter, r *http.Request) {
 		global.Page = "instance"
-		err := html["instance.html"].Execute(w, global)
+		page := bytes.Buffer{}
+		err := html["instance.html"].Execute(&page, global)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+		minified := bytes.Buffer{}
+		err = m.Minify("text/html", &minified, &page)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		w.Write(minified.Bytes())
 	})
 
 	http.HandleFunc("/login.html", func(w http.ResponseWriter, r *http.Request) {
 		global.Page = "login"
-		err := html["login.html"].Execute(w, global)
+		page := bytes.Buffer{}
+		err := html["login.html"].Execute(&page, global)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+		minified := bytes.Buffer{}
+		err = m.Minify("text/html", &minified, &page)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		w.Write(minified.Bytes())
 	})
 
 	http.HandleFunc("/settings.html", func(w http.ResponseWriter, r *http.Request) {
 		global.Page = "settings"
-		err := html["settings.html"].Execute(w, global)
+		page := bytes.Buffer{}
+		err := html["settings.html"].Execute(&page, global)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+		minified := bytes.Buffer{}
+		err = m.Minify("text/html", &minified, &page)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		w.Write(minified.Bytes())
 	})
-
-	ServeStatic()
 
 	log.Printf("Starting HTTP server at port: %d\n", global.Port)
 	err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", global.Port), nil)
