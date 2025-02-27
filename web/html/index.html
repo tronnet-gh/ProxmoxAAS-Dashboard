@@ -4,6 +4,9 @@
 		{{template "head" .}}
 		<script src="scripts/index.js" type="module"></script>
 		<script src="modules/wfa.js" type="module"></script>
+		<link rel="modulepreload" href="scripts/utils.js">
+		<link rel="modulepreload" href="scripts/dialog.js">
+		<link rel="modulepreload" href="scripts/clientsync.js">
 		<style>
 			#instance-container > div {
 				border-bottom: 1px solid white;
