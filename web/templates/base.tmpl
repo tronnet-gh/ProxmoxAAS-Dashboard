@@ -1,13 +1,13 @@
 {{define "head"}}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{.Organization}} - dashboard</title>
+<title>{{.global.Organization}} - dashboard</title>
 <link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
 <link rel="stylesheet" href="modules/w3.css">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <script>
-	window.PVE = "{{.PVE}}";
-	window.API = "{{.API}}";
+	window.PVE = "{{.global.PVE}}";
+	window.API = "{{.global.API}}";
 </script>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/nav.css">
@@ -15,16 +15,16 @@
 {{end}}
 
 {{define "header"}}
-<h1>{{.Organization}}</h1>
+<h1>{{.global.Organization}}</h1>
 <label for="navtoggle">&#9776;</label>
 <input type="checkbox" id="navtoggle">
 <nav id="navigation">
-	{{if eq .Page "login"}}
+	{{if eq .page "login"}}
 		<a href="login.html" aria-current="page">Login</a>
 	{{else}}
-		<a href="index.html" {{if eq .Page "index"}} aria-current="page" {{end}}>Instances</a>
-		<a href="account.html" {{if eq .Page "account"}} aria-current="page" {{end}}>Account</a>
-		<a href="settings.html" {{if eq .Page "settings"}} aria-current="page" {{end}}>Settings</a>
+		<a href="index.html" {{if eq .page "index"}} aria-current="page" {{end}}>Instances</a>
+		<a href="account.html" {{if eq .page "account"}} aria-current="page" {{end}}>Account</a>
+		<a href="settings.html" {{if eq .page "settings"}} aria-current="page" {{end}}>Settings</a>
 		<a href="login.html">Logout</a>
 	{{end}}
 </nav>	

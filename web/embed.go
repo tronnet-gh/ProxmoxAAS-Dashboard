@@ -17,7 +17,5 @@ var Modules_fs embed.FS
 var Scripts_fs embed.FS
 
 //go:embed html/*
-var HTML embed.FS
-
 //go:embed templates/*
 var Templates embed.FS

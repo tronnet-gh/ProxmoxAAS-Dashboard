@@ -1,18 +1,18 @@
 package app
 
 import (
+	"bufio"
 	"embed"
 	"encoding/json"
+	"html/template"
 	"io"
 	"io/fs"
 	"log"
 	"os"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/tdewolff/minify"
-	"github.com/tdewolff/minify/css"
-	"github.com/tdewolff/minify/html"
-	"github.com/tdewolff/minify/js"
 )
 
 type Config struct {
@@ -20,7 +20,6 @@ type Config struct {
 	Organization string `json:"organization"`
 	PVE          string `json:"pveurl"`
 	API          string `json:"apiurl"`
-	Page         string
 }
 
 func GetConfig(configPath string) Config {
@@ -34,39 +33,6 @@ func GetConfig(configPath string) Config {
 		log.Fatal("Error during parsing config file: ", err)
 	}
 	return config
-}
-
-type MimeType struct {
-	Type     string
-	Minifier func(m *minify.M, w io.Writer, r io.Reader, params map[string]string) error
-}
-
-var PlainTextMimeType = MimeType{
-	Type:     "text/plain",
-	Minifier: nil,
-}
-
-var MimeTypes = map[string]MimeType{
-	"css": {
-		Type:     "text/css",
-		Minifier: css.Minify,
-	},
-	"html": {
-		Type:     "text/html",
-		Minifier: html.Minify,
-	},
-	"svg": {
-		Type:     "image/svg+xml",
-		Minifier: nil,
-	},
-	"js": {
-		Type:     "application/javascript",
-		Minifier: js.Minify,
-	},
-	"wasm": {
-		Type:     "application/wasm",
-		Minifier: nil,
-	},
 }
 
 func InitMinify() *minify.M {
@@ -119,8 +85,48 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 					MimeType: PlainTextMimeType,
 				}
 			}
+
+			log.Printf("%s: %s \n\n", path, minified[path].Data)
 		}
 		return nil
 	})
 	return minified
+}
+
+func LoadHTMLToGin(engine *gin.Engine, html map[string]StaticFile) {
+	root := template.New("")
+	tmpl := template.Must(root, LoadAndAddToRoot(engine.FuncMap, root, html))
+	engine.SetHTMLTemplate(tmpl)
+}
+
+func LoadAndAddToRoot(FuncMap template.FuncMap, root *template.Template, html map[string]StaticFile) error {
+	for name, file := range html {
+		t := root.New(name).Funcs(FuncMap)
+		_, err := t.Parse(file.Data)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func TemplateMinifier(m *minify.M, w io.Writer, r io.Reader, _ map[string]string) error {
+	// remove newlines and tabs
+	rb := bufio.NewReader(r)
+	for {
+		line, err := rb.ReadString('\n')
+		if err != nil && err != io.EOF {
+			return err
+		}
+		line = strings.Replace(line, "\n", "", -1)
+		line = strings.Replace(line, "\t", "", -1)
+		line = strings.Replace(line, "    ", "", -1)
+		if _, errws := io.WriteString(w, line); errws != nil {
+			return errws
+		}
+		if err == io.EOF {
+			break
+		}
+	}
+	return nil
 }

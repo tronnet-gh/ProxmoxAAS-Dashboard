@@ -1,4 +1,4 @@
-import { goToPage, requestPVE, setAppearance, requestAPI } from "./utils.js";
+import { goToPage, setAppearance, requestAPI } from "./utils.js";
 import { alert } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
@@ -7,14 +7,6 @@ async function init () {
 	await deleteAllCookies();
 	setAppearance();
 	const formSubmitButton = document.querySelector("#submit");
-	const realms = await requestPVE("/access/domains", "GET");
-	const realmSelect = document.querySelector("#realm");
-	realms.data.forEach((element) => {
-		realmSelect.add(new Option(element.comment, element.realm));
-		if ("default" in element && element.default === 1) {
-			realmSelect.value = element.realm;
-		}
-	});
 	formSubmitButton.addEventListener("click", async (e) => {
 		e.preventDefault();
 		const form = document.querySelector("form");
