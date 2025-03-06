@@ -85,8 +85,6 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 					MimeType: PlainTextMimeType,
 				}
 			}
-
-			log.Printf("%s: %s \n\n", path, minified[path].Data)
 		}
 		return nil
 	})
