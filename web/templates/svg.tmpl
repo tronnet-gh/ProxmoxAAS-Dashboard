@@ -1,0 +1,7 @@
+{{define "svg"}}
+	{{if .Clickable}}
+		<svg id={{.ID}} alt="{{.Alt}}" class="clickable"><use href="{{.Src}}#symb"></svg>
+	{{else}}
+		<svg id={{.ID}} alt="{{.Alt}}"><use href="{{.Src}}#symb"></svg>
+	{{end}}
+{{end}}

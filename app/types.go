@@ -1,49 +1,16 @@
 package app
 
-import (
-	"io"
-
-	"github.com/tdewolff/minify"
-	"github.com/tdewolff/minify/css"
-	"github.com/tdewolff/minify/html"
-	"github.com/tdewolff/minify/js"
-)
-
-type MimeType struct {
-	Type     string
-	Minifier func(m *minify.M, w io.Writer, r io.Reader, params map[string]string) error
+type Config struct {
+	Port         int    `json:"listenPort"`
+	Organization string `json:"organization"`
+	DASH         string `json:"dashurl"`
+	PVE          string `json:"pveurl"`
+	API          string `json:"apiurl"`
 }
 
-var PlainTextMimeType = MimeType{
-	Type:     "text/plain",
-	Minifier: nil,
-}
-
-var MimeTypes = map[string]MimeType{
-	"css": {
-		Type:     "text/css",
-		Minifier: css.Minify,
-	},
-	"html": {
-		Type:     "text/html",
-		Minifier: html.Minify,
-	},
-	"tmpl": {
-		Type:     "text/plain",
-		Minifier: TemplateMinifier,
-	},
-	"svg": {
-		Type:     "image/svg+xml",
-		Minifier: nil,
-	},
-	"js": {
-		Type:     "application/javascript",
-		Minifier: js.Minify,
-	},
-	"wasm": {
-		Type:     "application/wasm",
-		Minifier: nil,
-	},
+type StaticFile struct {
+	Data     string
+	MimeType MimeType
 }
 
 // used when requesting GET /access/domains
@@ -70,4 +37,33 @@ type Option struct {
 	Selected bool
 	Value    string
 	Display  string
+}
+
+type RequestType int
+
+type RequestContext struct {
+	Cookies map[string]string
+	Body    map[string]interface{}
+}
+
+// used in constructing instance cards in index
+type Node struct {
+	Node   string `json:"node"`
+	Status string `json:"status"`
+}
+
+// used in constructing instance cards in index
+type Instance struct {
+	VMID             uint
+	Name             string
+	Type             string
+	Status           string
+	Node             string
+	StatusIcon       Icon
+	NodeStatus       string
+	NodeStatusIcon   Icon
+	PowerBtnIcon     Icon
+	ConsoleBtnIcon   Icon
+	ConfigureBtnIcon Icon
+	DeleteBtnIcon    Icon
 }

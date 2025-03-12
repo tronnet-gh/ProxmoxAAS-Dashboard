@@ -4,23 +4,19 @@ import (
 	"bufio"
 	"embed"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"io/fs"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/tdewolff/minify"
 )
-
-type Config struct {
-	Port         int    `json:"listenPort"`
-	Organization string `json:"organization"`
-	PVE          string `json:"pveurl"`
-	API          string `json:"apiurl"`
-}
 
 func GetConfig(configPath string) Config {
 	content, err := os.ReadFile(configPath)
@@ -43,11 +39,6 @@ func InitMinify() *minify.M {
 		}
 	}
 	return m
-}
-
-type StaticFile struct {
-	Data     string
-	MimeType MimeType
 }
 
 func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
@@ -80,9 +71,10 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 					}
 				}
 			} else { // if the file has no extension, skip minify
+				mimetype := MimeTypes["*"]
 				minified[path] = StaticFile{
 					Data:     string(v),
-					MimeType: PlainTextMimeType,
+					MimeType: mimetype,
 				}
 			}
 		}
@@ -91,10 +83,11 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 	return minified
 }
 
-func LoadHTMLToGin(engine *gin.Engine, html map[string]StaticFile) {
+func LoadHTMLToGin(engine *gin.Engine, html map[string]StaticFile) *template.Template {
 	root := template.New("")
 	tmpl := template.Must(root, LoadAndAddToRoot(engine.FuncMap, root, html))
 	engine.SetHTMLTemplate(tmpl)
+	return tmpl
 }
 
 func LoadAndAddToRoot(FuncMap template.FuncMap, root *template.Template, html map[string]StaticFile) error {
@@ -127,4 +120,104 @@ func TemplateMinifier(m *minify.M, w io.Writer, r io.Reader, _ map[string]string
 		}
 	}
 	return nil
+}
+
+func HandleNonFatalError(c *gin.Context, err error) {
+	log.Printf("[Error] encountered an error: %s", err.Error())
+	c.Status(http.StatusInternalServerError)
+}
+
+func RequestGetAPI(path string, context RequestContext) (*http.Response, error) {
+	req, err := http.NewRequest("GET", global.API+path, nil)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range context.Cookies {
+		req.AddCookie(&http.Cookie{Name: k, Value: v})
+	}
+
+	client := &http.Client{}
+	response, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	} else if response.StatusCode != 200 {
+		return response, nil
+	}
+
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	err = response.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(data, &context.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+
+}
+
+func get_API_resources(token string, csrf string) (map[uint]Instance, map[string]Node, error) {
+	ctx := RequestContext{
+		Cookies: map[string]string{
+			"PVEAuthCookie":       token,
+			"CSRFPreventionToken": csrf,
+		},
+		Body: map[string]interface{}{},
+	}
+	res, err := RequestGetAPI("/proxmox/cluster/resources", ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	instances := map[uint]Instance{}
+	nodes := map[string]Node{}
+
+	if res.StatusCode == 200 { // if we successfully retrieved the resources, then process it and return index
+		for _, v := range ctx.Body["data"].([]interface{}) {
+			m := v.(map[string]interface{})
+			if m["type"] == "node" {
+				node := Node{}
+				err := mapstructure.Decode(v, &node)
+				if err != nil {
+					return nil, nil, err
+				}
+				nodes[node.Node] = node
+			} else if m["type"] == "lxc" || m["type"] == "qemu" {
+				instance := Instance{}
+				err := mapstructure.Decode(v, &instance)
+				if err != nil {
+					return nil, nil, err
+				}
+				instances[instance.VMID] = instance
+			}
+		}
+		for vmid, instance := range instances {
+			status := instance.Status
+			icons := Icons[status]
+			instance.StatusIcon = icons["status"]
+			instance.PowerBtnIcon = icons["power"]
+			instance.PowerBtnIcon.ID = "power-btn"
+			instance.ConfigureBtnIcon = icons["config"]
+			instance.ConfigureBtnIcon.ID = "configure-btn"
+			instance.ConsoleBtnIcon = icons["console"]
+			instance.ConsoleBtnIcon.ID = "console-btn"
+			instance.DeleteBtnIcon = icons["delete"]
+			instance.DeleteBtnIcon.ID = "delete-btn"
+			nodestatus := nodes[instance.Node].Status
+			icons = Icons[nodestatus]
+			instance.NodeStatus = nodestatus
+			instance.NodeStatusIcon = icons["status"]
+			instances[vmid] = instance
+		}
+		return instances, nodes, nil
+	} else { // if we did not successfully retrieve resources, then return 500 because auth was 1 but was invalid somehow
+		return nil, nil, fmt.Errorf("request to /cluster/resources/ resulted in %+v", res)
+	}
 }

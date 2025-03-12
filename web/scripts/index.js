@@ -1,75 +1,74 @@
-import { requestPVE, requestAPI, goToPage, setAppearance, getSearchSettings, goToURL, instancesConfig, nodesConfig, setSVGSrc, setSVGAlt } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, setAppearance, getSearchSettings, goToURL, getInstancesFragment } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
 
 class InstanceCard extends HTMLElement {
+	actionLock = false;
+	shadowRoot = null;
+
 	constructor () {
 		super();
-		this.attachShadow({ mode: "open" });
-		this.shadowRoot.innerHTML = `
-			<link rel="stylesheet" href="modules/w3.css">
-			<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-			<link rel="stylesheet" href="css/style.css">
-			<style>
-				* {
-					margin: 0;
-				}
-			</style>
-			<div class="w3-row" style="margin-top: 1em; margin-bottom: 1em;">
-				<hr class="w3-show-small w3-hide-medium w3-hide-large" style="margin: 0; margin-bottom: 1em;">
-				<p class="w3-col l1 m2 s6" id="instance-id"></p>
-				<p class="w3-col l2 m3 s6" id="instance-name"></p>
-				<p class="w3-col l1 m2 w3-hide-small" id="instance-type"></p>
-				<div class="w3-col l2 m3 s6 flex row nowrap">
-					<svg id="instance-status-icon"></svg>
-					<p id="instance-status"></p>
-				</div>
-				<p class="w3-col l2 w3-hide-medium w3-hide-small" id="node-name"></p>
-				<div class="w3-col l2 w3-hide-medium w3-hide-small flex row nowrap">
-					<svg id="node-status-icon"></svg>
-					<p id="node-status"></p>
-				</div>
-				<div class="w3-col l2 m2 s6 flex row nowrap" style="height: 1lh;">
-					<svg id="power-btn" tabindex="0" role="button"></svg>
-					<svg id="console-btn" tabindex="0" role="button"></svg>
-					<svg id="configure-btn" tabindex="0" role="button"></svg>
-					<svg id="delete-btn" tabindex="0" role="button"></svg>
-				</div>
-			</div>
-		`;
+		const internals = this.attachInternals();
+		this.shadowRoot = internals.shadowRoot;
 		this.actionLock = false;
 	}
 
-	get data () {
+	get type () {
+		return this.dataset.type;
+	}
+
+	set type (type) {
+		this.dataset.type = type;
+	}
+
+	get status () {
+		return this.dataset.status;
+	}
+
+	set status (status) {
+		this.dataset.status = status;
+	}
+
+	get vmid () {
+		return this.dataset.vmid;
+	}
+
+	set vmid (vmid) {
+		this.dataset.vmid = vmid;
+	}
+
+	get name () {
+		return this.dataset.name;
+	}
+
+	set name (name) {
+		this.dataset.name = name;
+	}
+
+	get node () {
 		return {
-			type: this.type,
-			status: this.status,
-			vmid: this.status,
-			name: this.name,
-			node: this.node,
-			searchQuery: this.searchQuery
+			name: this.dataset.node,
+			status: this.dataset.nodestatus
 		};
 	}
 
-	set data (data) {
-		if (data.status === "unknown") {
-			data.status = "stopped";
-		}
-		this.type = data.type;
-		this.status = data.status;
-		this.vmid = data.vmid;
-		this.name = data.name;
-		this.node = data.node;
-		this.searchQueryResult = data.searchQueryResult;
-		this.update();
+	set node (node) {
+		this.dataset.node = node.name;
+		this.dataset.nodetsatus = node.status;
+	}
+
+	set searchQueryResult (result) {
+		this.dataset.searchqueryresult = JSON.stringify(result);
+	}
+
+	get searchQueryResult () {
+		return JSON.parse(!this.dataset.searchqueryresult ? "{}" : this.dataset.searchqueryresult);
 	}
 
 	update () {
-		const vmidParagraph = this.shadowRoot.querySelector("#instance-id");
-		vmidParagraph.innerText = this.vmid;
-
 		const nameParagraph = this.shadowRoot.querySelector("#instance-name");
+		nameParagraph.innerText = "";
 		if (this.searchQueryResult.alignment) {
 			let i = 0; // name index
 			let c = 0; // alignment index
@@ -106,55 +105,24 @@ class InstanceCard extends HTMLElement {
 			nameParagraph.innerHTML = this.name ? this.name : "&nbsp;";
 		}
 
-		const typeParagraph = this.shadowRoot.querySelector("#instance-type");
-		typeParagraph.innerText = this.type;
-
-		const statusParagraph = this.shadowRoot.querySelector("#instance-status");
-		statusParagraph.innerText = this.status;
-
-		const statusIcon = this.shadowRoot.querySelector("#instance-status-icon");
-		setSVGSrc(statusIcon, instancesConfig[this.status].status.src);
-		setSVGAlt(statusIcon, instancesConfig[this.status].status.alt);
-
-		const nodeNameParagraph = this.shadowRoot.querySelector("#node-name");
-		nodeNameParagraph.innerText = this.node.name;
-
-		const nodeStatusParagraph = this.shadowRoot.querySelector("#node-status");
-		nodeStatusParagraph.innerText = this.node.status;
-
-		const nodeStatusIcon = this.shadowRoot.querySelector("#node-status-icon");
-		setSVGSrc(nodeStatusIcon, nodesConfig[this.node.status].status.src);
-		setSVGAlt(nodeStatusIcon, nodesConfig[this.node.status].status.alt);
-
 		const powerButton = this.shadowRoot.querySelector("#power-btn");
-		setSVGSrc(powerButton, instancesConfig[this.status].power.src);
-		setSVGAlt(powerButton, instancesConfig[this.status].power.alt);
-		if (instancesConfig[this.status].power.clickable) {
-			powerButton.classList.add("clickable");
+		if (powerButton.classList.contains("clickable")) {
 			powerButton.onclick = this.handlePowerButton.bind(this);
 		}
 
 		const configButton = this.shadowRoot.querySelector("#configure-btn");
-		setSVGSrc(configButton, instancesConfig[this.status].config.src);
-		setSVGAlt(configButton, instancesConfig[this.status].config.alt);
-		if (instancesConfig[this.status].config.clickable) {
-			configButton.classList.add("clickable");
+		if (configButton.classList.contains("clickable")) {
 			configButton.onclick = this.handleConfigButton.bind(this);
 		}
 
 		const consoleButton = this.shadowRoot.querySelector("#console-btn");
-		setSVGSrc(consoleButton, instancesConfig[this.status].console.src);
-		setSVGAlt(consoleButton, instancesConfig[this.status].console.alt);
-		if (instancesConfig[this.status].console.clickable) {
+		if (consoleButton.classList.contains("clickable")) {
 			consoleButton.classList.add("clickable");
 			consoleButton.onclick = this.handleConsoleButton.bind(this);
 		}
 
 		const deleteButton = this.shadowRoot.querySelector("#delete-btn");
-		setSVGSrc(deleteButton, instancesConfig[this.status].delete.src);
-		setSVGAlt(deleteButton, instancesConfig[this.status].delete.alt);
-		if (instancesConfig[this.status].delete.clickable) {
-			deleteButton.classList.add("clickable");
+		if (deleteButton.classList.contains("clickable")) {
 			deleteButton.onclick = this.handleDeleteButton.bind(this);
 		}
 
@@ -217,7 +185,7 @@ class InstanceCard extends HTMLElement {
 
 	handleConsoleButton () {
 		if (!this.actionLock && this.status === "running") {
-			const data = { console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node.name, resize: "off", cmd: "" };
+			const data = { console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node, resize: "off", cmd: "" };
 			data[`${this.type === "qemu" ? "novnc" : "xtermjs"}`] = 1;
 			goToURL(window.PVE, data, true);
 		}
@@ -260,8 +228,6 @@ customElements.define("instance-card", InstanceCard);
 
 window.addEventListener("DOMContentLoaded", init);
 
-let instances = [];
-
 async function init () {
 	setAppearance();
 	const cookie = document.cookie;
@@ -270,32 +236,37 @@ async function init () {
 	}
 
 	wfaInit("modules/wfa.wasm");
+	initInstances();
 
 	document.querySelector("#instance-add").addEventListener("click", handleInstanceAdd);
-	document.querySelector("#vm-search").addEventListener("input", populateInstances);
+	document.querySelector("#vm-search").addEventListener("input", sortInstances);
 
 	setupClientSync(refreshInstances);
 }
 
 async function refreshInstances () {
-	await getInstances();
-	await populateInstances();
+	let instances = await getInstancesFragment();
+	if (instances.status !== 200) {
+		alert("Error fetching instances.");
+	}
+	else {
+		instances = instances.data;
+		const container = document.querySelector("#instance-container");
+		container.setHTMLUnsafe(instances);
+		sortInstances();
+	}
 }
 
-async function getInstances () {
-	const resources = await requestPVE("/cluster/resources", "GET");
-	instances = [];
-	resources.data.forEach((element) => {
-		if (element.type === "lxc" || element.type === "qemu") {
-			const nodeName = element.node;
-			const nodeStatus = resources.data.find(item => item.node === nodeName && item.type === "node").status;
-			element.node = { name: nodeName, status: nodeStatus };
-			instances.push(element);
-		}
-	});
+function initInstances () {
+	const container = document.querySelector("#instance-container");
+	let instances = container.children;
+	instances = [].slice.call(instances);
+	for (let i = 0; i < instances.length; i++) {
+		instances[i].update();
+	}
 }
 
-async function populateInstances () {
+function sortInstances () {
 	const searchCriteria = getSearchSettings();
 	const searchQuery = document.querySelector("#search").value || null;
 	let criteria;
@@ -334,22 +305,16 @@ async function populateInstances () {
 			return { score: score / item.length, alignment };
 		};
 	}
-	sortInstances(criteria, searchQuery);
-	const instanceContainer = document.querySelector("#instance-container");
-	instanceContainer.innerHTML = "";
-	for (let i = 0; i < instances.length; i++) {
-		const newInstance = document.createElement("instance-card");
-		newInstance.data = instances[i];
-		instanceContainer.append(newInstance);
-	}
-}
 
-function sortInstances (criteria, searchQuery) {
+	const container = document.querySelector("#instance-container");
+	let instances = container.children;
+	instances = [].slice.call(instances);
+
 	for (let i = 0; i < instances.length; i++) {
-		if (!instances[i].name) { // if the instance has no name, assume its just empty string
-			instances[i].name = "";
+		if (!instances[i].dataset.name) { // if the instance has no name, assume its just empty string
+			instances[i].dataset.name = "";
 		}
-		const { score, alignment } = criteria(instances[i].name.toLowerCase(), searchQuery ? searchQuery.toLowerCase() : "");
+		const { score, alignment } = criteria(instances[i].dataset.name.toLowerCase(), searchQuery ? searchQuery.toLowerCase() : "");
 		instances[i].searchQueryResult = { score, alignment };
 	}
 	const sortCriteria = (a, b) => {
@@ -362,7 +327,13 @@ function sortInstances (criteria, searchQuery) {
 			return aScore - bScore;
 		}
 	};
+
 	instances.sort(sortCriteria);
+
+	for (let i = 0; i < instances.length; i++) {
+		container.appendChild(instances[i]);
+		instances[i].update();
+	}
 }
 
 async function handleInstanceAdd () {
@@ -425,11 +396,11 @@ async function handleInstanceAdd () {
 			const vmid = form.get("vmid");
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/create`, "POST", body);
 			if (result.status === 200) {
-				populateInstances();
+				refreshInstances();
 			}
 			else {
 				alert(`Attempted to create new instance ${vmid} but got: ${result.error}`);
-				populateInstances();
+				refreshInstances();
 			}
 		}
 	});

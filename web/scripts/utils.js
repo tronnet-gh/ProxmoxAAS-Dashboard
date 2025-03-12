@@ -247,6 +247,21 @@ export async function requestAPI (path, method, body = null) {
 	return response;
 }
 
+export async function getInstancesFragment () {
+	const content = {
+		method: "GET",
+		mode: "cors",
+		credentials: "include",
+		headers: {
+			"Content-Type": "application/x-www-form-urlencoded"
+		}
+	};
+	content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
+
+	const response = await request(`${window.DASH}/instances_fragment`, content);
+	return response;
+}
+
 async function request (url, content) {
 	try {
 		const response = await fetch(url, content);
@@ -257,6 +272,10 @@ async function request (url, content) {
 			data.status = response.status;
 		}
 		else if (contentType.includes("text/html")) {
+			data = { data: await response.text() };
+			data.status = response.status;
+		}
+		else if (contentType.includes("text/plain")) {
 			data = { data: await response.text() };
 			data.status = response.status;
 		}

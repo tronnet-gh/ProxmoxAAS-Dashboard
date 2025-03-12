@@ -54,7 +54,11 @@
 							<p class="w3-col l2 w3-hide-medium w3-hide-small">Host Status</p>
 							<p class="w3-col l2 m2 w3-hide-small">Actions</p>
 						</div>
-						<div id="instance-container"></div>
+						<div id="instance-container">
+							{{range .instances}}
+								{{template "instance" .}}
+							{{end}}
+						</div>
 					</div>
 				</div>
 			</section>

@@ -1,6 +1,7 @@
 {
 	"listenPort": 8080,
 	"organization": "myorg",
+	"dashurl": "https://paas.mydomain.example",
 	"apiurl": "https://paas.mydomain.example/api",
 	"pveurl": "https://pve.mydomain.example"
 }

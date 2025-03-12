@@ -4,5 +4,13 @@
 	],
 	"rules": {
 		"no-inline-style": "off"
-	}
+	},
+	"elements": [
+		"html5",
+		{
+			"head": {
+				"requiredContent": []
+			}
+		}
+	]
 }

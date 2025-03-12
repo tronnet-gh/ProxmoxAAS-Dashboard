@@ -4,6 +4,7 @@ go 1.24
 
 require (
 	github.com/gin-gonic/gin v1.10.0
+	github.com/go-viper/mapstructure/v2 v2.2.1
 	github.com/tdewolff/minify v2.3.6+incompatible
 )
 

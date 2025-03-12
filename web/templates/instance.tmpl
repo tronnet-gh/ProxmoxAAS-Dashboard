@@ -1,0 +1,35 @@
+{{define "instance"}}
+<instance-card data-type="{{.Type}}" data-status="{{.Status}}" data-vmid="{{.VMID}}" data-name="{{.Name}}" data-node="{{.Node}}" data-nodestatus="{{.NodeStatus}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="modules/w3.css">
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="css/style.css">
+		<style>
+			* {
+				margin: 0;
+			}
+		</style>
+		<div class="w3-row" style="margin-top: 1em; margin-bottom: 1em;">
+			<hr class="w3-show-small w3-hide-medium w3-hide-large" style="margin: 0; margin-bottom: 1em;">
+			<p class="w3-col l1 m2 s6">{{.VMID}}</p>
+			<p class="w3-col l2 m3 s6" id="instance-name">{{.Name}}</p>
+			<p class="w3-col l1 m2 w3-hide-small">{{.Type}}</p>
+			<div class="w3-col l2 m3 s6 flex row nowrap">
+				{{template "svg" .StatusIcon}}
+				<p>{{.Status}}</p>
+			</div>
+			<p class="w3-col l2 w3-hide-medium w3-hide-small">{{.Node}}</p>
+			<div class="w3-col l2 w3-hide-medium w3-hide-small flex row nowrap">
+				{{template "svg" .NodeStatusIcon}}
+				<p>{{.NodeStatus}}</p>
+			</div>
+			<div class="w3-col l2 m2 s6 flex row nowrap" style="height: 1lh;">
+				{{template "svg" .PowerBtnIcon}}
+				{{template "svg" .ConsoleBtnIcon}}
+				{{template "svg" .ConfigureBtnIcon}}
+				{{template "svg" .DeleteBtnIcon}}
+			</div>
+		</div>
+	</template>
+</instance-card>
+{{end}}
