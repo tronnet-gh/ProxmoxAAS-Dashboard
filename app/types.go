@@ -43,7 +43,7 @@ type RequestType int
 
 type RequestContext struct {
 	Cookies map[string]string
-	Body    map[string]interface{}
+	Body    map[string]any
 }
 
 // used in constructing instance cards in index

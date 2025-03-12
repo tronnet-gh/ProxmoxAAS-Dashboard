@@ -127,7 +127,7 @@ func handle_GET_Instance(c *gin.Context) {
 func handle_GET_Login(c *gin.Context) {
 	ctx := RequestContext{
 		Cookies: nil,
-		Body:    map[string]interface{}{},
+		Body:    map[string]any{},
 	}
 	res, err := RequestGetAPI("/proxmox/access/domains", ctx)
 	if err != nil {
@@ -144,8 +144,8 @@ func handle_GET_Login(c *gin.Context) {
 		Name: "realm",
 	}
 
-	for _, v := range ctx.Body["data"].([]interface{}) {
-		v = v.(map[string]interface{})
+	for _, v := range ctx.Body["data"].([]any) {
+		v = v.(map[string]any)
 		realm := Realm{}
 		err := mapstructure.Decode(v, &realm)
 		if err != nil {

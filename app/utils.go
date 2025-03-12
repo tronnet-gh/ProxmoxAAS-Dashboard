@@ -169,7 +169,7 @@ func get_API_resources(token string, csrf string) (map[uint]Instance, map[string
 			"PVEAuthCookie":       token,
 			"CSRFPreventionToken": csrf,
 		},
-		Body: map[string]interface{}{},
+		Body: map[string]any{},
 	}
 	res, err := RequestGetAPI("/proxmox/cluster/resources", ctx)
 	if err != nil {
@@ -180,8 +180,8 @@ func get_API_resources(token string, csrf string) (map[uint]Instance, map[string
 	nodes := map[string]Node{}
 
 	if res.StatusCode == 200 { // if we successfully retrieved the resources, then process it and return index
-		for _, v := range ctx.Body["data"].([]interface{}) {
-			m := v.(map[string]interface{})
+		for _, v := range ctx.Body["data"].([]any) {
+			m := v.(map[string]any)
 			if m["type"] == "node" {
 				node := Node{}
 				err := mapstructure.Decode(v, &node)
