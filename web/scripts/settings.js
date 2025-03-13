@@ -1,34 +1,35 @@
-import { setAppearance } from "./utils.js";
+import { setAppearance, getSyncSettings, getSearchSettings, getThemeSettings, setSyncSettings, setSearchSettings, setThemeSettings } from "./utils.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
 function init () {
 	setAppearance();
-	const scheme = localStorage.getItem("sync-scheme");
+	const {scheme, rate} = getSyncSettings();
 	if (scheme) {
 		document.querySelector(`#sync-${scheme}`).checked = true;
 	}
-	const rate = localStorage.getItem("sync-rate");
 	if (rate) {
 		document.querySelector("#sync-rate").value = rate;
 	}
-	const search = localStorage.getItem("search-criteria");
+
+	const search = getSearchSettings();
 	if (search) {
 		document.querySelector(`#search-${search}`).checked = true;
 	}
-	const theme = localStorage.getItem("appearance-theme");
+
+	const theme = getThemeSettings();
 	if (theme) {
 		document.querySelector("#appearance-theme").value = theme;
 	}
+
 	document.querySelector("#settings").addEventListener("submit", handleSaveSettings, false);
 }
 
 function handleSaveSettings (event) {
 	event.preventDefault();
 	const form = new FormData(document.querySelector("#settings"));
-	localStorage.setItem("sync-scheme", form.get("sync-scheme"));
-	localStorage.setItem("sync-rate", form.get("sync-rate"));
-	localStorage.setItem("search-criteria", form.get("search-criteria"));
-	localStorage.setItem("appearance-theme", form.get("appearance-theme"));
-	window.location.reload();
+	setSyncSettings(form.get("sync-scheme"), form.get("sync-rate"));
+	setSearchSettings(form.get("search-criteria"));
+	setThemeSettings(form.get("appearance-theme"));
+	init();
 }

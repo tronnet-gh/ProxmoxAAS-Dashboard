@@ -66,111 +66,6 @@ export const resourcesConfig = {
 	}
 };
 
-export const instancesConfig = {
-	running: {
-		status: {
-			src: "images/status/active.svg",
-			alt: "Instance is running",
-			clickable: false
-		},
-		power: {
-			src: "images/actions/instance/stop.svg",
-			alt: "Shutdown Instance",
-			clickable: true
-		},
-		config: {
-			src: "images/actions/instance/config-inactive.svg",
-			alt: "Change Configuration (Inactive)",
-			clickable: false
-		},
-		console: {
-			src: "images/actions/instance/console-active.svg",
-			alt: "Open Console",
-			clickable: true
-		},
-		delete: {
-			src: "images/actions/delete-inactive.svg",
-			alt: "Delete Instance (Inactive)",
-			clickable: false
-		}
-	},
-	stopped: {
-		status: {
-			src: "images/status/inactive.svg",
-			alt: "Instance is stopped",
-			clickable: false
-		},
-		power: {
-			src: "images/actions/instance/start.svg",
-			alt: "Start Instance",
-			clickable: true
-		},
-		config: {
-			src: "images/actions/instance/config-active.svg",
-			alt: "Change Configuration",
-			clickable: true
-		},
-		console: {
-			src: "images/actions/instance/console-inactive.svg",
-			alt: "Open Console (Inactive)",
-			clickable: false
-		},
-		delete: {
-			src: "images/actions/delete-active.svg",
-			alt: "Delete Instance",
-			clickable: true
-		}
-	},
-	loading: {
-		status: {
-			src: "images/status/loading.svg",
-			alt: "Instance is loading",
-			clickable: false
-		},
-		power: {
-			src: "images/status/loading.svg",
-			alt: "Loading Instance",
-			clickable: false
-		},
-		config: {
-			src: "images/actions/instance/config-inactive.svg",
-			alt: "Change Configuration (Inactive)",
-			clickable: false
-		},
-		console: {
-			src: "images/actions/instance/console-inactive.svg",
-			alt: "Open Console (Inactive)",
-			clickable: false
-		},
-		delete: {
-			src: "images/actions/delete-inactive.svg",
-			alt: "Delete Instance (Inactive)",
-			clickable: false
-		}
-	}
-};
-
-export const nodesConfig = {
-	online: {
-		status: {
-			src: "images/status/active.svg",
-			alt: "Node is online"
-		}
-	},
-	offline: {
-		status: {
-			src: "images/status/inactive.svg",
-			alt: "Node is offline"
-		}
-	},
-	uknown: {
-		status: {
-			src: "images/status/inactive.svg",
-			alt: "Node is offline"
-		}
-	}
-};
-
 export const bootConfig = {
 	eligiblePrefixes: ["ide", "sata", "scsi", "net"],
 	ide: {
@@ -190,6 +85,10 @@ export const bootConfig = {
 		alt: "NET Bootable Icon"
 	}
 };
+
+export function setCookie (cname, cval) {
+	document.cookie = `${cname}=${cval}`;
+}
 
 export function getCookie (cname) {
 	const name = cname + "=";
@@ -349,13 +248,30 @@ export function getSearchSettings () {
 	return searchCriteria;
 }
 
-export function setAppearance () {
+export function getThemeSettings () {
 	let theme = localStorage.getItem("appearance-theme");
 	if (!theme) {
 		theme = settingsDefault["appearance-theme"];
 		localStorage.setItem("appearance-theme", theme);
 	}
+	return theme;
+}
 
+export function setSyncSettings (scheme, rate) {
+	localStorage.setItem("sync-scheme", scheme)
+	localStorage.setItem("sync-rate", rate)
+}
+
+export function setSearchSettings (criteria) {
+	localStorage.setItem("search-criteria", criteria)
+}
+
+export function setThemeSettings (theme) {
+	localStorage.setItem("appearance-theme", theme);
+}
+
+export function setAppearance () {
+	let theme = getThemeSettings();
 	if (theme === "auto") {
 		document.querySelector(":root").classList.remove("dark-theme", "light-theme");
 	}
