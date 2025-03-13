@@ -258,12 +258,12 @@ export function getThemeSettings () {
 }
 
 export function setSyncSettings (scheme, rate) {
-	localStorage.setItem("sync-scheme", scheme)
-	localStorage.setItem("sync-rate", rate)
+	localStorage.setItem("sync-scheme", scheme);
+	localStorage.setItem("sync-rate", rate);
 }
 
 export function setSearchSettings (criteria) {
-	localStorage.setItem("search-criteria", criteria)
+	localStorage.setItem("search-criteria", criteria);
 }
 
 export function setThemeSettings (theme) {
@@ -271,7 +271,7 @@ export function setThemeSettings (theme) {
 }
 
 export function setAppearance () {
-	let theme = getThemeSettings();
+	const theme = getThemeSettings();
 	if (theme === "auto") {
 		document.querySelector(":root").classList.remove("dark-theme", "light-theme");
 	}
