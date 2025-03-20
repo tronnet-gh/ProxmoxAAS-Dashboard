@@ -185,7 +185,7 @@ class InstanceCard extends HTMLElement {
 
 	handleConsoleButton () {
 		if (!this.actionLock && this.status === "running") {
-			const data = { console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node, resize: "off", cmd: "" };
+			const data = { console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node.name, resize: "off", cmd: "" };
 			data[`${this.type === "qemu" ? "novnc" : "xtermjs"}`] = 1;
 			goToURL(window.PVE, data, true);
 		}
