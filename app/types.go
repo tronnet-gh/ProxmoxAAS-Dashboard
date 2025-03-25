@@ -67,3 +67,13 @@ type Instance struct {
 	ConfigureBtnIcon Icon
 	DeleteBtnIcon    Icon
 }
+
+type Account struct {
+	Username string
+	Pools    map[string]bool
+	Nodes    map[string]bool
+	VMID     struct {
+		Min int
+		Max int
+	}
+}

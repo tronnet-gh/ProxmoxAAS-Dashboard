@@ -230,10 +230,6 @@ window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
 	setAppearance();
-	const cookie = document.cookie;
-	if (cookie === "") {
-		goToPage("login.html");
-	}
 
 	wfaInit("modules/wfa.wasm");
 	initInstances();

@@ -9,7 +9,6 @@ import (
 	"proxmoxaas-dashboard/dist/web" // go will complain here until the first build
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-viper/mapstructure/v2"
 	"github.com/tdewolff/minify"
 )
 
@@ -69,18 +68,28 @@ func ServeStatic(router *gin.Engine, m *minify.M) {
 }
 
 func handle_GET_Account(c *gin.Context) {
-	c.HTML(http.StatusOK, "html/account.html", gin.H{
-		"global": global,
-		"page":   "account",
-	})
+	username, token, csrf, err := GetAuth(c)
+	if err == nil {
+		account, err := GetUserAccount(username, token, csrf)
+		if err != nil {
+			HandleNonFatalError(c, err)
+			return
+		}
+
+		c.HTML(http.StatusOK, "html/account.html", gin.H{
+			"global":  global,
+			"page":    "account",
+			"account": account,
+		})
+	} else {
+		c.Redirect(http.StatusFound, "/login.html") // if user is not authed, redirect user to login page
+	}
 }
 
 func handle_GET_Index(c *gin.Context) {
-	_, err := c.Cookie("auth")
-	token, _ := c.Cookie("PVEAuthCookie")
-	csrf, _ := c.Cookie("CSRFPreventionToken")
+	_, token, csrf, err := GetAuth(c)
 	if err == nil { // user should be authed, try to return index with population
-		instances, _, err := get_API_resources(token, csrf)
+		instances, _, err := GetClusterResources(token, csrf)
 		if err != nil {
 			HandleNonFatalError(c, err)
 		}
@@ -90,19 +99,14 @@ func handle_GET_Index(c *gin.Context) {
 			"instances": instances,
 		})
 	} else { // return index without populating
-		c.HTML(http.StatusOK, "html/index.html", gin.H{
-			"global": global,
-			"page":   "index",
-		})
+		c.Redirect(http.StatusFound, "/login.html") // if user is not authed, redirect user to login page
 	}
 }
 
 func handle_GET_Instances_Fragment(c *gin.Context) {
-	_, err := c.Cookie("auth")
-	token, _ := c.Cookie("PVEAuthCookie")
-	csrf, _ := c.Cookie("CSRFPreventionToken")
+	_, token, csrf, err := GetAuth(c)
 	if err == nil { // user should be authed, try to return index with population
-		instances, _, err := get_API_resources(token, csrf)
+		instances, _, err := GetClusterResources(token, csrf)
 		if err != nil {
 			HandleNonFatalError(c, err)
 		}
@@ -118,40 +122,30 @@ func handle_GET_Instances_Fragment(c *gin.Context) {
 }
 
 func handle_GET_Instance(c *gin.Context) {
-	c.HTML(http.StatusOK, "html/instance.html", gin.H{
-		"global": global,
-		"page":   "instance",
-	})
+	_, _, _, err := GetAuth(c)
+	if err == nil {
+		c.HTML(http.StatusOK, "html/instance.html", gin.H{
+			"global": global,
+			"page":   "instance",
+		})
+	} else {
+		c.Redirect(http.StatusFound, "/login.html")
+	}
 }
 
 func handle_GET_Login(c *gin.Context) {
-	ctx := RequestContext{
-		Cookies: nil,
-		Body:    map[string]any{},
-	}
-	res, err := RequestGetAPI("/proxmox/access/domains", ctx)
+	realms, err := GetLoginRealms()
 	if err != nil {
 		HandleNonFatalError(c, err)
-		return
-	}
-	if res.StatusCode != 200 { // we expect /access/domains to always be avaliable
-		HandleNonFatalError(c, err)
-		return
 	}
 
-	realms := Select{
+	sel := Select{
 		ID:   "realm",
 		Name: "realm",
 	}
 
-	for _, v := range ctx.Body["data"].([]any) {
-		v = v.(map[string]any)
-		realm := Realm{}
-		err := mapstructure.Decode(v, &realm)
-		if err != nil {
-			HandleNonFatalError(c, err)
-		}
-		realms.Options = append(realms.Options, Option{
+	for _, realm := range realms {
+		sel.Options = append(sel.Options, Option{
 			Selected: realm.Default != 0,
 			Value:    realm.Realm,
 			Display:  realm.Comment,
@@ -161,13 +155,18 @@ func handle_GET_Login(c *gin.Context) {
 	c.HTML(http.StatusOK, "html/login.html", gin.H{
 		"global": global,
 		"page":   "login",
-		"realms": realms,
+		"realms": sel,
 	})
 }
 
 func handle_GET_Settings(c *gin.Context) {
-	c.HTML(http.StatusOK, "html/settings.html", gin.H{
-		"global": global,
-		"page":   "settings",
-	})
+	_, _, _, err := GetAuth(c)
+	if err == nil {
+		c.HTML(http.StatusOK, "html/settings.html", gin.H{
+			"global": global,
+			"page":   "settings",
+		})
+	} else {
+		c.Redirect(http.StatusFound, "/login.html")
+	}
 }

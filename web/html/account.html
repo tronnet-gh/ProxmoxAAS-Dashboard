@@ -43,10 +43,10 @@
 			<h2>Account</h2>
 			<section class="w3-card w3-padding">
 				<h3>Account Details</h3>
-				<p id="username">Username:</p>
-				<p id="pool">Pools:</p>
-				<p id="vmid">VMID Range:</p>
-				<p id="nodes">Nodes:</p>
+				<p id="username">Username: {{.account.Username}}</p>
+				<p id="pool">Pools: {{MapKeys .account.Pools ", "}}</p>
+				<p id="vmid">VMID Range: {{.account.VMID.Min}} - {{.account.VMID.Max}}</p>
+				<p id="nodes">Nodes: {{MapKeys .account.Nodes ", "}}</p>
 			</section>
 			<section class="w3-card w3-padding">
 				<div class="flex row nowrap">

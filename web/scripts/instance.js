@@ -42,10 +42,6 @@ const resourcesConfigPage = mergeDeep({}, resourcesConfig, resourceInputTypes);
 
 async function init () {
 	setAppearance();
-	const cookie = document.cookie;
-	if (cookie === "") {
-		goToPage("login.html");
-	}
 
 	const uriData = getURIData();
 	node = uriData.node;

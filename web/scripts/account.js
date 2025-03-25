@@ -1,5 +1,5 @@
 import { dialog } from "./dialog.js";
-import { requestAPI, goToPage, getCookie, setAppearance } from "./utils.js";
+import { requestAPI, setAppearance } from "./utils.js";
 
 class ResourceChart extends HTMLElement {
 	constructor () {
@@ -139,23 +139,12 @@ const prefixes = {
 
 async function init () {
 	setAppearance();
-	const cookie = document.cookie;
-	if (cookie === "") {
-		goToPage("login.html");
-	}
 
 	let resources = requestAPI("/user/dynamic/resources");
 	let meta = requestAPI("/global/config/resources");
-	let userCluster = requestAPI("/user/config/cluster");
 
 	resources = await resources;
 	meta = (await meta).resources;
-	userCluster = await userCluster;
-
-	document.querySelector("#username").innerText = `Username: ${getCookie("username")}`;
-	document.querySelector("#pool").innerText = `Pools: ${Object.keys(userCluster.pools).toString()}`;
-	document.querySelector("#vmid").innerText = `VMID Range: ${userCluster.vmid.min} - ${userCluster.vmid.max}`;
-	document.querySelector("#nodes").innerText = `Nodes: ${Object.keys(userCluster.nodes).toString()}`;
 
 	populateResources("#resource-container", meta, resources);
 
