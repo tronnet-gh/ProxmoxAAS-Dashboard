@@ -1,0 +1,47 @@
+{{define "resource-chart"}}
+<resource-chart>
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="modules/w3.css">
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="css/style.css">
+		<style>
+			* {
+				box-sizing: border-box;
+				font-family: monospace;
+			}
+			#container{
+				margin: 0;
+				width: 100%;
+				height: fit-content;
+				padding: 10px 10px 10px 10px;
+				border-radius: 5px;
+			}
+			progress {
+				width: 100%;
+				border: 0;
+				height: 1em;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				appearance: none;
+			}
+			#caption {
+				text-align: center;
+				margin-top: 10px;
+				display: flex;
+				flex-direction: column;
+			}
+		</style>
+		<div id="container">
+			<progress value="{{.Used}}" max="{{.Max}}"></progress>
+			<p id="caption">
+				<span>{{.Name}}</span>
+				{{if eq .Type "list"}}
+					<span>{{.Avail}} {{.Prefix}}{{.Unit}} Avaliable</span>
+				{{else}}
+					<span>{{printf "%.2f" .Avail}} {{.Prefix}}{{.Unit}} Avaliable</span>
+				{{end}}
+			</p>
+		</div>
+	</template>
+</resource-chart>
+{{end}}-

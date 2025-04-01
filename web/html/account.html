@@ -3,8 +3,6 @@
 	<head>
 		{{template "head" .}}
 		<script src="scripts/account.js" type="module"></script>
-		<script src="modules/chart.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 		<link rel="modulepreload" href="scripts/utils.js">
 		<link rel="modulepreload" href="scripts/dialog.js">
 		<style>
@@ -56,7 +54,23 @@
 			</section>
 			<section class="w3-card w3-padding">
 				<h3>Cluster Resources</h3>
-				<div id="resource-container"></div>
+				<div id="resource-container">
+					{{range .account.Resources}}
+						{{if .Display}}
+							{{if eq .Type "numeric"}}
+								{{template "resource-chart" .}}
+							{{end}}
+							{{if eq .Type "storage"}}
+								{{template "resource-chart" .}}
+							{{end}}
+							{{if eq .Type "list"}}
+								{{range .Resources}}
+									{{template "resource-chart" .}}
+								{{end}}
+							{{end}}
+						{{end}}
+					{{end}}
+				</div>
 			</section>
 		</main>
 	</body>
