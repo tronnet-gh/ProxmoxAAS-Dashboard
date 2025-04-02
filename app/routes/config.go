@@ -7,12 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HandleGETInstance(c *gin.Context) {
+func HandleGETConfig(c *gin.Context) {
 	_, _, _, err := common.GetAuth(c)
 	if err == nil {
-		c.HTML(http.StatusOK, "html/instance.html", gin.H{
+		c.HTML(http.StatusOK, "html/config.html", gin.H{
 			"global": common.Global,
-			"page":   "instance",
+			"page":   "config",
 		})
 	} else {
 		c.Redirect(http.StatusFound, "/login.html")

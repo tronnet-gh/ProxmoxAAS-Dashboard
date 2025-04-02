@@ -115,7 +115,7 @@ func HandleGETInstancesFragment(c *gin.Context) {
 			common.HandleNonFatalError(c, err)
 		}
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "templates/instances.frag", gin.H{
+		common.TMPL.ExecuteTemplate(c.Writer, "html/instances.frag", gin.H{
 			"instances": instances,
 		})
 		c.Status(http.StatusOK)

@@ -29,7 +29,7 @@ func Run() {
 	router.GET("/account.html", routes.HandleGETAccount)
 	router.GET("/", routes.HandleGETIndex)
 	router.GET("/index.html", routes.HandleGETIndex)
-	router.GET("/instance.html", routes.HandleGETInstance)
+	router.GET("/config.html", routes.HandleGETConfig)
 	router.GET("/login.html", routes.HandleGETLogin)
 	router.GET("/settings.html", routes.HandleGETSettings)
 

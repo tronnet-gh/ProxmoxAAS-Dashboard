@@ -35,11 +35,7 @@
 			<progress value="{{.Used}}" max="{{.Max}}"></progress>
 			<p id="caption">
 				<span>{{.Name}}</span>
-				{{if eq .Type "list"}}
-					<span>{{.Avail}} {{.Prefix}}{{.Unit}} Avaliable</span>
-				{{else}}
-					<span>{{printf "%.2f" .Avail}} {{.Prefix}}{{.Unit}} Avaliable</span>
-				{{end}}
+				<span>{{printf "%g" .Avail}} {{.Prefix}}{{.Unit}} Avaliable</span>
 			</p>
 		</div>
 	</template>

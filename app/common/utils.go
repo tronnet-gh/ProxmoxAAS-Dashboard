@@ -185,7 +185,7 @@ func GetAuth(c *gin.Context) (string, string, string, error) {
 	token, errToken := c.Cookie("PVEAuthCookie")
 	csrf, errCSRF := c.Cookie("CSRFPreventionToken")
 	if errUsername != nil || errAuth != nil || errToken != nil || errCSRF != nil {
-		return "", "", "", fmt.Errorf("auth: %s, token: %s, csrf: %s", errAuth, errToken, errCSRF)
+		return "", "", "", fmt.Errorf("error occured getting user cookies: (auth: %s, token: %s, csrf: %s)", errAuth, errToken, errCSRF)
 	} else {
 		return username, token, csrf, nil
 	}

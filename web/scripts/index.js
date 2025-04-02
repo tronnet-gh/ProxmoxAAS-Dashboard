@@ -179,7 +179,7 @@ class InstanceCard extends HTMLElement {
 
 	handleConfigButton () {
 		if (!this.actionLock && this.status === "stopped") { // if the action lock is false, and the node is stopped, then navigate to the config page with the node info in the search query
-			goToPage("instance.html", { node: this.node.name, type: this.type, vmid: this.vmid });
+			goToPage("config.html", { node: this.node.name, type: this.type, vmid: this.vmid });
 		}
 	}
 
