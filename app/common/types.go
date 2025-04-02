@@ -33,3 +33,9 @@ type RequestContext struct {
 	Cookies map[string]string
 	Body    map[string]any
 }
+
+type Auth struct {
+	Username string
+	Token    string
+	CSRF     string
+}

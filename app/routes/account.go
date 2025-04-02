@@ -83,9 +83,9 @@ type ResourceChart struct {
 }
 
 func HandleGETAccount(c *gin.Context) {
-	username, token, csrf, err := common.GetAuth(c)
+	auth, err := common.GetAuth(c)
 	if err == nil {
-		account, err := GetUserAccount(username, token, csrf)
+		account, err := GetUserAccount(auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -153,16 +153,16 @@ func HandleGETAccount(c *gin.Context) {
 	}
 }
 
-func GetUserAccount(username string, token string, csrf string) (Account, error) {
+func GetUserAccount(auth common.Auth) (Account, error) {
 	account := Account{
 		Resources: map[string]any{},
 	}
 
 	ctx := common.RequestContext{
 		Cookies: map[string]string{
-			"username":            username,
-			"PVEAuthCookie":       token,
-			"CSRFPreventionToken": csrf,
+			"username":            auth.Username,
+			"PVEAuthCookie":       auth.Token,
+			"CSRFPreventionToken": auth.CSRF,
 		},
 		Body: map[string]any{},
 	}
@@ -179,7 +179,7 @@ func GetUserAccount(username string, token string, csrf string) (Account, error)
 	if err != nil {
 		return account, err
 	} else {
-		account.Username = username
+		account.Username = auth.Username
 	}
 
 	ctx.Body = map[string]any{}

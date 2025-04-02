@@ -31,11 +31,11 @@ type Instance struct {
 	DeleteBtnIcon    common.Icon
 }
 
-func GetClusterResources(token string, csrf string) (map[uint]Instance, map[string]Node, error) {
+func GetClusterResources(auth common.Auth) (map[uint]Instance, map[string]Node, error) {
 	ctx := common.RequestContext{
 		Cookies: map[string]string{
-			"PVEAuthCookie":       token,
-			"CSRFPreventionToken": csrf,
+			"PVEAuthCookie":       auth.Token,
+			"CSRFPreventionToken": auth.CSRF,
 		},
 		Body: map[string]any{},
 	}
@@ -91,9 +91,9 @@ func GetClusterResources(token string, csrf string) (map[uint]Instance, map[stri
 }
 
 func HandleGETIndex(c *gin.Context) {
-	_, token, csrf, err := common.GetAuth(c)
+	auth, err := common.GetAuth(c)
 	if err == nil { // user should be authed, try to return index with population
-		instances, _, err := GetClusterResources(token, csrf)
+		instances, _, err := GetClusterResources(auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 		}
@@ -108,9 +108,9 @@ func HandleGETIndex(c *gin.Context) {
 }
 
 func HandleGETInstancesFragment(c *gin.Context) {
-	_, token, csrf, err := common.GetAuth(c)
+	Auth, err := common.GetAuth(c)
 	if err == nil { // user should be authed, try to return index with population
-		instances, _, err := GetClusterResources(token, csrf)
+		instances, _, err := GetClusterResources(Auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 		}

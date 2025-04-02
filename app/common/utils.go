@@ -179,14 +179,14 @@ func RequestGetAPI(path string, context RequestContext) (*http.Response, int, er
 	return response, response.StatusCode, nil
 }
 
-func GetAuth(c *gin.Context) (string, string, string, error) {
+func GetAuth(c *gin.Context) (Auth, error) {
 	_, errAuth := c.Cookie("auth")
 	username, errUsername := c.Cookie("username")
 	token, errToken := c.Cookie("PVEAuthCookie")
 	csrf, errCSRF := c.Cookie("CSRFPreventionToken")
 	if errUsername != nil || errAuth != nil || errToken != nil || errCSRF != nil {
-		return "", "", "", fmt.Errorf("error occured getting user cookies: (auth: %s, token: %s, csrf: %s)", errAuth, errToken, errCSRF)
+		return Auth{}, fmt.Errorf("error occured getting user cookies: (auth: %s, token: %s, csrf: %s)", errAuth, errToken, errCSRF)
 	} else {
-		return username, token, csrf, nil
+		return Auth{username, token, csrf}, nil
 	}
 }

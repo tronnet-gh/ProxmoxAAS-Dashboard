@@ -151,7 +151,7 @@ var Icons = map[string]map[string]Icon{
 			Clickable: false,
 		},
 	},
-	"uknown": {
+	"unknown": {
 		"status": {
 			Src:       "images/status/inactive.svg",
 			Alt:       "Node is offline",
