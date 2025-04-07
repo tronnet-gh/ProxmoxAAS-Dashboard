@@ -16,7 +16,6 @@ type StaticFile struct {
 // type used for templated <select>
 type Select struct {
 	ID      string
-	Name    string
 	Options []Option
 }
 

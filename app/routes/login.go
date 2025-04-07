@@ -30,12 +30,10 @@ func GetLoginRealms() ([]Realm, error) {
 	}
 	res, code, err := common.RequestGetAPI("/proxmox/access/domains", ctx)
 	if err != nil {
-		//HandleNonFatalError(c, err)
 		return realms, err
 	}
 	if code != 200 { // we expect /access/domains to always be avaliable
-		//HandleNonFatalError(c, err)
-		return realms, fmt.Errorf("request to /proxmox/access/do9mains resulted in %+v", res)
+		return realms, fmt.Errorf("request to /proxmox/access/domains resulted in %+v", res)
 	}
 
 	for _, v := range ctx.Body["data"].([]any) {
@@ -58,8 +56,7 @@ func HandleGETLogin(c *gin.Context) {
 	}
 
 	sel := common.Select{
-		ID:   "realm",
-		Name: "realm",
+		ID: "realm",
 	}
 
 	for _, realm := range realms {
