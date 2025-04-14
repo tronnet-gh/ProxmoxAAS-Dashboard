@@ -38,3 +38,10 @@ type Auth struct {
 	Token    string
 	CSRF     string
 }
+
+type Icon struct {
+	ID        string
+	Src       string
+	Alt       string
+	Clickable bool
+}

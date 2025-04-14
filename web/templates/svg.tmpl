@@ -1,7 +1,15 @@
 {{define "svg"}}
-	{{if .Clickable}}
-		<svg id={{.ID}} alt="{{.Alt}}" class="clickable"><use href="{{.Src}}#symb"></svg>
+	{{if .ID}}
+		{{if .Clickable}}
+			<svg id={{.ID}} aria-label="{{.Alt}}" class="clickable"><use href="{{.Src}}#symb"></svg>
+		{{else}}
+			<svg id={{.ID}} aria-label="{{.Alt}}"><use href="{{.Src}}#symb"></svg>
+		{{end}}
 	{{else}}
-		<svg id={{.ID}} alt="{{.Alt}}"><use href="{{.Src}}#symb"></svg>
+		{{if .Clickable}}
+			<svg aria-label="{{.Alt}}" class="clickable"><use href="{{.Src}}#symb"></svg>
+		{{else}}
+			<svg aria-label="{{.Alt}}"><use href="{{.Src}}#symb"></svg>
+		{{end}}
 	{{end}}
 {{end}}

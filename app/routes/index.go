@@ -16,22 +16,16 @@ type Node struct {
 }
 
 // used in constructing instance cards in index
-type Instance struct {
-	VMID             uint
-	Name             string
-	Type             string
-	Status           string
-	Node             string
-	StatusIcon       common.Icon
-	NodeStatus       string
-	NodeStatusIcon   common.Icon
-	PowerBtnIcon     common.Icon
-	ConsoleBtnIcon   common.Icon
-	ConfigureBtnIcon common.Icon
-	DeleteBtnIcon    common.Icon
+type InstanceCard struct {
+	VMID       uint
+	Name       string
+	Type       string
+	Status     string
+	Node       string
+	NodeStatus string
 }
 
-func GetClusterResources(auth common.Auth) (map[uint]Instance, map[string]Node, error) {
+func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]Node, error) {
 	ctx := common.RequestContext{
 		Cookies: map[string]string{
 			"PVEAuthCookie":       auth.Token,
@@ -47,7 +41,7 @@ func GetClusterResources(auth common.Auth) (map[uint]Instance, map[string]Node, 
 		return nil, nil, fmt.Errorf("request to /cluster/resources/ resulted in %+v", res)
 	}
 
-	instances := map[uint]Instance{}
+	instances := map[uint]InstanceCard{}
 	nodes := map[string]Node{}
 
 	// if we successfully retrieved the resources, then process it and return index
@@ -61,7 +55,7 @@ func GetClusterResources(auth common.Auth) (map[uint]Instance, map[string]Node, 
 			}
 			nodes[node.Node] = node
 		} else if m["type"] == "lxc" || m["type"] == "qemu" {
-			instance := Instance{}
+			instance := InstanceCard{}
 			err := mapstructure.Decode(v, &instance)
 			if err != nil {
 				return nil, nil, err
@@ -70,21 +64,8 @@ func GetClusterResources(auth common.Auth) (map[uint]Instance, map[string]Node, 
 		}
 	}
 	for vmid, instance := range instances {
-		status := instance.Status
-		icons := common.Icons[status]
-		instance.StatusIcon = icons["status"]
-		instance.PowerBtnIcon = icons["power"]
-		instance.PowerBtnIcon.ID = "power-btn"
-		instance.ConfigureBtnIcon = icons["config"]
-		instance.ConfigureBtnIcon.ID = "configure-btn"
-		instance.ConsoleBtnIcon = icons["console"]
-		instance.ConsoleBtnIcon.ID = "console-btn"
-		instance.DeleteBtnIcon = icons["delete"]
-		instance.DeleteBtnIcon.ID = "delete-btn"
 		nodestatus := nodes[instance.Node].Status
-		icons = common.Icons[nodestatus]
 		instance.NodeStatus = nodestatus
-		instance.NodeStatusIcon = icons["status"]
 		instances[vmid] = instance
 	}
 	return instances, nodes, nil
