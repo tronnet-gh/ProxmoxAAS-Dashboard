@@ -15,6 +15,6 @@ func HandleGETSettings(c *gin.Context) {
 			"page":   "settings",
 		})
 	} else {
-		c.Redirect(http.StatusFound, "/login.html")
+		c.Redirect(http.StatusFound, "/login")
 	}
 }

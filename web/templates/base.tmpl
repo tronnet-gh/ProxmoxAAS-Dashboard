@@ -21,12 +21,12 @@
 <input type="checkbox" id="navtoggle">
 <nav id="navigation">
 	{{if eq .page "login"}}
-		<a href="login.html" aria-current="page">Login</a>
+		<a href="login" aria-current="page">Login</a>
 	{{else}}
-		<a href="index.html" {{if eq .page "index"}} aria-current="page" {{end}}>Instances</a>
-		<a href="account.html" {{if eq .page "account"}} aria-current="page" {{end}}>Account</a>
-		<a href="settings.html" {{if eq .page "settings"}} aria-current="page" {{end}}>Settings</a>
-		<a href="login.html">Logout</a>
+		<a href="index" {{if eq .page "index"}} aria-current="page" {{end}}>Instances</a>
+		<a href="account" {{if eq .page "account"}} aria-current="page" {{end}}>Account</a>
+		<a href="settings" {{if eq .page "settings"}} aria-current="page" {{end}}>Settings</a>
+		<a href="login">Logout</a>
 	{{end}}
 </nav>	
 {{end}}

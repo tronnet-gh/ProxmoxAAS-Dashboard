@@ -16,7 +16,7 @@ async function init () {
 		const ticket = await requestTicket(formData.get("username"), formData.get("password"), formData.get("realm"));
 		if (ticket.status === 200) {
 			formSubmitButton.innerText = "LOGIN";
-			goToPage("index.html");
+			goToPage("index");
 		}
 		else if (ticket.status === 401) {
 			alert("Authenticaton failed.");

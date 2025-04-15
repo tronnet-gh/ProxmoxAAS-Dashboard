@@ -146,18 +146,21 @@ export async function requestAPI (path, method, body = null) {
 	return response;
 }
 
-export async function getInstancesFragment () {
+export async function requestDash (path, method, body = null) {
+	const prms = new URLSearchParams(body);
 	const content = {
-		method: "GET",
-		mode: "cors",
+		method,
 		credentials: "include",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded"
 		}
 	};
 	content.headers.CSRFPreventionToken = getCookie("CSRFPreventionToken");
+	if (body) {
+		content.body = prms.toString();
+	}
 
-	const response = await request(`${window.DASH}/instances_fragment`, content);
+	const response = await request(`${window.DASH}${path}`, content);
 	return response;
 }
 
@@ -351,6 +354,7 @@ export function isEmpty (obj) {
 	}
 }
 
+/*
 export function addResourceLine (resourceConfig, field, attributesOverride, labelPrefix = null) {
 	const iconHref = resourceConfig.icon;
 	const elementType = resourceConfig.element;
@@ -428,3 +432,4 @@ export function addResourceLine (resourceConfig, field, attributesOverride, labe
 
 	return { icon, label, element, unit };
 }
+*/

@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, goToPage, setAppearance, getSearchSettings, goToURL, getInstancesFragment } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, setAppearance, getSearchSettings, goToURL, requestDash } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
@@ -179,7 +179,7 @@ class InstanceCard extends HTMLElement {
 
 	handleConfigButton () {
 		if (!this.actionLock && this.status === "stopped") { // if the action lock is false, and the node is stopped, then navigate to the config page with the node info in the search query
-			goToPage("config.html", { node: this.node.name, type: this.type, vmid: this.vmid });
+			goToPage("config", { node: this.node.name, type: this.type, vmid: this.vmid });
 		}
 	}
 
@@ -238,6 +238,10 @@ async function init () {
 	document.querySelector("#vm-search").addEventListener("input", sortInstances);
 
 	setupClientSync(refreshInstances);
+}
+
+async function getInstancesFragment () {
+	return await requestDash("/index/instances", "GET")
 }
 
 async function refreshInstances () {

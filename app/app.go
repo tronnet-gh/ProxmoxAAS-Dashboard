@@ -26,14 +26,15 @@ func Run() {
 	html := common.MinifyStatic(m, web.Templates)
 	common.TMPL = common.LoadHTMLToGin(router, html)
 
-	router.GET("/account.html", routes.HandleGETAccount)
+	router.GET("/account", routes.HandleGETAccount)
 	router.GET("/", routes.HandleGETIndex)
-	router.GET("/index.html", routes.HandleGETIndex)
-	router.GET("/config.html", routes.HandleGETConfig)
-	router.GET("/login.html", routes.HandleGETLogin)
-	router.GET("/settings.html", routes.HandleGETSettings)
+	router.GET("/index", routes.HandleGETIndex)
+	router.GET("/config", routes.HandleGETConfig)
+	router.GET("/login", routes.HandleGETLogin)
+	router.GET("/settings", routes.HandleGETSettings)
 
-	router.GET("/instances_fragment", routes.HandleGETInstancesFragment)
+	router.GET("/index/instances", routes.HandleGETInstancesFragment)
+	router.GET("/config/volumes", routes.HandleGETConfigVolumesFragment)
 
 	log.Fatal(router.Run(fmt.Sprintf("0.0.0.0:%d", common.Global.Port)))
 }

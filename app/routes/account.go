@@ -149,7 +149,7 @@ func HandleGETAccount(c *gin.Context) {
 			"account": account,
 		})
 	} else {
-		c.Redirect(http.StatusFound, "/login.html") // if user is not authed, redirect user to login page
+		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
 	}
 }
 
