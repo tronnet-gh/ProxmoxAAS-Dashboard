@@ -35,6 +35,9 @@ func Run() {
 
 	router.GET("/index/instances", routes.HandleGETInstancesFragment)
 	router.GET("/config/volumes", routes.HandleGETConfigVolumesFragment)
+	router.GET("/config/nets", routes.HandleGETConfigNetsFragment)
+	router.GET("/config/devices", routes.HandleGETConfigDevicesFragment)
+	router.GET("/config/boot", routes.HandleGETConfigBootFragment)
 
 	log.Fatal(router.Run(fmt.Sprintf("0.0.0.0:%d", common.Global.Port)))
 }

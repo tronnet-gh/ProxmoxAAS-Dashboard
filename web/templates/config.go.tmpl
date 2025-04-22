@@ -1,0 +1,304 @@
+{{define "proctype-input"}}
+<svg aria-label="CPU Type"><use href="images/resources/cpu.svg#symb"></svg>
+<label for="proctype">CPU Type</label>
+{{template "select" .}}
+<div></div>
+{{end}}
+
+{{define "cores-input"}}
+<svg aria-label="CPU Amount"><use href="images/resources/cpu.svg#symb"></svg>
+<label for="cores">CPU Amount</label>
+<input id="cores" name="cores" class="w3-input w3-border" type="number" required value="{{.}}">
+<p>Cores</p>
+{{end}}
+
+{{define "memory-input"}}
+<svg aria-label="Memory Amount"><use href="images/resources/ram.svg#symb"></svg>
+<label for="ram">Memory</label>
+<input id="ram" name="ram" class="w3-input w3-border" type="number" required value="{{.}}">
+<p>MiB</p>
+{{end}}
+
+{{define "swap-input"}}
+<svg aria-label="Swap Amount"><use href="images/resources/swap.svg#symb"></svg>
+<label for="swap">Swap</label>
+<input id="swap" name="swap" class="w3-input w3-border" type="number" required value="{{.}}">
+<p>MiB</p>
+{{end}}
+
+{{define "volumes"}}
+	{{range $k,$v := .}}
+		{{if eq $v.Type "rootfs"}}
+			{{ template "volume-rootfs" Map "Name" $k "Volume" $v}}
+		{{else if eq $v.Type "mp"}}
+			{{ template "volume-mp" Map "Name" $k "Volume" $v}}
+		{{else if eq $v.Type "ide"}}
+			{{ template "volume-ide" Map "Name" $k "Volume" $v}}
+		{{else if or (eq $v.Type "scsi") (eq $v.Type "sata")}}
+			{{ template "volume-scsi" Map "Name" $k "Volume" $v}}
+		{{else if eq $v.Type "unused"}}
+			{{ template "volume-unused" Map "Name" $k "Volume" $v}}
+		{{else}}
+		{{end}}
+	{{end}}
+{{end}}
+
+{{define "volume-rootfs"}}
+<svg data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive"><use href="images/resources/drive.svg#symb"></svg>
+<p>{{.Name}}</p>
+<p>{{.Volume.File}}</p>
+<div>
+	{{template "volume-action-move" .}}
+	{{template "volume-action-resize" .}}
+	{{template "volume-action-none" .}}
+	{{template "volume-action-none" .}}
+</div>
+{{end}}
+
+{{define "volume-mp"}}
+<svg data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive"><use href="images/resources/drive.svg#symb"></svg>
+<p>{{.Name}}</p>
+<p>{{.Volume.File}}</p>
+<div>
+	{{template "volume-action-move" .}}
+	{{template "volume-action-resize" .}}
+	{{template "volume-action-detach" .}}
+	{{template "volume-action-delete-inactive" .}}
+</div>
+{{end}}
+
+{{define "volume-ide"}}
+<svg data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive"><use href="images/resources/drive.svg#symb"></svg>
+<p>{{.Name}}</p>
+<p>{{.Volume.File}}</p>
+<div>
+	{{template "volume-action-none" .}}
+	{{template "volume-action-none" .}}
+	{{template "volume-action-none" .}}
+	{{template "volume-action-delete" .}}
+</div>
+{{end}}
+
+{{define "volume-scsi"}}
+<svg data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive"><use href="images/resources/drive.svg#symb"></svg>
+<p>{{.Name}}</p>
+<p>{{.Volume.File}}</p>
+<div>
+	{{template "volume-action-move" .}}
+	{{template "volume-action-resize" .}}
+	{{template "volume-action-detach" .}}
+	{{template "volume-action-delete-inactive" .}}
+</div>
+{{end}}
+
+{{define "volume-unused"}}
+<svg data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive"><use href="images/resources/drive.svg#symb"></svg>
+<p>{{.Name}}</p>
+<p>{{.Volume.File}}</p>
+<div>
+	{{template "volume-action-move-inactive" .}}
+	{{template "volume-action-resize-inactive" .}}
+	{{template "volume-action-attach" .}}
+	{{template "volume-action-delete" .}}
+</div>
+{{end}}
+
+{{define "volume-action-move"}}
+<volume-action data-type="move" data-volume="{{.Name}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="css/style.css">
+		<svg class="clickable" aria-label="Move {{.Name}}"><use href="images/actions/disk/move-active.svg#symb"></svg>
+	</template>
+</volume-action>
+{{end}}
+
+{{define "volume-action-move-inactive"}}
+<volume-action data-type="none" data-volume="{{.Name}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="css/style.css">
+		<svg aria-label=""><use href="images/actions/disk/move-inactive.svg#symb"></svg>
+	</template>
+</volume-action>
+{{end}}
+
+{{define "volume-action-resize"}}
+<volume-action data-type="resize" data-volume="{{.Name}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="css/style.css">
+		<svg class="clickable" aria-label="Resize {{.Name}}"><use href="images/actions/disk/resize-active.svg#symb"></svg>
+	</template>
+</volume-action>
+{{end}}
+
+{{define "volume-action-resize-inactive"}}
+<volume-action data-type="none" data-volume="{{.Name}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="css/style.css">
+		<svg aria-label=""><use href="images/actions/disk/resize-inactive.svg#symb"></svg>
+	</template>
+</volume-action>
+{{end}}
+
+{{define "volume-action-delete"}}
+<volume-action data-type="delete" data-volume="{{.Name}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="css/style.css">
+		<svg class="clickable" aria-label="Delete {{.Name}}"><use href="images/actions/disk/delete-active.svg#symb"></svg>
+	</template>
+</volume-action>
+{{end}}
+
+{{define "volume-action-delete-inactive"}}
+<volume-action data-type="none" data-volume="{{.Name}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="css/style.css">
+		<svg aria-label=""><use href="images/actions/disk/delete-inactive.svg#symb"></svg>
+	</template>
+</volume-action>
+{{end}}
+
+{{define "volume-action-attach"}}
+<volume-action data-type="attach" data-volume="{{.Name}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="css/style.css">
+		<svg class="clickable" aria-label="Attach {{.Name}}"><use href="images/actions/disk/attach.svg#symb"></svg>
+	</template>
+</volume-action>
+{{end}}
+
+{{define "volume-action-detach"}}
+<volume-action data-type="detach" data-volume="{{.Name}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="css/style.css">
+		<svg class="clickable" aria-label="Detach {{.Name}}"><use href="images/actions/disk/detach.svg#symb"></svg>
+	</template>
+</volume-action>
+{{end}}
+
+{{define "volume-action-none"}}
+<volume-action data-type="none">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="css/style.css">
+		<svg aria-label=""></svg>
+	</template>
+</volume-action>
+{{end}}
+
+{{define "nets"}}
+	{{range $k,$v := .}}
+		{{template "net" $v}}
+	{{end}}
+{{end}}
+
+{{define "net"}}
+<svg data-network="{{.Net_ID}}" aria-label="Net {{.Net_ID}}"><use href="images/resources/network.svg#symb"></svg>
+<p>{{.Net_ID}}</p>
+<p>{{.Value}}</p>
+<div>
+	<network-action data-type="config" data-network="{{.Net_ID}}" data-value="{{.Value}}">
+		<template shadowrootmode="open">
+			<link rel="stylesheet" href="css/style.css">
+			<svg class="clickable" aria-label="Configure Net {{.Net_ID}}"><use href="images/actions/network/config.svg#symb"></svg>
+		</template>
+	</network-action>
+	<network-action data-type="delete" data-network="{{.Net_ID}}" data-value="{{.Value}}">
+		<template shadowrootmode="open">
+			<link rel="stylesheet" href="css/style.css">
+			<svg class="clickable" aria-label="Delete Net {{.Net_ID}}"><use href="images/actions/network/delete-active.svg#symb"></svg>
+		</template>
+	</network-action>
+</div>
+{{end}}
+
+{{define "devices"}}
+	{{range $k,$v := .}}
+		{{template "device" $v}}
+	{{end}}
+{{end}}
+
+{{define "device"}}
+<svg data-device="{{.Device_ID}}" aria-label="Device {{.Device_ID}}"><use href="images/resources/device.svg#symb"></svg>
+<p>{{.Device_ID}}</p>
+<p>{{.Device_Name}}</p>
+<div>
+	<device-action data-type="config" data-device="{{.Device_ID}}" data-value="{{.Value}}">
+		<template shadowrootmode="open">
+			<link rel="stylesheet" href="css/style.css">
+			<svg class="clickable" aria-label="Configure Device {{.Device_ID}}"><use href="images/actions/device/config.svg#symb"></svg>
+		</template>
+	</device-action>
+	<device-action data-type="delete" data-device="{{.Device_ID}}" data-value="{{.Value}}">
+		<template shadowrootmode="open">
+			<link rel="stylesheet" href="css/style.css">
+			<svg class="clickable" aria-label="Delete Device {{.Device_ID}}"><use href="images/actions/device/delete-active.svg#symb"></svg>
+		</template>
+	</device-action>
+</div>
+{{end}}
+
+{{define "boot"}}
+<draggable-container id="enabled" data-group="boot">
+	<template shadowrootmode="open">
+		{{template "boot-style"}}
+		<label>Enabled</label>
+		<div id="wrapper" style="padding-bottom: 1em;">
+			{{range .Enabled}}
+				{{template "boot-target" .}}
+			{{end}}
+		</div>
+	</template>
+</draggable-container>
+<hr style="padding: 0; margin: 0;">
+<draggable-container id="disabled" data-group="boot">
+	<template shadowrootmode="open">
+		{{template "boot-style"}}
+		<label>Disabled</label>
+		<div id="wrapper" style="padding-bottom: 1em;">
+			{{range .Disabled}}
+				{{template "boot-target" .}}
+			{{end}}
+		</div>
+	</template>
+</draggable-container>
+{{end}}
+
+{{define "boot-style"}}
+<style>
+	div.draggable-item.ghost {
+		border: 1px dashed var(--main-text-color);
+		border-radius: 5px;
+		margin: -1px;
+	}
+	div.draggable-item {
+		cursor: grab;
+	}
+	div.draggable-item svg {
+		height: 1em;
+		width: 1em;
+	}
+	* {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+</style>
+{{end}}
+
+{{define "boot-target"}}
+{{if .volume_id}}
+<div class="draggable-item" data-value="{{.volume_id}}" style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
+	<svg aria-label="Drag"><use href="images/actions/drag.svg#symb"></use></svg>
+	<svg aria-label="Volume"><use href="images/resources/drive.svg#symb"></use></svg>
+	<p style="margin: 0px;">{{.volume_id}}</p>
+	<p style="margin: 0px; overflow: hidden; white-space: nowrap;">{{.file}}</p>
+</div>
+{{else if .net_id}}
+<div class="draggable-item" data-value="{{.net_id}}" style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
+	<svg aria-label="Drag"><use href="images/actions/drag.svg#symb"></use></svg>
+	<svg aria-label="Net"><use href="images/resources/network.svg#symb"></use></svg>
+	<p style="margin: 0px;">{{.net_id}}</p>
+	<p style="margin: 0px; overflow: hidden; white-space: nowrap;">{{.value}}</p>
+</div>
+{{else}}
+{{end}}
+{{end}}

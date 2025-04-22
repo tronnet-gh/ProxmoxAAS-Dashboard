@@ -6,6 +6,7 @@ import (
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/css"
 	"github.com/tdewolff/minify/html"
+	"github.com/tdewolff/minify/js"
 )
 
 type MimeType struct {
@@ -36,7 +37,7 @@ var MimeTypes = map[string]MimeType{
 	},
 	"js": {
 		Type:     "application/javascript",
-		Minifier: nil,
+		Minifier: js.Minify,
 	},
 	"wasm": {
 		Type:     "application/wasm",

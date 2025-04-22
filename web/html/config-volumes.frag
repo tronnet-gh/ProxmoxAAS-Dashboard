@@ -1,0 +1,1 @@
+{{template "volumes" .config.Volumes}}

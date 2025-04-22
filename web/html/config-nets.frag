@@ -1,0 +1,1 @@
+{{template "nets" .config.Nets}}

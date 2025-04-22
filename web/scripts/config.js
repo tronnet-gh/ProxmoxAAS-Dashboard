@@ -1,44 +1,12 @@
-import { requestPVE, requestAPI, goToPage, getURIData, resourcesConfig, bootConfig, setAppearance, setSVGSrc, setSVGAlt, mergeDeep, addResourceLine } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, getURIData, setAppearance, setSVGSrc, requestDash } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 
-window.addEventListener("DOMContentLoaded", init); // do the dumb thing where the disk config refreshes every second
-
-const diskMetaData = resourcesConfig.disk;
-const networkMetaData = resourcesConfig.network;
-const pcieMetaData = resourcesConfig.pci;
-const bootMetaData = bootConfig;
+window.addEventListener("DOMContentLoaded", init);
 
 let node;
 let type;
 let vmid;
 let config;
-
-const resourceInputTypes = { // input types for each resource for config page
-	cpu: {
-		element: "select",
-		attributes: {}
-	},
-	cores: {
-		element: "input",
-		attributes: {
-			type: "number"
-		}
-	},
-	memory: {
-		element: "input",
-		attributes: {
-			type: "number"
-		}
-	},
-	swap: {
-		element: "input",
-		attributes: {
-			type: "number"
-		}
-	}
-};
-
-const resourcesConfigPage = mergeDeep({}, resourcesConfig, resourceInputTypes);
 
 async function init () {
 	setAppearance();
@@ -53,291 +21,195 @@ async function init () {
 	const name = type === "qemu" ? "name" : "hostname";
 	document.querySelector("#name").innerHTML = document.querySelector("#name").innerHTML.replace("%{vmname}", config.data[name]);
 
-	populateResources();
-	populateDisk();
-	populateNetworks();
-	populateDevices();
-	populateBoot();
+	initVolumes();
+	initNetworks();
+	initDevices();
 
 	document.querySelector("#exit").addEventListener("click", handleFormExit);
-}
-
-function getOrdered (keys) {
-	const orderedKeys = Object.keys(keys).sort((a, b) => {
-		return parseInt(a) - parseInt(b);
-	}); // ordered integer list
-	return orderedKeys;
 }
 
 async function getConfig () {
 	config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
 }
 
-async function populateResources () {
-	const field = document.querySelector("#resources");
-	if (type === "qemu") {
-		const global = (await requestAPI("/global/config/resources")).resources;
-		const user = await requestAPI("/user/config/resources");
-		let options = [];
-		const globalCPU = global.cpu;
-		const userCPU = node in user.cpu.nodes ? user.cpu.nodes[node] : user.cpu.global;
-		if (globalCPU.whitelist) {
-			userCPU.forEach((userType) => {
-				options.push(userType.name);
-			});
-			options = options.sort((a, b) => {
-				return a.localeCompare(b);
-			});
+class VolumeAction extends HTMLElement {
+	shadowRoot = null;
+
+	constructor () {
+		super();
+		const internals = this.attachInternals();
+		this.shadowRoot = internals.shadowRoot;
+		if (this.dataset.type === "move") {
+			this.addEventListener("click", this.handleDiskMove);
 		}
-		else {
-			const supported = await requestPVE(`/nodes/${node}/capabilities/qemu/cpu`);
-			supported.data.forEach((supportedType) => {
-				if (!userCPU.some((userType) => supportedType.name === userType.name)) {
-					options.push(supportedType.name);
-				}
-			});
-			options = options.sort((a, b) => {
-				return a.localeCompare(b);
-			});
+		else if (this.dataset.type === "resize") {
+			this.addEventListener("click", this.handleDiskResize);
 		}
-		addResourceLine(resourcesConfigPage.cpu, field, { value: config.data.cpu, options });
+		else if (this.dataset.type === "delete") {
+			this.addEventListener("click", this.handleDiskDelete);
+		}
+		else if (this.dataset.type === "attach") {
+			this.addEventListener("click", this.handleDiskAttach);
+		}
+		else if (this.dataset.type === "detach") {
+			this.addEventListener("click", this.handleDiskDetach);
+		}
 	}
-	addResourceLine(resourcesConfigPage.cores, field, { value: config.data.cores, min: 1, max: 8192 });
-	addResourceLine(resourcesConfigPage.memory, field, { value: config.data.memory, min: 16, step: 1 });
-	if (type === "lxc") {
-		addResourceLine(resourcesConfigPage.swap, field, { value: config.data.swap, min: 0, step: 1 });
+
+	async setStatusLoading () {
+		const svg = document.querySelector(`svg[data-volume="${this.dataset.volume}"]`);
+		setSVGSrc(svg, "images/status/loading.svg");
+	}
+
+	async handleDiskDetach () {
+		const disk = this.dataset.volume;
+		const header = `Detach ${disk}`;
+		const body = `<p>Are you sure you want to detach disk ${disk}</p>`;
+		dialog(header, body, async (result, form) => {
+			if (result === "confirm") {
+				this.setStatusLoading();
+				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/detach`, "POST");
+				if (result.status !== 200) {
+					alert(`Attempted to detach ${disk} but got: ${result.error}`);
+				}
+				refreshVolumes();
+				refreshBoot();
+			}
+		});
+	}
+
+	async handleDiskAttach () {
+		const header = `Attach ${this.dataset.volume}`;
+		const body = `
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+				<label for="device">${type === "qemu" ? "SCSI" : "MP"}</label>
+				<input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required>
+			</form>
+		`;
+
+		dialog(header, body, async (result, form) => {
+			if (result === "confirm") {
+				const device = form.get("device");
+				this.setStatusLoading();
+				const body = {
+					source: this.dataset.volume.replace("unused", "")
+				};
+				const prefix = type === "qemu" ? "scsi" : "mp";
+				const disk = `${prefix}${device}`;
+				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/attach`, "POST", body);
+				if (result.status !== 200) {
+					alert(`Attempted to attach ${this.dataset.volume} to ${disk} but got: ${result.error}`);
+				}
+				refreshVolumes();
+				refreshBoot();
+			}
+		});
+	}
+
+	async handleDiskResize () {
+		const header = `Resize ${this.dataset.volume}`;
+		const body = `
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+				<label for="size-increment">Size Increment (GiB)</label>
+				<input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072">
+			</form>
+			`;
+
+		dialog(header, body, async (result, form) => {
+			if (result === "confirm") {
+				const disk = this.dataset.volume;
+				this.setStatusLoading();
+				const body = {
+					size: form.get("size-increment")
+				};
+				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/resize`, "POST", body);
+				if (result.status !== 200) {
+					alert(`Attempted to resize ${disk} but got: ${result.error}`);
+				}
+				refreshVolumes();
+				refreshBoot();
+			}
+		});
+	}
+
+	async handleDiskMove () {
+		const content = type === "qemu" ? "images" : "rootdir";
+		const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
+
+		const header = `Move ${this.dataset.volume}`;
+
+		let options = "";
+		storage.data.forEach((element) => {
+			if (element.content.includes(content)) {
+				options += `<option value="${element.storage}">${element.storage}</option>"`;
+			}
+		});
+		const select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select"><option hidden disabled selected value></option>${options}</select>`;
+
+		const body = `
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+				${select}
+				<label for="delete-check">Delete Source</label><input class="w3-input w3-border" name="delete-check" id="delete-check" type="checkbox" checked required>
+			</form>
+		`;
+
+		dialog(header, body, async (result, form) => {
+			if (result === "confirm") {
+				const disk = this.dataset.volume;
+				this.setStatusLoading();
+				const body = {
+					storage: form.get("storage-select"),
+					delete: form.get("delete-check") === "on" ? "1" : "0"
+				};
+				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/move`, "POST", body);
+				if (result.status !== 200) {
+					alert(`Attempted to move ${disk} to ${body.storage} but got: ${result.error}`);
+				}
+				refreshVolumes();
+				refreshBoot();
+			}
+		});
+	}
+
+	async handleDiskDelete () {
+		const disk = this.dataset.volume;
+		const header = `Delete ${disk}`;
+		const body = `<p>Are you sure you want to <strong>delete</strong> disk ${disk}</p>`;
+		dialog(header, body, async (result, form) => {
+			if (result === "confirm") {
+				this.setStatusLoading();
+				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/delete`, "DELETE");
+				if (result.status !== 200) {
+					alert(`Attempted to delete ${disk} but got: ${result.error}`);
+				}
+				refreshVolumes();
+				refreshBoot();
+			}
+		});
 	}
 }
 
-async function populateDisk () {
-	document.querySelector("#disks").innerHTML = "";
-	for (let i = 0; i < diskMetaData[type].prefixOrder.length; i++) {
-		const prefix = diskMetaData[type].prefixOrder[i];
-		const busName = diskMetaData[type][prefix].name;
-		const disks = {};
-		Object.keys(config.data).forEach((element) => {
-			if (element.startsWith(prefix) && !isNaN(element.replace(prefix, ""))) {
-				disks[element.replace(prefix, "")] = config.data[element];
-			}
-		});
-		const orderedKeys = getOrdered(disks);
-		orderedKeys.forEach((element) => {
-			const disk = disks[element];
-			addDiskLine("disks", prefix, busName, element, disk);
-		});
-	}
-	document.querySelector("#disk-add").addEventListener("click", handleDiskAdd);
+customElements.define("volume-action", VolumeAction);
 
+async function initVolumes () {
+	document.querySelector("#disk-add").addEventListener("click", handleDiskAdd);
 	if (type === "qemu") {
-		document.querySelector("#cd-add").classList.remove("none");
 		document.querySelector("#cd-add").addEventListener("click", handleCDAdd);
 	}
 }
 
-function addDiskLine (fieldset, busPrefix, busName, device, diskDetails) {
-	const field = document.querySelector(`#${fieldset}`);
+async function refreshVolumes () {
+	let volumes = await requestDash(`/config/volumes?node=${node}&type=${type}&vmid=${vmid}`, "GET");
+	if (volumes.status !== 200) {
+		alert("Error fetching instance volumes.");
+	}
+	else {
+		volumes = volumes.data;
+		const container = document.querySelector("#volumes");
+		container.setHTMLUnsafe(volumes);
+	}
 
-	const diskName = `${busName} ${device}`;
-	const diskID = `${busPrefix}${device}`;
-
-	// Set the disk icon, either drive.svg or disk.svg
-	const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	setSVGSrc(icon, diskMetaData[type][busPrefix].icon);
-	setSVGAlt(icon, diskName);
-	icon.dataset.disk = diskID;
-	field.appendChild(icon);
-
-	// Add a label for the disk bus and device number
-	const diskLabel = document.createElement("p");
-	diskLabel.innerText = diskName;
-	diskLabel.dataset.disk = diskID;
-	field.appendChild(diskLabel);
-
-	// Add text of the disk configuration
-	const diskDesc = document.createElement("p");
-	diskDesc.innerText = diskDetails;
-	diskDesc.dataset.disk = diskID;
-	diskDesc.style.overflowX = "hidden";
-	diskDesc.style.whiteSpace = "nowrap";
-	field.appendChild(diskDesc);
-
-	const actionDiv = document.createElement("div");
-	diskMetaData.actionBarOrder.forEach((element) => {
-		const action = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-		if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("attach")) { // attach
-			setSVGSrc(action, diskMetaData.actions.attach.src);
-			setSVGAlt(action, diskMetaData.actions.attach.title);
-			action.title = "Attach Disk";
-			action.addEventListener("click", handleDiskAttach);
-			action.classList.add("clickable");
-		}
-		else if (element === "detach_attach" && diskMetaData[type][busPrefix].actions.includes("detach")) { // detach
-			setSVGSrc(action, diskMetaData.actions.detach.src);
-			setSVGAlt(action, diskMetaData.actions.detach.title);
-			action.addEventListener("click", handleDiskDetach);
-			action.classList.add("clickable");
-		}
-		else if (element === "delete") {
-			const active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
-			setSVGSrc(action, `images/actions/delete-${active}.svg`);
-			setSVGAlt(action, "Delete Disk");
-			if (active === "active") {
-				action.addEventListener("click", handleDiskDelete);
-				action.classList.add("clickable");
-			}
-		}
-		else {
-			const active = diskMetaData[type][busPrefix].actions.includes(element) ? "active" : "inactive"; // resize
-			setSVGSrc(action, `images/actions/disk/${element}-${active}.svg`);
-			if (active === "active") {
-				setSVGAlt(action, `${element.charAt(0).toUpperCase()}${element.slice(1)} Disk`);
-				if (element === "move") {
-					action.addEventListener("click", handleDiskMove);
-				}
-				else if (element === "resize") {
-					action.addEventListener("click", handleDiskResize);
-				}
-				action.classList.add("clickable");
-			}
-		}
-		action.dataset.disk = diskID;
-		actionDiv.append(action);
-	});
-	field.appendChild(actionDiv);
-}
-
-async function handleDiskDetach () {
-	const disk = this.dataset.disk;
-	const header = `Detach ${disk}`;
-	const body = `<p>Are you sure you want to detach disk ${disk}</p>`;
-	dialog(header, body, async (result, form) => {
-		if (result === "confirm") {
-			setSVGSrc(document.querySelector(`svg[data-disk="${disk}"]`), "images/status/loading.svg");
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/detach`, "POST");
-			if (result.status !== 200) {
-				alert(`Attempted to detach ${disk} but got: ${result.error}`);
-			}
-			await getConfig();
-			populateDisk();
-			deleteBootLine(`boot-${disk}`);
-		}
-	});
-}
-
-async function handleDiskAttach () {
-	const header = `Attach ${this.dataset.disk}`;
-	const body = `
-		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="device">${type === "qemu" ? "SCSI" : "MP"}</label>
-			<input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required>
-		</form>
-	`;
-
-	dialog(header, body, async (result, form) => {
-		if (result === "confirm") {
-			const device = form.get("device");
-			setSVGSrc(document.querySelector(`svg[data-disk="${this.dataset.disk}"]`), "images/status/loading.svg");
-			const body = {
-				source: this.dataset.disk.replace("unused", "")
-			};
-			const prefix = type === "qemu" ? "scsi" : "mp";
-			const disk = `${prefix}${device}`;
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/attach`, "POST", body);
-			if (result.status !== 200) {
-				alert(`Attempted to attach ${this.dataset.disk} to ${disk} but got: ${result.error}`);
-			}
-			await getConfig();
-			populateDisk();
-			addBootLine("disabled", { id: disk, prefix, value: disk, detail: config.data[disk] });
-		}
-	});
-}
-
-async function handleDiskResize () {
-	const header = `Resize ${this.dataset.disk}`;
-	const body = `
-		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="size-increment">Size Increment (GiB)</label>
-			<input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072">
-		</form>
-		`;
-
-	dialog(header, body, async (result, form) => {
-		if (result === "confirm") {
-			const disk = this.dataset.disk;
-			setSVGSrc(document.querySelector(`svg[data-disk="${disk}"]`), "images/status/loading.svg");
-			const body = {
-				size: form.get("size-increment")
-			};
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/resize`, "POST", body);
-			if (result.status !== 200) {
-				alert(`Attempted to resize ${disk} but got: ${result.error}`);
-			}
-			await getConfig();
-			populateDisk();
-			const prefix = bootMetaData.eligiblePrefixes.find((pref) => disk.startsWith(pref));
-			updateBootLine(`boot-${disk}`, { id: disk, prefix, value: disk, detail: config.data[disk] });
-		}
-	});
-}
-
-async function handleDiskMove () {
-	const content = type === "qemu" ? "images" : "rootdir";
-	const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
-
-	const header = `Move ${this.dataset.disk}`;
-
-	let options = "";
-	storage.data.forEach((element) => {
-		if (element.content.includes(content)) {
-			options += `<option value="${element.storage}">${element.storage}</option>"`;
-		}
-	});
-	const select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select"><option hidden disabled selected value></option>${options}</select>`;
-
-	const body = `
-		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			${select}
-			<label for="delete-check">Delete Source</label><input class="w3-input w3-border" name="delete-check" id="delete-check" type="checkbox" checked required>
-		</form>
-	`;
-
-	dialog(header, body, async (result, form) => {
-		if (result === "confirm") {
-			const disk = this.dataset.disk;
-			setSVGSrc(document.querySelector(`svg[data-disk="${disk}"]`), "images/status/loading.svg");
-			const body = {
-				storage: form.get("storage-select"),
-				delete: form.get("delete-check") === "on" ? "1" : "0"
-			};
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/move`, "POST", body);
-			if (result.status !== 200) {
-				alert(`Attempted to move ${disk} to ${body.storage} but got: ${result.error}`);
-			}
-			await getConfig();
-			populateDisk();
-			const prefix = bootMetaData.eligiblePrefixes.find((pref) => disk.startsWith(pref));
-			updateBootLine(`boot-${disk}`, { id: disk, prefix, value: config.data[disk] });
-		}
-	});
-}
-
-async function handleDiskDelete () {
-	const disk = this.dataset.disk;
-	const header = `Delete ${disk}`;
-	const body = `<p>Are you sure you want to <strong>delete</strong> disk${disk}</p>`;
-	dialog(header, body, async (result, form) => {
-		if (result === "confirm") {
-			setSVGSrc(document.querySelector(`svg[data-disk="${disk}"]`), "images/status/loading.svg");
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/delete`, "DELETE");
-			if (result.status !== 200) {
-				alert(`Attempted to delete ${disk} but got: ${result.error}`);
-			}
-			await getConfig();
-			populateDisk();
-			deleteBootLine(`boot-${disk}`);
-		}
-	});
+	initVolumes();
 }
 
 async function handleDiskAdd () {
@@ -375,9 +247,8 @@ async function handleDiskAdd () {
 			if (result.status !== 200) {
 				alert(`Attempted to create ${disk} but got: ${result.error}`);
 			}
-			await getConfig();
-			populateDisk();
-			addBootLine("disabled", { id: disk, prefix, value: disk, detail: config.data[disk] });
+			refreshVolumes();
+			refreshBoot();
 		}
 	});
 }
@@ -404,9 +275,8 @@ async function handleCDAdd () {
 			if (result.status !== 200) {
 				alert(`Attempted to mount ${body.iso} to ${disk} but got: result.error`);
 			}
-			await getConfig();
-			populateDisk();
-			addBootLine("disabled", { id: disk, prefix: "ide", value: disk, detail: config.data[disk] });
+			refreshVolumes();
+			refreshBoot();
 		}
 	});
 
@@ -418,118 +288,93 @@ async function handleCDAdd () {
 	isoSelect.selectedIndex = -1;
 }
 
-async function populateNetworks () {
-	document.querySelector("#networks").innerHTML = "";
-	const networks = {};
-	const prefix = networkMetaData.prefix;
-	Object.keys(config.data).forEach((element) => {
-		if (element.startsWith(prefix)) {
-			networks[element.replace(prefix, "")] = config.data[element];
-		}
-	});
-	const orderedKeys = getOrdered(networks);
-	orderedKeys.forEach((element) => {
-		addNetworkLine("networks", prefix, element, networks[element]);
-	});
+class NetworkAction extends HTMLElement {
+	shadowRoot = null;
 
+	constructor () {
+		super();
+		const internals = this.attachInternals();
+		this.shadowRoot = internals.shadowRoot;
+		if (this.dataset.type === "config") {
+			this.addEventListener("click", this.handleNetworkConfig);
+		}
+		else if (this.dataset.type === "delete") {
+			this.addEventListener("click", this.handleNetworkDelete);
+		}
+	}
+
+	async setStatusLoading () {
+		const svg = document.querySelector(`svg[data-network="${this.dataset.network}"]`);
+		setSVGSrc(svg, "images/status/loading.svg");
+	}
+
+	async handleNetworkConfig () {
+		const netID = this.dataset.network;
+		const netDetails = this.dataset.value;
+		const header = `Edit ${netID}`;
+		const body = `
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+				<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">
+			</form>
+		`;
+
+		const d = dialog(header, body, async (result, form) => {
+			if (result === "confirm") {
+				this.setStatusLoading();
+				const body = {
+					rate: form.get("rate")
+				};
+				const net = `${netID}`;
+				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/modify`, "POST", body);
+				if (result.status !== 200) {
+					alert(`Attempted to change ${net} but got: ${result.error}`);
+				}
+				refreshNetworks();
+				refreshBoot();
+			}
+		});
+
+		d.querySelector("#rate").value = netDetails.split("rate=")[1].split(",")[0];
+	}
+
+	async handleNetworkDelete () {
+		const netID = this.dataset.network;
+		const header = `Delete ${netID}`;
+		const body = "";
+
+		dialog(header, body, async (result, form) => {
+			if (result === "confirm") {
+				setSVGSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
+				const net = `${netID}`;
+				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/delete`, "DELETE");
+				if (result.status !== 200) {
+					alert(`Attempted to delete ${net} but got: ${result.error}`);
+				}
+				refreshNetworks();
+				refreshBoot();
+			}
+		});
+	}
+}
+
+customElements.define("network-action", NetworkAction);
+
+async function initNetworks () {
 	document.querySelector("#network-add").addEventListener("click", handleNetworkAdd);
 }
 
-function addNetworkLine (fieldset, prefix, netID, netDetails) {
-	const field = document.querySelector(`#${fieldset}`);
+async function refreshNetworks () {
+	let nets = await requestDash(`/config/nets?node=${node}&type=${type}&vmid=${vmid}`, "GET");
+	if (nets.status !== 200) {
+		alert("Error fetching instance nets.");
+	}
+	else {
+		nets = nets.data;
+		const container = document.querySelector("#networks");
+		container.setHTMLUnsafe(nets);
+	}
 
-	const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	setSVGSrc(icon, networkMetaData.icon);
-	setSVGAlt(icon, `${prefix}${netID}`);
-	icon.dataset.network = netID;
-	icon.dataset.values = netDetails;
-	field.appendChild(icon);
-
-	const netLabel = document.createElement("p");
-	netLabel.innerText = `${prefix}${netID}`;
-	netLabel.dataset.network = netID;
-	netLabel.dataset.values = netDetails;
-	field.appendChild(netLabel);
-
-	const netDesc = document.createElement("p");
-	netDesc.innerText = netDetails;
-	netDesc.dataset.network = netID;
-	netDesc.dataset.values = netDetails;
-	netDesc.style.overflowX = "hidden";
-	netDesc.style.whiteSpace = "nowrap";
-	field.appendChild(netDesc);
-
-	const actionDiv = document.createElement("div");
-
-	const configBtn = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	configBtn.classList.add("clickable");
-	setSVGSrc(configBtn, "images/actions/network/config.svg");
-	setSVGAlt(configBtn, "Config Interface");
-	configBtn.addEventListener("click", handleNetworkConfig);
-	configBtn.dataset.network = netID;
-	configBtn.dataset.values = netDetails;
-	actionDiv.appendChild(configBtn);
-
-	const deleteBtn = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	deleteBtn.classList.add("clickable");
-	setSVGSrc(deleteBtn, "images/actions/delete-active.svg");
-	setSVGAlt(deleteBtn, "Delete Interface");
-	deleteBtn.addEventListener("click", handleNetworkDelete);
-	deleteBtn.dataset.network = netID;
-	deleteBtn.dataset.values = netDetails;
-	actionDiv.appendChild(deleteBtn);
-
-	field.appendChild(actionDiv);
-}
-
-async function handleNetworkConfig () {
-	const netID = this.dataset.network;
-	const netDetails = this.dataset.values;
-	const header = `Edit net${netID}`;
-	const body = `
-		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">
-		</form>
-	`;
-
-	const d = dialog(header, body, async (result, form) => {
-		if (result === "confirm") {
-			setSVGSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
-			const body = {
-				rate: form.get("rate")
-			};
-			const net = `net${netID}`;
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/modify`, "POST", body);
-			if (result.status !== 200) {
-				alert(`Attempted to change ${net} but got: ${result.error}`);
-			}
-			await getConfig();
-			populateNetworks();
-			updateBootLine(`boot-net${netID}`, { id: net, prefix: "net", value: net, detail: config.data[`net${netID}`] });
-		}
-	});
-
-	d.querySelector("#rate").value = netDetails.split("rate=")[1].split(",")[0];
-}
-
-async function handleNetworkDelete () {
-	const netID = this.dataset.network;
-	const header = `Delete net${netID}`;
-	const body = "";
-
-	dialog(header, body, async (result, form) => {
-		if (result === "confirm") {
-			setSVGSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
-			const net = `net${netID}`;
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/delete`, "DELETE");
-			if (result.status !== 200) {
-				alert(`Attempted to delete ${net} but got: ${result.error}`);
-			}
-			await getConfig();
-			populateNetworks();
-			deleteBootLine(`boot-${net}`);
-		}
-	});
+	initNetworks();
 }
 
 async function handleNetworkAdd () {
@@ -552,148 +397,112 @@ async function handleNetworkAdd () {
 			if (type === "lxc") {
 				body.name = form.get("name");
 			}
-			const netID = form.get("netid");
-			const net = `net${netID}`;
+			const id = form.get("netid");
+			const net = `net${id}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/create`, "POST", body);
 			if (result.status !== 200) {
 				alert(`Attempted to create ${net} but got: ${result.error}`);
 			}
-			await getConfig();
-			populateNetworks();
-			const id = `net${netID}`;
-			addBootLine("disabled", { id, prefix: "net", value: id, detail: config.data[`net${netID}`] });
+			refreshNetworks();
+			refreshBoot();
 		}
 	});
 }
 
-async function populateDevices () {
-	if (type === "qemu") {
-		document.querySelector("#devices-card").classList.remove("none");
-		document.querySelector("#devices").innerHTML = "";
-		const devices = {};
-		const prefix = pcieMetaData.prefix;
-		Object.keys(config.data).forEach((element) => {
-			if (element.startsWith(prefix)) {
-				devices[element.replace(prefix, "")] = config.data[element];
+class DeviceAction extends HTMLElement {
+	shadowRoot = null;
+
+	constructor () {
+		super();
+		const internals = this.attachInternals();
+		this.shadowRoot = internals.shadowRoot;
+		if (this.dataset.type === "config") {
+			this.addEventListener("click", this.handleDeviceConfig);
+		}
+		else if (this.dataset.type === "delete") {
+			this.addEventListener("click", this.handleDeviceDelete);
+		}
+	}
+
+	async setStatusLoading () {
+		const svg = document.querySelector(`svg[data-device="${this.dataset.device}"]`);
+		setSVGSrc(svg, "images/status/loading.svg");
+	}
+
+	async handleDeviceConfig () {
+		const deviceID = this.dataset.device;
+		const deviceDetails = this.dataset.value;
+		const deviceName = this.dataset.name;
+		const header = `Edit Expansion Card ${deviceID}`;
+		const body = `
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+				<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">
+			</form>
+		`;
+
+		const d = dialog(header, body, async (result, form) => {
+			if (result === "confirm") {
+				this.setStatusLoading();
+				const body = {
+					device: form.get("device"),
+					pcie: form.get("pcie") ? 1 : 0
+				};
+				const device = `${deviceID}`;
+				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/${device}/modify`, "POST", body);
+				if (result.status !== 200) {
+					alert(`Attempted to add ${device} but got: ${result.error}`);
+				}
+				refreshDevices();
 			}
 		});
-		const orderedKeys = getOrdered(devices);
-		orderedKeys.forEach(async (element) => {
-			const deviceData = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/hostpci${element}`, "GET");
-			addDeviceLine("devices", prefix, element, devices[element], deviceData.device_name);
-		});
 
+		const availDevices = await requestAPI(`/cluster/${node}/pci`, "GET");
+		d.querySelector("#device").append(new Option(deviceName, deviceDetails.split(",")[0]));
+		for (const availDevice of availDevices) {
+			d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.device_bus));
+		}
+		d.querySelector("#pcie").checked = deviceDetails.includes("pcie=1");
+	}
+
+	async handleDeviceDelete () {
+		const deviceID = this.dataset.device;
+		const header = `Remove Expansion Card ${deviceID}`;
+		const body = "";
+
+		dialog(header, body, async (result, form) => {
+			if (result === "confirm") {
+				this.setStatusLoading();
+				const device = `${deviceID}`;
+				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/${device}/delete`, "DELETE");
+				if (result.status !== 200) {
+					alert(`Attempted to delete ${device} but got: ${result.error}`);
+				}
+				refreshDevices();
+			}
+		});
+	}
+}
+
+customElements.define("device-action", DeviceAction);
+
+async function initDevices () {
+	if (type === "qemu") {
 		document.querySelector("#device-add").addEventListener("click", handleDeviceAdd);
 	}
 }
 
-function addDeviceLine (fieldset, prefix, deviceID, deviceDetails, deviceName) {
-	const field = document.querySelector(`#${fieldset}`);
-
-	const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	setSVGSrc(icon, pcieMetaData.icon);
-	setSVGAlt(icon, `${prefix}${deviceID}`);
-	icon.dataset.device = deviceID;
-	icon.dataset.values = deviceDetails;
-	icon.dataset.name = deviceName;
-	field.appendChild(icon);
-
-	const IDLabel = document.createElement("p");
-	IDLabel.innerText = `hostpci${deviceID}`;
-	IDLabel.dataset.device = deviceID;
-	IDLabel.dataset.values = deviceDetails;
-	IDLabel.dataset.name = deviceName;
-	IDLabel.style.overflowX = "hidden";
-	IDLabel.style.whiteSpace = "nowrap";
-	field.appendChild(IDLabel);
-
-	const deviceLabel = document.createElement("p");
-	deviceLabel.innerText = deviceName;
-	deviceLabel.dataset.device = deviceID;
-	deviceLabel.dataset.values = deviceDetails;
-	deviceLabel.dataset.name = deviceName;
-	deviceLabel.style.overflowX = "hidden";
-	deviceLabel.style.whiteSpace = "nowrap";
-	field.appendChild(deviceLabel);
-
-	const actionDiv = document.createElement("div");
-
-	const configBtn = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	configBtn.classList.add("clickable");
-	setSVGSrc(configBtn, "images/actions/device/config.svg");
-	setSVGAlt(configBtn, "Config Device");
-	configBtn.addEventListener("click", handleDeviceConfig);
-	configBtn.dataset.device = deviceID;
-	configBtn.dataset.values = deviceDetails;
-	configBtn.dataset.name = deviceName;
-	actionDiv.appendChild(configBtn);
-
-	const deleteBtn = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	deleteBtn.classList.add("clickable");
-	setSVGSrc(deleteBtn, "images/actions/delete-active.svg");
-	setSVGAlt(deleteBtn, "Delete Device");
-	deleteBtn.addEventListener("click", handleDeviceDelete);
-	deleteBtn.dataset.device = deviceID;
-	deleteBtn.dataset.values = deviceDetails;
-	deleteBtn.dataset.name = deviceName;
-	actionDiv.appendChild(deleteBtn);
-
-	field.appendChild(actionDiv);
-}
-
-async function handleDeviceConfig () {
-	const deviceID = this.dataset.device;
-	const deviceDetails = this.dataset.values;
-	const deviceName = this.dataset.name;
-	const header = `Edit Expansion Card ${deviceID}`;
-	const body = `
-		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">
-		</form>
-	`;
-
-	const d = dialog(header, body, async (result, form) => {
-		if (result === "confirm") {
-			setSVGSrc(document.querySelector(`svg[data-device="${deviceID}"]`), "images/status/loading.svg");
-			const body = {
-				device: form.get("device"),
-				pcie: form.get("pcie") ? 1 : 0
-			};
-			const device = `hostpci${deviceID}`;
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/${device}/modify`, "POST", body);
-			if (result.status !== 200) {
-				alert(`Attempted to add ${device} but got: ${result.error}`);
-			}
-			await getConfig();
-			populateDevices();
-		}
-	});
-
-	const availDevices = await requestAPI(`/cluster/${node}/pci`, "GET");
-	d.querySelector("#device").append(new Option(deviceName, deviceDetails.split(",")[0]));
-	for (const availDevice of availDevices) {
-		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.device_id));
+async function refreshDevices () {
+	let devices = await requestDash(`/config/devices?node=${node}&type=${type}&vmid=${vmid}`, "GET");
+	if (devices.status !== 200) {
+		alert("Error fetching instance devices.");
 	}
-	d.querySelector("#pcie").checked = deviceDetails.includes("pcie=1");
-}
+	else {
+		devices = devices.data;
+		const container = document.querySelector("#devices");
+		container.setHTMLUnsafe(devices);
+	}
 
-async function handleDeviceDelete () {
-	const deviceID = this.dataset.device;
-	const header = `Remove Expansion Card ${deviceID}`;
-	const body = "";
-
-	dialog(header, body, async (result, form) => {
-		if (result === "confirm") {
-			setSVGSrc(document.querySelector(`svg[data-device="${deviceID}"]`), "images/status/loading.svg");
-			const device = `hostpci${deviceID}`;
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/${device}/delete`, "DELETE");
-			if (result.status !== 200) {
-				alert(`Attempted to delete ${device} but got: ${result.error}`);
-			}
-			await getConfig();
-			populateDevices();
-		}
-	});
+	initDevices();
 }
 
 async function handleDeviceAdd () {
@@ -713,119 +522,31 @@ async function handleDeviceAdd () {
 				device: form.get("device"),
 				pcie: form.get("pcie") ? 1 : 0
 			};
-			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/hostpci${hostpci}/create`, "POST", body);
+			const deviceID = `hostpci${hostpci}`;
+			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/${deviceID}/create`, "POST", body);
 			if (result.status !== 200) {
 				alert(`Attempted to add ${body.device} but got: ${result.error}`);
 			}
-			await getConfig();
-			populateDevices();
+			refreshDevices();
 		}
 	});
 
 	const availDevices = await requestAPI(`/cluster/${node}/pci`, "GET");
 	for (const availDevice of availDevices) {
-		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.device_id));
+		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.device_bus));
 	}
 	d.querySelector("#pcie").checked = true;
 }
 
-async function populateBoot () {
-	if (type === "qemu") {
-		document.querySelector("#boot-card").classList.remove("none");
-		document.querySelector("#enabled").title = "Enabled";
-		document.querySelector("#disabled").title = "Disabled";
-		let order = [];
-		if (config.data.boot.startsWith("order=")) {
-			order = config.data.boot.replace("order=", "").split(";");
-		}
-		const bootable = { disabled: [] };
-		const eligible = bootMetaData.eligiblePrefixes;
-		for (let i = 0; i < order.length; i++) {
-			const element = order[i];
-			const prefix = eligible.find((pref) => order[i].startsWith(pref));
-			const detail = config.data[element];
-			const num = element.replace(prefix, "");
-			if (!isNaN(num)) {
-				bootable[i] = { id: element, value: element, prefix, detail };
-			}
-		}
-		Object.keys(config.data).forEach((element) => {
-			const prefix = eligible.find((pref) => element.startsWith(pref));
-			const detail = config.data[element];
-			const num = element.replace(prefix, "");
-			if (prefix && !order.includes(element) && !isNaN(num)) {
-				bootable.disabled.push({ id: element, value: element, prefix, detail });
-			}
-		});
-		Object.keys(bootable).sort();
-		Object.keys(bootable).forEach((element) => {
-			if (element !== "disabled") {
-				addBootLine("enabled", bootable[element], document.querySelector("#enabled-spacer"));
-			}
-			else {
-				bootable.disabled.forEach((item) => {
-					addBootLine("disabled", item, document.querySelector("#disabled-spacer"));
-				});
-			}
-		});
-	}
-}
-
-function addBootLine (container, data, before = null) {
-	const item = document.createElement("draggable-item");
-	item.data = data;
-	item.innerHTML = `
-		<div style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
-			<svg id="drag" role="application" aria-label="drag icon"><title>drag icon</title><use href="images/actions/drag.svg#symb"></use></svg>
-			<svg role="application" aria-label="${bootMetaData[data.prefix].alt}"><title>${bootMetaData[data.prefix].alt}</title><use href="${bootMetaData[data.prefix].icon}#symb"></use></svg>
-			<p style="margin: 0px;">${data.id}</p>
-			<p style="margin: 0px; overflow-x: hidden; white-space: nowrap;">${data.detail}</p>
-		</div>
-	`;
-	item.id = `boot-${data.id}`;
-	if (before) {
-		document.querySelector(`#${container}`).insertBefore(item, before);
+async function refreshBoot () {
+	let boot = await requestDash(`/config/boot?node=${node}&type=${type}&vmid=${vmid}`, "GET");
+	if (boot.status !== 200) {
+		alert("Error fetching instance boot order.");
 	}
 	else {
-		document.querySelector(`#${container}`).append(item);
-	}
-	item.container = container;
-	item.value = data.value;
-}
-
-function deleteBootLine (id) {
-	const query = `#${id}`;
-	const enabled = document.querySelector("#enabled");
-	const disabled = document.querySelector("#disabled");
-	const inEnabled = enabled.querySelector(query);
-	const inDisabled = disabled.querySelector(query);
-	if (inEnabled) {
-		enabled.removeChild(inEnabled);
-	}
-	if (inDisabled) {
-		disabled.removeChild(inDisabled);
-	}
-}
-
-function updateBootLine (id, newData) {
-	const enabled = document.querySelector("#enabled");
-	const disabled = document.querySelector("#disabled");
-	let element = null;
-	if (enabled.querySelector(`#${id}`)) {
-		element = enabled.querySelector(`#${id}`);
-	}
-	if (disabled.querySelector(`#${id}`)) {
-		element = disabled.querySelector(`#${id}`);
-	}
-	if (element) {
-		const container = element.container;
-		const before = element.nextSibling;
-		deleteBootLine(id);
-		addBootLine(container, newData, before);
-		return true;
-	}
-	else {
-		return false;
+		boot = boot.data;
+		const order = document.querySelector("#boot-order");
+		order.setHTMLUnsafe(boot);
 	}
 }
 
@@ -843,7 +564,7 @@ async function handleFormExit () {
 	}
 	const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/resources`, "POST", body);
 	if (result.status === 200) {
-		goToPage("index.html");
+		goToPage("index");
 	}
 	else {
 		alert(`Attempted to set basic resources but got: ${result.error}`);

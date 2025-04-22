@@ -1,0 +1,1 @@
+{{template "devices" .config.Devices}}

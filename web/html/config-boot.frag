@@ -1,0 +1,1 @@
+{{template "boot" .config.Boot}}

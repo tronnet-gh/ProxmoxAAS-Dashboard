@@ -14,6 +14,8 @@
 				margin-bottom: 0;
 				padding-top: 0;
 				padding-bottom: 0;
+				overflow: hidden;
+				white-space: nowrap;
 			}
 		</style>
 	</head>
@@ -23,29 +25,44 @@
 		</header>
 		<main>
 			<section>
-				<h2 id="name"><a href="index.html">Instances</a> / %{vmname}</h2>
+				<h2 id="name"><a href="index">Instances</a> / {{.config.Name}}</h2>
 				<form>
 					<fieldset class="w3-card w3-padding">
 						<legend>Resources</legend>
-						<div class="input-grid" id="resources" style="grid-template-columns: auto auto auto 1fr;"></div>
+						<div class="input-grid" id="resources" style="grid-template-columns: auto auto auto 1fr;">
+							{{if eq .config.Type "VM"}}
+								{{template "proctype-input" .config.ProctypeSelect}}
+							{{end}}
+							{{template "cores-input" .config.Cores}}
+							{{template "memory-input" .config.Memory}}
+							{{if eq .config.Type "CT"}}
+								{{template "swap-input" .config.Swap}}
+							{{end}}
+						</div>
 					</fieldset>
 					<fieldset class="w3-card w3-padding">
-						<legend>Disks</legend>
-						<div class="input-grid" id="disks" style="grid-template-columns: auto auto 1fr auto;"></div>
+						<legend>Volumes</legend>
+						<div class="input-grid" id="volumes" style="grid-template-columns: auto auto 1fr auto;">
+							{{template "volumes" .config.Volumes}}
+						</div>
 						<div class="w3-container w3-center">
 							<button type="button" id="disk-add" class="w3-button" aria-label="Add New Disk">
 								<span class="large" style="margin: 0;">Add Disk</span>
 								<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New Disk"><use href="images/actions/disk/add-disk.svg#symb"></use></svg>
 							</button>
-							<button type="button" id="cd-add" class="w3-button none" aria-label="Add New CD">
+							{{if eq .config.Type "VM"}}
+							<button type="button" id="cd-add" class="w3-button" aria-label="Add New CD">
 								<span class="large" style="margin: 0;">Mount CD</span>
 								<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New CDROM"><use href="images/actions/disk/add-cd.svg#symb"></use></svg>
 							</button>
+							{{end}}
 						</div>
 					</fieldset>
 					<fieldset class="w3-card w3-padding">
 						<legend>Network Interfaces</legend>
-						<div class="input-grid" id="networks" style="grid-template-columns: auto auto 1fr auto;"></div>
+						<div class="input-grid" id="networks" style="grid-template-columns: auto auto 1fr auto;">
+							{{template "nets" .config.Nets}}
+						</div>
 						<div class="w3-container w3-center">
 							<button type="button" id="network-add" class="w3-button" aria-label="Add New Network Interface">
 								<span class="large" style="margin: 0;">Add Network</span>
@@ -53,9 +70,12 @@
 							</button>
 						</div>
 					</fieldset>
-					<fieldset class="w3-card w3-padding none" id="devices-card">
+					{{if eq .config.Type "VM"}}
+					<fieldset class="w3-card w3-padding">
 						<legend>PCIe Devices</legend>
-						<div class="input-grid" id="devices" style="grid-template-columns: auto auto 1fr auto;"></div>
+						<div class="input-grid" id="devices" style="grid-template-columns: auto auto 1fr auto;">
+							{{template "devices" .config.Devices}}
+						</div>
 						<div class="w3-container w3-center">
 							<button type="button" id="device-add" class="w3-button" aria-label="Add New PCIe Device">
 								<span class="large" style="margin: 0;">Add Device</span>
@@ -63,12 +83,13 @@
 							</button>
 						</div>
 					</fieldset>
-					<fieldset class="w3-card w3-padding none" id="boot-card">
+					<fieldset class="w3-card w3-padding">
 						<legend>Boot Order</legend>
-						<draggable-container id="enabled"></draggable-container>
-						<hr style="padding: 0; margin: 0;">
-						<draggable-container id="disabled"></draggable-container>
+						<div id="boot-order">
+							{{template "boot" .config.Boot}}
+						</div>
 					</fieldset>
+					{{end}}
 					<div class="w3-container w3-center" id="form-actions">
 						<button class="w3-button w3-margin" id="exit" type="button">EXIT</button>
 					</div>
