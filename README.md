@@ -57,7 +57,7 @@ To install the Fabric component, go to [ProxmoxAAS-Fabric](https://git.tronnet.n
 
 To install the LDAP component, go to [ProxmoxAAS-LDAP](https://git.tronnet.net/tronnet/ProxmoxAAS-LDAP).This is an optional component which adds a lightweight REST API server ontop of a simplified LDAP environment. It is only used by the API as a potential authentication backend. 
 
-### Installation - Reverse Proxy
+## Installation - Reverse Proxy
 1. Configure nginx or preferred reverse proxy to reverse proxy the dashboard. The configuration should include at least the following, ensuring that the configured ports are adjusted appropriately:
 ```
 server {
