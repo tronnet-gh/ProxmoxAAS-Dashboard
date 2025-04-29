@@ -6,7 +6,6 @@ window.addEventListener("DOMContentLoaded", init);
 let node;
 let type;
 let vmid;
-let config;
 
 async function init () {
 	setAppearance();
@@ -16,20 +15,11 @@ async function init () {
 	type = uriData.type;
 	vmid = uriData.vmid;
 
-	await getConfig();
-
-	const name = type === "qemu" ? "name" : "hostname";
-	document.querySelector("#name").innerHTML = document.querySelector("#name").innerHTML.replace("%{vmname}", config.data[name]);
-
 	initVolumes();
 	initNetworks();
 	initDevices();
 
 	document.querySelector("#exit").addEventListener("click", handleFormExit);
-}
-
-async function getConfig () {
-	config = await requestPVE(`/nodes/${node}/${type}/${vmid}/config`, "GET");
 }
 
 class VolumeAction extends HTMLElement {
@@ -83,7 +73,7 @@ class VolumeAction extends HTMLElement {
 		const body = `
 			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
 				<label for="device">${type === "qemu" ? "SCSI" : "MP"}</label>
-				<input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" required>
+				<input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "30" : "255"}" required>
 			</form>
 		`;
 
@@ -113,7 +103,7 @@ class VolumeAction extends HTMLElement {
 				<label for="size-increment">Size Increment (GiB)</label>
 				<input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072">
 			</form>
-			`;
+		`;
 
 		dialog(header, body, async (result, form) => {
 			if (result === "confirm") {
@@ -135,9 +125,7 @@ class VolumeAction extends HTMLElement {
 	async handleDiskMove () {
 		const content = type === "qemu" ? "images" : "rootdir";
 		const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
-
 		const header = `Move ${this.dataset.volume}`;
-
 		let options = "";
 		storage.data.forEach((element) => {
 			if (element.content.includes(content)) {
@@ -215,9 +203,7 @@ async function refreshVolumes () {
 async function handleDiskAdd () {
 	const content = type === "qemu" ? "images" : "rootdir";
 	const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
-
 	const header = "Create New Disk";
-
 	let options = "";
 	storage.data.forEach((element) => {
 		if (element.content.includes(content)) {
@@ -228,7 +214,7 @@ async function handleDiskAdd () {
 
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="device">${type === "qemu" ? "SCSI" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "5" : "255"}" value="0" required>
+			<label for="device">${type === "qemu" ? "SCSI" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "30" : "255"}" value="0" required>
 			${select}
 			<label for="size">Size (GiB)</label><input class="w3-input w3-border" name="size" id="size" type="number" min="0" max="131072" required>
 		</form>
@@ -255,9 +241,7 @@ async function handleDiskAdd () {
 
 async function handleCDAdd () {
 	const isos = await requestAPI("/user/vm-isos", "GET");
-
 	const header = "Mount a CDROM";
-
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
 			<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required>
@@ -341,7 +325,6 @@ class NetworkAction extends HTMLElement {
 		const netID = this.dataset.network;
 		const header = `Delete ${netID}`;
 		const body = "";
-
 		dialog(header, body, async (result, form) => {
 			if (result === "confirm") {
 				setSVGSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
@@ -388,7 +371,6 @@ async function handleNetworkAdd () {
 		body += "<label for=\"name\">Interface Name</label><input type=\"text\" id=\"name\" name=\"name\" class=\"w3-input w3-border\">";
 	}
 	body += "</form>";
-
 	dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			const body = {
@@ -468,7 +450,6 @@ class DeviceAction extends HTMLElement {
 		const deviceID = this.dataset.device;
 		const header = `Remove Expansion Card ${deviceID}`;
 		const body = "";
-
 		dialog(header, body, async (result, form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
@@ -514,7 +495,6 @@ async function handleDeviceAdd () {
 			<label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">
 		</form>
 	`;
-
 	const d = dialog(header, body, async (result, form) => {
 		if (result === "confirm") {
 			const hostpci = form.get("hostpci");

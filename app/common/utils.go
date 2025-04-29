@@ -16,7 +16,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tdewolff/minify"
+	"github.com/tdewolff/minify/v2"
 )
 
 var TMPL *template.Template

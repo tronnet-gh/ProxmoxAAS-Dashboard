@@ -77,4 +77,6 @@ input[type="radio"] {
 
 dialog {
 	max-width: calc(min(50%, 80ch));
+	background-color: var(--main-bg-color);
+	color: var(--main-text-color);
 }

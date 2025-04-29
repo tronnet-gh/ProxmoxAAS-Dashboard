@@ -3,6 +3,20 @@ import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
 
+window.addEventListener("DOMContentLoaded", init);
+
+async function init () {
+	setAppearance();
+
+	wfaInit("modules/wfa.wasm");
+	initInstances();
+
+	document.querySelector("#instance-add").addEventListener("click", handleInstanceAdd);
+	document.querySelector("#vm-search").addEventListener("input", sortInstances);
+
+	setupClientSync(refreshInstances);
+}
+
 class InstanceCard extends HTMLElement {
 	actionLock = false;
 	shadowRoot = null;
@@ -125,20 +139,12 @@ class InstanceCard extends HTMLElement {
 		if (deleteButton.classList.contains("clickable")) {
 			deleteButton.onclick = this.handleDeleteButton.bind(this);
 		}
-
-		if (this.node.status !== "online") {
-			powerButton.classList.add("hidden");
-			configButton.classList.add("hidden");
-			consoleButton.classList.add("hidden");
-			deleteButton.classList.add("hidden");
-		}
 	}
 
 	async handlePowerButton () {
 		if (!this.actionLock) {
 			const header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
 			const body = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"} VM ${this.vmid}</p>`;
-
 			dialog(header, body, async (result, form) => {
 				if (result === "confirm") {
 					this.actionLock = true;
@@ -226,22 +232,8 @@ class InstanceCard extends HTMLElement {
 
 customElements.define("instance-card", InstanceCard);
 
-window.addEventListener("DOMContentLoaded", init);
-
-async function init () {
-	setAppearance();
-
-	wfaInit("modules/wfa.wasm");
-	initInstances();
-
-	document.querySelector("#instance-add").addEventListener("click", handleInstanceAdd);
-	document.querySelector("#vm-search").addEventListener("input", sortInstances);
-
-	setupClientSync(refreshInstances);
-}
-
 async function getInstancesFragment () {
-	return await requestDash("/index/instances", "GET")
+	return await requestDash("/index/instances", "GET");
 }
 
 async function refreshInstances () {

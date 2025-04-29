@@ -12,10 +12,10 @@ async function init () {
 function handlePasswordChangeForm () {
 	const body = `
 		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-		<label for="new-password">New Password</label>
-		<input class="w3-input w3-border" id="new-password" name="new-password" type="password"required>
-		<label for="confirm-password">Confirm Password</label>
-		<input class="w3-input w3-border" id="confirm-password" name="confirm-password" type="password" required>
+			<label for="new-password">New Password</label>
+			<input class="w3-input w3-border" id="new-password" name="new-password" type="password"required>
+			<label for="confirm-password">Confirm Password</label>
+			<input class="w3-input w3-border" id="confirm-password" name="confirm-password" type="password" required>
 		</form>
 	`;
 	const d = dialog("Change Password", body, async (result, form) => {

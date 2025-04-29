@@ -3,17 +3,19 @@ package common
 import (
 	"io"
 
-	"github.com/tdewolff/minify"
-	"github.com/tdewolff/minify/css"
-	"github.com/tdewolff/minify/html"
-	"github.com/tdewolff/minify/js"
+	"github.com/tdewolff/minify/v2"
+	"github.com/tdewolff/minify/v2/css"
+	"github.com/tdewolff/minify/v2/html"
+	"github.com/tdewolff/minify/v2/js"
 )
 
+// defines mime type and associated minifier
 type MimeType struct {
 	Type     string
 	Minifier func(m *minify.M, w io.Writer, r io.Reader, params map[string]string) error
 }
 
+// map file extension to mime types
 var MimeTypes = map[string]MimeType{
 	"css": {
 		Type:     "text/css",
