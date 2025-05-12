@@ -29,15 +29,14 @@ func Run() {
 	router.GET("/account", routes.HandleGETAccount)
 	router.GET("/", routes.HandleGETIndex)
 	router.GET("/index", routes.HandleGETIndex)
-	router.GET("/config", routes.HandleGETConfig)
-	router.GET("/login", routes.HandleGETLogin)
-	router.GET("/settings", routes.HandleGETSettings)
-
 	router.GET("/index/instances", routes.HandleGETInstancesFragment)
+	router.GET("/config", routes.HandleGETConfig)
 	router.GET("/config/volumes", routes.HandleGETConfigVolumesFragment)
 	router.GET("/config/nets", routes.HandleGETConfigNetsFragment)
 	router.GET("/config/devices", routes.HandleGETConfigDevicesFragment)
 	router.GET("/config/boot", routes.HandleGETConfigBootFragment)
+	router.GET("/login", routes.HandleGETLogin)
+	router.GET("/settings", routes.HandleGETSettings)
 
 	log.Fatal(router.Run(fmt.Sprintf("0.0.0.0:%d", common.Global.Port)))
 }

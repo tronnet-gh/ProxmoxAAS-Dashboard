@@ -9,6 +9,41 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
+func HandleGETIndex(c *gin.Context) {
+	auth, err := common.GetAuth(c)
+	if err == nil { // user should be authed, try to return index with population
+		instances, _, err := GetClusterResources(auth)
+		if err != nil {
+			common.HandleNonFatalError(c, err)
+		}
+		c.HTML(http.StatusOK, "html/index.html", gin.H{
+			"global":    common.Global,
+			"page":      "index",
+			"instances": instances,
+		})
+	} else { // return index without populating
+		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
+	}
+}
+
+func HandleGETInstancesFragment(c *gin.Context) {
+	Auth, err := common.GetAuth(c)
+	if err == nil { // user should be authed, try to return index with population
+		instances, _, err := GetClusterResources(Auth)
+		if err != nil {
+			common.HandleNonFatalError(c, err)
+		}
+		c.Header("Content-Type", "text/plain")
+		common.TMPL.ExecuteTemplate(c.Writer, "html/index-instances.frag", gin.H{
+			"instances": instances,
+		})
+		c.Status(http.StatusOK)
+	} else { // return 401
+		c.Status(http.StatusUnauthorized)
+	}
+
+}
+
 // used in constructing instance cards in index
 type Node struct {
 	Node   string `json:"node"`
@@ -69,39 +104,4 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 		instances[vmid] = instance
 	}
 	return instances, nodes, nil
-}
-
-func HandleGETIndex(c *gin.Context) {
-	auth, err := common.GetAuth(c)
-	if err == nil { // user should be authed, try to return index with population
-		instances, _, err := GetClusterResources(auth)
-		if err != nil {
-			common.HandleNonFatalError(c, err)
-		}
-		c.HTML(http.StatusOK, "html/index.html", gin.H{
-			"global":    common.Global,
-			"page":      "index",
-			"instances": instances,
-		})
-	} else { // return index without populating
-		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
-	}
-}
-
-func HandleGETInstancesFragment(c *gin.Context) {
-	Auth, err := common.GetAuth(c)
-	if err == nil { // user should be authed, try to return index with population
-		instances, _, err := GetClusterResources(Auth)
-		if err != nil {
-			common.HandleNonFatalError(c, err)
-		}
-		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/index-instances.frag", gin.H{
-			"instances": instances,
-		})
-		c.Status(http.StatusOK)
-	} else { // return 401
-		c.Status(http.StatusUnauthorized)
-	}
-
 }

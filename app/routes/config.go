@@ -13,42 +13,12 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
-type VMPath struct {
-	Node string
-	Type string
-	VMID string
-}
-
-// imported types from fabric
-
-type InstanceConfig struct {
-	Type     fabric.InstanceType       `json:"type"`
-	Name     string                    `json:"name"`
-	Proctype string                    `json:"cpu"`
-	Cores    uint64                    `json:"cores"`
-	Memory   uint64                    `json:"memory"`
-	Swap     uint64                    `json:"swap"`
-	Volumes  map[string]*fabric.Volume `json:"volumes"`
-	Nets     map[string]*fabric.Net    `json:"nets"`
-	Devices  map[string]*fabric.Device `json:"devices"`
-	Boot     fabric.BootOrder          `json:"boot"`
-	// overrides
-	ProctypeSelect common.Select
-}
-
 func HandleGETConfig(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
-		req_node := c.Query("node")
-		req_type := c.Query("type")
-		req_vmid := c.Query("vmid")
-		if req_node == "" || req_type == "" || req_vmid == "" {
-			common.HandleNonFatalError(c, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid))
-		}
-		vm_path := VMPath{
-			Node: req_node,
-			Type: req_type,
-			VMID: req_vmid,
+		vm_path, err := ExtractVMPath(c)
+		if err != nil {
+			common.HandleNonFatalError(c, err)
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
@@ -56,7 +26,6 @@ func HandleGETConfig(c *gin.Context) {
 			common.HandleNonFatalError(c, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
 		}
 
-		config.ProctypeSelect = common.Select{}
 		if config.Type == "VM" { // if VM, fetch CPU types from node
 			config.ProctypeSelect, err = GetCPUTypes(vm_path, auth)
 			if err != nil {
@@ -82,16 +51,9 @@ func HandleGETConfig(c *gin.Context) {
 func HandleGETConfigVolumesFragment(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
-		req_node := c.Query("node")
-		req_type := c.Query("type")
-		req_vmid := c.Query("vmid")
-		if req_node == "" || req_type == "" || req_vmid == "" {
-			common.HandleNonFatalError(c, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid))
-		}
-		vm_path := VMPath{
-			Node: req_node,
-			Type: req_type,
-			VMID: req_vmid,
+		vm_path, err := ExtractVMPath(c)
+		if err != nil {
+			common.HandleNonFatalError(c, err)
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
@@ -112,16 +74,9 @@ func HandleGETConfigVolumesFragment(c *gin.Context) {
 func HandleGETConfigNetsFragment(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
-		req_node := c.Query("node")
-		req_type := c.Query("type")
-		req_vmid := c.Query("vmid")
-		if req_node == "" || req_type == "" || req_vmid == "" {
-			common.HandleNonFatalError(c, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid))
-		}
-		vm_path := VMPath{
-			Node: req_node,
-			Type: req_type,
-			VMID: req_vmid,
+		vm_path, err := ExtractVMPath(c)
+		if err != nil {
+			common.HandleNonFatalError(c, err)
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
@@ -142,16 +97,9 @@ func HandleGETConfigNetsFragment(c *gin.Context) {
 func HandleGETConfigDevicesFragment(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
-		req_node := c.Query("node")
-		req_type := c.Query("type")
-		req_vmid := c.Query("vmid")
-		if req_node == "" || req_type == "" || req_vmid == "" {
-			common.HandleNonFatalError(c, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid))
-		}
-		vm_path := VMPath{
-			Node: req_node,
-			Type: req_type,
-			VMID: req_vmid,
+		vm_path, err := ExtractVMPath(c)
+		if err != nil {
+			common.HandleNonFatalError(c, err)
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
@@ -172,16 +120,9 @@ func HandleGETConfigDevicesFragment(c *gin.Context) {
 func HandleGETConfigBootFragment(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
-		req_node := c.Query("node")
-		req_type := c.Query("type")
-		req_vmid := c.Query("vmid")
-		if req_node == "" || req_type == "" || req_vmid == "" {
-			common.HandleNonFatalError(c, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid))
-		}
-		vm_path := VMPath{
-			Node: req_node,
-			Type: req_type,
-			VMID: req_vmid,
+		vm_path, err := ExtractVMPath(c)
+		if err != nil {
+			common.HandleNonFatalError(c, err)
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
@@ -197,6 +138,44 @@ func HandleGETConfigBootFragment(c *gin.Context) {
 	} else {
 		c.Status(http.StatusUnauthorized)
 	}
+}
+
+func ExtractVMPath(c *gin.Context) (VMPath, error) {
+	req_node := c.Query("node")
+	req_type := c.Query("type")
+	req_vmid := c.Query("vmid")
+	if req_node == "" || req_type == "" || req_vmid == "" {
+		return VMPath{}, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid)
+	}
+	vm_path := VMPath{
+		Node: req_node,
+		Type: req_type,
+		VMID: req_vmid,
+	}
+	return vm_path, nil
+}
+
+type VMPath struct {
+	Node string
+	Type string
+	VMID string
+}
+
+// imported types from fabric
+
+type InstanceConfig struct {
+	Type     fabric.InstanceType       `json:"type"`
+	Name     string                    `json:"name"`
+	Proctype string                    `json:"cpu"`
+	Cores    uint64                    `json:"cores"`
+	Memory   uint64                    `json:"memory"`
+	Swap     uint64                    `json:"swap"`
+	Volumes  map[string]*fabric.Volume `json:"volumes"`
+	Nets     map[string]*fabric.Net    `json:"nets"`
+	Devices  map[string]*fabric.Device `json:"devices"`
+	Boot     fabric.BootOrder          `json:"boot"`
+	// overrides
+	ProctypeSelect common.Select
 }
 
 func GetInstanceConfig(vm VMPath, auth common.Auth) (InstanceConfig, error) {
@@ -248,7 +227,8 @@ type CPUConfig struct {
 
 func GetCPUTypes(vm VMPath, auth common.Auth) (common.Select, error) {
 	cputypes := common.Select{
-		ID: "proctype",
+		ID:       "proctype",
+		Required: true,
 	}
 
 	// get global resource config

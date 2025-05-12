@@ -10,6 +10,77 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
+func HandleGETAccount(c *gin.Context) {
+	auth, err := common.GetAuth(c)
+	if err == nil {
+		account, err := GetUserAccount(auth)
+		if err != nil {
+			common.HandleNonFatalError(c, err)
+			return
+		}
+
+		for k, v := range account.Resources {
+			switch t := v.(type) {
+			case NumericResource:
+				avail, prefix := FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+				account.Resources[k] = ResourceChart{
+					Type:    t.Type,
+					Display: t.Display,
+					Name:    t.Name,
+					Used:    t.Total.Used,
+					Max:     t.Total.Max,
+					Avail:   avail,
+					Prefix:  prefix,
+					Unit:    t.Unit,
+				}
+			case StorageResource:
+				avail, prefix := FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+				account.Resources[k] = ResourceChart{
+					Type:    t.Type,
+					Display: t.Display,
+					Name:    t.Name,
+					Used:    t.Total.Used,
+					Max:     t.Total.Max,
+					Avail:   avail,
+					Prefix:  prefix,
+					Unit:    t.Unit,
+				}
+			case ListResource:
+				l := struct {
+					Type      string
+					Display   bool
+					Resources []ResourceChart
+				}{
+					Type:      t.Type,
+					Display:   t.Display,
+					Resources: []ResourceChart{},
+				}
+
+				for _, r := range t.Total {
+					l.Resources = append(l.Resources, ResourceChart{
+						Type:    t.Type,
+						Display: t.Display,
+						Name:    r.Name,
+						Used:    r.Used,
+						Max:     r.Max,
+						Avail:   float64(r.Avail), // usually an int
+						Unit:    "",
+					})
+				}
+				account.Resources[k] = l
+			}
+		}
+
+		c.HTML(http.StatusOK, "html/account.html", gin.H{
+			"global":  common.Global,
+			"page":    "account",
+			"account": account,
+		})
+	} else {
+		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
+	}
+}
+
 type Account struct {
 	Username string
 	Pools    map[string]bool
@@ -80,77 +151,6 @@ type ResourceChart struct {
 	Avail   float64
 	Prefix  string
 	Unit    string
-}
-
-func HandleGETAccount(c *gin.Context) {
-	auth, err := common.GetAuth(c)
-	if err == nil {
-		account, err := GetUserAccount(auth)
-		if err != nil {
-			common.HandleNonFatalError(c, err)
-			return
-		}
-
-		for k, v := range account.Resources {
-			switch t := v.(type) {
-			case NumericResource:
-				avail, prefix := FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
-				account.Resources[k] = ResourceChart{
-					Type:    t.Type,
-					Display: t.Display,
-					Name:    t.Name,
-					Used:    t.Total.Used,
-					Max:     t.Total.Max,
-					Avail:   avail,
-					Prefix:  prefix,
-					Unit:    t.Unit,
-				}
-			case StorageResource:
-				avail, prefix := FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
-				account.Resources[k] = ResourceChart{
-					Type:    t.Type,
-					Display: t.Display,
-					Name:    t.Name,
-					Used:    t.Total.Used,
-					Max:     t.Total.Max,
-					Avail:   avail,
-					Prefix:  prefix,
-					Unit:    t.Unit,
-				}
-			case ListResource:
-				l := struct {
-					Type      string
-					Display   bool
-					Resources []ResourceChart
-				}{
-					Type:      t.Type,
-					Display:   t.Display,
-					Resources: []ResourceChart{},
-				}
-
-				for _, r := range t.Total {
-					l.Resources = append(l.Resources, ResourceChart{
-						Type:    t.Type,
-						Display: t.Display,
-						Name:    r.Name,
-						Used:    r.Used,
-						Max:     r.Max,
-						Avail:   float64(r.Avail), // usually an int
-						Unit:    "",
-					})
-				}
-				account.Resources[k] = l
-			}
-		}
-
-		c.HTML(http.StatusOK, "html/account.html", gin.H{
-			"global":  common.Global,
-			"page":    "account",
-			"account": account,
-		})
-	} else {
-		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
-	}
 }
 
 func GetUserAccount(auth common.Auth) (Account, error) {

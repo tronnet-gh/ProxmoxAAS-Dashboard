@@ -149,11 +149,6 @@ class InstanceCard extends HTMLElement {
 				if (result === "confirm") {
 					this.actionLock = true;
 					const targetAction = this.status === "running" ? "stop" : "start";
-					const targetStatus = this.status === "running" ? "stopped" : "running";
-					const prevStatus = this.status;
-					this.status = "loading";
-
-					this.update();
 
 					const result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", { node: this.node.name, vmid: this.vmid });
 
@@ -162,22 +157,19 @@ class InstanceCard extends HTMLElement {
 					while (true) {
 						const taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`, "GET");
 						if (taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
-							this.status = targetStatus;
-							this.update();
-							this.actionLock = false;
 							break;
 						}
 						else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
-							this.status = prevStatus;
 							alert(`Attempted to ${targetAction} ${this.vmid} but got: ${taskStatus.data.exitstatus}`);
-							this.update();
-							this.actionLock = false;
 							break;
 						}
 						else { // task has not stopped
 							await waitFor(1000);
 						}
 					}
+
+					this.actionLock = false;
+					refreshInstances();
 				}
 			});
 		}
@@ -205,25 +197,18 @@ class InstanceCard extends HTMLElement {
 			dialog(header, body, async (result, form) => {
 				if (result === "confirm") {
 					this.actionLock = true;
-					this.status = "loading";
-					this.update();
 
 					const action = {};
 					action.purge = 1;
 					action["destroy-unreferenced-disks"] = 1;
 
 					const result = await requestAPI(`/cluster/${this.node.name}/${this.type}/${this.vmid}/delete`, "DELETE");
-					if (result.status === 200) {
-						if (this.parentElement) {
-							this.parentElement.removeChild(this);
-						}
-					}
-					else {
+					if (result.status !== 200) {
 						alert(`Attempted to delete ${this.vmid} but got: ${result.error}`);
-						this.status = this.prevStatus;
-						this.update();
-						this.actionLock = false;
 					}
+
+					this.actionLock = false;
+					refreshInstances();
 				}
 			});
 		}
