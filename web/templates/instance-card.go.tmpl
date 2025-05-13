@@ -16,11 +16,11 @@
 			<p class="w3-col l1 m2 w3-hide-small">{{.Type}}</p>
 			<div class="w3-col l2 m3 s6 flex row nowrap">
 				{{if eq .Status "running"}}
-					<svg aria-label="instance is running"><use href="images/status/active.svg#symb"></svg>
+					<svg id="status" aria-label="instance is running"><use href="images/status/active.svg#symb"></svg>
 				{{else if eq .Status "stopped"}}
-					<svg aria-label="instance is stopped"><use href="images/status/inactive.svg#symb"></svg>
+					<svg id="status" aria-label="instance is stopped"><use href="images/status/inactive.svg#symb"></svg>
 				{{else if eq .Status "loading"}}
-					<svg aria-label="instance is loading"><use href="images/status/loading.svg#symb"></svg>
+					<svg id="status" aria-label="instance is loading"><use href="images/status/loading.svg#symb"></svg>
 				{{else}}
 				{{end}}
 				<p>{{.Status}}</p>
