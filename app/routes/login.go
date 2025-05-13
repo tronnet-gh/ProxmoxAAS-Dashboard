@@ -9,6 +9,18 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
+// used when requesting GET /access/domains
+type GetRealmsBody struct {
+	Data []Realm `json:"data"`
+}
+
+// stores each realm's data
+type Realm struct {
+	Default int    `json:"default"`
+	Realm   string `json:"realm"`
+	Comment string `json:"comment"`
+}
+
 func GetLoginRealms() ([]Realm, error) {
 	realms := []Realm{}
 
@@ -35,18 +47,6 @@ func GetLoginRealms() ([]Realm, error) {
 	}
 
 	return realms, nil
-}
-
-// used when requesting GET /access/domains
-type GetRealmsBody struct {
-	Data []Realm `json:"data"`
-}
-
-// stores each realm's data
-type Realm struct {
-	Default int    `json:"default"`
-	Realm   string `json:"realm"`
-	Comment string `json:"comment"`
 }
 
 func HandleGETLogin(c *gin.Context) {
