@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, goToPage, setAppearance, getSearchSettings, goToURL, requestDash } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, setAppearance, getSearchSettings, goToURL, requestDash, setSVGSrc, setSVGAlt } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
@@ -141,6 +141,16 @@ class InstanceCard extends HTMLElement {
 		}
 	}
 
+	setStatusLoading() {
+		this.status = "loading"
+		let statusicon = this.shadowRoot.querySelector("#status")
+		let powerbtn = this.shadowRoot.querySelector("#power-btn")
+		setSVGSrc(statusicon, "images/status/loading.svg")
+		setSVGAlt(statusicon, "instance is loading")
+		setSVGSrc(powerbtn, "images/status/loading.svg")
+		setSVGAlt(powerbtn, "")
+	}
+
 	async handlePowerButton () {
 		if (!this.actionLock) {
 			const header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
@@ -151,6 +161,7 @@ class InstanceCard extends HTMLElement {
 					const targetAction = this.status === "running" ? "stop" : "start";
 
 					const result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", { node: this.node.name, vmid: this.vmid });
+					this.setStatusLoading()
 
 					const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
 
