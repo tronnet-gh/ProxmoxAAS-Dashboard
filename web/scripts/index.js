@@ -141,14 +141,14 @@ class InstanceCard extends HTMLElement {
 		}
 	}
 
-	setStatusLoading() {
-		this.status = "loading"
-		let statusicon = this.shadowRoot.querySelector("#status")
-		let powerbtn = this.shadowRoot.querySelector("#power-btn")
-		setSVGSrc(statusicon, "images/status/loading.svg")
-		setSVGAlt(statusicon, "instance is loading")
-		setSVGSrc(powerbtn, "images/status/loading.svg")
-		setSVGAlt(powerbtn, "")
+	setStatusLoading () {
+		this.status = "loading";
+		const statusicon = this.shadowRoot.querySelector("#status");
+		const powerbtn = this.shadowRoot.querySelector("#power-btn");
+		setSVGSrc(statusicon, "images/status/loading.svg");
+		setSVGAlt(statusicon, "instance is loading");
+		setSVGSrc(powerbtn, "images/status/loading.svg");
+		setSVGAlt(powerbtn, "");
 	}
 
 	async handlePowerButton () {
@@ -161,7 +161,7 @@ class InstanceCard extends HTMLElement {
 					const targetAction = this.status === "running" ? "stop" : "start";
 
 					const result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", { node: this.node.name, vmid: this.vmid });
-					this.setStatusLoading()
+					this.setStatusLoading();
 
 					const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
 
