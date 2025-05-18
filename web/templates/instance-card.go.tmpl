@@ -41,11 +41,15 @@
 				{{if and (eq .NodeStatus "online") (eq .Status "running")}}
 					<svg id="power-btn" class="clickable" aria-label="shutdown instance"><use href="images/actions/instance/stop.svg#symb"></svg>
 					<svg id="configure-btn" aria-label=""><use href="images/actions/instance/config-inactive.svg#symb"></svg>
-					<svg id="console-btn" class="clickable" aria-label="open console"><use href="images/actions/instance/console-active.svg#symb"></svg>
+					<a href="{{.ConsolePath}}" target="_blank">
+						<svg id="console-btn" class="clickable" aria-label="open console"><use href="images/actions/instance/console-active.svg#symb"></svg>
+					</a>
 					<svg id="delete-btn" aria-label=""><use href="images/actions/instance/delete-inactive.svg#symb"></svg>
 				{{else if and (eq .NodeStatus "online") (eq .Status "stopped")}}
 					<svg id="power-btn" class="clickable" aria-label="start instance"><use href="images/actions/instance/start.svg#symb"></svg>
-					<svg id="configure-btn" class="clickable" aria-label="change configuration"><use href="images/actions/instance/config-active.svg#symb"></svg>
+					<a href="{{.ConfigPath}}">
+						<svg id="configure-btn" class="clickable" aria-label="change configuration"><use href="images/actions/instance/config-active.svg#symb"></svg>
+					</a>
 					<svg id="console-btn" aria-label=""><use href="images/actions/instance/console-inactive.svg#symb"></svg>
 					<svg id="delete-btn" class="clickable" aria-label="delete instance"><use href="images/actions/instance/delete-active.svg#symb"></svg>
 				{{else if and (eq .NodeStatus "online") (eq .Status "loading")}}

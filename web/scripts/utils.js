@@ -114,20 +114,6 @@ export function goToPage (page, data = null) {
 	window.location.href = `${page}${data ? "?" : ""}${params}`;
 }
 
-export function goToURL (href, data = {}, newwindow = false) {
-	const url = new URL(href);
-	for (const k in data) {
-		url.searchParams.append(k, data[k]);
-	}
-
-	if (newwindow) {
-		window.open(url, document.title, "height=480,width=848");
-	}
-	else {
-		window.location.assign(url.toString());
-	}
-}
-
 export function getURIData () {
 	const url = new URL(window.location.href);
 	return Object.fromEntries(url.searchParams);

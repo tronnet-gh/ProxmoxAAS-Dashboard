@@ -53,22 +53,25 @@ type Node struct {
 
 // used in constructing instance cards in index
 type InstanceCard struct {
-	VMID       uint
-	Name       string
-	Type       string
-	Status     string
-	Node       string
-	NodeStatus string
+	VMID        uint
+	Name        string
+	Type        string
+	Status      string
+	Node        string
+	NodeStatus  string
+	ConfigPath  string
+	ConsolePath string
 }
 
 // used in retriving cluster tasks
 type Task struct {
-	Type   string
-	Node   string
-	User   string
-	ID     string
-	VMID   uint
-	Status string
+	Type    string
+	Node    string
+	User    string
+	ID      string
+	VMID    uint
+	Status  string
+	EndTime uint
 }
 
 type InstanceStatus struct {
@@ -116,6 +119,12 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 	for vmid, instance := range instances {
 		nodestatus := nodes[instance.Node].Status
 		instance.NodeStatus = nodestatus
+		instance.ConfigPath = fmt.Sprintf("config?node=%s&type=%s&vmid=%d", instance.Node, instance.Type, instance.VMID)
+		if instance.Type == "qemu" {
+			instance.ConsolePath = fmt.Sprintf("%s/?console=kvm&vmid=%d&vmname=%s&node=%s&resize=off&cmd=&novnc=1", common.Global.PVE, instance.VMID, instance.Name, instance.Node)
+		} else if instance.Type == "lxc" {
+			instance.ConsolePath = fmt.Sprintf("%s/?console=lxc&vmid=%d&vmname=%s&node=%s&resize=off&cmd=&xtermjs=1", common.Global.PVE, instance.VMID, instance.Name, instance.Node)
+		}
 		instances[vmid] = instance
 	}
 
@@ -127,6 +136,9 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 	if code != 200 { // if we did not successfully retrieve tasks, then return 500 because auth was 1 but was invalid somehow
 		return nil, nil, fmt.Errorf("request to /cluster/tasks resulted in %+v", res)
 	}
+
+	most_recent_task := map[uint]uint{}
+	expected_state := map[uint]string{}
 
 	for _, v := range ctx.Body["data"].([]any) {
 		task := Task{}
@@ -151,8 +163,21 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 		} else if !(task.Status == "running" || task.Status == "OK") { // task is not running or finished with status OK
 			continue
 		} else { // recent task is a start or stop task for user instance which is running or "OK"
+			if task.EndTime > most_recent_task[task.VMID] { // if the task's end time is later than the most recent one encountered
+				most_recent_task[task.VMID] = task.EndTime            // update the most recent task
+				if task.Type == "qmstart" || task.Type == "vzstart" { // if the task was a start task, update the expected state to running
+					expected_state[task.VMID] = "running"
+				} else if task.Type == "qmstop" || task.Type == "vzstop" { // if the task was a stop task, update the expected state to stopped
+					expected_state[task.VMID] = "stopped"
+				}
+			}
+		}
+	}
+
+	for vmid, expected_state := range expected_state { // for the expected states from recent tasks
+		if instances[vmid].Status != expected_state { // if the current node's state from /cluster/resources differs from expected state
 			// get /status/current which is updated faster than /cluster/resources
-			instance := instances[task.VMID]
+			instance := instances[vmid]
 			path := fmt.Sprintf("/proxmox/nodes/%s/%s/%d/status/current", instance.Node, instance.Type, instance.VMID)
 			ctx.Body = map[string]any{}
 			res, code, err := common.RequestGetAPI(path, ctx)
@@ -167,7 +192,7 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 			mapstructure.Decode(ctx.Body["data"], &status)
 
 			instance.Status = status.Status
-			instances[task.VMID] = instance
+			instances[vmid] = instance
 		}
 	}
 

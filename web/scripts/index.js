@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, goToPage, setAppearance, getSearchSettings, goToURL, requestDash, setSVGSrc, setSVGAlt } from "./utils.js";
+import { requestPVE, requestAPI, setAppearance, getSearchSettings, requestDash, setSVGSrc, setSVGAlt } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
@@ -124,17 +124,6 @@ class InstanceCard extends HTMLElement {
 			powerButton.onclick = this.handlePowerButton.bind(this);
 		}
 
-		const configButton = this.shadowRoot.querySelector("#configure-btn");
-		if (configButton.classList.contains("clickable")) {
-			configButton.onclick = this.handleConfigButton.bind(this);
-		}
-
-		const consoleButton = this.shadowRoot.querySelector("#console-btn");
-		if (consoleButton.classList.contains("clickable")) {
-			consoleButton.classList.add("clickable");
-			consoleButton.onclick = this.handleConsoleButton.bind(this);
-		}
-
 		const deleteButton = this.shadowRoot.querySelector("#delete-btn");
 		if (deleteButton.classList.contains("clickable")) {
 			deleteButton.onclick = this.handleDeleteButton.bind(this);
@@ -183,20 +172,6 @@ class InstanceCard extends HTMLElement {
 					refreshInstances();
 				}
 			});
-		}
-	}
-
-	handleConfigButton () {
-		if (!this.actionLock && this.status === "stopped") { // if the action lock is false, and the node is stopped, then navigate to the config page with the node info in the search query
-			goToPage("config", { node: this.node.name, type: this.type, vmid: this.vmid });
-		}
-	}
-
-	handleConsoleButton () {
-		if (!this.actionLock && this.status === "running") {
-			const data = { console: `${this.type === "qemu" ? "kvm" : "lxc"}`, vmid: this.vmid, vmname: this.name, node: this.node.name, resize: "off", cmd: "" };
-			data[`${this.type === "qemu" ? "novnc" : "xtermjs"}`] = 1;
-			goToURL(window.PVE, data, true);
 		}
 	}
 

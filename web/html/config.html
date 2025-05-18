@@ -26,7 +26,7 @@
 		<main>
 			<section>
 				<h2><a href="index">Instances</a> / {{.config.Name}}</h2>
-				<form>
+				<form id="config-form">
 					<fieldset class="w3-card w3-padding">
 						<legend>Resources</legend>
 						<div class="input-grid" id="resources" style="grid-template-columns: auto auto auto 1fr;">
@@ -91,7 +91,7 @@
 					</fieldset>
 					{{end}}
 					<div class="w3-container w3-center" id="form-actions">
-						<button class="w3-button w3-margin" id="exit" type="button">EXIT</button>
+						<button class="w3-button w3-margin" id="exit" type="submit">EXIT</button>
 					</div>
 				</form>
 			</section>

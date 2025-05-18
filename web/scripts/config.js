@@ -19,7 +19,7 @@ async function init () {
 	initNetworks();
 	initDevices();
 
-	document.querySelector("#exit").addEventListener("click", handleFormExit);
+	document.querySelector("#config-form").addEventListener("submit", handleFormExit);
 }
 
 class VolumeAction extends HTMLElement {
@@ -530,7 +530,8 @@ async function refreshBoot () {
 	}
 }
 
-async function handleFormExit () {
+async function handleFormExit (event) {
+	event.preventDefault();
 	const body = {
 		cores: document.querySelector("#cores").value,
 		memory: document.querySelector("#ram").value
