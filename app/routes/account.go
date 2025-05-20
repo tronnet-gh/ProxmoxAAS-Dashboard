@@ -6,80 +6,10 @@ import (
 	"net/http"
 	"proxmoxaas-dashboard/app/common"
 
+	"github.com/gerow/go-color"
 	"github.com/gin-gonic/gin"
 	"github.com/go-viper/mapstructure/v2"
 )
-
-func HandleGETAccount(c *gin.Context) {
-	auth, err := common.GetAuth(c)
-	if err == nil {
-		account, err := GetUserAccount(auth)
-		if err != nil {
-			common.HandleNonFatalError(c, err)
-			return
-		}
-
-		for k, v := range account.Resources {
-			switch t := v.(type) {
-			case NumericResource:
-				avail, prefix := FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
-				account.Resources[k] = ResourceChart{
-					Type:    t.Type,
-					Display: t.Display,
-					Name:    t.Name,
-					Used:    t.Total.Used,
-					Max:     t.Total.Max,
-					Avail:   avail,
-					Prefix:  prefix,
-					Unit:    t.Unit,
-				}
-			case StorageResource:
-				avail, prefix := FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
-				account.Resources[k] = ResourceChart{
-					Type:    t.Type,
-					Display: t.Display,
-					Name:    t.Name,
-					Used:    t.Total.Used,
-					Max:     t.Total.Max,
-					Avail:   avail,
-					Prefix:  prefix,
-					Unit:    t.Unit,
-				}
-			case ListResource:
-				l := struct {
-					Type      string
-					Display   bool
-					Resources []ResourceChart
-				}{
-					Type:      t.Type,
-					Display:   t.Display,
-					Resources: []ResourceChart{},
-				}
-
-				for _, r := range t.Total {
-					l.Resources = append(l.Resources, ResourceChart{
-						Type:    t.Type,
-						Display: t.Display,
-						Name:    r.Name,
-						Used:    r.Used,
-						Max:     r.Max,
-						Avail:   float64(r.Avail), // usually an int
-						Unit:    "",
-					})
-				}
-				account.Resources[k] = l
-			}
-		}
-
-		c.HTML(http.StatusOK, "html/account.html", gin.H{
-			"global":  common.Global,
-			"page":    "account",
-			"account": account,
-		})
-	} else {
-		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
-	}
-}
 
 type Account struct {
 	Username string
@@ -143,14 +73,101 @@ type ListResource struct {
 }
 
 type ResourceChart struct {
-	Type    string
-	Display bool
-	Name    string
-	Used    int64
-	Max     int64
-	Avail   float64
-	Prefix  string
-	Unit    string
+	Type     string
+	Display  bool
+	Name     string
+	Used     int64
+	Max      int64
+	Avail    float64
+	Prefix   string
+	Unit     string
+	ColorHex string
+}
+
+var Red = color.RGB{
+	R: 1,
+	G: 0,
+	B: 0,
+}
+
+var Green = color.RGB{
+	R: 0,
+	G: 1,
+	B: 0,
+}
+
+func HandleGETAccount(c *gin.Context) {
+	auth, err := common.GetAuth(c)
+	if err == nil {
+		account, err := GetUserAccount(auth)
+		if err != nil {
+			common.HandleNonFatalError(c, err)
+			return
+		}
+
+		for k, v := range account.Resources {
+			switch t := v.(type) {
+			case NumericResource:
+				avail, prefix := FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+				account.Resources[k] = ResourceChart{
+					Type:     t.Type,
+					Display:  t.Display,
+					Name:     t.Name,
+					Used:     t.Total.Used,
+					Max:      t.Total.Max,
+					Avail:    avail,
+					Prefix:   prefix,
+					Unit:     t.Unit,
+					ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
+				}
+			case StorageResource:
+				avail, prefix := FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+				account.Resources[k] = ResourceChart{
+					Type:     t.Type,
+					Display:  t.Display,
+					Name:     t.Name,
+					Used:     t.Total.Used,
+					Max:      t.Total.Max,
+					Avail:    avail,
+					Prefix:   prefix,
+					Unit:     t.Unit,
+					ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
+				}
+			case ListResource:
+				l := struct {
+					Type      string
+					Display   bool
+					Resources []ResourceChart
+				}{
+					Type:      t.Type,
+					Display:   t.Display,
+					Resources: []ResourceChart{},
+				}
+
+				for _, r := range t.Total {
+					l.Resources = append(l.Resources, ResourceChart{
+						Type:     t.Type,
+						Display:  t.Display,
+						Name:     r.Name,
+						Used:     r.Used,
+						Max:      r.Max,
+						Avail:    float64(r.Avail), // usually an int
+						Unit:     "",
+						ColorHex: InterpolateColorHSV(Green, Red, float64(r.Used)/float64(r.Max)).ToHTML(),
+					})
+				}
+				account.Resources[k] = l
+			}
+		}
+
+		c.HTML(http.StatusOK, "html/account.html", gin.H{
+			"global":  common.Global,
+			"page":    "account",
+			"account": account,
+		})
+	} else {
+		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
+	}
 }
 
 func GetUserAccount(auth common.Auth) (Account, error) {
@@ -260,4 +277,16 @@ func FormatNumber(val int64, base int64) (float64, string) {
 	} else {
 		return 0, ""
 	}
+}
+
+// interpolate between min and max by normalized (0 - 1) val
+func InterpolateColorHSV(min color.RGB, max color.RGB, val float64) color.RGB {
+	minhsl := min.ToHSL()
+	maxhsl := max.ToHSL()
+	interphsl := color.HSL{
+		H: (1-val)*minhsl.H + (val)*maxhsl.H,
+		S: (1-val)*minhsl.S + (val)*maxhsl.S,
+		L: (1-val)*minhsl.L + (val)*maxhsl.L,
+	}
+	return interphsl.ToRGB()
 }
