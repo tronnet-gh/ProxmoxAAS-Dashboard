@@ -122,11 +122,24 @@ class InstanceCard extends HTMLElement {
 		const powerButton = this.shadowRoot.querySelector("#power-btn");
 		if (powerButton.classList.contains("clickable")) {
 			powerButton.onclick = this.handlePowerButton.bind(this);
+			powerButton.onkeydown = (event) => {
+				console.log(event.key, event.key === "Enter")
+				if (event.key === "Enter") {
+					event.preventDefault()
+					this.handlePowerButton()
+				}
+			}
 		}
 
 		const deleteButton = this.shadowRoot.querySelector("#delete-btn");
 		if (deleteButton.classList.contains("clickable")) {
 			deleteButton.onclick = this.handleDeleteButton.bind(this);
+			deleteButton.onkeydown = (event) => {
+				if (event.key === "Enter") {
+					event.preventDefault()
+					this.handleDeleteButton()
+				}
+			}
 		}
 	}
 

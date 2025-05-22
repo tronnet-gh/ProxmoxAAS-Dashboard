@@ -237,51 +237,42 @@
 {{end}}
 
 {{define "boot"}}
-<draggable-container id="enabled" data-group="boot">
-	<template shadowrootmode="open">
-		{{template "boot-style"}}
-		<label>Enabled</label>
-		<div id="wrapper" style="padding-bottom: 1em;">
-			{{range .Enabled}}
-				{{template "boot-target" .}}
-			{{end}}
-		</div>
-	</template>
-</draggable-container>
+{{template "boot-container" Map "ID" "enabled" "Name" "Enabled" "Targets" .Enabled}}
 <hr style="padding: 0; margin: 0;">
-<draggable-container id="disabled" data-group="boot">
-	<template shadowrootmode="open">
-		{{template "boot-style"}}
-		<label>Disabled</label>
-		<div id="wrapper" style="padding-bottom: 1em;">
-			{{range .Disabled}}
-				{{template "boot-target" .}}
-			{{end}}
-		</div>
-	</template>
-</draggable-container>
+{{template "boot-container" Map "ID" "disabled" "Name" "Disabled" "Targets" .Disabled}}
 {{end}}
 
-{{define "boot-style"}}
-<style>
-	div.draggable-item.ghost {
-		border: 1px dashed var(--main-text-color);
-		border-radius: 5px;
-		margin: -1px;
-	}
-	div.draggable-item {
-		cursor: grab;
-	}
-	div.draggable-item svg {
-		height: 1em;
-		width: 1em;
-	}
-	* {
-		-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		box-sizing: border-box;
-	}
-</style>
+{{define "boot-container"}}
+<draggable-container id="{{.ID}}" data-group="boot">
+	<template shadowrootmode="open">
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			div.draggable-item.ghost {
+				border: 1px dashed var(--main-text-color);
+				border-radius: 5px;
+				margin: -1px;
+			}
+			div.draggable-item {
+				cursor: grab;
+			}
+			div.draggable-item svg {
+				height: 1em;
+				width: 1em;
+			}
+			#wrapper {
+				padding-bottom: 1em;
+			}
+		</style>
+		<label>{{.Name}}</label>
+		<div id="wrapper">
+			{{range .Targets}}
+				{{template "boot-target" .}}
+			{{end}}
+		</div>
+	</template>
+</draggable-container>
 {{end}}
 
 {{define "boot-target"}}

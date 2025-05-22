@@ -10,6 +10,39 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
+// used in constructing instance cards in index
+type Node struct {
+	Node   string `json:"node"`
+	Status string `json:"status"`
+}
+
+// used in constructing instance cards in index
+type InstanceCard struct {
+	VMID        uint
+	Name        string
+	Type        string
+	Status      string
+	Node        string
+	NodeStatus  string
+	ConfigPath  string
+	ConsolePath string
+}
+
+// used in retriving cluster tasks
+type Task struct {
+	Type    string
+	Node    string
+	User    string
+	ID      string
+	VMID    uint
+	Status  string
+	EndTime uint
+}
+
+type InstanceStatus struct {
+	Status string
+}
+
 func HandleGETIndex(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil { // user should be authed, try to return index with population
@@ -43,39 +76,6 @@ func HandleGETInstancesFragment(c *gin.Context) {
 		c.Status(http.StatusUnauthorized)
 	}
 
-}
-
-// used in constructing instance cards in index
-type Node struct {
-	Node   string `json:"node"`
-	Status string `json:"status"`
-}
-
-// used in constructing instance cards in index
-type InstanceCard struct {
-	VMID        uint
-	Name        string
-	Type        string
-	Status      string
-	Node        string
-	NodeStatus  string
-	ConfigPath  string
-	ConsolePath string
-}
-
-// used in retriving cluster tasks
-type Task struct {
-	Type    string
-	Node    string
-	User    string
-	ID      string
-	VMID    uint
-	Status  string
-	EndTime uint
-}
-
-type InstanceStatus struct {
-	Status string
 }
 
 func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]Node, error) {

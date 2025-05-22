@@ -13,6 +13,46 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
+type VMPath struct {
+	Node string
+	Type string
+	VMID string
+}
+
+// imported types from fabric
+
+type InstanceConfig struct {
+	Type     fabric.InstanceType       `json:"type"`
+	Name     string                    `json:"name"`
+	Proctype string                    `json:"cpu"`
+	Cores    uint64                    `json:"cores"`
+	Memory   uint64                    `json:"memory"`
+	Swap     uint64                    `json:"swap"`
+	Volumes  map[string]*fabric.Volume `json:"volumes"`
+	Nets     map[string]*fabric.Net    `json:"nets"`
+	Devices  map[string]*fabric.Device `json:"devices"`
+	Boot     fabric.BootOrder          `json:"boot"`
+	// overrides
+	ProctypeSelect common.Select
+}
+
+type GlobalConfig struct {
+	CPU struct {
+		Whitelist bool
+	}
+}
+
+type UserConfig struct {
+	CPU struct {
+		Global []CPUConfig
+		Nodes  map[string][]CPUConfig
+	}
+}
+
+type CPUConfig struct {
+	Name string
+}
+
 func HandleGETConfig(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
@@ -155,29 +195,6 @@ func ExtractVMPath(c *gin.Context) (VMPath, error) {
 	return vm_path, nil
 }
 
-type VMPath struct {
-	Node string
-	Type string
-	VMID string
-}
-
-// imported types from fabric
-
-type InstanceConfig struct {
-	Type     fabric.InstanceType       `json:"type"`
-	Name     string                    `json:"name"`
-	Proctype string                    `json:"cpu"`
-	Cores    uint64                    `json:"cores"`
-	Memory   uint64                    `json:"memory"`
-	Swap     uint64                    `json:"swap"`
-	Volumes  map[string]*fabric.Volume `json:"volumes"`
-	Nets     map[string]*fabric.Net    `json:"nets"`
-	Devices  map[string]*fabric.Device `json:"devices"`
-	Boot     fabric.BootOrder          `json:"boot"`
-	// overrides
-	ProctypeSelect common.Select
-}
-
 func GetInstanceConfig(vm VMPath, auth common.Auth) (InstanceConfig, error) {
 	config := InstanceConfig{}
 	path := fmt.Sprintf("/cluster/%s/%s/%s", vm.Node, vm.Type, vm.VMID)
@@ -206,23 +223,6 @@ func GetInstanceConfig(vm VMPath, auth common.Auth) (InstanceConfig, error) {
 	config.Swap = config.Swap / (1024 * 1024)     // swap in MiB
 
 	return config, nil
-}
-
-type GlobalConfig struct {
-	CPU struct {
-		Whitelist bool
-	}
-}
-
-type UserConfig struct {
-	CPU struct {
-		Global []CPUConfig
-		Nodes  map[string][]CPUConfig
-	}
-}
-
-type CPUConfig struct {
-	Name string
 }
 
 func GetCPUTypes(vm VMPath, auth common.Auth) (common.Select, error) {
