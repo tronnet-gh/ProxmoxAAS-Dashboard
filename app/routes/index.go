@@ -50,11 +50,12 @@ func HandleGETIndex(c *gin.Context) {
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 		}
-		c.HTML(http.StatusOK, "html/index.html", gin.H{
+		page := gin.H{
 			"global":    common.Global,
 			"page":      "index",
 			"instances": instances,
-		})
+		}
+		c.HTML(http.StatusOK, "html/index.html", page)
 	} else { // return index without populating
 		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
 	}
@@ -68,7 +69,7 @@ func HandleGETInstancesFragment(c *gin.Context) {
 			common.HandleNonFatalError(c, err)
 		}
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/index-instances.frag", gin.H{
+		common.TMPL.ExecuteTemplate(c.Writer, "html/index-instances.go.tmpl", gin.H{
 			"instances": instances,
 		})
 		c.Status(http.StatusOK)

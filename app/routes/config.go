@@ -42,7 +42,7 @@ type GlobalConfig struct {
 	}
 }
 
-type UserConfig struct {
+type UserConfigResources struct {
 	CPU struct {
 		Global []CPUConfig
 		Nodes  map[string][]CPUConfig
@@ -102,7 +102,7 @@ func HandleGETConfigVolumesFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-volumes.frag", gin.H{
+		common.TMPL.ExecuteTemplate(c.Writer, "html/config-volumes.go.tmpl", gin.H{
 			"config": config,
 		})
 		c.Status(http.StatusOK)
@@ -125,7 +125,7 @@ func HandleGETConfigNetsFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-nets.frag", gin.H{
+		common.TMPL.ExecuteTemplate(c.Writer, "html/config-nets.go.tmpl", gin.H{
 			"config": config,
 		})
 		c.Status(http.StatusOK)
@@ -148,7 +148,7 @@ func HandleGETConfigDevicesFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-devices.frag", gin.H{
+		common.TMPL.ExecuteTemplate(c.Writer, "html/config-devices.go.tmpl", gin.H{
 			"config": config,
 		})
 		c.Status(http.StatusOK)
@@ -171,7 +171,7 @@ func HandleGETConfigBootFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-boot.frag", gin.H{
+		common.TMPL.ExecuteTemplate(c.Writer, "html/config-boot.go.tmpl", gin.H{
 			"config": config,
 		})
 		c.Status(http.StatusOK)
@@ -264,7 +264,7 @@ func GetCPUTypes(vm VMPath, auth common.Auth) (common.Select, error) {
 	if code != 200 {
 		return cputypes, fmt.Errorf("request to %s resulted in %+v", path, res)
 	}
-	user := UserConfig{}
+	user := UserConfigResources{}
 	err = mapstructure.Decode(ctx.Body, &user)
 	if err != nil {
 		return cputypes, err
