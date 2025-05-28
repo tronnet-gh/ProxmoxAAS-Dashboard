@@ -1,3 +1,64 @@
+/**
+ * Custom modal dialog with form support. Assumes the following structure:
+ * <modal-dialog><template shadowrootmode="open">
+ * <p id="prompt"></p>
+ * <div id="body">
+ * <form id="form"> ... </form>
+ * </div>
+ * <div id="controls">
+ * <button value="..." form=""
+ * </div>
+ * </modal-dialog></template>
+ * Where prompt is the modal dialog's prompt or header,
+ * body contains an optional form or other information,
+ * and controls contains a series of buttons which controls the form
+ */
+class ModalDialog extends HTMLElement {
+	shadowRoot = null;
+	dialog = null;
+
+	constructor () {
+		super();
+		// setup shadowDOM
+		const internals = this.attachInternals();
+		this.shadowRoot = internals.shadowRoot;
+		this.dialog = this.shadowRoot.querySelector("dialog");
+		// add dialog handler to each control button with the return value corresponding to their value attribute
+		const controls = this.shadowRoot.querySelector("#controls");
+		for (const button of controls.childNodes) {
+			button.addEventListener("click", async (e) => {
+				e.preventDefault();
+				this.dialog.close(e.target.value);
+			});
+		}
+		this.setOnClose(); // default behavior to just close the dialog, should call setOnClose to override this behavior
+	}
+
+	showModal () {
+		this.dialog.showModal();
+	}
+
+	querySelector (query) {
+		return this.shadowRoot.querySelector(query);
+	}
+
+	querySelectorAll (query) {
+		return this.shadowRoot.querySelectorAll(query);
+	}
+
+	setOnClose (callback = (result, form) => {}) {
+		this.dialog.addEventListener("close", () => {
+			const formElem = this.dialog.querySelector("form");
+			const formData = formElem ? new FormData(formElem) : null;
+			callback(this.dialog.returnValue, formData);
+			formElem.reset();
+			this.dialog.close();
+		});
+	}
+}
+
+customElements.define("modal-dialog", ModalDialog);
+
 export function dialog (header, body, onclose = async (result, form) => { }) {
 	const dialog = document.createElement("dialog");
 	dialog.innerHTML = `

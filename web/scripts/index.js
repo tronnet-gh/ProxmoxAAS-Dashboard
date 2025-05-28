@@ -123,12 +123,12 @@ class InstanceCard extends HTMLElement {
 		if (powerButton.classList.contains("clickable")) {
 			powerButton.onclick = this.handlePowerButton.bind(this);
 			powerButton.onkeydown = (event) => {
-				console.log(event.key, event.key === "Enter")
+				console.log(event.key, event.key === "Enter");
 				if (event.key === "Enter") {
-					event.preventDefault()
-					this.handlePowerButton()
+					event.preventDefault();
+					this.handlePowerButton();
 				}
-			}
+			};
 		}
 
 		const deleteButton = this.shadowRoot.querySelector("#delete-btn");
@@ -136,10 +136,10 @@ class InstanceCard extends HTMLElement {
 			deleteButton.onclick = this.handleDeleteButton.bind(this);
 			deleteButton.onkeydown = (event) => {
 				if (event.key === "Enter") {
-					event.preventDefault()
-					this.handleDeleteButton()
+					event.preventDefault();
+					this.handleDeleteButton();
 				}
-			}
+			};
 		}
 	}
 
@@ -155,9 +155,8 @@ class InstanceCard extends HTMLElement {
 
 	async handlePowerButton () {
 		if (!this.actionLock) {
-			const header = `${this.status === "running" ? "Stop" : "Start"} VM ${this.vmid}`;
-			const body = `<p>Are you sure you want to ${this.status === "running" ? "stop" : "start"} VM ${this.vmid}</p>`;
-			dialog(header, body, async (result, form) => {
+			const dialog = this.shadowRoot.querySelector("#power-dialog");
+			dialog.setOnClose(async (result, form) => {
 				if (result === "confirm") {
 					this.actionLock = true;
 					const targetAction = this.status === "running" ? "stop" : "start";
@@ -185,13 +184,14 @@ class InstanceCard extends HTMLElement {
 					refreshInstances();
 				}
 			});
+			dialog.showModal();
 		}
 	}
 
 	handleDeleteButton () {
 		if (!this.actionLock && this.status === "stopped") {
-			const header = `Delete VM ${this.vmid}`;
-			const body = `<p>Are you sure you want to <strong>delete</strong> VM ${this.vmid}</p>`;
+			const header = `Delete ${this.vmid}`;
+			const body = `<p>Are you sure you want to <strong>delete</strong> ${this.vmid}</p>`;
 
 			dialog(header, body, async (result, form) => {
 				if (result === "confirm") {
@@ -313,46 +313,9 @@ function sortInstances () {
 }
 
 async function handleInstanceAdd () {
-	const header = "Create New Instance";
+	const d = document.querySelector("#create-instance-dialog");
 
-	const body = `
-		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="type">Instance Type</label>
-			<select class="w3-select w3-border" name="type" id="type" required>
-				<option value="lxc">Container</option>
-				<option value="qemu">Virtual Machine</option>
-			</select>
-			<label for="node">Node</label>
-			<select class="w3-select w3-border" name="node" id="node" required></select>
-			<label for="name">Name</label>
-			<input class="w3-input w3-border" name="name" id="name" required>
-			<label for="vmid">ID</label>
-			<input class="w3-input w3-border" name="vmid" id="vmid" type="number" required>
-			<label for="pool">Pool</label>
-			<select class="w3-select w3-border" name="pool" id="pool" required></select>
-			<label for="cores">Cores (Threads)</label>
-			<input class="w3-input w3-border" name="cores" id="cores" type="number" min="1" max="8192" required>
-			<label for="memory">Memory (MiB)</label>
-			<input class="w3-input w3-border" name="memory" id="memory" type="number" min="16", step="1" required>
-			<p class="container-specific none" style="grid-column: 1 / span 2; text-align: center;">Container Options</p>
-			<label class="container-specific none" for="swap">Swap (MiB)</label>
-			<input class="w3-input w3-border container-specific none" name="swap" id="swap" type="number" min="0" step="1" required disabled>
-			<label class="container-specific none" for="template-image">Template Image</label>
-			<select class="w3-select w3-border container-specific none" name="template-image" id="template-image" required disabled></select>
-			<label class="container-specific none" for="rootfs-storage">ROOTFS Storage</label>
-			<select class="w3-select w3-border container-specific none" name="rootfs-storage" id="rootfs-storage" required disabled></select>
-			<label class="container-specific none" for="rootfs-size">ROOTFS Size (GiB)</label>
-			<input class="w3-input w3-border container-specific none" name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled>
-			<label class="container-specific none" for="password">Password</label>
-			<input class="w3-input w3-border container-specific none" name="password" id="password" type="password" required disabled>
-			<label class="container-specific none" for="confirm-password">Confirm Password</label>
-			<input class="w3-input w3-border container-specific none" name="confirm-password" id="confirm-password" type="password" required disabled>
-		</form>
-	`;
-
-	const templates = await requestAPI("/user/ct-templates", "GET");
-
-	const d = dialog(header, body, async (result, form) => {
+	d.setOnClose(async (result, form) => {
 		if (result === "confirm") {
 			const body = {
 				name: form.get("name"),
@@ -381,6 +344,8 @@ async function handleInstanceAdd () {
 		}
 	});
 
+	const templates = await requestAPI("/user/ct-templates", "GET");
+
 	const typeSelect = d.querySelector("#type");
 	typeSelect.selectedIndex = -1;
 	typeSelect.addEventListener("change", () => {
@@ -396,6 +361,10 @@ async function handleInstanceAdd () {
 				element.disabled = false;
 			});
 		}
+	});
+	d.querySelectorAll(".container-specific").forEach((element) => {
+		element.classList.add("none");
+		element.disabled = true;
 	});
 
 	const rootfsContent = "rootdir";
@@ -468,4 +437,6 @@ async function handleInstanceAdd () {
 
 	password.addEventListener("change", validatePassword);
 	confirmPassword.addEventListener("keyup", validatePassword);
+
+	d.showModal();
 }
