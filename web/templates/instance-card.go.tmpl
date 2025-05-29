@@ -61,6 +61,7 @@
 				{{end}}
 			</div>
 		</div>
+
 		<modal-dialog id="power-dialog">
 			<template shadowrootmode="open">
 				<link rel="stylesheet" href="modules/w3.css">
@@ -84,6 +85,30 @@
 							Are you sure you want to <strong>start</strong> {{.VMID}}?
 						{{else}}
 						{{end}}
+						</p>
+						</form>
+					</div>
+					<div id="controls" class="w3-center w3-container">
+						<button id="cancel" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+						<button id="confirm" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					</div>
+				</dialog>
+			</template>
+		</modal-dialog>
+
+		<modal-dialog id="delete-dialog">
+			<template shadowrootmode="open">
+				<link rel="stylesheet" href="modules/w3.css">
+				<link rel="stylesheet" href="css/style.css">
+				<link rel="stylesheet" href="css/form.css">
+				<dialog class="w3-container w3-card w3-border-0">
+					<p class="w3-large" id="prompt" style="text-align: center;">
+						Delete {{.VMID}}
+					</p>
+					<div id="body">
+						<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+						<p>
+						Are you sure you want to <strong>delete</strong> {{.VMID}}
 						</p>
 						</form>
 					</div>

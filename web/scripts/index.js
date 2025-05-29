@@ -1,5 +1,5 @@
 import { requestPVE, requestAPI, setAppearance, getSearchSettings, requestDash, setSVGSrc, setSVGAlt } from "./utils.js";
-import { alert, dialog } from "./dialog.js";
+import { alert } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
 
@@ -11,7 +11,8 @@ async function init () {
 	wfaInit("modules/wfa.wasm");
 	initInstances();
 
-	document.querySelector("#instance-add").addEventListener("click", handleInstanceAdd);
+	initInstanceAddForm();
+	document.querySelector("#instance-add").addEventListener("click", handleInstanceAddButton);
 	document.querySelector("#vm-search").addEventListener("input", sortInstances);
 
 	setupClientSync(refreshInstances);
@@ -119,6 +120,7 @@ class InstanceCard extends HTMLElement {
 			nameParagraph.innerHTML = this.name ? this.name : "&nbsp;";
 		}
 
+		this.initPowerForm();
 		const powerButton = this.shadowRoot.querySelector("#power-btn");
 		if (powerButton.classList.contains("clickable")) {
 			powerButton.onclick = this.handlePowerButton.bind(this);
@@ -131,6 +133,7 @@ class InstanceCard extends HTMLElement {
 			};
 		}
 
+		this.initDeleteForm();
 		const deleteButton = this.shadowRoot.querySelector("#delete-btn");
 		if (deleteButton.classList.contains("clickable")) {
 			deleteButton.onclick = this.handleDeleteButton.bind(this);
@@ -153,63 +156,70 @@ class InstanceCard extends HTMLElement {
 		setSVGAlt(powerbtn, "");
 	}
 
+	async initPowerForm () {
+		const dialog = this.shadowRoot.querySelector("#power-dialog");
+		dialog.setOnClose(async (result, form) => {
+			if (result === "confirm") {
+				this.actionLock = true;
+				const targetAction = this.status === "running" ? "stop" : "start";
+
+				const result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", { node: this.node.name, vmid: this.vmid });
+				this.setStatusLoading();
+
+				const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
+
+				while (true) {
+					const taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`, "GET");
+					if (taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
+						break;
+					}
+					else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
+						alert(`Attempted to ${targetAction} ${this.vmid} but got: ${taskStatus.data.exitstatus}`);
+						break;
+					}
+					else { // task has not stopped
+						await waitFor(1000);
+					}
+				}
+
+				this.actionLock = false;
+				refreshInstances();
+			}
+		});
+	}
+
 	async handlePowerButton () {
 		if (!this.actionLock) {
 			const dialog = this.shadowRoot.querySelector("#power-dialog");
-			dialog.setOnClose(async (result, form) => {
-				if (result === "confirm") {
-					this.actionLock = true;
-					const targetAction = this.status === "running" ? "stop" : "start";
-
-					const result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", { node: this.node.name, vmid: this.vmid });
-					this.setStatusLoading();
-
-					const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
-
-					while (true) {
-						const taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`, "GET");
-						if (taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
-							break;
-						}
-						else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
-							alert(`Attempted to ${targetAction} ${this.vmid} but got: ${taskStatus.data.exitstatus}`);
-							break;
-						}
-						else { // task has not stopped
-							await waitFor(1000);
-						}
-					}
-
-					this.actionLock = false;
-					refreshInstances();
-				}
-			});
 			dialog.showModal();
 		}
 	}
 
+	initDeleteForm () {
+		const dialog = this.shadowRoot.querySelector("#delete-dialog");
+		dialog.setOnClose(async (result, form) => {
+			if (result === "confirm") {
+				this.actionLock = true;
+
+				const action = {};
+				action.purge = 1;
+				action["destroy-unreferenced-disks"] = 1;
+
+				const result = await requestAPI(`/cluster/${this.node.name}/${this.type}/${this.vmid}/delete`, "DELETE");
+				if (result.status !== 200) {
+					alert(`Attempted to delete ${this.vmid} but got: ${result.error}`);
+				}
+
+				this.actionLock = false;
+				refreshInstances();
+			}
+		});
+	}
+
 	handleDeleteButton () {
 		if (!this.actionLock && this.status === "stopped") {
-			const header = `Delete ${this.vmid}`;
-			const body = `<p>Are you sure you want to <strong>delete</strong> ${this.vmid}</p>`;
-
-			dialog(header, body, async (result, form) => {
-				if (result === "confirm") {
-					this.actionLock = true;
-
-					const action = {};
-					action.purge = 1;
-					action["destroy-unreferenced-disks"] = 1;
-
-					const result = await requestAPI(`/cluster/${this.node.name}/${this.type}/${this.vmid}/delete`, "DELETE");
-					if (result.status !== 200) {
-						alert(`Attempted to delete ${this.vmid} but got: ${result.error}`);
-					}
-
-					this.actionLock = false;
-					refreshInstances();
-				}
-			});
+			const dialog = this.shadowRoot.querySelector("#delete-dialog");
+			dialog.showModal();
 		}
 	}
 }
@@ -312,9 +322,8 @@ function sortInstances () {
 	}
 }
 
-async function handleInstanceAdd () {
+async function initInstanceAddForm () {
 	const d = document.querySelector("#create-instance-dialog");
-
 	d.setOnClose(async (result, form) => {
 		if (result === "confirm") {
 			const body = {
@@ -343,6 +352,10 @@ async function handleInstanceAdd () {
 			}
 		}
 	});
+}
+
+async function handleInstanceAddButton () {
+	const d = document.querySelector("#create-instance-dialog");
 
 	const templates = await requestAPI("/user/ct-templates", "GET");
 
@@ -375,6 +388,7 @@ async function handleInstanceAdd () {
 	const userCluster = await requestAPI("/user/config/cluster", "GET");
 
 	const nodeSelect = d.querySelector("#node");
+	nodeSelect.innerHTML = "";
 	const clusterNodes = await requestPVE("/nodes", "GET");
 	const allowedNodes = Object.keys(userCluster.nodes);
 	clusterNodes.data.forEach((element) => {
@@ -415,6 +429,7 @@ async function handleInstanceAdd () {
 
 	// add user pools to selector
 	const poolSelect = d.querySelector("#pool");
+	poolSelect.innerHTML = "";
 	const userPools = Object.keys(userCluster.pools);
 	userPools.forEach((element) => {
 		poolSelect.add(new Option(element));

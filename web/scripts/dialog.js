@@ -23,15 +23,6 @@ class ModalDialog extends HTMLElement {
 		const internals = this.attachInternals();
 		this.shadowRoot = internals.shadowRoot;
 		this.dialog = this.shadowRoot.querySelector("dialog");
-		// add dialog handler to each control button with the return value corresponding to their value attribute
-		const controls = this.shadowRoot.querySelector("#controls");
-		for (const button of controls.childNodes) {
-			button.addEventListener("click", async (e) => {
-				e.preventDefault();
-				this.dialog.close(e.target.value);
-			});
-		}
-		this.setOnClose(); // default behavior to just close the dialog, should call setOnClose to override this behavior
 	}
 
 	showModal () {
@@ -46,6 +37,7 @@ class ModalDialog extends HTMLElement {
 		return this.shadowRoot.querySelectorAll(query);
 	}
 
+	// it is usually not safe to call this on each dialog invocation
 	setOnClose (callback = (result, form) => {}) {
 		this.dialog.addEventListener("close", () => {
 			const formElem = this.dialog.querySelector("form");
