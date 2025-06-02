@@ -1,0 +1,3 @@
+[submodule "ProxmoxAAS-Fabric"]
+	path = ProxmoxAAS-Fabric
+	url = https://git.tronnet.net/tronnet/ProxmoxAAS-Fabric

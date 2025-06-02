@@ -11,7 +11,7 @@ require (
 	proxmoxaas-fabric v0.0.0
 )
 
-replace proxmoxaas-fabric => ../ProxmoxAAS-Fabric
+replace proxmoxaas-fabric => ./ProxmoxAAS-Fabric
 
 require (
 	github.com/buger/goterm v1.0.4 // indirect
