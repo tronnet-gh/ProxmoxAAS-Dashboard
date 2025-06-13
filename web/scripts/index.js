@@ -323,6 +323,7 @@ function sortInstances () {
 }
 
 async function initInstanceAddForm () {
+	// form submit logic
 	const d = document.querySelector("#create-instance-dialog");
 	d.setOnClose(async (result, form) => {
 		if (result === "confirm") {
@@ -352,6 +353,15 @@ async function initInstanceAddForm () {
 			}
 		}
 	});
+
+	// custom password validation checker
+	const password = d.querySelector("#password");
+	const confirmPassword = d.querySelector("#confirm-password");
+	function validatePassword () {
+		confirmPassword.setCustomValidity(password.value !== confirmPassword.value ? "Passwords Don't Match" : "");
+	}
+	password.addEventListener("change", validatePassword);
+	confirmPassword.addEventListener("keyup", validatePassword);
 }
 
 async function handleInstanceAddButton () {
@@ -400,6 +410,7 @@ async function handleInstanceAddButton () {
 	nodeSelect.addEventListener("change", async () => { // change rootfs storage based on node
 		const node = nodeSelect.value;
 		const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
+		rootfsStorage.innerHTML = "";
 		storage.data.forEach((element) => {
 			if (element.content.includes(rootfsContent)) {
 				rootfsStorage.add(new Option(element.storage));
@@ -442,16 +453,6 @@ async function handleInstanceAddButton () {
 		templateImage.append(new Option(template.name, template.volid));
 	}
 	templateImage.selectedIndex = -1;
-
-	const password = d.querySelector("#password");
-	const confirmPassword = d.querySelector("#confirm-password");
-
-	function validatePassword () {
-		confirmPassword.setCustomValidity(password.value !== confirmPassword.value ? "Passwords Don't Match" : "");
-	}
-
-	password.addEventListener("change", validatePassword);
-	confirmPassword.addEventListener("keyup", validatePassword);
 
 	d.showModal();
 }
