@@ -1,5 +1,5 @@
 import { requestPVE, requestAPI, setAppearance, getSearchSettings, requestDash, setSVGSrc, setSVGAlt } from "./utils.js";
-import { alert } from "./dialog.js";
+import { alert, dialog } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
 
@@ -11,7 +11,6 @@ async function init () {
 	wfaInit("modules/wfa.wasm");
 	initInstances();
 
-	initInstanceAddForm();
 	document.querySelector("#instance-add").addEventListener("click", handleInstanceAddButton);
 	document.querySelector("#vm-search").addEventListener("input", sortInstances);
 
@@ -120,7 +119,6 @@ class InstanceCard extends HTMLElement {
 			nameParagraph.innerHTML = this.name ? this.name : "&nbsp;";
 		}
 
-		this.initPowerForm();
 		const powerButton = this.shadowRoot.querySelector("#power-btn");
 		if (powerButton.classList.contains("clickable")) {
 			powerButton.onclick = this.handlePowerButton.bind(this);
@@ -133,7 +131,6 @@ class InstanceCard extends HTMLElement {
 			};
 		}
 
-		this.initDeleteForm();
 		const deleteButton = this.shadowRoot.querySelector("#delete-btn");
 		if (deleteButton.classList.contains("clickable")) {
 			deleteButton.onclick = this.handleDeleteButton.bind(this);
@@ -156,70 +153,60 @@ class InstanceCard extends HTMLElement {
 		setSVGAlt(powerbtn, "");
 	}
 
-	async initPowerForm () {
-		const dialog = this.shadowRoot.querySelector("#power-dialog");
-		dialog.setOnClose(async (result, form) => {
-			if (result === "confirm") {
-				this.actionLock = true;
-				const targetAction = this.status === "running" ? "stop" : "start";
-
-				const result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", { node: this.node.name, vmid: this.vmid });
-				this.setStatusLoading();
-
-				const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
-
-				while (true) {
-					const taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`, "GET");
-					if (taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
-						break;
-					}
-					else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
-						alert(`Attempted to ${targetAction} ${this.vmid} but got: ${taskStatus.data.exitstatus}`);
-						break;
-					}
-					else { // task has not stopped
-						await waitFor(1000);
-					}
-				}
-
-				this.actionLock = false;
-				refreshInstances();
-			}
-		});
-	}
-
 	async handlePowerButton () {
 		if (!this.actionLock) {
-			const dialog = this.shadowRoot.querySelector("#power-dialog");
-			dialog.showModal();
-		}
-	}
+			const template = this.shadowRoot.querySelector("#power-dialog");
+			dialog(template, async (result, form) => {
+				if (result === "confirm") {
+					this.actionLock = true;
+					const targetAction = this.status === "running" ? "stop" : "start";
 
-	initDeleteForm () {
-		const dialog = this.shadowRoot.querySelector("#delete-dialog");
-		dialog.setOnClose(async (result, form) => {
-			if (result === "confirm") {
-				this.actionLock = true;
+					const result = await requestPVE(`/nodes/${this.node.name}/${this.type}/${this.vmid}/status/${targetAction}`, "POST", { node: this.node.name, vmid: this.vmid });
+					this.setStatusLoading();
 
-				const action = {};
-				action.purge = 1;
-				action["destroy-unreferenced-disks"] = 1;
+					const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
 
-				const result = await requestAPI(`/cluster/${this.node.name}/${this.type}/${this.vmid}/delete`, "DELETE");
-				if (result.status !== 200) {
-					alert(`Attempted to delete ${this.vmid} but got: ${result.error}`);
+					while (true) {
+						const taskStatus = await requestPVE(`/nodes/${this.node.name}/tasks/${result.data}/status`, "GET");
+						if (taskStatus.data.status === "stopped" && taskStatus.data.exitstatus === "OK") { // task stopped and was successful
+							break;
+						}
+						else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
+							alert(`Attempted to ${targetAction} ${this.vmid} but got: ${taskStatus.data.exitstatus}`);
+							break;
+						}
+						else { // task has not stopped
+							await waitFor(1000);
+						}
+					}
+
+					this.actionLock = false;
+					refreshInstances();
 				}
-
-				this.actionLock = false;
-				refreshInstances();
-			}
-		});
+			});
+		}
 	}
 
 	handleDeleteButton () {
 		if (!this.actionLock && this.status === "stopped") {
-			const dialog = this.shadowRoot.querySelector("#delete-dialog");
-			dialog.showModal();
+			const template = this.shadowRoot.querySelector("#delete-dialog");
+			dialog(template, async (result, form) => {
+				if (result === "confirm") {
+					this.actionLock = true;
+
+					const action = {};
+					action.purge = 1;
+					action["destroy-unreferenced-disks"] = 1;
+
+					const result = await requestAPI(`/cluster/${this.node.name}/${this.type}/${this.vmid}/delete`, "DELETE");
+					if (result.status !== 200) {
+						alert(`Attempted to delete ${this.vmid} but got: ${result.error}`);
+					}
+
+					this.actionLock = false;
+					refreshInstances();
+				}
+			});
 		}
 	}
 }
@@ -322,10 +309,9 @@ function sortInstances () {
 	}
 }
 
-async function initInstanceAddForm () {
-	// form submit logic
-	const d = document.querySelector("#create-instance-dialog");
-	d.setOnClose(async (result, form) => {
+async function handleInstanceAddButton () {
+	const template = document.querySelector("#create-instance-dialog");
+	const d = dialog(template, async (result, form) => {
 		if (result === "confirm") {
 			const body = {
 				name: form.get("name"),
@@ -353,19 +339,6 @@ async function initInstanceAddForm () {
 			}
 		}
 	});
-
-	// custom password validation checker
-	const password = d.querySelector("#password");
-	const confirmPassword = d.querySelector("#confirm-password");
-	function validatePassword () {
-		confirmPassword.setCustomValidity(password.value !== confirmPassword.value ? "Passwords Don't Match" : "");
-	}
-	password.addEventListener("change", validatePassword);
-	confirmPassword.addEventListener("keyup", validatePassword);
-}
-
-async function handleInstanceAddButton () {
-	const d = document.querySelector("#create-instance-dialog");
 
 	const templates = await requestAPI("/user/ct-templates", "GET");
 
@@ -453,6 +426,15 @@ async function handleInstanceAddButton () {
 		templateImage.append(new Option(template.name, template.volid));
 	}
 	templateImage.selectedIndex = -1;
+
+	// setup custom password checker for containers
+	const password = d.querySelector("#password");
+	const confirmPassword = d.querySelector("#confirm-password");
+	function validatePassword () {
+		confirmPassword.setCustomValidity(password.value !== confirmPassword.value ? "Passwords Don't Match" : "");
+	}
+	password.addEventListener("change", validatePassword);
+	confirmPassword.addEventListener("keyup", validatePassword);
 
 	d.showModal();
 }
