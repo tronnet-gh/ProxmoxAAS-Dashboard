@@ -27,20 +27,73 @@
 {{end}}
 
 {{define "volumes"}}
-	{{range $k,$v := .}}
+	{{range $k,$v := .Volumes}}
 		{{if eq $v.Type "rootfs"}}
-			{{ template "volume-rootfs" Map "Name" $k "Volume" $v}}
+			{{ template "volume-rootfs" Map "Name" $k "Volume" $v "InstanceType" $.InstanceType}}
 		{{else if eq $v.Type "mp"}}
-			{{ template "volume-mp" Map "Name" $k "Volume" $v}}
+			{{ template "volume-mp" Map "Name" $k "Volume" $v "InstanceType" $.InstanceType}}
 		{{else if eq $v.Type "ide"}}
-			{{ template "volume-ide" Map "Name" $k "Volume" $v}}
+			{{ template "volume-ide" Map "Name" $k "Volume" $v "InstanceType" $.InstanceType}}
 		{{else if or (eq $v.Type "scsi") (eq $v.Type "sata")}}
-			{{ template "volume-scsi" Map "Name" $k "Volume" $v}}
+			{{ template "volume-scsi" Map "Name" $k "Volume" $v "InstanceType" $.InstanceType}}
 		{{else if eq $v.Type "unused"}}
-			{{ template "volume-unused" Map "Name" $k "Volume" $v}}
+			{{ template "volume-unused" Map "Name" $k "Volume" $v "InstanceType" $.InstanceType}}
 		{{else}}
 		{{end}}
 	{{end}}
+{{end}}
+
+{{define "volumes-add-disk"}}
+<button type="button" id="disk-add" class="w3-button" aria-label="Add New Disk">
+	<span class="large" style="margin: 0;">Add Disk</span>
+	<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New Disk"><use href="images/actions/disk/add-disk.svg#symb"></use></svg>
+</button>
+<template id="add-disk-dialog">
+	<dialog class="w3-container w3-card w3-border-0">
+		<p class="w3-large" id="prompt" style="text-align: center;">
+			Create New Disk
+		</p>
+		<div id="body">
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+				{{if eq .config.Type "VM"}}
+				<label for="device">SCSI</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="30" value="0" required>
+				{{else}}
+				<label for="device">MP</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="255" value="0" required>
+				{{end}}
+				<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required></select>
+				<label for="size">Size (GiB)</label><input class="w3-input w3-border" name="size" id="size" type="number" min="0" max="131072" required>
+			</form>
+		</div>
+		<div id="controls" class="w3-center w3-container">
+			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+		</div>
+	</dialog>
+</template>
+{{end}}
+
+{{define "volumes-add-cd"}}
+<button type="button" id="cd-add" class="w3-button" aria-label="Add New CD">
+	<span class="large" style="margin: 0;">Mount CD</span>
+	<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New CDROM"><use href="images/actions/disk/add-cd.svg#symb"></use></svg>
+</button>
+<template id="add-cd-dialog">
+	<dialog class="w3-container w3-card w3-border-0">
+		<p class="w3-large" id="prompt" style="text-align: center;">
+			Mount a CDROM
+		</p>
+		<div id="body">
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+				<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required>
+				<label for="iso-select">Image</label><select class="w3-select w3-border" name="iso-select" id="iso-select" required></select>
+			</form>
+		</div>
+		<div id="controls" class="w3-center w3-container">
+			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+		</div>
+	</dialog>
+</template>
 {{end}}
 
 {{define "volume-rootfs"}}
@@ -108,6 +161,23 @@
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
 		<svg class="clickable" aria-label="Move {{.Name}}"><use href="images/actions/disk/move-active.svg#symb"></svg>
+		<template id="dialog-template">
+			<dialog class="w3-container w3-card w3-border-0">
+				<p class="w3-large" id="prompt" style="text-align: center;">
+					Move {{.Name}}
+				</p>
+				<div id="body">
+					<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+						<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select"></select>
+						<label for="delete-check">Delete Source</label><input class="w3-input w3-border" name="delete-check" id="delete-check" type="checkbox" checked required>
+					</form>
+				</div>
+				<div id="controls" class="w3-center w3-container">
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+				</div>
+			</dialog>
+		</template>
 	</template>
 </volume-action>
 {{end}}
@@ -126,6 +196,23 @@
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
 		<svg class="clickable" aria-label="Resize {{.Name}}"><use href="images/actions/disk/resize-active.svg#symb"></svg>
+		<template id="dialog-template">
+			<dialog class="w3-container w3-card w3-border-0">
+				<p class="w3-large" id="prompt" style="text-align: center;">
+					Resize {{.Name}}
+				</p>
+				<div id="body">
+					<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+						<label for="size-increment">Size Increment (GiB)</label>
+						<input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072">
+					</form>
+				</div>
+				<div id="controls" class="w3-center w3-container">
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+				</div>
+			</dialog>
+		</template>
 	</template>
 </volume-action>
 {{end}}
@@ -144,6 +231,22 @@
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
 		<svg class="clickable" aria-label="Delete {{.Name}}"><use href="images/actions/disk/delete-active.svg#symb"></svg>
+		<template id="dialog-template">
+			<dialog class="w3-container w3-card w3-border-0">
+				<p class="w3-large" id="prompt" style="text-align: center;">
+					Delete {{.Name}}
+				</p>
+				<div id="body">
+					<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+						<p>Are you sure you want to <strong>delete</strong> disk {{.Name}}</p>
+					</form>
+				</div>
+				<div id="controls" class="w3-center w3-container">
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+				</div>
+			</dialog>
+		</template>
 	</template>
 </volume-action>
 {{end}}
@@ -162,6 +265,28 @@
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
 		<svg class="clickable" aria-label="Attach {{.Name}}"><use href="images/actions/disk/attach.svg#symb"></svg>
+		<template id="dialog-template">
+			<dialog class="w3-container w3-card w3-border-0">
+				<p class="w3-large" id="prompt" style="text-align: center;">
+					Attach {{.Name}}
+				</p>
+				<div id="body">
+					<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+						{{if eq .InstanceType "VM"}}
+						<label for="device">SCSI</label>
+						<input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="30" required>
+						{{else}}
+						<label for="device">MP</label>
+						<input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="255" required>
+						{{end}}
+					</form>
+				</div>
+				<div id="controls" class="w3-center w3-container">
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+				</div>
+			</dialog>
+		</template>
 	</template>
 </volume-action>
 {{end}}
@@ -171,6 +296,22 @@
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
 		<svg class="clickable" aria-label="Detach {{.Name}}"><use href="images/actions/disk/detach.svg#symb"></svg>
+		<template id="dialog-template">
+			<dialog class="w3-container w3-card w3-border-0">
+				<p class="w3-large" id="prompt" style="text-align: center;">
+					Detach {{.Name}}
+				</p>
+				<div id="body">
+					<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+						<p>Are you sure you want to detach disk {{.Name}}</p>
+					</form>
+				</div>
+				<div id="controls" class="w3-center w3-container">
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+				</div>
+			</dialog>
+		</template>
 	</template>
 </volume-action>
 {{end}}
@@ -190,6 +331,33 @@
 	{{end}}
 {{end}}
 
+{{define "nets-add-net"}}
+<button type="button" id="network-add" class="w3-button" aria-label="Add New Network Interface">
+	<span class="large" style="margin: 0;">Add Network</span>
+	<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New Network Interface"><use href="images/actions/network/add.svg#symb"></use></svg>
+</button>
+<template id="add-net-dialog">
+	<dialog class="w3-container w3-card w3-border-0">
+		<p class="w3-large" id="prompt" style="text-align: center;">
+			Create Network Interface
+		</p>
+		<div id="body">
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+				<label for="netid">Interface ID</label><input type="number" id="netid" name="netid" class="w3-input w3-border">
+				<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">
+				{{if eq .config.Type "CT"}}
+				<label for="name">Interface Name</label><input type="text" id="name" name="name" class="w3-input w3-border">
+				{{end}}
+			</form>
+		</div>
+		<div id="controls" class="w3-center w3-container">
+			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+		</div>
+	</dialog>
+</template>
+{{end}}
+
 {{define "net"}}
 <svg data-network="{{.Net_ID}}" aria-label="Net {{.Net_ID}}"><use href="images/resources/network.svg#symb"></svg>
 <p>{{.Net_ID}}</p>
@@ -199,12 +367,44 @@
 		<template shadowrootmode="open">
 			<link rel="stylesheet" href="css/style.css">
 			<svg class="clickable" aria-label="Configure Net {{.Net_ID}}"><use href="images/actions/network/config.svg#symb"></svg>
+			<template id="dialog-template">
+				<dialog class="w3-container w3-card w3-border-0">
+					<p class="w3-large" id="prompt" style="text-align: center;">
+						Edit {{.Net_ID}}
+					</p>
+					<div id="body">
+						<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+							<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">
+						</form>
+					</div>
+					<div id="controls" class="w3-center w3-container">
+						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					</div>
+				</dialog>
+			</template>
 		</template>
 	</network-action>
 	<network-action data-type="delete" data-network="{{.Net_ID}}" data-value="{{.Value}}">
 		<template shadowrootmode="open">
 			<link rel="stylesheet" href="css/style.css">
 			<svg class="clickable" aria-label="Delete Net {{.Net_ID}}"><use href="images/actions/network/delete-active.svg#symb"></svg>
+			<template id="dialog-template">
+				<dialog class="w3-container w3-card w3-border-0">
+					<p class="w3-large" id="prompt" style="text-align: center;">
+						Delete {{.Net_ID}}
+					</p>
+					<div id="body">
+						<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+							<p>Are you sure you want to <strong>delete</strong> {{.Net_ID}}</p>
+						</form>
+					</div>
+					<div id="controls" class="w3-center w3-container">
+						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					</div>
+				</dialog>
+			</template>
 		</template>
 	</network-action>
 </div>
@@ -216,6 +416,31 @@
 	{{end}}
 {{end}}
 
+{{define "devices-add-device"}}
+<button type="button" id="device-add" class="w3-button" aria-label="Add New PCIe Device">
+	<span class="large" style="margin: 0;">Add Device</span>
+	<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New PCIe Device"><use href="images/actions/device/add.svg#symb"></use></svg>
+</button>
+<template id="add-device-dialog">
+	<dialog class="w3-container w3-card w3-border-0">
+		<p class="w3-large" id="prompt" style="text-align: center;">
+			Add Expansion Card
+		</p>
+		<div id="body">
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+				<label for="hostpci">Device Bus</label><input type="number" id="hostpci" name="hostpci" class="w3-input w3-border">
+				<label for="device">Device</label><select id="device" name="device" required></select>
+				<label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">
+			</form>
+		</div>
+		<div id="controls" class="w3-center w3-container">
+			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+		</div>
+	</dialog>
+</template>
+{{end}}
+
 {{define "device"}}
 <svg data-device="{{.Device_ID}}" aria-label="Device {{.Device_ID}}"><use href="images/resources/device.svg#symb"></svg>
 <p>{{.Device_ID}}</p>
@@ -225,12 +450,44 @@
 		<template shadowrootmode="open">
 			<link rel="stylesheet" href="css/style.css">
 			<svg class="clickable" aria-label="Configure Device {{.Device_ID}}"><use href="images/actions/device/config.svg#symb"></svg>
+			<template id="dialog-template">
+				<dialog class="w3-container w3-card w3-border-0">
+					<p class="w3-large" id="prompt" style="text-align: center;">
+						Edit Expansion Card {{.Device_ID}}
+					</p>
+					<div id="body">
+						<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+							<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">
+						</form>
+					</div>
+					<div id="controls" class="w3-center w3-container">
+						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					</div>
+				</dialog>
+			</template>
 		</template>
 	</device-action>
 	<device-action data-type="delete" data-device="{{.Device_ID}}" data-value="{{.Value}}">
 		<template shadowrootmode="open">
 			<link rel="stylesheet" href="css/style.css">
 			<svg class="clickable" aria-label="Delete Device {{.Device_ID}}"><use href="images/actions/device/delete-active.svg#symb"></svg>
+			<template id="dialog-template">
+				<dialog class="w3-container w3-card w3-border-0">
+					<p class="w3-large" id="prompt" style="text-align: center;">
+						remove Expansion Card {{.Device_ID}}
+					</p>
+					<div id="body">
+						<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+							<p>Are you sure you want to <strong>remove</strong> {{.Device_ID}}</p>
+						</form>
+					</div>
+					<div id="controls" class="w3-center w3-container">
+						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					</div>
+				</dialog>
+			</template>
 		</template>
 	</device-action>
 </div>

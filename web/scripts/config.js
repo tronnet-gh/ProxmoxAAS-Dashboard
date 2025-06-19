@@ -29,6 +29,7 @@ class VolumeAction extends HTMLElement {
 		super();
 		const internals = this.attachInternals();
 		this.shadowRoot = internals.shadowRoot;
+		this.template = this.shadowRoot.querySelector("#dialog-template");
 		if (this.dataset.type === "move") {
 			this.addEventListener("click", this.handleDiskMove);
 		}
@@ -53,9 +54,7 @@ class VolumeAction extends HTMLElement {
 
 	async handleDiskDetach () {
 		const disk = this.dataset.volume;
-		const header = `Detach ${disk}`;
-		const body = `<p>Are you sure you want to detach disk ${disk}</p>`;
-		dialog(header, body, async (result, form) => {
+		dialog(this.template, async (result, form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/detach`, "POST");
@@ -69,15 +68,7 @@ class VolumeAction extends HTMLElement {
 	}
 
 	async handleDiskAttach () {
-		const header = `Attach ${this.dataset.volume}`;
-		const body = `
-			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-				<label for="device">${type === "qemu" ? "SCSI" : "MP"}</label>
-				<input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "30" : "255"}" required>
-			</form>
-		`;
-
-		dialog(header, body, async (result, form) => {
+		dialog(this.template, async (result, form) => {
 			if (result === "confirm") {
 				const device = form.get("device");
 				this.setStatusLoading();
@@ -97,15 +88,7 @@ class VolumeAction extends HTMLElement {
 	}
 
 	async handleDiskResize () {
-		const header = `Resize ${this.dataset.volume}`;
-		const body = `
-			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-				<label for="size-increment">Size Increment (GiB)</label>
-				<input class="w3-input w3-border" name="size-increment" id="size-increment" type="number" min="0" max="131072">
-			</form>
-		`;
-
-		dialog(header, body, async (result, form) => {
+		dialog(this.template, async (result, form) => {
 			if (result === "confirm") {
 				const disk = this.dataset.volume;
 				this.setStatusLoading();
@@ -123,25 +106,7 @@ class VolumeAction extends HTMLElement {
 	}
 
 	async handleDiskMove () {
-		const content = type === "qemu" ? "images" : "rootdir";
-		const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
-		const header = `Move ${this.dataset.volume}`;
-		let options = "";
-		storage.data.forEach((element) => {
-			if (element.content.includes(content)) {
-				options += `<option value="${element.storage}">${element.storage}</option>"`;
-			}
-		});
-		const select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select"><option hidden disabled selected value></option>${options}</select>`;
-
-		const body = `
-			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-				${select}
-				<label for="delete-check">Delete Source</label><input class="w3-input w3-border" name="delete-check" id="delete-check" type="checkbox" checked required>
-			</form>
-		`;
-
-		dialog(header, body, async (result, form) => {
+		const d = dialog(this.template, async (result, form) => {
 			if (result === "confirm") {
 				const disk = this.dataset.volume;
 				this.setStatusLoading();
@@ -157,13 +122,20 @@ class VolumeAction extends HTMLElement {
 				refreshBoot();
 			}
 		});
+		const content = type === "qemu" ? "images" : "rootdir";
+		const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
+		const select = d.querySelector("#storage-select");
+		storage.data.forEach((element) => {
+			if (element.content.includes(content)) {
+				select.add(new Option(element.storage));
+			}
+			select.selectedIndex = -1;
+		});
 	}
 
 	async handleDiskDelete () {
 		const disk = this.dataset.volume;
-		const header = `Delete ${disk}`;
-		const body = `<p>Are you sure you want to <strong>delete</strong> disk ${disk}</p>`;
-		dialog(header, body, async (result, form) => {
+		dialog(this.template, async (result, form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/delete`, "DELETE");
@@ -201,26 +173,8 @@ async function refreshVolumes () {
 }
 
 async function handleDiskAdd () {
-	const content = type === "qemu" ? "images" : "rootdir";
-	const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
-	const header = "Create New Disk";
-	let options = "";
-	storage.data.forEach((element) => {
-		if (element.content.includes(content)) {
-			options += `<option value="${element.storage}">${element.storage}</option>"`;
-		}
-	});
-	const select = `<label for="storage-select">Storage</label><select class="w3-select w3-border" name="storage-select" id="storage-select" required><option hidden disabled selected value></option>${options}</select>`;
-
-	const body = `
-		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="device">${type === "qemu" ? "SCSI" : "MP"}</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="${type === "qemu" ? "30" : "255"}" value="0" required>
-			${select}
-			<label for="size">Size (GiB)</label><input class="w3-input w3-border" name="size" id="size" type="number" min="0" max="131072" required>
-		</form>
-	`;
-
-	dialog(header, body, async (result, form) => {
+	const template = document.querySelector("#add-disk-dialog");
+	const d = dialog(template, async (result, form) => {
 		if (result === "confirm") {
 			const body = {
 				storage: form.get("storage-select"),
@@ -237,19 +191,21 @@ async function handleDiskAdd () {
 			refreshBoot();
 		}
 	});
+
+	const content = type === "qemu" ? "images" : "rootdir";
+	const storage = await requestPVE(`/nodes/${node}/storage`, "GET");
+	const select = d.querySelector("#storage-select");
+	storage.data.forEach((element) => {
+		if (element.content.includes(content)) {
+			select.add(new Option(element.storage));
+		}
+		select.selectedIndex = -1;
+	});
 }
 
 async function handleCDAdd () {
-	const isos = await requestAPI("/user/vm-isos", "GET");
-	const header = "Mount a CDROM";
-	const body = `
-		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="device">IDE</label><input class="w3-input w3-border" name="device" id="device" type="number" min="0" max="3" required>
-			<label for="iso-select">Image</label><select class="w3-select w3-border" name="iso-select" id="iso-select" required></select>
-		</form>
-	`;
-
-	const d = dialog(header, body, async (result, form) => {
+	const template = document.querySelector("#add-cd-dialog");
+	const d = dialog(template, async (result, form) => {
 		if (result === "confirm") {
 			const body = {
 				iso: form.get("iso-select")
@@ -264,12 +220,13 @@ async function handleCDAdd () {
 		}
 	});
 
-	const isoSelect = d.querySelector("#iso-select");
+	const isos = await requestAPI("/user/vm-isos", "GET");
+	const select = d.querySelector("#iso-select");
 
 	for (const iso of isos) {
-		isoSelect.append(new Option(iso.name, iso.volid));
+		select.add(new Option(iso.name, iso.volid));
 	}
-	isoSelect.selectedIndex = -1;
+	select.selectedIndex = -1;
 }
 
 class NetworkAction extends HTMLElement {
@@ -279,6 +236,7 @@ class NetworkAction extends HTMLElement {
 		super();
 		const internals = this.attachInternals();
 		this.shadowRoot = internals.shadowRoot;
+		this.template = this.shadowRoot.querySelector("#dialog-template");
 		if (this.dataset.type === "config") {
 			this.addEventListener("click", this.handleNetworkConfig);
 		}
@@ -293,16 +251,9 @@ class NetworkAction extends HTMLElement {
 	}
 
 	async handleNetworkConfig () {
-		const netID = this.dataset.network;
 		const netDetails = this.dataset.value;
-		const header = `Edit ${netID}`;
-		const body = `
-			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-				<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">
-			</form>
-		`;
-
-		const d = dialog(header, body, async (result, form) => {
+		const netID = this.dataset.network;
+		const d = dialog(this.template, async (result, form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
 				const body = {
@@ -323,9 +274,7 @@ class NetworkAction extends HTMLElement {
 
 	async handleNetworkDelete () {
 		const netID = this.dataset.network;
-		const header = `Delete ${netID}`;
-		const body = "";
-		dialog(header, body, async (result, form) => {
+		dialog(this.template, async (result, form) => {
 			if (result === "confirm") {
 				setSVGSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
 				const net = `${netID}`;
@@ -361,17 +310,8 @@ async function refreshNetworks () {
 }
 
 async function handleNetworkAdd () {
-	const header = "Create Network Interface";
-	let body = `
-		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="netid">Interface ID</label><input type="number" id="netid" name="netid" class="w3-input w3-border">
-			<label for="rate">Rate Limit (MB/s)</label><input type="number" id="rate" name="rate" class="w3-input w3-border">
-	`;
-	if (type === "lxc") {
-		body += "<label for=\"name\">Interface Name</label><input type=\"text\" id=\"name\" name=\"name\" class=\"w3-input w3-border\">";
-	}
-	body += "</form>";
-	dialog(header, body, async (result, form) => {
+	const template = document.querySelector("#add-net-dialog");
+	dialog(template, async (result, form) => {
 		if (result === "confirm") {
 			const body = {
 				rate: form.get("rate")
@@ -398,6 +338,7 @@ class DeviceAction extends HTMLElement {
 		super();
 		const internals = this.attachInternals();
 		this.shadowRoot = internals.shadowRoot;
+		this.template = this.shadowRoot.querySelector("#dialog-template");
 		if (this.dataset.type === "config") {
 			this.addEventListener("click", this.handleDeviceConfig);
 		}
@@ -415,14 +356,7 @@ class DeviceAction extends HTMLElement {
 		const deviceID = this.dataset.device;
 		const deviceDetails = this.dataset.value;
 		const deviceName = this.dataset.name;
-		const header = `Edit Expansion Card ${deviceID}`;
-		const body = `
-			<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-				<label for="device">Device</label><select id="device" name="device" required></select><label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">
-			</form>
-		`;
-
-		const d = dialog(header, body, async (result, form) => {
+		const d = dialog(this.template, async (result, form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
 				const body = {
@@ -448,9 +382,7 @@ class DeviceAction extends HTMLElement {
 
 	async handleDeviceDelete () {
 		const deviceID = this.dataset.device;
-		const header = `Remove Expansion Card ${deviceID}`;
-		const body = "";
-		dialog(header, body, async (result, form) => {
+		dialog(this.template, async (result, form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
 				const device = `${deviceID}`;
@@ -487,15 +419,8 @@ async function refreshDevices () {
 }
 
 async function handleDeviceAdd () {
-	const header = "Add Expansion Card";
-	const body = `
-		<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
-			<label for="hostpci">Device Bus</label><input type="number" id="hostpci" name="hostpci" class="w3-input w3-border">
-			<label for="device">Device</label><select id="device" name="device" required></select>
-			<label for="pcie">PCI-Express</label><input type="checkbox" id="pcie" name="pcie" class="w3-input w3-border">
-		</form>
-	`;
-	const d = dialog(header, body, async (result, form) => {
+	const template = document.querySelector("#add-device-dialog");
+	const d = dialog(template, async (result, form) => {
 		if (result === "confirm") {
 			const hostpci = form.get("hostpci");
 			const body = {
