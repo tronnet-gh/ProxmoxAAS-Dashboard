@@ -7,6 +7,7 @@ import (
 	"github.com/tdewolff/minify/v2/css"
 	"github.com/tdewolff/minify/v2/html"
 	"github.com/tdewolff/minify/v2/js"
+	"github.com/tdewolff/minify/v2/svg"
 )
 
 // defines mime type and associated minifier
@@ -35,7 +36,7 @@ var MimeTypes = map[string]MimeType{
 	},
 	"svg": {
 		Type:     "image/svg+xml",
-		Minifier: nil,
+		Minifier: svg.Minify,
 	},
 	"js": {
 		Type:     "application/javascript",
