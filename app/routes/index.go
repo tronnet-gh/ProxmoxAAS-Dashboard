@@ -26,6 +26,7 @@ type InstanceCard struct {
 	NodeStatus  string
 	ConfigPath  string
 	ConsolePath string
+	BackupsPath string
 }
 
 // used in retriving cluster tasks
@@ -85,9 +86,9 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 			"PVEAuthCookie":       auth.Token,
 			"CSRFPreventionToken": auth.CSRF,
 		},
-		Body: map[string]any{},
 	}
-	res, code, err := common.RequestGetAPI("/proxmox/cluster/resources", ctx)
+	body := map[string]any{}
+	res, code, err := common.RequestGetAPI("/proxmox/cluster/resources", ctx, &body)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -99,7 +100,7 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 	nodes := map[string]Node{}
 
 	// if we successfully retrieved the resources, then process it and return index
-	for _, v := range ctx.Body["data"].([]any) {
+	for _, v := range body["data"].([]any) {
 		m := v.(map[string]any)
 		if m["type"] == "node" {
 			node := Node{}
@@ -126,11 +127,12 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 		} else if instance.Type == "lxc" {
 			instance.ConsolePath = fmt.Sprintf("%s/?console=lxc&vmid=%d&vmname=%s&node=%s&resize=off&cmd=&xtermjs=1", common.Global.PVE, instance.VMID, instance.Name, instance.Node)
 		}
+		instance.BackupsPath = fmt.Sprintf("backups?node=%s&type=%s&vmid=%d", instance.Node, instance.Type, instance.VMID)
 		instances[vmid] = instance
 	}
 
-	ctx.Body = map[string]any{}
-	res, code, err = common.RequestGetAPI("/proxmox/cluster/tasks", ctx)
+	body = map[string]any{}
+	res, code, err = common.RequestGetAPI("/proxmox/cluster/tasks", ctx, &body)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -141,7 +143,7 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 	most_recent_task := map[uint]uint{}
 	expected_state := map[uint]string{}
 
-	for _, v := range ctx.Body["data"].([]any) {
+	for _, v := range body["data"].([]any) {
 		task := Task{}
 		err := mapstructure.Decode(v, &task)
 		if err != nil {
@@ -180,8 +182,8 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 			// get /status/current which is updated faster than /cluster/resources
 			instance := instances[vmid]
 			path := fmt.Sprintf("/proxmox/nodes/%s/%s/%d/status/current", instance.Node, instance.Type, instance.VMID)
-			ctx.Body = map[string]any{}
-			res, code, err := common.RequestGetAPI(path, ctx)
+			body = map[string]any{}
+			res, code, err := common.RequestGetAPI(path, ctx, &body)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -190,7 +192,7 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 			}
 
 			status := InstanceStatus{}
-			mapstructure.Decode(ctx.Body["data"], &status)
+			mapstructure.Decode(body["data"], &status)
 
 			instance.Status = status.Status
 			instances[vmid] = instance

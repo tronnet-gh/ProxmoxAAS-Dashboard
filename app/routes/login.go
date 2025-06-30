@@ -26,9 +26,10 @@ func GetLoginRealms() ([]Realm, error) {
 
 	ctx := common.RequestContext{
 		Cookies: nil,
-		Body:    map[string]any{},
+		//Body:    map[string]any{},
 	}
-	res, code, err := common.RequestGetAPI("/proxmox/access/domains", ctx)
+	body := map[string]any{}
+	res, code, err := common.RequestGetAPI("/proxmox/access/domains", ctx, &body)
 	if err != nil {
 		return realms, err
 	}
@@ -36,7 +37,7 @@ func GetLoginRealms() ([]Realm, error) {
 		return realms, fmt.Errorf("request to /proxmox/access/domains resulted in %+v", res)
 	}
 
-	for _, v := range ctx.Body["data"].([]any) {
+	for _, v := range body["data"].([]any) {
 		v = v.(map[string]any)
 		realm := Realm{}
 		err := mapstructure.Decode(v, &realm)

@@ -31,7 +31,6 @@ type RequestType int
 
 type RequestContext struct {
 	Cookies map[string]string
-	Body    map[string]any
 }
 
 type Auth struct {

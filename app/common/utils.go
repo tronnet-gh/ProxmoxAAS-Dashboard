@@ -10,6 +10,7 @@ import (
 	"io"
 	"io/fs"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"reflect"
@@ -21,6 +22,12 @@ import (
 
 var TMPL *template.Template
 var Global Config
+
+type VMPath struct {
+	Node string
+	Type string
+	VMID string
+}
 
 func GetConfig(configPath string) Config {
 	content, err := os.ReadFile(configPath)
@@ -159,7 +166,7 @@ func HandleNonFatalError(c *gin.Context, err error) {
 	c.Status(http.StatusInternalServerError)
 }
 
-func RequestGetAPI(path string, context RequestContext) (*http.Response, int, error) {
+func RequestGetAPI(path string, context RequestContext, body any) (*http.Response, int, error) {
 	req, err := http.NewRequest("GET", Global.API+path, nil)
 	if err != nil {
 		return nil, 0, err
@@ -186,9 +193,18 @@ func RequestGetAPI(path string, context RequestContext) (*http.Response, int, er
 		return nil, response.StatusCode, err
 	}
 
-	err = json.Unmarshal(data, &context.Body)
-	if err != nil {
-		return nil, response.StatusCode, err
+	switch body.(type) { // write json to body object depending on type, currently supports map[string]any (ie json) or []any (ie array of json)
+	case *map[string]any:
+		err = json.Unmarshal(data, &body)
+		if err != nil {
+			return nil, response.StatusCode, err
+		}
+	case *[]any:
+		err = json.Unmarshal(data, &body)
+		if err != nil {
+			return nil, response.StatusCode, err
+		}
+	default:
 	}
 
 	return response, response.StatusCode, nil
@@ -203,5 +219,40 @@ func GetAuth(c *gin.Context) (Auth, error) {
 		return Auth{}, fmt.Errorf("error occured getting user cookies: (auth: %s, token: %s, csrf: %s)", errAuth, errToken, errCSRF)
 	} else {
 		return Auth{username, token, csrf}, nil
+	}
+}
+
+func ExtractVMPath(c *gin.Context) (VMPath, error) {
+	req_node := c.Query("node")
+	req_type := c.Query("type")
+	req_vmid := c.Query("vmid")
+	if req_node == "" || req_type == "" || req_vmid == "" {
+		return VMPath{}, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid)
+	}
+	vm_path := VMPath{
+		Node: req_node,
+		Type: req_type,
+		VMID: req_vmid,
+	}
+	return vm_path, nil
+}
+
+func FormatNumber(val int64, base int64) (float64, string) {
+	valf := float64(val)
+	basef := float64(base)
+	steps := 0
+	for math.Abs(valf) > basef && steps < 4 {
+		valf /= basef
+		steps++
+	}
+
+	if base == 1000 {
+		prefixes := []string{"", "K", "M", "G", "T"}
+		return valf, prefixes[steps]
+	} else if base == 1024 {
+		prefixes := []string{"", "Ki", "Mi", "Gi", "Ti"}
+		return valf, prefixes[steps]
+	} else {
+		return 0, ""
 	}
 }

@@ -13,12 +13,6 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
-type VMPath struct {
-	Node string
-	Type string
-	VMID string
-}
-
 // imported types from fabric
 
 type InstanceConfig struct {
@@ -56,7 +50,7 @@ type CPUConfig struct {
 func HandleGETConfig(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
-		vm_path, err := ExtractVMPath(c)
+		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 		}
@@ -91,7 +85,7 @@ func HandleGETConfig(c *gin.Context) {
 func HandleGETConfigVolumesFragment(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
-		vm_path, err := ExtractVMPath(c)
+		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 		}
@@ -114,7 +108,7 @@ func HandleGETConfigVolumesFragment(c *gin.Context) {
 func HandleGETConfigNetsFragment(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
-		vm_path, err := ExtractVMPath(c)
+		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 		}
@@ -137,7 +131,7 @@ func HandleGETConfigNetsFragment(c *gin.Context) {
 func HandleGETConfigDevicesFragment(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
-		vm_path, err := ExtractVMPath(c)
+		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 		}
@@ -160,7 +154,7 @@ func HandleGETConfigDevicesFragment(c *gin.Context) {
 func HandleGETConfigBootFragment(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
-		vm_path, err := ExtractVMPath(c)
+		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 		}
@@ -180,22 +174,7 @@ func HandleGETConfigBootFragment(c *gin.Context) {
 	}
 }
 
-func ExtractVMPath(c *gin.Context) (VMPath, error) {
-	req_node := c.Query("node")
-	req_type := c.Query("type")
-	req_vmid := c.Query("vmid")
-	if req_node == "" || req_type == "" || req_vmid == "" {
-		return VMPath{}, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid)
-	}
-	vm_path := VMPath{
-		Node: req_node,
-		Type: req_type,
-		VMID: req_vmid,
-	}
-	return vm_path, nil
-}
-
-func GetInstanceConfig(vm VMPath, auth common.Auth) (InstanceConfig, error) {
+func GetInstanceConfig(vm common.VMPath, auth common.Auth) (InstanceConfig, error) {
 	config := InstanceConfig{}
 	path := fmt.Sprintf("/cluster/%s/%s/%s", vm.Node, vm.Type, vm.VMID)
 	ctx := common.RequestContext{
@@ -204,9 +183,9 @@ func GetInstanceConfig(vm VMPath, auth common.Auth) (InstanceConfig, error) {
 			"PVEAuthCookie":       auth.Token,
 			"CSRFPreventionToken": auth.CSRF,
 		},
-		Body: map[string]any{},
 	}
-	res, code, err := common.RequestGetAPI(path, ctx)
+	body := map[string]any{}
+	res, code, err := common.RequestGetAPI(path, ctx, &body)
 	if err != nil {
 		return config, err
 	}
@@ -214,7 +193,7 @@ func GetInstanceConfig(vm VMPath, auth common.Auth) (InstanceConfig, error) {
 		return config, fmt.Errorf("request to %s resulted in %+v", path, res)
 	}
 
-	err = mapstructure.Decode(ctx.Body, &config)
+	err = mapstructure.Decode(body, &config)
 	if err != nil {
 		return config, err
 	}
@@ -225,7 +204,7 @@ func GetInstanceConfig(vm VMPath, auth common.Auth) (InstanceConfig, error) {
 	return config, nil
 }
 
-func GetCPUTypes(vm VMPath, auth common.Auth) (common.Select, error) {
+func GetCPUTypes(vm common.VMPath, auth common.Auth) (common.Select, error) {
 	cputypes := common.Select{
 		ID:       "proctype",
 		Required: true,
@@ -238,10 +217,10 @@ func GetCPUTypes(vm VMPath, auth common.Auth) (common.Select, error) {
 			"PVEAuthCookie":       auth.Token,
 			"CSRFPreventionToken": auth.CSRF,
 		},
-		Body: map[string]any{},
 	}
+	body := map[string]any{}
 	path := "/global/config/resources"
-	res, code, err := common.RequestGetAPI(path, ctx)
+	res, code, err := common.RequestGetAPI(path, ctx, &body)
 	if err != nil {
 		return cputypes, err
 	}
@@ -249,15 +228,15 @@ func GetCPUTypes(vm VMPath, auth common.Auth) (common.Select, error) {
 		return cputypes, fmt.Errorf("request to %s resulted in %+v", path, res)
 	}
 	global := GlobalConfig{}
-	err = mapstructure.Decode(ctx.Body["resources"], &global)
+	err = mapstructure.Decode(body["resources"], &global)
 	if err != nil {
 		return cputypes, err
 	}
 
 	// get user resource config
-	ctx.Body = map[string]any{}
+	body = map[string]any{}
 	path = "/user/config/resources"
-	res, code, err = common.RequestGetAPI(path, ctx)
+	res, code, err = common.RequestGetAPI(path, ctx, &body)
 	if err != nil {
 		return cputypes, err
 	}
@@ -265,7 +244,7 @@ func GetCPUTypes(vm VMPath, auth common.Auth) (common.Select, error) {
 		return cputypes, fmt.Errorf("request to %s resulted in %+v", path, res)
 	}
 	user := UserConfigResources{}
-	err = mapstructure.Decode(ctx.Body, &user)
+	err = mapstructure.Decode(body, &user)
 	if err != nil {
 		return cputypes, err
 	}
@@ -287,9 +266,9 @@ func GetCPUTypes(vm VMPath, auth common.Auth) (common.Select, error) {
 		}
 	} else { // cpu is a blacklist
 		// get the supported cpu types from the node
-		ctx.Body = map[string]any{}
+		body = map[string]any{}
 		path = fmt.Sprintf("/proxmox/nodes/%s/capabilities/qemu/cpu", vm.Node)
-		res, code, err = common.RequestGetAPI(path, ctx)
+		res, code, err = common.RequestGetAPI(path, ctx, &body)
 		if err != nil {
 			return cputypes, err
 		}
@@ -299,7 +278,7 @@ func GetCPUTypes(vm VMPath, auth common.Auth) (common.Select, error) {
 		supported := struct {
 			data []CPUConfig
 		}{}
-		err = mapstructure.Decode(ctx.Body, supported)
+		err = mapstructure.Decode(body, supported)
 		if err != nil {
 			return cputypes, err
 		}

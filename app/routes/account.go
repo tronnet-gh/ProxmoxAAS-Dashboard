@@ -2,7 +2,6 @@ package routes
 
 import (
 	"fmt"
-	"math"
 	"net/http"
 	"proxmoxaas-dashboard/app/common"
 
@@ -108,7 +107,7 @@ func HandleGETAccount(c *gin.Context) {
 		for k, v := range account.Resources {
 			switch t := v.(type) {
 			case NumericResource:
-				avail, prefix := FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+				avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
 				account.Resources[k] = ResourceChart{
 					Type:     t.Type,
 					Display:  t.Display,
@@ -121,7 +120,7 @@ func HandleGETAccount(c *gin.Context) {
 					ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
 				}
 			case StorageResource:
-				avail, prefix := FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+				avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
 				account.Resources[k] = ResourceChart{
 					Type:     t.Type,
 					Display:  t.Display,
@@ -181,45 +180,45 @@ func GetUserAccount(auth common.Auth) (Account, error) {
 			"PVEAuthCookie":       auth.Token,
 			"CSRFPreventionToken": auth.CSRF,
 		},
-		Body: map[string]any{},
 	}
 
 	// get user account basic data
-	res, code, err := common.RequestGetAPI("/user/config/cluster", ctx)
+	body := map[string]any{}
+	res, code, err := common.RequestGetAPI("/user/config/cluster", ctx, &body)
 	if err != nil {
 		return account, err
 	}
 	if code != 200 {
 		return account, fmt.Errorf("request to /user/config/cluster resulted in %+v", res)
 	}
-	err = mapstructure.Decode(ctx.Body, &account)
+	err = mapstructure.Decode(body, &account)
 	if err != nil {
 		return account, err
 	} else {
 		account.Username = auth.Username
 	}
 
-	ctx.Body = map[string]any{}
+	body = map[string]any{}
 	// get user resources
-	res, code, err = common.RequestGetAPI("/user/dynamic/resources", ctx)
+	res, code, err = common.RequestGetAPI("/user/dynamic/resources", ctx, &body)
 	if err != nil {
 		return account, err
 	}
 	if code != 200 {
 		return account, fmt.Errorf("request to /user/dynamic/resources resulted in %+v", res)
 	}
-	resources := ctx.Body
+	resources := body
 
-	ctx.Body = map[string]any{}
+	body = map[string]any{}
 	// get resource meta data
-	res, code, err = common.RequestGetAPI("/global/config/resources", ctx)
+	res, code, err = common.RequestGetAPI("/global/config/resources", ctx, &body)
 	if err != nil {
 		return account, err
 	}
 	if code != 200 {
 		return account, fmt.Errorf("request to /global/config/resources resulted in %+v", res)
 	}
-	meta := ctx.Body["resources"].(map[string]any)
+	meta := body["resources"].(map[string]any)
 
 	// build each resource by its meta type
 	for k, v := range meta {
@@ -257,26 +256,6 @@ func GetUserAccount(auth common.Auth) (Account, error) {
 	}
 
 	return account, nil
-}
-
-func FormatNumber(val int64, base int64) (float64, string) {
-	valf := float64(val)
-	basef := float64(base)
-	steps := 0
-	for math.Abs(valf) > basef && steps < 4 {
-		valf /= basef
-		steps++
-	}
-
-	if base == 1000 {
-		prefixes := []string{"", "K", "M", "G", "T"}
-		return valf, prefixes[steps]
-	} else if base == 1024 {
-		prefixes := []string{"", "Ki", "Mi", "Gi", "Ti"}
-		return valf, prefixes[steps]
-	} else {
-		return 0, ""
-	}
 }
 
 // interpolate between min and max by normalized (0 - 1) val
