@@ -123,7 +123,6 @@ class InstanceCard extends HTMLElement {
 		if (powerButton.classList.contains("clickable")) {
 			powerButton.onclick = this.handlePowerButton.bind(this);
 			powerButton.onkeydown = (event) => {
-				console.log(event.key, event.key === "Enter");
 				if (event.key === "Enter") {
 					event.preventDefault();
 					this.handlePowerButton();

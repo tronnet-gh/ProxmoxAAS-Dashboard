@@ -63,9 +63,9 @@ func HandleGETIndex(c *gin.Context) {
 }
 
 func HandleGETInstancesFragment(c *gin.Context) {
-	Auth, err := common.GetAuth(c)
+	auth, err := common.GetAuth(c)
 	if err == nil { // user should be authed, try to return index with population
-		instances, _, err := GetClusterResources(Auth)
+		instances, _, err := GetClusterResources(auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 		}
