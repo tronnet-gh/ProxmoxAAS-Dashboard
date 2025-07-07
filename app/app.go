@@ -35,6 +35,8 @@ func Run() {
 	router.GET("/config/nets", routes.HandleGETConfigNetsFragment)
 	router.GET("/config/devices", routes.HandleGETConfigDevicesFragment)
 	router.GET("/config/boot", routes.HandleGETConfigBootFragment)
+	router.GET("/backups", routes.HandleGETBackups)
+	router.GET("/backups/backups", routes.HandleGETBackupsFragment)
 	router.GET("/login", routes.HandleGETLogin)
 	router.GET("/settings", routes.HandleGETSettings)
 

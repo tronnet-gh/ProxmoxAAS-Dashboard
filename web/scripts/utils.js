@@ -81,7 +81,11 @@ async function request (url, content) {
 		const response = await fetch(url, content);
 		const contentType = response.headers.get("Content-Type");
 		let data = null;
-		if (contentType.includes("application/json")) {
+
+		if (contentType === null) {
+			data = {};
+		}
+		else if (contentType.includes("application/json")) {
 			data = await response.json();
 			data.status = response.status;
 		}
@@ -94,8 +98,9 @@ async function request (url, content) {
 			data.status = response.status;
 		}
 		else {
-			data = response;
+			data = {};
 		}
+
 		if (!response.ok) {
 			return { status: response.status, error: data ? data.error : response.status };
 		}

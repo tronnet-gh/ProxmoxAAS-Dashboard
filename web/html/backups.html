@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{{template "head" .}}
+		<script src="scripts/backups.js" type="module"></script>
+		<link rel="modulepreload" href="scripts/utils.js">
+		<link rel="modulepreload" href="scripts/dialog.js">
+		<style>
+		</style>
+	</head>
+	<body>
+		<header>
+			{{template "header" .}}
+		</header>
+		<main>
+			<h2><a href="index">Instances</a> / {{.config.Name}} / Backups</h2>
+			<section class="w3-card w3-padding">
+				<div class="w3-row" style="border-bottom: 1px solid;">
+					<p class="w3-col l2 m4 s8">Time</p>
+					<p class="w3-col l6 m6 w3-hide-small">Notes</p>
+					<p class="w3-col l2 w3-hide-medium w3-hide-small">Size</p>
+					<p class="w3-col l2 m2 s4">Actions</p>
+				</div>
+				<div id="backups-container">
+					{{range $i, $x := .backups}}
+						{{template "backup-card" $x}}
+					{{end}}
+				</div>
+				<div class="w3-container w3-center">
+					{{template "backups-add-backup" .}}
+				</div>
+			</section>
+			<div class="w3-container w3-center">
+				<a class="w3-button w3-margin" id="exit" href="index">EXIT</a>
+			</div>
+		</main>
+	</body>
+</html>

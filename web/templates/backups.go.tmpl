@@ -1,0 +1,101 @@
+{{define "backup-card"}}
+<backup-card data-volid="{{.Volid}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="modules/w3.css">
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="css/style.css">
+		<style>
+			* {
+				margin: 0;
+			}
+			a {
+				height: 1em;
+				width: 1em;
+				margin: 0px;
+				padding: 0px;
+			}
+			svg {
+				height: 1em;
+				width: 1em;
+			}
+		</style>
+		<div class="w3-row" style="margin-top: 1em; margin-bottom: 1em;">
+			<p class="w3-col l2 m4 s8">{{.TimeFormatted}}</p>
+			<p class="w3-col l6 m6 w3-hide-small">{{.Notes}}</p>
+			<p class="w3-col l2 w3-hide-medium w3-hide-small">{{.SizeFormatted}}</p>
+			<div class="w3-col l2 m2 s4 flex row nowrap" style="height: 1lh;">
+				<svg id="edit-btn" class="clickable" aria-label="change notes"><use href="images/actions/instance/config-active.svg#symb"></svg>
+				<svg id="delete-btn" class="clickable" aria-label="delete backup" role="button" tabindex=0><use href="images/actions/instance/delete-active.svg#symb"></svg>
+			</div>
+		</div>
+		<template id="edit-dialog">
+			<link rel="stylesheet" href="modules/w3.css">
+			<link rel="stylesheet" href="css/style.css">
+			<link rel="stylesheet" href="css/form.css">
+			<dialog class="w3-container w3-card w3-border-0">
+				<p class="w3-large" id="prompt" style="text-align: center;">
+					Edit Backup
+				</p>
+				<div id="body">
+					<form method="dialog" class="input-grid" style="grid-template-columns: auto;" id="form">
+						<label for="rate">Notes</label>
+						<textarea id="notes" name="notes" class="w3-input w3-border">{{.Notes}}</textarea>
+					</form>
+				</div>
+				<div id="controls" class="w3-center w3-container">
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+				</div>
+			</dialog>
+		</template>
+		<template id="delete-dialog">
+			<link rel="stylesheet" href="modules/w3.css">
+			<link rel="stylesheet" href="css/style.css">
+			<link rel="stylesheet" href="css/form.css">
+			<dialog class="w3-container w3-card w3-border-0">
+				<p class="w3-large" id="prompt" style="text-align: center;">
+					Delete Backup
+				</p>
+				<div id="body">
+					<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+					<p>
+					Are you sure you want to <strong>delete</strong> the backup made at {{.TimeFormatted}}?
+					</p>
+					</form>
+				</div>
+				<div id="controls" class="w3-center w3-container">
+					<button id="cancel" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+					<button id="confirm" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+				</div>
+			</dialog>
+		</template>
+	</template>
+</backup-card>
+{{end}}
+
+{{define "backups-add-backup"}}
+<button type="button" id="backup-add" class="w3-button" aria-label="Create Backup">
+	<span class="large" style="margin: 0;">Create Backup</span>
+	<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Create Backup"><use href="images/actions/network/add.svg#symb"></use></svg>
+</button>
+<template id="create-backup-dialog">
+	<link rel="stylesheet" href="modules/w3.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/form.css">
+	<dialog class="w3-container w3-card w3-border-0">
+		<p class="w3-large" id="prompt" style="text-align: center;">
+			Create Backup
+		</p>
+		<div id="body">
+			<form method="dialog" class="input-grid" style="grid-template-columns: auto;" id="form">
+				<label for="rate">Notes</label>
+				<textarea id="notes" name="notes" class="w3-input w3-border">{{.Notes}}</textarea>
+			</form>
+		</div>
+		<div id="controls" class="w3-center w3-container">
+			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+		</div>
+	</dialog>
+</template>
+{{end}}
