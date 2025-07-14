@@ -24,8 +24,9 @@
 			<p class="w3-col l6 m6 w3-hide-small">{{.Notes}}</p>
 			<p class="w3-col l2 w3-hide-medium w3-hide-small">{{.SizeFormatted}}</p>
 			<div class="w3-col l2 m2 s4 flex row nowrap" style="height: 1lh;">
-				<svg id="edit-btn" class="clickable" aria-label="change notes"><use href="images/actions/instance/config-active.svg#symb"></svg>
-				<svg id="delete-btn" class="clickable" aria-label="delete backup" role="button" tabindex=0><use href="images/actions/instance/delete-active.svg#symb"></svg>
+				<svg id="edit-btn" class="clickable" aria-label="change notes"><use href="images/actions/backups/config.svg#symb"></svg>
+				<svg id="delete-btn" class="clickable" aria-label="delete backup" role="button" tabindex=0><use href="images/actions/backups/delete-active.svg#symb"></svg>
+				<svg id="restore-btn" class="clickable" aria-label="restore from backup" role="button" tabindex=0><use href="images/actions/backups/restore.svg#symb"></svg>
 			</div>
 		</div>
 		<template id="edit-dialog">
@@ -60,6 +61,29 @@
 					<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
 					<p>
 					Are you sure you want to <strong>delete</strong> the backup made at {{.TimeFormatted}}?
+					</p>
+					</form>
+				</div>
+				<div id="controls" class="w3-center w3-container">
+					<button id="cancel" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
+					<button id="confirm" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+				</div>
+			</dialog>
+		</template>
+		<template id="restore-dialog">
+			<link rel="stylesheet" href="modules/w3.css">
+			<link rel="stylesheet" href="css/style.css">
+			<link rel="stylesheet" href="css/form.css">
+			<dialog class="w3-container w3-card w3-border-0">
+				<p class="w3-large" id="prompt" style="text-align: center;">
+					Restore From Backup?
+				</p>
+				<div id="body">
+					<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+					<p>
+					Are you sure you want to <strong>restore</strong> from the backup made at {{.TimeFormatted}}?
+					<br>
+					WARNING: Restoring from a backup will WIPE disks NOT contained in the backup!!!
 					</p>
 					</form>
 				</div>
