@@ -47,6 +47,17 @@ class BackupCard extends HTMLElement {
 				}
 			};
 		}
+
+		const restoreButton = this.shadowRoot.querySelector("#restore-btn");
+		if (restoreButton.classList.contains("clickable")) {
+			restoreButton.onclick = this.handleRestoreButton.bind(this);
+			restoreButton.onkeydown = (event) => {
+				if (event.key === "Enter") {
+					event.preventDefault();
+					this.handleRestoreButton();
+				}
+			};
+		}
 	}
 
 	get volid () {
@@ -78,6 +89,22 @@ class BackupCard extends HTMLElement {
 					volid: this.volid
 				};
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/backup`, "DELETE", body);
+				if (result.status !== 200) {
+					alert(`Attempted to delete backup but got: ${result.error}`);
+				}
+				refreshBackups();
+			}
+		});
+	}
+
+	async handleRestoreButton () {
+		const template = this.shadowRoot.querySelector("#restore-dialog");
+		dialog(template, async (result, form) => {
+			if (result === "confirm") {
+				const body = {
+					volid: this.volid
+				};
+				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/backup/restore`, "POST", body);
 				if (result.status !== 200) {
 					alert(`Attempted to delete backup but got: ${result.error}`);
 				}
