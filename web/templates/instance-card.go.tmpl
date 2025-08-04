@@ -52,9 +52,7 @@
 				{{if and (eq .NodeStatus "online") (eq .Status "running")}}
 					<svg id="power-btn" class="clickable" aria-label="shutdown instance" role="button" tabindex=0><use href="images/actions/instance/stop.svg#symb"></svg>
 					<svg id="configure-btn" aria-disabled="true" role="none"><use href="images/actions/instance/config-inactive.svg#symb"></svg>
-					<a href="{{.BackupsPath}}">
-						<svg id="backup-btn" class="clickable" aria-label="manage backups"><use href="images/actions/instance/backup.svg#symb"></svg>
-					</a>
+					<svg id="backup-btn" aria-disabled="true" role="none"><use href="images/actions/instance/backup-inactive.svg#symb"></svg>
 					<a href="{{.ConsolePath}}" target="_blank">
 						<svg id="console-btn" class="clickable" aria-label="open console"><use href="images/actions/instance/console-active.svg#symb"></svg>
 					</a>
@@ -65,16 +63,14 @@
 						<svg id="configure-btn" class="clickable" aria-label="change configuration"><use href="images/actions/instance/config-active.svg#symb"></svg>
 					</a>
 					<a href="{{.BackupsPath}}">
-						<svg id="backup-btn" class="clickable" aria-label="manage backups"><use href="images/actions/instance/backup.svg#symb"></svg>
+						<svg id="backup-btn" class="clickable" aria-label="manage backups"><use href="images/actions/instance/backup-active.svg#symb"></svg>
 					</a>
 					<svg id="console-btn" aria-disabled="true" role="none"><use href="images/actions/instance/console-inactive.svg#symb"></svg>
 					<svg id="delete-btn" class="clickable" aria-label="delete instance" role="button" tabindex=0><use href="images/actions/instance/delete-active.svg#symb"></svg>
 				{{else if and (eq .NodeStatus "online") (eq .Status "loading")}}
 					<svg id="power-btn" aria-disabled="true" role="none"><use href="images/actions/instance/loading.svg#symb"></svg>
 					<svg id="configure-btn" aria-disabled="true" role="none"><use href="images/actions/instance/config-inactive.svg#symb"></svg>
-					<a href="{{.BackupsPath}}">
-						<svg id="backup-btn" class="clickable" aria-label="manage backups"><use href="images/actions/instance/backup.svg#symb"></svg>
-					</a>
+					<svg id="backup-btn" aria-disabled="true" role="none"><use href="images/actions/instance/backup-inactive.svg#symb"></svg>
 					<svg id="console-btn" aria-disabled="true" role="none"><use href="images/actions/instance/console-inactive.svg#symb"></svg>
 					<svg id="delete-btn" aria-disabled="true" role="none"><use href="images/actions/instance/delete-inactive.svg#symb"></svg>
 				{{else}}
