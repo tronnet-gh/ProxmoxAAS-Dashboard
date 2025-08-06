@@ -73,7 +73,8 @@ class VolumeAction extends HTMLElement {
 				const device = form.get("device");
 				this.setStatusLoading();
 				const body = {
-					source: this.dataset.volume.replace("unused", "")
+					source: this.dataset.volume.replace("unused", ""),
+					mp: form.get("mp")
 				};
 				const prefix = type === "qemu" ? "scsi" : "mp";
 				const disk = `${prefix}${device}`;
