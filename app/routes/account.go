@@ -18,7 +18,7 @@ type Account struct {
 		Min int
 		Max int
 	}
-	Resources map[string]any
+	Resources map[string]map[string]any
 }
 
 type Constraint struct {
@@ -46,6 +46,7 @@ type NumericResource struct {
 	Global     Constraint
 	Nodes      map[string]Constraint
 	Total      Constraint
+	Category   string
 }
 
 type StorageResource struct {
@@ -60,6 +61,7 @@ type StorageResource struct {
 	Global     Constraint
 	Nodes      map[string]Constraint
 	Total      Constraint
+	Category   string
 }
 
 type ListResource struct {
@@ -69,6 +71,7 @@ type ListResource struct {
 	Global    []Match
 	Nodes     map[string][]Match
 	Total     []Match
+	Category  string
 }
 
 type ResourceChart struct {
@@ -104,58 +107,60 @@ func HandleGETAccount(c *gin.Context) {
 			return
 		}
 
-		for k, v := range account.Resources {
-			switch t := v.(type) {
-			case NumericResource:
-				avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
-				account.Resources[k] = ResourceChart{
-					Type:     t.Type,
-					Display:  t.Display,
-					Name:     t.Name,
-					Used:     t.Total.Used,
-					Max:      t.Total.Max,
-					Avail:    avail,
-					Prefix:   prefix,
-					Unit:     t.Unit,
-					ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
-				}
-			case StorageResource:
-				avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
-				account.Resources[k] = ResourceChart{
-					Type:     t.Type,
-					Display:  t.Display,
-					Name:     t.Name,
-					Used:     t.Total.Used,
-					Max:      t.Total.Max,
-					Avail:    avail,
-					Prefix:   prefix,
-					Unit:     t.Unit,
-					ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
-				}
-			case ListResource:
-				l := struct {
-					Type      string
-					Display   bool
-					Resources []ResourceChart
-				}{
-					Type:      t.Type,
-					Display:   t.Display,
-					Resources: []ResourceChart{},
-				}
-
-				for _, r := range t.Total {
-					l.Resources = append(l.Resources, ResourceChart{
+		for category, resources := range account.Resources {
+			for resource, v := range resources {
+				switch t := v.(type) {
+				case NumericResource:
+					avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+					account.Resources[category][resource] = ResourceChart{
 						Type:     t.Type,
 						Display:  t.Display,
-						Name:     r.Name,
-						Used:     r.Used,
-						Max:      r.Max,
-						Avail:    float64(r.Avail), // usually an int
-						Unit:     "",
-						ColorHex: InterpolateColorHSV(Green, Red, float64(r.Used)/float64(r.Max)).ToHTML(),
-					})
+						Name:     t.Name,
+						Used:     t.Total.Used,
+						Max:      t.Total.Max,
+						Avail:    avail,
+						Prefix:   prefix,
+						Unit:     t.Unit,
+						ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
+					}
+				case StorageResource:
+					avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+					account.Resources[category][resource] = ResourceChart{
+						Type:     t.Type,
+						Display:  t.Display,
+						Name:     t.Name,
+						Used:     t.Total.Used,
+						Max:      t.Total.Max,
+						Avail:    avail,
+						Prefix:   prefix,
+						Unit:     t.Unit,
+						ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
+					}
+				case ListResource:
+					l := struct {
+						Type      string
+						Display   bool
+						Resources []ResourceChart
+					}{
+						Type:      t.Type,
+						Display:   t.Display,
+						Resources: []ResourceChart{},
+					}
+
+					for _, r := range t.Total {
+						l.Resources = append(l.Resources, ResourceChart{
+							Type:     t.Type,
+							Display:  t.Display,
+							Name:     r.Name,
+							Used:     r.Used,
+							Max:      r.Max,
+							Avail:    float64(r.Avail), // usually an int
+							Unit:     "",
+							ColorHex: InterpolateColorHSV(Green, Red, float64(r.Used)/float64(r.Max)).ToHTML(),
+						})
+					}
+					account.Resources[category][resource] = l
 				}
-				account.Resources[k] = l
 			}
 		}
 
@@ -171,7 +176,7 @@ func HandleGETAccount(c *gin.Context) {
 
 func GetUserAccount(auth common.Auth) (Account, error) {
 	account := Account{
-		Resources: map[string]any{},
+		Resources: map[string]map[string]any{},
 	}
 
 	ctx := common.RequestContext{
@@ -225,6 +230,10 @@ func GetUserAccount(auth common.Auth) (Account, error) {
 		m := v.(map[string]any)
 		t := m["type"].(string)
 		r := resources[k].(map[string]any)
+		category := m["category"].(string)
+		if _, ok := account.Resources[category]; !ok {
+			account.Resources[category] = map[string]any{}
+		}
 		if t == "numeric" {
 			n := NumericResource{}
 			n.Type = t
@@ -233,7 +242,7 @@ func GetUserAccount(auth common.Auth) (Account, error) {
 			if err_m != nil || err_r != nil {
 				return account, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
 			}
-			account.Resources[k] = n
+			account.Resources[category][k] = n
 		} else if t == "storage" {
 			n := StorageResource{}
 			n.Type = t
@@ -242,7 +251,7 @@ func GetUserAccount(auth common.Auth) (Account, error) {
 			if err_m != nil || err_r != nil {
 				return account, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
 			}
-			account.Resources[k] = n
+			account.Resources[category][k] = n
 		} else if t == "list" {
 			n := ListResource{}
 			n.Type = t
@@ -251,7 +260,7 @@ func GetUserAccount(auth common.Auth) (Account, error) {
 			if err_m != nil || err_r != nil {
 				return account, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
 			}
-			account.Resources[k] = n
+			account.Resources[category][k] = n
 		}
 	}
 
