@@ -16,16 +16,16 @@ import (
 // imported types from fabric
 
 type InstanceConfig struct {
-	Type     fabric.InstanceType       `json:"type"`
-	Name     string                    `json:"name"`
-	Proctype string                    `json:"cpu"`
-	Cores    uint64                    `json:"cores"`
-	Memory   uint64                    `json:"memory"`
-	Swap     uint64                    `json:"swap"`
-	Volumes  map[string]*fabric.Volume `json:"volumes"`
-	Nets     map[string]*fabric.Net    `json:"nets"`
-	Devices  map[string]*fabric.Device `json:"devices"`
-	Boot     fabric.BootOrder          `json:"boot"`
+	Type    fabric.InstanceType       `json:"type"`
+	Name    string                    `json:"name"`
+	CPU     string                    `json:"cpu"`
+	Cores   uint64                    `json:"cores"`
+	Memory  uint64                    `json:"memory"`
+	Swap    uint64                    `json:"swap"`
+	Volumes map[string]*fabric.Volume `json:"volumes"`
+	Nets    map[string]*fabric.Net    `json:"nets"`
+	Devices map[string]*fabric.Device `json:"devices"`
+	Boot    fabric.BootOrder          `json:"boot"`
 	// overrides
 	ProctypeSelect common.Select
 }
@@ -67,7 +67,7 @@ func HandleGETConfig(c *gin.Context) {
 			}
 		}
 		for i, cpu := range config.ProctypeSelect.Options {
-			if cpu.Value == config.Proctype {
+			if cpu.Value == config.CPU {
 				config.ProctypeSelect.Options[i].Selected = true
 			}
 		}
