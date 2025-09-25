@@ -449,7 +449,7 @@ async function refreshBoot () {
 	if (boot.status !== 200) {
 		alert("Error fetching instance boot order.");
 	}
-	else {
+	else if (type === "qemu") {
 		boot = boot.data;
 		const order = document.querySelector("#boot-order");
 		order.setHTMLUnsafe(boot);

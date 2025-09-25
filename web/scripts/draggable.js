@@ -48,7 +48,7 @@ class DraggableContainer extends HTMLElement {
 
 	get value () {
 		const value = [];
-		this.content.childNodes.forEach((element) => {
+		this.content.querySelectorAll(".draggable-item").forEach((element) => {
 			if (element.dataset.value) {
 				value.push(element.dataset.value);
 			}
