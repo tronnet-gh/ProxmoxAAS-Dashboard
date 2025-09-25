@@ -1,7 +1,6 @@
 package app
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"proxmoxaas-dashboard/dist/web" // go will complain here until the first build
@@ -13,13 +12,10 @@ import (
 	"github.com/tdewolff/minify/v2"
 )
 
-func Run() {
-	gin.SetMode(gin.ReleaseMode)
-
-	configPath := flag.String("config", "config.json", "path to config.json file")
-	flag.Parse()
+func Run(configPath *string) {
 	common.Global = common.GetConfig(*configPath)
 
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	m := common.InitMinify()
 	ServeStatic(router, m)
