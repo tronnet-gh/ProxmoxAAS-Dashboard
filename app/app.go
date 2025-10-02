@@ -3,10 +3,9 @@ package app
 import (
 	"fmt"
 	"log"
-	"proxmoxaas-dashboard/dist/web" // go will complain here until the first build
-
 	"proxmoxaas-dashboard/app/common"
 	"proxmoxaas-dashboard/app/routes"
+	"proxmoxaas-dashboard/dist/web" // go will complain here until the first build
 
 	"github.com/gin-gonic/gin"
 	"github.com/tdewolff/minify/v2"

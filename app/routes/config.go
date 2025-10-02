@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"proxmoxaas-dashboard/app/common"
+	fabric "proxmoxaas-fabric/app"
 	"slices"
 	"sort"
-
-	fabric "proxmoxaas-fabric/app"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-viper/mapstructure/v2"
