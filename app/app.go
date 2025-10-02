@@ -21,10 +21,10 @@ func Run(configPath *string) {
 	html := common.MinifyStatic(m, web.Templates)
 	common.TMPL = common.LoadHTMLToGin(router, html)
 
-	router.GET("/account", routes.HandleGETAccount)
 	router.GET("/", routes.HandleGETIndex)
 	router.GET("/index", routes.HandleGETIndex)
 	router.GET("/index/instances", routes.HandleGETInstancesFragment)
+	router.GET("/account", routes.HandleGETAccount)
 	router.GET("/config", routes.HandleGETConfig)
 	router.GET("/config/volumes", routes.HandleGETConfigVolumesFragment)
 	router.GET("/config/nets", routes.HandleGETConfigNetsFragment)
