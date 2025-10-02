@@ -272,8 +272,8 @@ function sortInstances () {
 		};
 		criteria = (item, query) => {
 			// lower is better
-			const { score, CIGAR } = global.wfAlign(query, item, penalties, true);
-			const alignment = global.DecodeCIGAR(CIGAR);
+			const { score, CIGAR } = global.wfa.wfAlign(query, item, penalties, true);
+			const alignment = global.wfa.DecodeCIGAR(CIGAR);
 			return { score: score / item.length, alignment };
 		};
 	}
