@@ -20,7 +20,7 @@
 		</style>
 		<div class="w3-row" style="margin-top: 1em; margin-bottom: 1em;">
 			<hr class="w3-show-small w3-hide-medium w3-hide-large" style="margin: 0; margin-bottom: 1em;">
-			<p class="w3-col l1 m2 s6">{{.VMID}}</p>
+			<p class="w3-col l1 m1 s6">{{.VMID}}</p>
 			<p class="w3-col l2 m3 s6" id="instance-name">{{.Name}}</p>
 			<p class="w3-col l1 m2 w3-hide-small">{{.Type}}</p>
 			<div class="w3-col l2 m3 s6 flex row nowrap">
@@ -47,7 +47,7 @@
 				{{end}}
 				<p>{{.NodeStatus}}</p>
 			</div>
-			<div class="w3-col l2 m2 s6 flex row nowrap" style="height: 1lh;">
+			<div class="w3-col l2 m3 s6 flex row nowrap" style="height: 1lh;">
 				{{if and (eq .NodeStatus "online") (eq .Status "running")}}
 					<svg id="power-btn" class="clickable" aria-label="shutdown instance" role="button" tabindex=0><use href="images/actions/instance/stop.svg#symb"></svg>
 					<svg id="configure-btn" aria-disabled="true" role="none"><use href="images/actions/instance/config-inactive.svg#symb"></svg>
