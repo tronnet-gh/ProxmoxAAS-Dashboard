@@ -33,6 +33,24 @@
 			.nowrap { /* needed for some reason to avoid a flickering issue on chrome ONLY */
 				flex-wrap: nowrap;
 			}
+			@media screen and (width >=993px) {
+				.hide-large {display: none !important;}
+			}
+			@media screen and (width <=993px) and (width >=601px){
+				.hide-large {display: none !important;}
+				.hide-medium {display:none !important}
+			}
+			@media screen and (width <=601px) {
+				.hide-large {display: none !important;}
+				.hide-medium {display:none !important}
+				.hide-small {display:none !important}
+			}
+			@media screen and (width <= 440px) {
+				.hide-large {display: none !important;}
+				.hide-medium {display:none !important}
+				.hide-small {display:none !important}
+				.hide-tiny { display: none !important;}
+			}
 		</style>
 		<p>{{.VMID}}</p>
 		<p id="instance-name">{{.Name}}</p>
