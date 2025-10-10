@@ -22,6 +22,18 @@
 				width: auto;
 				white-space: nowrap;
 			}
+			.flex { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				display: flex;
+			}
+			.row { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				flex-direction: row;
+				column-gap: 10px;
+				align-items: center;
+			}
+			.wrap { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				flex-wrap: wrap;
+				row-gap: 10px;
+			}
 		</style>
 		<p>{{.VMID}}</p>
 		<p id="instance-name">{{.Name}}</p>
