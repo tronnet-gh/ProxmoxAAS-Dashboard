@@ -8,12 +8,6 @@
 		<link rel="modulepreload" href="scripts/dialog.js">
 		<link rel="modulepreload" href="scripts/clientsync.js">
 		<style>
-			#instance-container > div {
-				border-bottom: 1px solid white;
-			}
-			#instance-container > div:last-child {
-				border-bottom: none;
-			}
 			@media screen and (width >= 440px) {
 				#vm-search {
 					max-width: calc(100% - 10px - 152px);
@@ -22,6 +16,50 @@
 			@media screen and (width <= 440px) {
 				#vm-search {
 					max-width: calc(100% - 10px - 47px);
+				}
+			}
+			@media screen and (width >= 993px) {
+				#instance-table {
+					display: grid;
+					grid-template-columns: repeat(7, auto);
+					grid-column-gap: 1em;
+					grid-row-gap: 0.25em;
+				}
+				#instance-table-header, #instance-container, #instance-table instance-card {
+					display: contents;
+				}
+			}
+			@media screen and (width <= 993px) and (width >= 601px){
+				#instance-table {
+					display: grid;
+					grid-template-columns: repeat(5, auto);
+					grid-column-gap: 1em;
+					grid-row-gap: 0.25em;
+				}
+				#instance-table-header, #instance-container, #instance-table instance-card {
+					display: contents;
+				}
+			}
+			@media screen and (width <= 601px) and (width >= 440px){
+				#instance-table {
+					display: grid;
+					grid-template-columns: repeat(4, auto);
+					grid-column-gap: 1em;
+					grid-row-gap: 0.25em;
+				}
+				#instance-table-header, #instance-container, #instance-table instance-card {
+					display: contents;
+				}
+			}
+			@media screen and (width <= 440px) {
+				#instance-table {
+					display: grid;
+					grid-template-columns: repeat(3, auto);
+					grid-column-gap: 1em;
+					grid-row-gap: 0.25em;
+				}
+				#instance-table-header, #instance-container, #instance-table instance-card {
+					display: contents;
 				}
 			}
 		</style>
@@ -90,16 +128,17 @@
 							</dialog>
 						</template>
 					</div>
-					<div>
-						<div class="w3-row w3-hide-small" style="border-bottom: 1px solid;">
-							<p class="w3-col l1 m1 w3-hide-small">ID</p>
-							<p class="w3-col l2 m3 w3-hide-small">Name</p>
-							<p class="w3-col l1 m2 w3-hide-small">Type</p>
-							<p class="w3-col l2 m3 w3-hide-small">Status</p>
-							<p class="w3-col l2 w3-hide-medium w3-hide-small">Host Name</p>
-							<p class="w3-col l2 w3-hide-medium w3-hide-small">Host Status</p>
-							<p class="w3-col l2 m3 w3-hide-small">Actions</p>
+					<div id="instance-table">
+						<div id="instance-table-header">
+							<p>ID</p>
+							<p>Name</p>
+							<p class="hide-tiny">Type</p>
+							<p class="hide-small">Status</p>
+							<p class="hide-medium">Host Name</p>
+							<p class="hide-medium">Host Status</p>
+							<p>Actions</p>
 						</div>
+						<hr style="grid-column: 1 / -1; padding: 0; margin: 0;">
 						<div id="instance-container">
 							{{range .instances}}
 								{{template "instance-card" .}}

@@ -100,7 +100,7 @@ img, svg {
 	color: var(--main-text-color)
 }
 
-hr, * {
+hr {
 	border-color: var(--main-text-color);
 }
 
@@ -156,18 +156,26 @@ hr, * {
 }
 
 /* add hide large class similar to w3-hide-medium and w3-hide-small */
-@media (width >=993px) {
-	.w3-hide-large {
-		display: none !important;
-	}
+@media screen and (width >=993px) {
+	.hide-large {display: none !important;}
 }
 
-/* fix edge case in w3-hide-medium where width between 992 and 993 */
-@media (width <=993px) and (width >=601px){
-	.w3-hide-medium{display:none!important}
+/* fixes edge case in w3-hide-medium where width between 992 and 993 */
+@media screen and (width <=993px) and (width >=601px){
+	.hide-large {display: none !important;}
+	.hide-medium {display:none !important}
 }
 
-/* fix edge case in w3-hide-small when width between 600 and 601 */
-@media (width <=601px) {
-	.w3-hide-small{display:none!important}
+/* fixes edge case in w3-hide-small when width between 600 and 601 */
+@media screen and (width <=601px) {
+	.hide-large {display: none !important;}
+	.hide-medium {display:none !important}
+	.hide-small {display:none !important}
+}
+
+@media screen and (width <= 440px) {
+	.hide-large {display: none !important;}
+	.hide-medium {display:none !important}
+	.hide-small {display:none !important}
+	.hide-tiny { display: none !important;}
 }

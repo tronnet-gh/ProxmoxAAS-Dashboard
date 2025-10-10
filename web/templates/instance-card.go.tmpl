@@ -6,75 +6,77 @@
 		<style>
 			* {
 				margin: 0;
+				padding: 0;
+				width: fit-content;
 			}
-			a {
+			a, svg {
+				line-height: 1em;
 				height: 1em;
 				width: 1em;
 				margin: 0px;
 				padding: 0px;
 			}
-			svg {
-				height: 1em;
-				width: 1em;
+			#instance-name {
+				overflow-x: hidden;
+				min-width: 0;
+				width: auto;
+				white-space: nowrap;
 			}
 		</style>
-		<div class="w3-row" style="margin-top: 1em; margin-bottom: 1em;">
-			<hr class="w3-show-small w3-hide-medium w3-hide-large" style="margin: 0; margin-bottom: 1em;">
-			<p class="w3-col l1 m1 s6">{{.VMID}}</p>
-			<p class="w3-col l2 m3 s6" id="instance-name">{{.Name}}</p>
-			<p class="w3-col l1 m2 w3-hide-small">{{.Type}}</p>
-			<div class="w3-col l2 m3 s6 flex row nowrap">
-				{{if eq .Status "running"}}
-					<svg id="status" aria-label="instance is running"><use href="images/status/active.svg#symb"></svg>
-				{{else if eq .Status "stopped"}}
-					<svg id="status" aria-label="instance is stopped"><use href="images/status/inactive.svg#symb"></svg>
-				{{else if eq .Status "loading"}}
-					<svg id="status" aria-label="instance is loading"><use href="images/status/loading.svg#symb"></svg>
-				{{else}}
-					<svg id="status" aria-label="instance is loading"><use href="images/status/loading.svg#symb"></svg>
-				{{end}}
-				<p>{{.Status}}</p>
-			</div>
-			<p class="w3-col l2 w3-hide-medium w3-hide-small">{{.Node}}</p>
-			<div class="w3-col l2 w3-hide-medium w3-hide-small flex row nowrap">
-				{{if eq .NodeStatus "online"}}
-					<svg aria-label="node is online"><use href="images/status/active.svg#symb"></svg>
-				{{else if eq .NodeStatus "offline"}}
-					<svg aria-label="node is offline"><use href="images/status/inactive.svg#symb"></svg>
-				{{else if eq .NodeStatus "unknown"}}
-					<svg aria-label="node is offline"><use href="images/status/inactive.svg#symb"></svg>
-				{{else}}
-				{{end}}
-				<p>{{.NodeStatus}}</p>
-			</div>
-			<div class="w3-col l2 m3 s6 flex row nowrap" style="height: 1lh;">
-				{{if and (eq .NodeStatus "online") (eq .Status "running")}}
-					<svg id="power-btn" class="clickable" aria-label="shutdown instance" role="button" tabindex=0><use href="images/actions/instance/stop.svg#symb"></svg>
-					<svg id="configure-btn" aria-disabled="true" role="none"><use href="images/actions/instance/config-inactive.svg#symb"></svg>
-					<svg id="backup-btn" aria-disabled="true" role="none"><use href="images/actions/instance/backup-inactive.svg#symb"></svg>
-					<a href="{{.ConsolePath}}" target="_blank">
-						<svg id="console-btn" class="clickable" aria-label="open console"><use href="images/actions/instance/console-active.svg#symb"></svg>
-					</a>
-					<svg id="delete-btn" aria-disabled="true" role="none"><use href="images/actions/instance/delete-inactive.svg#symb"></svg>
-				{{else if and (eq .NodeStatus "online") (eq .Status "stopped")}}
-					<svg id="power-btn" class="clickable" aria-label="start instance" role="button" tabindex=0><use href="images/actions/instance/start.svg#symb"></svg>
-					<a href="{{.ConfigPath}}">
-						<svg id="configure-btn" class="clickable" aria-label="change configuration"><use href="images/actions/instance/config-active.svg#symb"></svg>
-					</a>
-					<a href="{{.BackupsPath}}">
-						<svg id="backup-btn" class="clickable" aria-label="manage backups"><use href="images/actions/instance/backup-active.svg#symb"></svg>
-					</a>
-					<svg id="console-btn" aria-disabled="true" role="none"><use href="images/actions/instance/console-inactive.svg#symb"></svg>
-					<svg id="delete-btn" class="clickable" aria-label="delete instance" role="button" tabindex=0><use href="images/actions/instance/delete-active.svg#symb"></svg>
-				{{else if and (eq .NodeStatus "online") (eq .Status "loading")}}
-					<svg id="power-btn" aria-disabled="true" role="none"><use href="images/actions/instance/loading.svg#symb"></svg>
-					<svg id="configure-btn" aria-disabled="true" role="none"><use href="images/actions/instance/config-inactive.svg#symb"></svg>
-					<svg id="backup-btn" aria-disabled="true" role="none"><use href="images/actions/instance/backup-inactive.svg#symb"></svg>
-					<svg id="console-btn" aria-disabled="true" role="none"><use href="images/actions/instance/console-inactive.svg#symb"></svg>
-					<svg id="delete-btn" aria-disabled="true" role="none"><use href="images/actions/instance/delete-inactive.svg#symb"></svg>
-				{{else}}
-				{{end}}
-			</div>
+		<p>{{.VMID}}</p>
+		<p id="instance-name">{{.Name}}</p>
+		<p class="hide-small">{{.Type}}</p>
+		<div class="flex row nowrap hide-tiny">
+			{{if eq .Status "running"}}
+				<svg id="status" aria-label="instance is running"><use href="images/status/active.svg#symb"></svg>
+			{{else if eq .Status "stopped"}}
+				<svg id="status" aria-label="instance is stopped"><use href="images/status/inactive.svg#symb"></svg>
+			{{else if eq .Status "loading"}}
+				<svg id="status" aria-label="instance is loading"><use href="images/status/loading.svg#symb"></svg>
+			{{else}}
+				<svg id="status" aria-label="instance is loading"><use href="images/status/loading.svg#symb"></svg>
+			{{end}}
+			<p>{{.Status}}</p>
+		</div>
+		<p class="hide-medium">{{.Node}}</p>
+		<div class="flex row nowrap hide-medium">
+			{{if eq .NodeStatus "online"}}
+				<svg aria-label="node is online"><use href="images/status/active.svg#symb"></svg>
+			{{else if eq .NodeStatus "offline"}}
+				<svg aria-label="node is offline"><use href="images/status/inactive.svg#symb"></svg>
+			{{else if eq .NodeStatus "unknown"}}
+				<svg aria-label="node is offline"><use href="images/status/inactive.svg#symb"></svg>
+			{{else}}
+			{{end}}
+			<p>{{.NodeStatus}}</p>
+		</div>
+		<div class="flex row nowrap" style="height: 1lh;">
+			{{if and (eq .NodeStatus "online") (eq .Status "running")}}
+				<svg id="power-btn" class="clickable" aria-label="shutdown instance" role="button" tabindex=0><use href="images/actions/instance/stop.svg#symb"></svg>
+				<svg id="configure-btn" aria-disabled="true" role="none"><use href="images/actions/instance/config-inactive.svg#symb"></svg>
+				<svg id="backup-btn" aria-disabled="true" role="none"><use href="images/actions/instance/backup-inactive.svg#symb"></svg>
+				<a href="{{.ConsolePath}}" target="_blank">
+					<svg id="console-btn" class="clickable" aria-label="open console"><use href="images/actions/instance/console-active.svg#symb"></svg>
+				</a>
+				<svg id="delete-btn" aria-disabled="true" role="none"><use href="images/actions/instance/delete-inactive.svg#symb"></svg>
+			{{else if and (eq .NodeStatus "online") (eq .Status "stopped")}}
+				<svg id="power-btn" class="clickable" aria-label="start instance" role="button" tabindex=0><use href="images/actions/instance/start.svg#symb"></svg>
+				<a href="{{.ConfigPath}}">
+					<svg id="configure-btn" class="clickable" aria-label="change configuration"><use href="images/actions/instance/config-active.svg#symb"></svg>
+				</a>
+				<a href="{{.BackupsPath}}">
+					<svg id="backup-btn" class="clickable" aria-label="manage backups"><use href="images/actions/instance/backup-active.svg#symb"></svg>
+				</a>
+				<svg id="console-btn" aria-disabled="true" role="none"><use href="images/actions/instance/console-inactive.svg#symb"></svg>
+				<svg id="delete-btn" class="clickable" aria-label="delete instance" role="button" tabindex=0><use href="images/actions/instance/delete-active.svg#symb"></svg>
+			{{else if and (eq .NodeStatus "online") (eq .Status "loading")}}
+				<svg id="power-btn" aria-disabled="true" role="none"><use href="images/actions/instance/loading.svg#symb"></svg>
+				<svg id="configure-btn" aria-disabled="true" role="none"><use href="images/actions/instance/config-inactive.svg#symb"></svg>
+				<svg id="backup-btn" aria-disabled="true" role="none"><use href="images/actions/instance/backup-inactive.svg#symb"></svg>
+				<svg id="console-btn" aria-disabled="true" role="none"><use href="images/actions/instance/console-inactive.svg#symb"></svg>
+				<svg id="delete-btn" aria-disabled="true" role="none"><use href="images/actions/instance/delete-inactive.svg#symb"></svg>
+			{{else}}
+			{{end}}
 		</div>
 		<template id="power-dialog">
 			<link rel="stylesheet" href="modules/w3.css">
