@@ -219,7 +219,7 @@ async function getInstancesFragment () {
 async function refreshInstances () {
 	let instances = await getInstancesFragment();
 	if (instances.status !== 200) {
-		alert("Error fetching instances.");
+		alert(`Error fetching instances: ${instances.status} ${instances.error != undefined ? instances.error : ""}`);
 	}
 	else {
 		instances = instances.data;
@@ -253,9 +253,9 @@ function sortInstances () {
 			if (substrInc) {
 				const substrStartIndex = item.indexOf(query);
 				const queryLength = query.length;
-				const remaining = item.length - substrInc - queryLength;
+				const remaining = item.length - substrInc - queryLength + 1;
 				const alignment = `${"X".repeat(substrStartIndex)}${"M".repeat(queryLength)}${"X".repeat(remaining)}`;
-				return { score: 1, alignment };
+				return { score: -1, alignment };
 			}
 			else {
 				const alignment = `${"X".repeat(item.length)}`;
