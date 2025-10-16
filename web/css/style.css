@@ -114,6 +114,12 @@ hr {
 	align-items: center;
 }
 
+.column-reverse {
+	flex-direction: column-reverse;
+	row-gap: 10px;
+	align-items: center;
+}
+
 .wrap {
 	flex-wrap: wrap;
 	row-gap: 10px;

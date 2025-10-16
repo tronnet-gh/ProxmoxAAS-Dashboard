@@ -219,7 +219,7 @@ async function getInstancesFragment () {
 async function refreshInstances () {
 	let instances = await getInstancesFragment();
 	if (instances.status !== 200) {
-		alert(`Error fetching instances: ${instances.status} ${instances.error !== undefined ? instances.error : ""}`);
+		error(`Error fetching instances: ${instances.status} ${instances.error !== undefined ? instances.error : ""}`);
 	}
 	else {
 		instances = instances.data;
