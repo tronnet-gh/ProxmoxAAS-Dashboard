@@ -9,12 +9,15 @@
 				padding: 0;
 				width: fit-content;
 			}
-			a, svg {
+			a, svg, img {
 				line-height: 1em;
 				height: 1em;
 				width: 1em;
 				margin: 0px;
 				padding: 0px;
+			}
+			a img {
+				vertical-align: unset;
 			}
 			#instance-name {
 				overflow-x: hidden;
@@ -57,53 +60,53 @@
 		<p class="hide-small">{{.Type}}</p>
 		<div class="flex row nowrap hide-tiny">
 			{{if eq .Status "running"}}
-				<svg id="status" aria-label="instance is running"><use href="images/status/active.svg#symb"></svg>
+				<img id="status" aria-label="instance is running" src="images/status/active.svg#symb">
 			{{else if eq .Status "stopped"}}
-				<svg id="status" aria-label="instance is stopped"><use href="images/status/inactive.svg#symb"></svg>
+				<img id="status" aria-label="instance is stopped" src="images/status/inactive.svg#symb">
 			{{else if eq .Status "loading"}}
-				<svg id="status" aria-label="instance is loading"><use href="images/status/loading.svg#symb"></svg>
+				<img id="status" aria-label="instance is loading" src="images/status/loading.svg#symb">
 			{{else}}
-				<svg id="status" aria-label="instance is loading"><use href="images/status/loading.svg#symb"></svg>
+				<img id="status" aria-label="instance is loading" src="images/status/loading.svg#symb">
 			{{end}}
 			<p>{{.Status}}</p>
 		</div>
 		<p class="hide-medium">{{.Node}}</p>
 		<div class="flex row nowrap hide-medium">
 			{{if eq .NodeStatus "online"}}
-				<svg aria-label="node is online"><use href="images/status/active.svg#symb"></svg>
+				<img aria-label="node is online" src="images/status/active.svg#symb">
 			{{else if eq .NodeStatus "offline"}}
-				<svg aria-label="node is offline"><use href="images/status/inactive.svg#symb"></svg>
+				<img aria-label="node is offline" src="images/status/inactive.svg#symb">
 			{{else if eq .NodeStatus "unknown"}}
-				<svg aria-label="node is offline"><use href="images/status/inactive.svg#symb"></svg>
+				<img aria-label="node is offline" src="images/status/inactive.svg#symb">
 			{{else}}
 			{{end}}
 			<p>{{.NodeStatus}}</p>
 		</div>
 		<div class="flex row nowrap" style="height: 1lh;">
 			{{if and (eq .NodeStatus "online") (eq .Status "running")}}
-				<svg id="power-btn" class="clickable" aria-label="shutdown instance" role="button" tabindex=0><use href="images/actions/instance/stop.svg#symb"></svg>
-				<svg id="configure-btn" aria-disabled="true" role="none"><use href="images/actions/instance/config-inactive.svg#symb"></svg>
-				<svg id="backup-btn" aria-disabled="true" role="none"><use href="images/actions/instance/backup-inactive.svg#symb"></svg>
+				<img id="power-btn" class="clickable" aria-label="shutdown instance" role="button" tabindex=0 src="images/actions/instance/stop.svg#symb">
+				<img id="configure-btn" aria-disabled="true" role="none" src="images/actions/instance/config-inactive.svg#symb">
+				<img id="backup-btn" aria-disabled="true" role="none" src="images/actions/instance/backup-inactive.svg#symb">
 				<a href="{{.ConsolePath}}" target="_blank">
-					<svg id="console-btn" class="clickable" aria-label="open console"><use href="images/actions/instance/console-active.svg#symb"></svg>
+					<img id="console-btn" class="clickable" aria-label="open console" src="images/actions/instance/console-active.svg#symb">
 				</a>
-				<svg id="delete-btn" aria-disabled="true" role="none"><use href="images/actions/instance/delete-inactive.svg#symb"></svg>
+				<img id="delete-btn" aria-disabled="true" role="none" src="images/actions/instance/delete-inactive.svg#symb">
 			{{else if and (eq .NodeStatus "online") (eq .Status "stopped")}}
-				<svg id="power-btn" class="clickable" aria-label="start instance" role="button" tabindex=0><use href="images/actions/instance/start.svg#symb"></svg>
+				<img id="power-btn" class="clickable" aria-label="start instance" role="button" tabindex=0 src="images/actions/instance/start.svg#symb">
 				<a href="{{.ConfigPath}}">
-					<svg id="configure-btn" class="clickable" aria-label="change configuration"><use href="images/actions/instance/config-active.svg#symb"></svg>
+					<img id="configure-btn" class="clickable" aria-label="change configuration" src="images/actions/instance/config-active.svg#symb">
 				</a>
 				<a href="{{.BackupsPath}}">
-					<svg id="backup-btn" class="clickable" aria-label="manage backups"><use href="images/actions/instance/backup-active.svg#symb"></svg>
+					<img id="backup-btn" class="clickable" aria-label="manage backups" src="images/actions/instance/backup-active.svg#symb">
 				</a>
-				<svg id="console-btn" aria-disabled="true" role="none"><use href="images/actions/instance/console-inactive.svg#symb"></svg>
-				<svg id="delete-btn" class="clickable" aria-label="delete instance" role="button" tabindex=0><use href="images/actions/instance/delete-active.svg#symb"></svg>
+				<img id="console-btn" aria-disabled="true" role="none" src="images/actions/instance/console-inactive.svg#symb">
+				<img id="delete-btn" class="clickable" aria-label="delete instance" role="button" tabindex=0 src="images/actions/instance/delete-active.svg#symb">
 			{{else if and (eq .NodeStatus "online") (eq .Status "loading")}}
-				<svg id="power-btn" aria-disabled="true" role="none"><use href="images/actions/instance/loading.svg#symb"></svg>
-				<svg id="configure-btn" aria-disabled="true" role="none"><use href="images/actions/instance/config-inactive.svg#symb"></svg>
-				<svg id="backup-btn" aria-disabled="true" role="none"><use href="images/actions/instance/backup-inactive.svg#symb"></svg>
-				<svg id="console-btn" aria-disabled="true" role="none"><use href="images/actions/instance/console-inactive.svg#symb"></svg>
-				<svg id="delete-btn" aria-disabled="true" role="none"><use href="images/actions/instance/delete-inactive.svg#symb"></svg>
+				<img id="power-btn" aria-disabled="true" role="none" src="images/actions/instance/loading.svg#symb">
+				<img id="configure-btn" aria-disabled="true" role="none" src="images/actions/instance/config-inactive.svg#symb">
+				<img id="backup-btn" aria-disabled="true" role="none" src="images/actions/instance/backup-inactive.svg#symb">
+				<img id="console-btn" aria-disabled="true" role="none" src="images/actions/instance/console-inactive.svg#symb">
+				<img id="delete-btn" aria-disabled="true" role="none" src="images/actions/instance/delete-inactive.svg#symb">
 			{{else}}
 			{{end}}
 		</div>

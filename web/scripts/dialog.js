@@ -103,7 +103,7 @@ class ErrorDialog extends HTMLElement {
 			</dialog>
 		`;
 		this.dialog = this.shadowRoot.querySelector("dialog");
-		this.errors = this.shadowRoot.querySelector("#errors")
+		this.errors = this.shadowRoot.querySelector("#errors");
 
 		for (const control of this.shadowRoot.querySelector("#controls").childNodes) {
 			control.addEventListener("click", async (e) => {
@@ -111,15 +111,15 @@ class ErrorDialog extends HTMLElement {
 				this.dialog.close(e.target.value);
 			});
 		}
-		
+
 		this.dialog.addEventListener("close", () => {
-			if (this.dialog.returnValue == "ok") {}
-			else if (this.dialog.returnValue == "copy") {
-				let errors = ""
+			if (this.dialog.returnValue === "ok") {}
+			else if (this.dialog.returnValue === "copy") {
+				let errors = "";
 				for (const error of this.errors.childNodes) {
-					errors += `${error.innerText}\n`
+					errors += `${error.innerText}\n`;
 				}
-				navigator.clipboard.writeText(errors)
+				navigator.clipboard.writeText(errors);
 			}
 			this.parentElement.removeChild(this);
 		});

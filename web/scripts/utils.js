@@ -192,15 +192,10 @@ export function setAppearance () {
 }
 
 // assumes href is path to svg, and id to grab is #symb
-export function setSVGSrc (svgElem, href) {
-	let useElem = svgElem.querySelector("use");
-	if (!useElem) {
-		useElem = document.createElementNS("http://www.w3.org/2000/svg", "use");
-	}
-	useElem.setAttribute("href", `${href}#symb`);
-	svgElem.append(useElem);
+export function setIconSrc (icon, path) {
+	icon.setAttribute("src", path);
 }
 
-export function setSVGAlt (svgElem, alt) {
-	svgElem.setAttribute("aria-label", alt);
+export function setIconAlt (icon, alt) {
+	icon.setAttribute("alt", alt);
 }

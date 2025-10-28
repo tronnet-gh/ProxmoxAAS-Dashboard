@@ -23,9 +23,9 @@
 			<p class="w3-col l6 m6 hide-small">{{.Notes}}</p>
 			<p class="w3-col l2 hide-medium">{{.SizeFormatted}}</p>
 			<div class="w3-col l2 m2 s4 flex row nowrap" style="height: 1lh;">
-				<svg id="edit-btn" class="clickable" aria-label="change notes"><use href="images/actions/backups/config.svg#symb"></svg>
-				<svg id="delete-btn" class="clickable" aria-label="delete backup" role="button" tabindex=0><use href="images/actions/backups/delete-active.svg#symb"></svg>
-				<svg id="restore-btn" class="clickable" aria-label="restore from backup" role="button" tabindex=0><use href="images/actions/backups/restore.svg#symb"></svg>
+				<img id="edit-btn" class="clickable" aria-label="change notes" src="images/actions/backups/config.svg#symb">
+				<img id="delete-btn" class="clickable" aria-label="delete backup" role="button" tabindex=0 src="images/actions/backups/delete-active.svg#symb">
+				<img id="restore-btn" class="clickable" aria-label="restore from backup" role="button" tabindex=0 src="images/actions/backups/restore.svg#symb">
 			</div>
 		</div>
 		<template id="edit-dialog">
@@ -100,7 +100,7 @@
 {{define "backups-add-backup"}}
 <button type="button" id="backup-add" class="w3-button" aria-label="Create Backup">
 	<span class="large" style="margin: 0;">Create Backup</span>
-	<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Create Backup"><use href="images/actions/network/add.svg#symb"></use></svg>
+	<img class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Create Backup" src="images/actions/network/add.svg#symb">
 </button>
 <template id="create-backup-dialog">
 	<link rel="stylesheet" href="modules/w3.css">

@@ -1,26 +1,26 @@
 {{define "proctype-input"}}
-<svg aria-label="CPU Type"><use href="images/resources/cpu.svg#symb"></svg>
+<img aria-label="CPU Type" src="images/resources/cpu.svg#symb">
 <label for="proctype">CPU Type</label>
 {{template "select" .}}
 <div></div>
 {{end}}
 
 {{define "cores-input"}}
-<svg aria-label="CPU Amount"><use href="images/resources/cpu.svg#symb"></svg>
+<img aria-label="CPU Amount" src="images/resources/cpu.svg#symb">
 <label for="cores">CPU Amount</label>
 <input id="cores" name="cores" class="w3-input w3-border" type="number" required value="{{.}}">
 <p>Cores</p>
 {{end}}
 
 {{define "memory-input"}}
-<svg aria-label="Memory Amount"><use href="images/resources/ram.svg#symb"></svg>
+<img aria-label="Memory Amount" src="images/resources/ram.svg#symb">
 <label for="ram">Memory</label>
 <input id="ram" name="ram" class="w3-input w3-border" type="number" required value="{{.}}">
 <p>MiB</p>
 {{end}}
 
 {{define "swap-input"}}
-<svg aria-label="Swap Amount"><use href="images/resources/swap.svg#symb"></svg>
+<img aria-label="Swap Amount" src="images/resources/swap.svg#symb">
 <label for="swap">Swap</label>
 <input id="swap" name="swap" class="w3-input w3-border" type="number" required value="{{.}}">
 <p>MiB</p>
@@ -46,7 +46,7 @@
 {{define "volumes-add-disk"}}
 <button type="button" id="disk-add" class="w3-button" aria-label="Add New Disk">
 	<span class="large" style="margin: 0;">Add Disk</span>
-	<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New Disk"><use href="images/actions/disk/add-disk.svg#symb"></use></svg>
+	<img class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New Disk" src="images/actions/disk/add-disk.svg#symb">
 </button>
 <template id="add-disk-dialog">
 	<dialog class="w3-container w3-card w3-border-0">
@@ -75,7 +75,7 @@
 {{define "volumes-add-cd"}}
 <button type="button" id="cd-add" class="w3-button" aria-label="Add New CD">
 	<span class="large" style="margin: 0;">Mount CD</span>
-	<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New CDROM"><use href="images/actions/disk/add-cd.svg#symb"></use></svg>
+	<img class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New CDROM" src="images/actions/disk/add-cd.svg#symb">
 </button>
 <template id="add-cd-dialog">
 	<dialog class="w3-container w3-card w3-border-0">
@@ -97,7 +97,7 @@
 {{end}}
 
 {{define "volume-rootfs"}}
-<svg data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive"><use href="images/resources/drive.svg#symb"></svg>
+<img data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive" src="images/resources/drive.svg#symb">
 <p>{{.Name}}</p>
 <p>{{.Volume.File}}</p>
 <div>
@@ -109,7 +109,7 @@
 {{end}}
 
 {{define "volume-mp"}}
-<svg data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive"><use href="images/resources/drive.svg#symb"></svg>
+<img data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive" src="images/resources/drive.svg#symb">
 <p>{{.Name}}</p>
 <p>{{.Volume.File}}</p>
 <div>
@@ -121,7 +121,7 @@
 {{end}}
 
 {{define "volume-ide"}}
-<svg data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive"><use href="images/resources/drive.svg#symb"></svg>
+<img data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive" src="images/resources/drive.svg#symb">
 <p>{{.Name}}</p>
 <p>{{.Volume.File}}</p>
 <div>
@@ -133,7 +133,7 @@
 {{end}}
 
 {{define "volume-scsi"}}
-<svg data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive"><use href="images/resources/drive.svg#symb"></svg>
+<img data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive" src="images/resources/drive.svg#symb">
 <p>{{.Name}}</p>
 <p>{{.Volume.File}}</p>
 <div>
@@ -145,7 +145,7 @@
 {{end}}
 
 {{define "volume-unused"}}
-<svg data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive"><use href="images/resources/drive.svg#symb"></svg>
+<img data-volume={{.Name}} xmlns="http://www.w3.org/2000/svg" aria-label="Drive" src="images/resources/drive.svg#symb">
 <p>{{.Name}}</p>
 <p>{{.Volume.File}}</p>
 <div>
@@ -160,7 +160,7 @@
 <volume-action data-type="move" data-volume="{{.Name}}">
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
-		<svg class="clickable" aria-label="Move {{.Name}}"><use href="images/actions/disk/move-active.svg#symb"></svg>
+		<img class="clickable" aria-label="Move {{.Name}}" src="images/actions/disk/move-active.svg#symb">
 		<template id="dialog-template">
 			<dialog class="w3-container w3-card w3-border-0">
 				<p class="w3-large" id="prompt" style="text-align: center;">
@@ -186,7 +186,7 @@
 <volume-action data-type="none" data-volume="{{.Name}}">
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
-		<svg aria-label=""><use href="images/actions/disk/move-inactive.svg#symb"></svg>
+		<img aria-label="" src="images/actions/disk/move-inactive.svg#symb">
 	</template>
 </volume-action>
 {{end}}
@@ -195,7 +195,7 @@
 <volume-action data-type="resize" data-volume="{{.Name}}">
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
-		<svg class="clickable" aria-label="Resize {{.Name}}"><use href="images/actions/disk/resize-active.svg#symb"></svg>
+		<img class="clickable" aria-label="Resize {{.Name}}" src="images/actions/disk/resize-active.svg#symb">
 		<template id="dialog-template">
 			<dialog class="w3-container w3-card w3-border-0">
 				<p class="w3-large" id="prompt" style="text-align: center;">
@@ -221,7 +221,7 @@
 <volume-action data-type="none" data-volume="{{.Name}}">
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
-		<svg aria-label=""><use href="images/actions/disk/resize-inactive.svg#symb"></svg>
+		<img aria-label="" src="images/actions/disk/resize-inactive.svg#symb">
 	</template>
 </volume-action>
 {{end}}
@@ -230,7 +230,7 @@
 <volume-action data-type="delete" data-volume="{{.Name}}">
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
-		<svg class="clickable" aria-label="Delete {{.Name}}"><use href="images/actions/disk/delete-active.svg#symb"></svg>
+		<img class="clickable" aria-label="Delete {{.Name}}" src="images/actions/disk/delete-active.svg#symb">
 		<template id="dialog-template">
 			<dialog class="w3-container w3-card w3-border-0">
 				<p class="w3-large" id="prompt" style="text-align: center;">
@@ -255,7 +255,7 @@
 <volume-action data-type="none" data-volume="{{.Name}}">
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
-		<svg aria-label=""><use href="images/actions/disk/delete-inactive.svg#symb"></svg>
+		<img aria-label="" src="images/actions/disk/delete-inactive.svg#symb">
 	</template>
 </volume-action>
 {{end}}
@@ -264,7 +264,7 @@
 <volume-action data-type="attach" data-volume="{{.Name}}">
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
-		<svg class="clickable" aria-label="Attach {{.Name}}"><use href="images/actions/disk/attach.svg#symb"></svg>
+		<img class="clickable" aria-label="Attach {{.Name}}" src="images/actions/disk/attach.svg#symb">
 		<template id="dialog-template">
 			<dialog class="w3-container w3-card w3-border-0">
 				<p class="w3-large" id="prompt" style="text-align: center;">
@@ -297,7 +297,7 @@
 <volume-action data-type="detach" data-volume="{{.Name}}">
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
-		<svg class="clickable" aria-label="Detach {{.Name}}"><use href="images/actions/disk/detach.svg#symb"></svg>
+		<img class="clickable" aria-label="Detach {{.Name}}" src="images/actions/disk/detach.svg#symb">
 		<template id="dialog-template">
 			<dialog class="w3-container w3-card w3-border-0">
 				<p class="w3-large" id="prompt" style="text-align: center;">
@@ -322,7 +322,7 @@
 <volume-action data-type="none">
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="css/style.css">
-		<svg aria-label=""></svg>
+		<img aria-label="" src="images/common/blank.svg">
 	</template>
 </volume-action>
 {{end}}
@@ -336,7 +336,7 @@
 {{define "nets-add-net"}}
 <button type="button" id="network-add" class="w3-button" aria-label="Add New Network Interface">
 	<span class="large" style="margin: 0;">Add Network</span>
-	<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New Network Interface"><use href="images/actions/network/add.svg#symb"></use></svg>
+	<img class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New Network Interface" src="images/actions/network/add.svg#symb">
 </button>
 <template id="add-net-dialog">
 	<dialog class="w3-container w3-card w3-border-0">
@@ -361,14 +361,14 @@
 {{end}}
 
 {{define "net"}}
-<svg data-network="{{.Net_ID}}" aria-label="Net {{.Net_ID}}"><use href="images/resources/network.svg#symb"></svg>
+<img data-network="{{.Net_ID}}" aria-label="Net {{.Net_ID}}" src="images/resources/network.svg#symb">
 <p>{{.Net_ID}}</p>
 <p>{{.Value}}</p>
 <div>
 	<network-action data-type="config" data-network="{{.Net_ID}}" data-value="{{.Value}}">
 		<template shadowrootmode="open">
 			<link rel="stylesheet" href="css/style.css">
-			<svg class="clickable" aria-label="Configure Net {{.Net_ID}}"><use href="images/actions/network/config.svg#symb"></svg>
+			<img class="clickable" aria-label="Configure Net {{.Net_ID}}" src="images/actions/network/config.svg#symb">
 			<template id="dialog-template">
 				<dialog class="w3-container w3-card w3-border-0">
 					<p class="w3-large" id="prompt" style="text-align: center;">
@@ -390,7 +390,7 @@
 	<network-action data-type="delete" data-network="{{.Net_ID}}" data-value="{{.Value}}">
 		<template shadowrootmode="open">
 			<link rel="stylesheet" href="css/style.css">
-			<svg class="clickable" aria-label="Delete Net {{.Net_ID}}"><use href="images/actions/network/delete-active.svg#symb"></svg>
+			<img class="clickable" aria-label="Delete Net {{.Net_ID}}" src="images/actions/network/delete-active.svg#symb">
 			<template id="dialog-template">
 				<dialog class="w3-container w3-card w3-border-0">
 					<p class="w3-large" id="prompt" style="text-align: center;">
@@ -421,7 +421,7 @@
 {{define "devices-add-device"}}
 <button type="button" id="device-add" class="w3-button" aria-label="Add New PCIe Device">
 	<span class="large" style="margin: 0;">Add Device</span>
-	<svg class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New PCIe Device"><use href="images/actions/device/add.svg#symb"></use></svg>
+	<img class="small" role="img" style="height: 1lh; width: 1lh;" aria-label="Add New PCIe Device" src="images/actions/device/add.svg#symb">
 </button>
 <template id="add-device-dialog">
 	<dialog class="w3-container w3-card w3-border-0">
@@ -444,14 +444,14 @@
 {{end}}
 
 {{define "device"}}
-<svg data-device="{{.Device_ID}}" aria-label="Device {{.Device_ID}}"><use href="images/resources/device.svg#symb"></svg>
+<img data-device="{{.Device_ID}}" aria-label="Device {{.Device_ID}}" src="images/resources/device.svg#symb">
 <p>{{.Device_ID}}</p>
 <p>{{.Device_Name}}</p>
 <div>
 	<device-action data-type="config" data-device="{{.Device_ID}}" data-value="{{.Value}}">
 		<template shadowrootmode="open">
 			<link rel="stylesheet" href="css/style.css">
-			<svg class="clickable" aria-label="Configure Device {{.Device_ID}}"><use href="images/actions/device/config.svg#symb"></svg>
+			<img class="clickable" aria-label="Configure Device {{.Device_ID}}" src="images/actions/device/config.svg#symb">
 			<template id="dialog-template">
 				<dialog class="w3-container w3-card w3-border-0">
 					<p class="w3-large" id="prompt" style="text-align: center;">
@@ -473,7 +473,7 @@
 	<device-action data-type="delete" data-device="{{.Device_ID}}" data-value="{{.Value}}">
 		<template shadowrootmode="open">
 			<link rel="stylesheet" href="css/style.css">
-			<svg class="clickable" aria-label="Delete Device {{.Device_ID}}"><use href="images/actions/device/delete-active.svg#symb"></svg>
+			<img class="clickable" aria-label="Delete Device {{.Device_ID}}" src="images/actions/device/delete-active.svg#symb">
 			<template id="dialog-template">
 				<dialog class="w3-container w3-card w3-border-0">
 					<p class="w3-large" id="prompt" style="text-align: center;">
@@ -537,15 +537,15 @@
 {{define "boot-target"}}
 {{if .volume_id}}
 <div class="draggable-item" data-value="{{.volume_id}}" style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
-	<svg aria-label="Drag"><use href="images/actions/drag.svg#symb"></use></svg>
-	<svg aria-label="Volume"><use href="images/resources/drive.svg#symb"></use></svg>
+	<img aria-label="Drag" src="images/actions/drag.svg#symb">
+	<img aria-label="Volume" src="images/resources/drive.svg#symb">
 	<p style="margin: 0px;">{{.volume_id}}</p>
 	<p style="margin: 0px; overflow: hidden; white-space: nowrap;">{{.file}}</p>
 </div>
 {{else if .net_id}}
 <div class="draggable-item" data-value="{{.net_id}}" style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
-	<svg aria-label="Drag"><use href="images/actions/drag.svg#symb"></use></svg>
-	<svg aria-label="Net"><use href="images/resources/network.svg#symb"></use></svg>
+	<img aria-label="Drag" src="images/actions/drag.svg#symb">
+	<img aria-label="Net" src="images/resources/network.svg#symb">
 	<p style="margin: 0px;">{{.net_id}}</p>
 	<p style="margin: 0px; overflow: hidden; white-space: nowrap;">{{.value}}</p>
 </div>

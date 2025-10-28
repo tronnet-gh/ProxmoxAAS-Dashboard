@@ -1,5 +1,5 @@
-import { requestPVE, requestAPI, setAppearance, getSearchSettings, requestDash, setSVGSrc, setSVGAlt } from "./utils.js";
-import { alert, dialog } from "./dialog.js";
+import { requestPVE, requestAPI, setAppearance, getSearchSettings, requestDash, setIconSrc, setIconAlt } from "./utils.js";
+import { alert, dialog, error } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
 
@@ -120,25 +120,29 @@ class InstanceCard extends HTMLElement {
 		}
 
 		const powerButton = this.shadowRoot.querySelector("#power-btn");
-		if (powerButton.classList.contains("clickable")) {
-			powerButton.onclick = this.handlePowerButton.bind(this);
-			powerButton.onkeydown = (event) => {
-				if (event.key === "Enter") {
-					event.preventDefault();
-					this.handlePowerButton();
-				}
-			};
+		if (powerButton !== null) {
+			if (powerButton.classList.contains("clickable")) {
+				powerButton.onclick = this.handlePowerButton.bind(this);
+				powerButton.onkeydown = (event) => {
+					if (event.key === "Enter") {
+						event.preventDefault();
+						this.handlePowerButton();
+					}
+				};
+			}
 		}
 
 		const deleteButton = this.shadowRoot.querySelector("#delete-btn");
-		if (deleteButton.classList.contains("clickable")) {
-			deleteButton.onclick = this.handleDeleteButton.bind(this);
-			deleteButton.onkeydown = (event) => {
-				if (event.key === "Enter") {
-					event.preventDefault();
-					this.handleDeleteButton();
-				}
-			};
+		if (deleteButton !== null) {
+			if (deleteButton.classList.contains("clickable")) {
+				deleteButton.onclick = this.handleDeleteButton.bind(this);
+				deleteButton.onkeydown = (event) => {
+					if (event.key === "Enter") {
+						event.preventDefault();
+						this.handleDeleteButton();
+					}
+				};
+			}
 		}
 	}
 
@@ -146,10 +150,10 @@ class InstanceCard extends HTMLElement {
 		this.status = "loading";
 		const statusicon = this.shadowRoot.querySelector("#status");
 		const powerbtn = this.shadowRoot.querySelector("#power-btn");
-		setSVGSrc(statusicon, "images/status/loading.svg");
-		setSVGAlt(statusicon, "instance is loading");
-		setSVGSrc(powerbtn, "images/status/loading.svg");
-		setSVGAlt(powerbtn, "");
+		setIconSrc(statusicon, "images/status/loading.svg");
+		setIconAlt(statusicon, "instance is loading");
+		setIconSrc(powerbtn, "images/status/loading.svg");
+		setIconAlt(powerbtn, "");
 	}
 
 	async handlePowerButton () {

@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, goToPage, getURIData, setAppearance, setSVGSrc, requestDash } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, getURIData, setAppearance, setIconSrc, requestDash } from "./utils.js";
 import { alert, dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
@@ -48,8 +48,8 @@ class VolumeAction extends HTMLElement {
 	}
 
 	async setStatusLoading () {
-		const svg = document.querySelector(`svg[data-volume="${this.dataset.volume}"]`);
-		setSVGSrc(svg, "images/status/loading.svg");
+		const icon = document.querySelector(`img[data-volume="${this.dataset.volume}"]`);
+		setIconSrc(icon, "images/status/loading.svg");
 	}
 
 	async handleDiskDetach () {
@@ -247,8 +247,8 @@ class NetworkAction extends HTMLElement {
 	}
 
 	async setStatusLoading () {
-		const svg = document.querySelector(`svg[data-network="${this.dataset.network}"]`);
-		setSVGSrc(svg, "images/status/loading.svg");
+		const icon = document.querySelector(`img[data-network="${this.dataset.network}"]`);
+		setIconSrc(icon, "images/status/loading.svg");
 	}
 
 	async handleNetworkConfig () {
@@ -277,7 +277,7 @@ class NetworkAction extends HTMLElement {
 		const netID = this.dataset.network;
 		dialog(this.template, async (result, form) => {
 			if (result === "confirm") {
-				setSVGSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
+				setIconSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
 				const net = `${netID}`;
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/delete`, "DELETE");
 				if (result.status !== 200) {
@@ -349,8 +349,8 @@ class DeviceAction extends HTMLElement {
 	}
 
 	async setStatusLoading () {
-		const svg = document.querySelector(`svg[data-device="${this.dataset.device}"]`);
-		setSVGSrc(svg, "images/status/loading.svg");
+		const icon = document.querySelector(`img[data-device="${this.dataset.device}"]`);
+		setIconSrc(icon, "images/status/loading.svg");
 	}
 
 	async handleDeviceConfig () {

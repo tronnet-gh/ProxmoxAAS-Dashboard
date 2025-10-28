@@ -100,6 +100,10 @@ img, svg {
 	color: var(--main-text-color)
 }
 
+a img {
+	vertical-align: unset;
+}
+
 hr {
 	border-color: var(--main-text-color);
 }
