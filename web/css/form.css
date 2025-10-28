@@ -1,3 +1,8 @@
+input, select, textarea {
+	background-color: var(--main-input-bg-color);
+	color: var(--main-text-color);
+}
+
 .input-grid {
 	display: grid;
 	gap: 5px 10px;
