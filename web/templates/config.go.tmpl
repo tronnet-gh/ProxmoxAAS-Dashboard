@@ -537,15 +537,15 @@
 {{define "boot-target"}}
 {{if .volume_id}}
 <div class="draggable-item" data-value="{{.volume_id}}" style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
-	<img alt="Drag" src="images/actions/drag.svg#symb">
-	<img alt="Volume" src="images/resources/drive.svg#symb">
+	<img style="height: 1em; width: 1em" alt="Drag" src="images/actions/drag.svg#symb">
+	<img style="height: 1em; width: 1em" alt="Volume" src="images/resources/drive.svg#symb">
 	<p style="margin: 0px;">{{.volume_id}}</p>
 	<p style="margin: 0px; overflow: hidden; white-space: nowrap;">{{.file}}</p>
 </div>
 {{else if .net_id}}
 <div class="draggable-item" data-value="{{.net_id}}" style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
-	<img alt="Drag" src="images/actions/drag.svg#symb">
-	<img alt="Net" src="images/resources/network.svg#symb">
+	<img style="height: 1em; width: 1em" alt="Drag" src="images/actions/drag.svg#symb">
+	<img style="height: 1em; width: 1em" alt="Net" src="images/resources/network.svg#symb">
 	<p style="margin: 0px;">{{.net_id}}</p>
 	<p style="margin: 0px; overflow: hidden; white-space: nowrap;">{{.value}}</p>
 </div>
