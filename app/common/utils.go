@@ -20,15 +20,7 @@ import (
 	"github.com/tdewolff/minify/v2"
 )
 
-var TMPL *template.Template
-var Global Config
-
-type VMPath struct {
-	Node string
-	Type string
-	VMID string
-}
-
+// get config file from configPath
 func GetConfig(configPath string) Config {
 	content, err := os.ReadFile(configPath)
 	if err != nil {
@@ -42,6 +34,7 @@ func GetConfig(configPath string) Config {
 	return config
 }
 
+// initialize minifier using the meta types specified
 func InitMinify() *minify.M {
 	m := minify.New()
 	for _, v := range MimeTypes {
@@ -125,7 +118,7 @@ func LoadHTMLToGin(engine *gin.Engine, html map[string]StaticFile) *template.Tem
 		},
 	}
 	tmpl := template.Must(root, LoadAndAddToRoot(engine.FuncMap, root, html))
-	engine.SetHTMLTemplate(tmpl)
+	engine.SetHTMLTemplate(root)
 	return tmpl
 }
 

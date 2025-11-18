@@ -1,5 +1,9 @@
 package common
 
+import "html/template"
+
+var Global Config
+
 type Config struct {
 	Port         int    `json:"listenPort"`
 	Organization string `json:"organization"`
@@ -8,9 +12,21 @@ type Config struct {
 	API          string `json:"apiurl"`
 }
 
+// variable for html template root
+// generated from LoadHTMLToGin
+var TMPL *template.Template
+
+// static served file type containing data and mimetype
 type StaticFile struct {
 	Data     string
 	MimeType MimeType
+}
+
+// parsed vmpath data (ie node/type/vmid)
+type VMPath struct {
+	Node string
+	Type string
+	VMID string
 }
 
 // type used for templated <select>
@@ -26,8 +42,6 @@ type Option struct {
 	Value    string
 	Display  string
 }
-
-type RequestType int
 
 type RequestContext struct {
 	Cookies map[string]string

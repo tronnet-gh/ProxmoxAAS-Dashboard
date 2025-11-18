@@ -14,6 +14,7 @@ import (
 func Run(configPath *string) {
 	common.Global = common.GetConfig(*configPath)
 
+	// setup static resources
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	m := common.InitMinify()
@@ -21,6 +22,7 @@ func Run(configPath *string) {
 	html := common.MinifyStatic(m, web.Templates)
 	common.TMPL = common.LoadHTMLToGin(router, html)
 
+	// dynamic routes for pages and page fragments
 	router.GET("/", routes.HandleGETIndex)
 	router.GET("/index", routes.HandleGETIndex)
 	router.GET("/index/instances", routes.HandleGETInstancesFragment)
@@ -35,9 +37,11 @@ func Run(configPath *string) {
 	router.GET("/login", routes.HandleGETLogin)
 	router.GET("/settings", routes.HandleGETSettings)
 
+	// run on all interfaces with port
 	log.Fatal(router.Run(fmt.Sprintf("0.0.0.0:%d", common.Global.Port)))
 }
 
+// setup static resources under web (css, images, modules, scripts)
 func ServeStatic(router *gin.Engine, m *minify.M) {
 	css := common.MinifyStatic(m, web.CSS_fs)
 	router.GET("/css/*css", func(c *gin.Context) {

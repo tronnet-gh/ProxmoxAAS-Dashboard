@@ -26,7 +26,6 @@ func GetLoginRealms() ([]Realm, error) {
 
 	ctx := common.RequestContext{
 		Cookies: nil,
-		//Body:    map[string]any{},
 	}
 	body := map[string]any{}
 	res, code, err := common.RequestGetAPI("/proxmox/access/domains", ctx, &body)

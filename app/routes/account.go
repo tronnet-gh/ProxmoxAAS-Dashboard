@@ -21,12 +21,14 @@ type Account struct {
 	Resources map[string]map[string]any
 }
 
+// numerical constraint
 type Constraint struct {
 	Max   int64
 	Used  int64
 	Avail int64
 }
 
+// match constraint
 type Match struct {
 	Name  string
 	Match string
@@ -107,6 +109,7 @@ func HandleGETAccount(c *gin.Context) {
 			return
 		}
 
+		// for each resource category, create a resource chart
 		for category, resources := range account.Resources {
 			for resource, v := range resources {
 				switch t := v.(type) {

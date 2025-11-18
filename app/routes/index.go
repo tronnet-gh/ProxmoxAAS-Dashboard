@@ -10,13 +10,7 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
-// used in constructing instance cards in index
-type Node struct {
-	Node   string `json:"node"`
-	Status string `json:"status"`
-}
-
-// used in constructing instance cards in index
+// primary type used in constructing instance cards in index
 type InstanceCard struct {
 	VMID        uint
 	Name        string
@@ -27,6 +21,12 @@ type InstanceCard struct {
 	ConfigPath  string
 	ConsolePath string
 	BackupsPath string
+}
+
+// used in constructing instance cards in index
+type Node struct {
+	Node   string `json:"node"`
+	Status string `json:"status"`
 }
 
 // used in retriving cluster tasks
@@ -92,24 +92,24 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 	if err != nil {
 		return nil, nil, err
 	}
-	if code != 200 { // if we did not successfully retrieve resources, then return 500 because auth was 1 but was invalid somehow
+	if code != 200 { // if we did not successfully retrieve resources, then return the error because auth was 1 but was invalid somehow
 		return nil, nil, fmt.Errorf("request to /cluster/resources resulted in %+v", res)
 	}
 
 	instances := map[uint]InstanceCard{}
 	nodes := map[string]Node{}
 
-	// if we successfully retrieved the resources, then process it and return index
+	// parse /proxmox/cluster/resources to separate instances and nodes
 	for _, v := range body["data"].([]any) {
 		m := v.(map[string]any)
-		if m["type"] == "node" {
+		if m["type"] == "node" { // if type is node -> parse as Node object
 			node := Node{}
 			err := mapstructure.Decode(v, &node)
 			if err != nil {
 				return nil, nil, err
 			}
 			nodes[node.Node] = node
-		} else if m["type"] == "lxc" || m["type"] == "qemu" {
+		} else if m["type"] == "lxc" || m["type"] == "qemu" { // if type is lxc or qemu -> parse as InstanceCard object
 			instance := InstanceCard{}
 			err := mapstructure.Decode(v, &instance)
 			if err != nil {
@@ -118,16 +118,21 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 			instances[instance.VMID] = instance
 		}
 	}
+	// once all basic instance and node stuff is parsed, go back and fill in cross referenced data
 	for vmid, instance := range instances {
-		nodestatus := nodes[instance.Node].Status
-		instance.NodeStatus = nodestatus
+		// set instance's node status
+		instance.NodeStatus = nodes[instance.Node].Status
+		// set instance's config link path
 		instance.ConfigPath = fmt.Sprintf("config?node=%s&type=%s&vmid=%d", instance.Node, instance.Type, instance.VMID)
+		// set the instance's console link path
 		if instance.Type == "qemu" {
 			instance.ConsolePath = fmt.Sprintf("%s/?console=kvm&vmid=%d&vmname=%s&node=%s&resize=off&cmd=&novnc=1", common.Global.PVE, instance.VMID, instance.Name, instance.Node)
 		} else if instance.Type == "lxc" {
 			instance.ConsolePath = fmt.Sprintf("%s/?console=lxc&vmid=%d&vmname=%s&node=%s&resize=off&cmd=&xtermjs=1", common.Global.PVE, instance.VMID, instance.Name, instance.Node)
 		}
+		// set the instance's backups link path
 		instance.BackupsPath = fmt.Sprintf("backups?node=%s&type=%s&vmid=%d", instance.Node, instance.Type, instance.VMID)
+		// save back to instances map
 		instances[vmid] = instance
 	}
 
@@ -143,7 +148,9 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 	most_recent_task := map[uint]uint{}
 	expected_state := map[uint]string{}
 
+	// iterate through recent user accessible tasks to find the task most recently made on an instance
 	for _, v := range body["data"].([]any) {
+		// parse task as Task object
 		task := Task{}
 		err := mapstructure.Decode(v, &task)
 		if err != nil {
@@ -177,6 +184,7 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 		}
 	}
 
+	// iterate through the instances with recent tasks, refetch their state from a more reliable source
 	for vmid, expected_state := range expected_state { // for the expected states from recent tasks
 		if instances[vmid].Status != expected_state { // if the current node's state from /cluster/resources differs from expected state
 			// get /status/current which is updated faster than /cluster/resources
