@@ -156,11 +156,14 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 		if err != nil {
 			return nil, nil, err
 		}
+
+		// try to get task vmid but continue if it would be an invalid vmid
 		x, err := strconv.Atoi(task.ID)
-		task.VMID = uint(x)
+		// if there was an error converting the task's vmid, skip it
 		if err != nil {
-			return nil, nil, err
+			continue
 		}
+		task.VMID = uint(x)
 
 		if task.User != auth.Username { // task was not made by user (ie was not a power on/off task)
 			continue
