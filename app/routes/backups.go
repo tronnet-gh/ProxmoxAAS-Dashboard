@@ -26,6 +26,7 @@ func HandleGETBackups(c *gin.Context) {
 		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
+			return
 		}
 
 		backups, err := GetInstanceBackups(vm_path, auth)
@@ -57,6 +58,7 @@ func HandleGETBackupsFragment(c *gin.Context) {
 		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
+			return
 		}
 
 		backups, err := GetInstanceBackups(vm_path, auth)

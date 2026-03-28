@@ -50,6 +50,7 @@ func HandleGETIndex(c *gin.Context) {
 		instances, _, err := GetClusterResources(auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
+			return
 		}
 		page := gin.H{
 			"global":    common.Global,
@@ -68,6 +69,7 @@ func HandleGETInstancesFragment(c *gin.Context) {
 		instances, _, err := GetClusterResources(auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
+			return
 		}
 		c.Header("Content-Type", "text/plain")
 		common.TMPL.ExecuteTemplate(c.Writer, "html/index-instances.go.tmpl", gin.H{

@@ -52,6 +52,7 @@ func HandleGETConfig(c *gin.Context) {
 		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
+			return
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
@@ -87,6 +88,7 @@ func HandleGETConfigVolumesFragment(c *gin.Context) {
 		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
+			return
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
@@ -110,6 +112,7 @@ func HandleGETConfigNetsFragment(c *gin.Context) {
 		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
+			return
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
@@ -133,6 +136,7 @@ func HandleGETConfigDevicesFragment(c *gin.Context) {
 		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
+			return
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
@@ -156,6 +160,7 @@ func HandleGETConfigBootFragment(c *gin.Context) {
 		vm_path, err := common.ExtractVMPath(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
+			return
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
