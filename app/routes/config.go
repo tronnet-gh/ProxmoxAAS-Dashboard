@@ -3,8 +3,8 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
-	fabric "proxmoxaas-fabric/app"
 	"slices"
 	"sort"
 
@@ -15,16 +15,16 @@ import (
 // imported types from fabric
 
 type InstanceConfig struct {
-	Type    fabric.InstanceType       `json:"type"`
-	Name    string                    `json:"name"`
-	CPU     string                    `json:"cpu"`
-	Cores   uint64                    `json:"cores"`
-	Memory  uint64                    `json:"memory"`
-	Swap    uint64                    `json:"swap"`
-	Volumes map[string]*fabric.Volume `json:"volumes"`
-	Nets    map[string]*fabric.Net    `json:"nets"`
-	Devices map[string]*fabric.Device `json:"devices"`
-	Boot    fabric.BootOrder          `json:"boot"`
+	Type    paas.InstanceType       `json:"type"`
+	Name    string                  `json:"name"`
+	CPU     string                  `json:"cpu"`
+	Cores   uint64                  `json:"cores"`
+	Memory  uint64                  `json:"memory"`
+	Swap    uint64                  `json:"swap"`
+	Volumes map[string]*paas.Volume `json:"volumes"`
+	Nets    map[string]*paas.Net    `json:"nets"`
+	Devices map[string]*paas.Device `json:"devices"`
+	Boot    paas.BootOrder          `json:"boot"`
 	// overrides
 	ProctypeSelect common.Select
 }

@@ -1,0 +1,3 @@
+[submodule "proxmoxaas-common-lib"]
+	path = proxmoxaas-common-lib
+	url = https://git.tronnet.net/tronnet/proxmoxaas-common-lib

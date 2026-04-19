@@ -7,10 +7,10 @@ require (
 	github.com/gin-gonic/gin v1.12.0
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/tdewolff/minify/v2 v2.24.11
-	proxmoxaas-fabric v0.0.0
+	proxmoxaas-common-lib v0.0.0
 )
 
-replace proxmoxaas-fabric => ./ProxmoxAAS-Fabric
+replace proxmoxaas-common-lib => ./proxmoxaas-common-lib
 
 require (
 	github.com/buger/goterm v1.0.4 // indirect
