@@ -4,17 +4,16 @@
 	"description": "Front-end for ProxmoxAAS",
 	"type": "module",
 	"scripts": {
-		"lint": "html-validate --config configs/.htmlvalidate.json web/html/*; stylelint --config configs/.stylelintrc.json --formatter verbose --fix web/css/*.css; DEBUG=eslint:cli-engine eslint --config configs/.eslintrc.json --fix web/scripts/",
+		"lint": "html-validate --config configs/.htmlvalidate.json web/html/*; stylelint --config configs/.stylelintrc.json --formatter verbose --fix web/css/*.css; DEBUG=eslint:cli-engine eslint --config configs/eslint.config.mjs --fix web/scripts/",
 		"update-modules": "rm -rf web/modules/wfa.js web/modules/wfa.wasm; curl https://git.tronnet.net/alu/WFA-JS/releases/download/latest/wfa.js -o web/modules/wfa.js; curl https://git.tronnet.net/alu/WFA-JS/releases/download/latest/wfa.wasm -o web/modules/wfa.wasm"
 	},
 	"devDependencies": {
-		"eslint": "^8.43.0",
-		"eslint-config-standard": "^17.1.0",
-		"eslint-plugin-import": "^2.27.5",
-		"eslint-plugin-n": "^16.0.1",
-		"eslint-plugin-promise": "^6.1.1",
+		"@eslint/eslintrc": "^3.3.5",
+		"@eslint/js": "^10.0.1",
+		"eslint": "^10.2.1",
+		"globals": "^17.5.0",
+		"html-validate": "^9.4.0",
 		"stylelint": "^15.9.0",
-		"stylelint-config-standard": "^33.0.0",
-		"html-validate": "^9.4.0"
+		"stylelint-config-standard": "^33.0.0"
 	}
 }
