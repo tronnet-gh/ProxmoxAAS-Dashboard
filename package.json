@@ -4,7 +4,7 @@
 	"description": "Front-end for ProxmoxAAS",
 	"type": "module",
 	"scripts": {
-		"lint": "html-validate --config configs/.htmlvalidate.json web/html/*; stylelint --config configs/.stylelintrc.json --formatter verbose --fix web/css/*.css; DEBUG=eslint:cli-engine eslint --config configs/eslint.config.mjs --fix web/scripts/",
+		"lint": "html-validate --config dev_config/.htmlvalidate.json web/html/*; stylelint --config dev_config/.stylelintrc.json --formatter verbose --fix web/css/*.css; DEBUG=eslint:cli-engine eslint --config dev_config/eslint.config.mjs --fix web/scripts/",
 		"update-modules": "rm -rf web/modules/wfa.js web/modules/wfa.wasm; curl https://git.tronnet.net/alu/WFA-JS/releases/download/latest/wfa.js -o web/modules/wfa.js; curl https://git.tronnet.net/alu/WFA-JS/releases/download/latest/wfa.wasm -o web/modules/wfa.wasm"
 	},
 	"devDependencies": {
