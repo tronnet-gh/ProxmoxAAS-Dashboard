@@ -113,8 +113,7 @@ class ErrorDialog extends HTMLElement {
 		}
 
 		this.dialog.addEventListener("close", () => {
-			if (this.dialog.returnValue === "ok") {}
-			else if (this.dialog.returnValue === "copy") {
+			if (this.dialog.returnValue === "copy") {
 				let errors = "";
 				for (const error of this.errors.childNodes) {
 					errors += `${error.innerText}\n`;

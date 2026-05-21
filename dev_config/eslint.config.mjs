@@ -23,6 +23,7 @@ export default defineConfig([js.configs.recommended,{
             "argsIgnorePattern": "^_",
             "varsIgnorePattern": "^_",
             "caughtErrorsIgnorePattern": "^_"
-        }]
+        }],
+		"prefer-const": ["error"]
     },
 }]);
