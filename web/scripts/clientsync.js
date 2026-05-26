@@ -19,7 +19,7 @@ export async function setupClientSync (callback) {
 	}
 	else if (scheme === "interrupt") {
 		const socket = new WebSocket(`wss://${window.API.replace("https://", "")}/sync/interrupt`);
-		socket.addEventListener("open", (event) => {
+		socket.addEventListener("open", (_event) => {
 			socket.send(`rate ${rate}`);
 		});
 		socket.addEventListener("message", (event) => {

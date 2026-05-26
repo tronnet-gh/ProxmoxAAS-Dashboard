@@ -2,7 +2,6 @@ package routes
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"proxmoxaas-dashboard/app/common"
 	"time"
@@ -38,8 +37,6 @@ func HandleGETBackups(c *gin.Context) {
 		if err != nil {
 			common.HandleNonFatalError(c, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
 		}
-
-		log.Printf("%+v", backups)
 
 		c.HTML(http.StatusOK, "html/backups.html", gin.H{
 			"global":  common.Global,
@@ -79,13 +76,7 @@ func HandleGETBackupsFragment(c *gin.Context) {
 func GetInstanceBackups(vm common.VMPath, auth common.Auth) ([]InstanceBackup, error) {
 	backups := []InstanceBackup{}
 	path := fmt.Sprintf("/cluster/%s/%s/%s/backup", vm.Node, vm.Type, vm.VMID)
-	ctx := common.RequestContext{
-		Cookies: map[string]string{
-			"username":            auth.Username,
-			"PVEAuthCookie":       auth.Token,
-			"CSRFPreventionToken": auth.CSRF,
-		},
-	}
+	ctx := common.GetRequestContextFromCookies(auth)
 	body := []any{}
 	res, code, err := common.RequestGetAPI(path, ctx, &body)
 	if err != nil {

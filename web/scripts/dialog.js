@@ -17,7 +17,7 @@
  * body contains an optional form or other information,
  * and controls contains a series of buttons which controls the form
  */
-export function dialog (template, onclose = async (result, form) => { }) {
+export function dialog (template, onclose = async (_result, _form) => { }) {
 	const dialog = template.content.querySelector("dialog").cloneNode(true);
 	document.body.append(dialog);
 	dialog.addEventListener("close", async () => {

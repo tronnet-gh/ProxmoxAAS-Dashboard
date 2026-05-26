@@ -80,33 +80,34 @@ async function request (url, content) {
 	try {
 		const response = await fetch(url, content);
 		const contentType = response.headers.get("Content-Type");
-		let data = null;
+		const res = {};
 
 		if (contentType === null) {
-			data = {};
+			res.data = null;
+			res.status = response.status;
 		}
 		else if (contentType.includes("application/json")) {
-			data = await response.json();
-			data.status = response.status;
+			res.data = await response.json();
+			res.status = response.status;
 		}
 		else if (contentType.includes("text/html")) {
-			data = { data: await response.text() };
-			data.status = response.status;
+			res.data = await response.text();
+			res.status = response.status;
 		}
 		else if (contentType.includes("text/plain")) {
-			data = { data: await response.text() };
-			data.status = response.status;
+			res.data = await response.text();
+			res.status = response.status;
 		}
 		else {
-			data = {};
+			res.data = null;
+			res.status = response.status;
 		}
-
+		
 		if (!response.ok) {
-			return { status: response.status, error: data ? data.error : response.status };
+			return { status: response.status, error: res.data ? res.data.error : response.status };
 		}
 		else {
-			data.status = response.status;
-			return data || response;
+			return res;
 		}
 	}
 	catch (error) {

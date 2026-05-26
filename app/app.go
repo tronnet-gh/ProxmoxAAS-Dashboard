@@ -38,7 +38,7 @@ func Run(configPath *string) {
 	router.GET("/settings", routes.HandleGETSettings)
 
 	// run on all interfaces with port
-	log.Fatal(router.Run(fmt.Sprintf("0.0.0.0:%d", common.Global.Port)))
+	log.Fatal("[Error] starting gin router: ", router.Run(fmt.Sprintf("0.0.0.0:%d", common.Global.Port)))
 }
 
 // setup static resources under web (css, images, modules, scripts)

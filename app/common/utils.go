@@ -24,12 +24,12 @@ import (
 func GetConfig(configPath string) Config {
 	content, err := os.ReadFile(configPath)
 	if err != nil {
-		log.Fatal("Error when opening config file: ", err)
+		log.Fatal("[Error] when opening config file: ", err)
 	}
 	var config Config
 	err = json.Unmarshal(content, &config)
 	if err != nil {
-		log.Fatal("Error during parsing config file: ", err)
+		log.Fatal("[Error] during parsing config file: ", err)
 	}
 	return config
 }
@@ -54,7 +54,7 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 		if !entry.IsDir() {
 			v, err := files.ReadFile(path)
 			if err != nil {
-				log.Fatalf("error parsing template file %s: %s", path, err.Error())
+				log.Fatalf("[Error] parsing template file %s: %s", path, err.Error())
 			}
 			x := strings.Split(entry.Name(), ".")
 			if len(x) >= 2 { // file has extension
@@ -62,7 +62,7 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 				if ok && mimetype.Minifier != nil { // if the extension is mapped in MimeTypes and has a minifier
 					min, err := m.String(mimetype.Type, string(v)) // try to minify
 					if err != nil {
-						log.Fatalf("error minifying file %s: %s", path, err.Error())
+						log.Fatalf("[Error] minifying file %s: %s", path, err.Error())
 					}
 					minified[path] = StaticFile{
 						Data:     min,
@@ -185,7 +185,6 @@ func RequestGetAPI(path string, context RequestContext, body any) (*http.Respons
 	if err != nil {
 		return nil, response.StatusCode, err
 	}
-
 	switch body.(type) { // write json to body object depending on type, currently supports map[string]any (ie json) or []any (ie array of json)
 	case *map[string]any:
 		err = json.Unmarshal(data, &body)
@@ -208,10 +207,11 @@ func GetAuth(c *gin.Context) (Auth, error) {
 	username, errUsername := c.Cookie("username")
 	token, errToken := c.Cookie("PVEAuthCookie")
 	csrf, errCSRF := c.Cookie("CSRFPreventionToken")
-	if errUsername != nil || errAuth != nil || errToken != nil || errCSRF != nil {
+	access, errAccess := c.Cookie("PAASAccessManagerTicket")
+	if errUsername != nil || errAuth != nil || errToken != nil || errCSRF != nil || errAccess != nil {
 		return Auth{}, fmt.Errorf("error occured getting user cookies: (auth: %s, token: %s, csrf: %s)", errAuth, errToken, errCSRF)
 	} else {
-		return Auth{username, token, csrf}, nil
+		return Auth{username, token, csrf, access}, nil
 	}
 }
 
@@ -239,13 +239,25 @@ func FormatNumber(val int64, base int64) (float64, string) {
 		steps++
 	}
 
-	if base == 1000 {
+	switch base {
+	case 1000:
 		prefixes := []string{"", "K", "M", "G", "T"}
 		return valf, prefixes[steps]
-	} else if base == 1024 {
+	case 1024:
 		prefixes := []string{"", "Ki", "Mi", "Gi", "Ti"}
 		return valf, prefixes[steps]
-	} else {
+	default:
 		return 0, ""
+	}
+}
+
+func GetRequestContextFromCookies(auth Auth) RequestContext {
+	return RequestContext{
+		Cookies: map[string]string{
+			"username":                auth.Username,
+			"PVEAuthCookie":           auth.Token,
+			"CSRFPreventionToken":     auth.CSRF,
+			"PAASAccessManagerTicket": auth.AccessManagerTicket,
+		},
 	}
 }

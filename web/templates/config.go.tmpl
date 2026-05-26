@@ -448,7 +448,7 @@
 <p>{{.Device_ID}}</p>
 <p>{{.Device_Name}}</p>
 <div>
-	<device-action data-type="config" data-device="{{.Device_ID}}" data-value="{{.Value}}">
+	<device-action data-type="config" data-device="{{.Device_ID}}" data-value="{{.Device_ID}}">
 		<template shadowrootmode="open">
 			<link rel="stylesheet" href="css/style.css">
 			<img class="clickable" alt="Configure Device {{.Device_ID}}" src="images/actions/device/config.svg#symb">
@@ -470,7 +470,7 @@
 			</template>
 		</template>
 	</device-action>
-	<device-action data-type="delete" data-device="{{.Device_ID}}" data-value="{{.Value}}">
+	<device-action data-type="delete" data-device="{{.Device_ID}}" data-value="{{.Device_ID}}">
 		<template shadowrootmode="open">
 			<link rel="stylesheet" href="css/style.css">
 			<img class="clickable" alt="Delete Device {{.Device_ID}}" src="images/actions/device/delete-active.svg#symb">

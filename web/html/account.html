@@ -42,9 +42,6 @@
 			<section class="w3-card w3-padding">
 				<h3>Account Details</h3>
 				<p id="username">Username: {{.account.Username}}</p>
-				<p id="pool">Pools: {{MapKeys .account.Pools ", "}}</p>
-				<p id="vmid">VMID Range: {{.account.VMID.Min}} - {{.account.VMID.Max}}</p>
-				<p id="nodes">Nodes: {{MapKeys .account.Nodes ", "}}</p>
 			</section>
 			<section class="w3-card w3-padding">
 				<div class="flex row nowrap">
@@ -52,33 +49,9 @@
 					<button class="w3-button w3-margin" id="change-password" type="button">Change Password</button>
 				</div>
 			</section>
-			<section class="w3-card w3-padding">
-				<h3>Cluster Resources</h3>
-				<div>
-					{{range $category, $v := .account.Resources}}
-						{{if ne $category ""}}
-							<h4>{{$category}}</h4>
-						{{end}}
-						<div class="resource-container">
-						{{range $v}}
-							{{if .Display}}
-								{{if eq .Type "numeric"}}
-									{{template "resource-chart" .}}
-								{{end}}
-								{{if eq .Type "storage"}}
-									{{template "resource-chart" .}}
-								{{end}}
-								{{if eq .Type "list"}}
-									{{range .Resources}}
-										{{template "resource-chart" .}}
-									{{end}}
-								{{end}}
-							{{end}}
-						{{end}}
-						</div>
-					{{end}}
-				</div>
-			</section>
+			{{range $poolname, $pool := .account.Pools}}
+				{{template "pool-resources" $pool}}
+			{{end}}
 		</main>
 		<template id="change-password-dialog">
 			<link rel="stylesheet" href="modules/w3.css">

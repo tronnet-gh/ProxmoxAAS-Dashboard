@@ -3,6 +3,7 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
 
 	"github.com/gerow/go-color"
@@ -12,13 +13,7 @@ import (
 
 type Account struct {
 	Username string
-	Pools    map[string]bool
-	Nodes    map[string]bool
-	VMID     struct {
-		Min int
-		Max int
-	}
-	Resources map[string]map[string]any
+	Pools    map[string]paas.Pool
 }
 
 // numerical constraint
@@ -103,171 +98,168 @@ var Green = color.RGB{
 func HandleGETAccount(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
-		account, err := GetUserAccount(auth)
+		pools, err := GetUserPools(auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
 		}
 
-		// for each resource category, create a resource chart
-		for category, resources := range account.Resources {
-			for resource, v := range resources {
-				switch t := v.(type) {
-				case NumericResource:
-					avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
-					account.Resources[category][resource] = ResourceChart{
-						Type:     t.Type,
-						Display:  t.Display,
-						Name:     t.Name,
-						Used:     t.Total.Used,
-						Max:      t.Total.Max,
-						Avail:    avail,
-						Prefix:   prefix,
-						Unit:     t.Unit,
-						ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
-					}
-				case StorageResource:
-					avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
-					account.Resources[category][resource] = ResourceChart{
-						Type:     t.Type,
-						Display:  t.Display,
-						Name:     t.Name,
-						Used:     t.Total.Used,
-						Max:      t.Total.Max,
-						Avail:    avail,
-						Prefix:   prefix,
-						Unit:     t.Unit,
-						ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
-					}
-				case ListResource:
-					l := struct {
-						Type      string
-						Display   bool
-						Resources []ResourceChart
-					}{
-						Type:      t.Type,
-						Display:   t.Display,
-						Resources: []ResourceChart{},
-					}
-
-					for _, r := range t.Total {
-						l.Resources = append(l.Resources, ResourceChart{
+		for poolname, pool := range pools {
+			// for each resource category
+			for category := range pool.Resources {
+				// for each resource in each category
+				for resource, v := range pool.Resources[category].(map[string]any) {
+					// create a resource chart for resource depending on resource type
+					switch t := v.(type) {
+					case NumericResource:
+						avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+						pools[poolname].Resources[category].(map[string]any)[resource] = ResourceChart{
 							Type:     t.Type,
 							Display:  t.Display,
-							Name:     r.Name,
-							Used:     r.Used,
-							Max:      r.Max,
-							Avail:    float64(r.Avail), // usually an int
-							Unit:     "",
-							ColorHex: InterpolateColorHSV(Green, Red, float64(r.Used)/float64(r.Max)).ToHTML(),
-						})
+							Name:     t.Name,
+							Used:     t.Total.Used,
+							Max:      t.Total.Max,
+							Avail:    avail,
+							Prefix:   prefix,
+							Unit:     t.Unit,
+							ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
+						}
+					case StorageResource:
+						avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+						pools[poolname].Resources[category].(map[string]any)[resource] = ResourceChart{
+							Type:     t.Type,
+							Display:  t.Display,
+							Name:     t.Name,
+							Used:     t.Total.Used,
+							Max:      t.Total.Max,
+							Avail:    avail,
+							Prefix:   prefix,
+							Unit:     t.Unit,
+							ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
+						}
+					case ListResource:
+						l := struct {
+							Type      string
+							Display   bool
+							Resources []ResourceChart
+						}{
+							Type:      t.Type,
+							Display:   t.Display,
+							Resources: []ResourceChart{},
+						}
+
+						for _, r := range t.Total {
+							l.Resources = append(l.Resources, ResourceChart{
+								Type:     t.Type,
+								Display:  t.Display,
+								Name:     r.Name,
+								Used:     r.Used,
+								Max:      r.Max,
+								Avail:    float64(r.Avail), // usually an int
+								Unit:     "",
+								ColorHex: InterpolateColorHSV(Green, Red, float64(r.Used)/float64(r.Max)).ToHTML(),
+							})
+						}
+						pools[poolname].Resources[category].(map[string]any)[resource] = l
 					}
-					account.Resources[category][resource] = l
 				}
 			}
 		}
 
 		c.HTML(http.StatusOK, "html/account.html", gin.H{
-			"global":  common.Global,
-			"page":    "account",
-			"account": account,
+			"global": common.Global,
+			"page":   "account",
+			"account": map[string]any{
+				"Username": auth.Username,
+				"Pools":    pools,
+			},
 		})
 	} else {
 		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
 	}
 }
 
-func GetUserAccount(auth common.Auth) (Account, error) {
-	account := Account{
-		Resources: map[string]map[string]any{},
-	}
+func GetUserPools(auth common.Auth) (map[string]paas.Pool, error) {
+	pools := map[string]paas.Pool{}
 
-	ctx := common.RequestContext{
-		Cookies: map[string]string{
-			"username":            auth.Username,
-			"PVEAuthCookie":       auth.Token,
-			"CSRFPreventionToken": auth.CSRF,
-		},
-	}
-
-	// get user account basic data
+	// get all pools
+	ctx := common.GetRequestContextFromCookies(auth)
 	body := map[string]any{}
-	res, code, err := common.RequestGetAPI("/user/config/cluster", ctx, &body)
+	res, code, err := common.RequestGetAPI("/access/pools", ctx, &body)
 	if err != nil {
-		return account, err
+		return pools, err
 	}
 	if code != 200 {
-		return account, fmt.Errorf("request to /user/config/cluster resulted in %+v", res)
+		return pools, fmt.Errorf("request to /access/pools resulted in %+v", res)
 	}
-	err = mapstructure.Decode(body, &account)
+	err = mapstructure.Decode(body["pools"].(map[string]any), &pools)
 	if err != nil {
-		return account, err
-	} else {
-		account.Username = auth.Username
+		return pools, err
 	}
 
-	body = map[string]any{}
-	// get user resources
-	res, code, err = common.RequestGetAPI("/user/dynamic/resources", ctx, &body)
-	if err != nil {
-		return account, err
-	}
-	if code != 200 {
-		return account, fmt.Errorf("request to /user/dynamic/resources resulted in %+v", res)
-	}
-	resources := body
-
+	// get global config for resource type metadata
 	body = map[string]any{}
 	// get resource meta data
 	res, code, err = common.RequestGetAPI("/global/config/resources", ctx, &body)
 	if err != nil {
-		return account, err
+		return pools, err
 	}
 	if code != 200 {
-		return account, fmt.Errorf("request to /global/config/resources resulted in %+v", res)
+		return pools, fmt.Errorf("request to /global/config/resources resulted in %+v", res)
 	}
 	meta := body["resources"].(map[string]any)
 
-	// build each resource by its meta type
-	for k, v := range meta {
-		m := v.(map[string]any)
-		t := m["type"].(string)
-		r := resources[k].(map[string]any)
-		category := m["category"].(string)
-		if _, ok := account.Resources[category]; !ok {
-			account.Resources[category] = map[string]any{}
-		}
-		if t == "numeric" {
-			n := NumericResource{}
-			n.Type = t
-			err_m := mapstructure.Decode(m, &n)
-			err_r := mapstructure.Decode(r, &n)
-			if err_m != nil || err_r != nil {
-				return account, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
+	// for each pool
+	for poolname, pool := range pools {
+		// for each resource in pool data
+		for k, v := range pool.Resources {
+			m := meta[k].(map[string]any)
+			t := m["type"].(string)
+			r := v.(map[string]any)
+			category := m["category"].(string)
+
+			// create a category if it does not already exist
+			if _, ok := pool.Resources[category]; !ok {
+				pool.Resources[category] = map[string]any{}
 			}
-			account.Resources[category][k] = n
-		} else if t == "storage" {
-			n := StorageResource{}
-			n.Type = t
-			err_m := mapstructure.Decode(m, &n)
-			err_r := mapstructure.Decode(r, &n)
-			if err_m != nil || err_r != nil {
-				return account, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
+
+			// depending on type, decode the pool data into the corresponding resource type
+			switch t {
+			case "numeric":
+				n := NumericResource{}
+				n.Type = t
+				err_m := mapstructure.Decode(m, &n)
+				err_r := mapstructure.Decode(r, &n)
+				if err_m != nil || err_r != nil {
+					return pools, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
+				}
+				pools[poolname].Resources[category].(map[string]any)[k] = n
+			case "storage":
+				n := StorageResource{}
+				n.Type = t
+				err_m := mapstructure.Decode(m, &n)
+				err_r := mapstructure.Decode(r, &n)
+				if err_m != nil || err_r != nil {
+					return pools, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
+				}
+				pools[poolname].Resources[category].(map[string]any)[k] = n
+			case "list":
+				n := ListResource{}
+				n.Type = t
+				err_m := mapstructure.Decode(m, &n)
+				err_r := mapstructure.Decode(r, &n)
+				if err_m != nil || err_r != nil {
+					return pools, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
+				}
+				pools[poolname].Resources[category].(map[string]any)[k] = n
 			}
-			account.Resources[category][k] = n
-		} else if t == "list" {
-			n := ListResource{}
-			n.Type = t
-			err_m := mapstructure.Decode(m, &n)
-			err_r := mapstructure.Decode(r, &n)
-			if err_m != nil || err_r != nil {
-				return account, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
-			}
-			account.Resources[category][k] = n
+
+			// delete the old entry, only categories should be left at the end of the loop
+			delete(pools[poolname].Resources, k)
 		}
 	}
 
-	return account, nil
+	return pools, nil
 }
 
 // interpolate between min and max by normalized (0 - 1) val

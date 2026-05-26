@@ -54,7 +54,7 @@ class VolumeAction extends HTMLElement {
 
 	async handleDiskDetach () {
 		const disk = this.dataset.volume;
-		dialog(this.template, async (result, form) => {
+		dialog(this.template, async (result, _form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/detach`, "POST");
@@ -136,7 +136,7 @@ class VolumeAction extends HTMLElement {
 
 	async handleDiskDelete () {
 		const disk = this.dataset.volume;
-		dialog(this.template, async (result, form) => {
+		dialog(this.template, async (result, _form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/delete`, "DELETE");
@@ -224,7 +224,7 @@ async function handleCDAdd () {
 	const isos = await requestAPI("/user/vm-isos", "GET");
 	const select = d.querySelector("#iso-select");
 
-	for (const iso of isos) {
+	for (const iso of isos.data) {
 		select.add(new Option(iso.name, iso.volid));
 	}
 	select.selectedIndex = -1;
@@ -275,7 +275,7 @@ class NetworkAction extends HTMLElement {
 
 	async handleNetworkDelete () {
 		const netID = this.dataset.network;
-		dialog(this.template, async (result, form) => {
+		dialog(this.template, async (result, _form) => {
 			if (result === "confirm") {
 				setIconSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
 				const net = `${netID}`;
@@ -375,7 +375,7 @@ class DeviceAction extends HTMLElement {
 
 		const availDevices = await requestAPI(`/cluster/${node}/pci`, "GET");
 		d.querySelector("#device").append(new Option(deviceName, deviceDetails.split(",")[0]));
-		for (const availDevice of availDevices) {
+		for (const availDevice of availDevices.data) {
 			d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.device_bus));
 		}
 		d.querySelector("#pcie").checked = deviceDetails.includes("pcie=1");
@@ -383,7 +383,7 @@ class DeviceAction extends HTMLElement {
 
 	async handleDeviceDelete () {
 		const deviceID = this.dataset.device;
-		dialog(this.template, async (result, form) => {
+		dialog(this.template, async (result, _form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
 				const device = `${deviceID}`;
@@ -437,8 +437,8 @@ async function handleDeviceAdd () {
 		}
 	});
 
-	const availDevices = await requestAPI(`/cluster/${node}/pci`, "GET");
-	for (const availDevice of availDevices) {
+	const availDevices = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci`, "GET");
+	for (const availDevice of availDevices.data) {
 		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.device_bus));
 	}
 	d.querySelector("#pcie").checked = true;

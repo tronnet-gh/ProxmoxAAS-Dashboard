@@ -48,9 +48,10 @@ type RequestContext struct {
 }
 
 type Auth struct {
-	Username string
-	Token    string
-	CSRF     string
+	Username            string
+	Token               string
+	CSRF                string
+	AccessManagerTicket string
 }
 
 type Icon struct {

@@ -83,7 +83,7 @@ class BackupCard extends HTMLElement {
 
 	async handleDeleteButton () {
 		const template = this.shadowRoot.querySelector("#delete-dialog");
-		dialog(template, async (result, form) => {
+		dialog(template, async (result, _form) => {
 			if (result === "confirm") {
 				const body = {
 					volid: this.volid
@@ -99,7 +99,7 @@ class BackupCard extends HTMLElement {
 
 	async handleRestoreButton () {
 		const template = this.shadowRoot.querySelector("#restore-dialog");
-		dialog(template, async (result, form) => {
+		dialog(template, async (result, _form) => {
 			if (result === "confirm") {
 				const body = {
 					volid: this.volid
