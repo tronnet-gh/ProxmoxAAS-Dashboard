@@ -72,10 +72,14 @@ func HandleGETInstancesFragment(c *gin.Context) {
 			return
 		}
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/index-instances.go.tmpl", gin.H{
+		err = common.TMPL.ExecuteTemplate(c.Writer, "html/index-instances.go.tmpl", gin.H{
 			"instances": instances,
 		})
-		c.Status(http.StatusOK)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		} else {
+			c.Status(http.StatusOK)
+		}
 	} else { // return 401
 		c.Status(http.StatusUnauthorized)
 	}
@@ -145,7 +149,7 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 	}
 
 	most_recent_task := map[uint]uint{}
-	expected_state := map[uint]string{}
+	expected_states := map[uint]string{}
 
 	// iterate through recent user accessible tasks to find the task most recently made on an instance
 	for _, v := range body {
@@ -179,16 +183,16 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 				most_recent_task[task.VMID] = task.EndTime // update the most recent task
 				switch task.Type {
 				case "qmstart", "vzstart": // if the task was a start task, update the expected state to running
-					expected_state[task.VMID] = "running"
+					expected_states[task.VMID] = "running"
 				case "qmstop", "vzstop": // if the task was a stop task, update the expected state to stopped
-					expected_state[task.VMID] = "stopped"
+					expected_states[task.VMID] = "stopped"
 				}
 			}
 		}
 	}
 
 	// iterate through the instances with recent tasks, refetch their state from a more reliable source
-	for vmid, expected_state := range expected_state { // for the expected states from recent tasks
+	for vmid, expected_state := range expected_states { // for the expected states from recent tasks
 		if instances[vmid].Status != expected_state { // if the current node's state from /cluster/resources differs from expected state
 			// get /status/current which is updated faster than /cluster/resources
 			instance := instances[vmid]
@@ -202,8 +206,12 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 				return nil, nil, fmt.Errorf("request to %s resulted in %+v", path, res)
 			}
 
+			// attempt to decode task status as instance status
 			status := InstanceStatus{}
-			mapstructure.Decode(body, &status)
+			err = mapstructure.Decode(body, &status)
+			if err != nil { // did not successfully decode task status, just skip
+				continue
+			}
 
 			instance.Status = status.Status
 			instances[vmid] = instance

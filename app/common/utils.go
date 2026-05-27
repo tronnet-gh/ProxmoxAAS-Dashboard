@@ -47,7 +47,7 @@ func InitMinify() *minify.M {
 
 func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 	minified := make(map[string]StaticFile)
-	fs.WalkDir(files, ".", func(path string, entry fs.DirEntry, err error) error {
+	err := fs.WalkDir(files, ".", func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -84,7 +84,13 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 		}
 		return nil
 	})
-	return minified
+
+	if err != nil {
+		log.Printf("[Error] MinifyStatic: %s", err)
+		return nil
+	} else {
+		return minified
+	}
 }
 
 func LoadHTMLToGin(engine *gin.Engine, html map[string]StaticFile) *template.Template {
@@ -165,7 +171,7 @@ func RequestGetAPI(path string, context RequestContext, body any) (*http.Respons
 		return nil, 0, err
 	}
 	for k, v := range context.Cookies {
-		req.AddCookie(&http.Cookie{Name: k, Value: v})
+		req.AddCookie(&http.Cookie{Name: k, Value: v, Secure: true})
 	}
 
 	client := &http.Client{}

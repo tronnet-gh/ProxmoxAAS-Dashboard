@@ -84,10 +84,14 @@ func HandleGETConfigVolumesFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-volumes.go.tmpl", gin.H{
+		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-volumes.go.tmpl", gin.H{
 			"config": config,
 		})
-		c.Status(http.StatusOK)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		} else {
+			c.Status(http.StatusOK)
+		}
 	} else {
 		c.Status(http.StatusUnauthorized)
 	}
@@ -108,10 +112,14 @@ func HandleGETConfigNetsFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-nets.go.tmpl", gin.H{
+		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-nets.go.tmpl", gin.H{
 			"config": config,
 		})
-		c.Status(http.StatusOK)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		} else {
+			c.Status(http.StatusOK)
+		}
 	} else {
 		c.Status(http.StatusUnauthorized)
 	}
@@ -132,10 +140,14 @@ func HandleGETConfigDevicesFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-devices.go.tmpl", gin.H{
+		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-devices.go.tmpl", gin.H{
 			"config": config,
 		})
-		c.Status(http.StatusOK)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		} else {
+			c.Status(http.StatusOK)
+		}
 	} else {
 		c.Status(http.StatusUnauthorized)
 	}
@@ -156,10 +168,14 @@ func HandleGETConfigBootFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-boot.go.tmpl", gin.H{
+		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-boot.go.tmpl", gin.H{
 			"config": config,
 		})
-		c.Status(http.StatusOK)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		} else {
+			c.Status(http.StatusOK)
+		}
 	} else {
 		c.Status(http.StatusUnauthorized)
 	}

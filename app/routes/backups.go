@@ -64,10 +64,14 @@ func HandleGETBackupsFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/backups-backups.go.tmpl", gin.H{
+		err = common.TMPL.ExecuteTemplate(c.Writer, "html/backups-backups.go.tmpl", gin.H{
 			"backups": backups,
 		})
-		c.Status(http.StatusOK)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		} else {
+			c.Status(http.StatusOK)
+		}
 	} else { // return 401
 		c.Status(http.StatusUnauthorized)
 	}
