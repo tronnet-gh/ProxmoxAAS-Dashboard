@@ -1,6 +1,7 @@
 package app
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"proxmoxaas-dashboard/app/common"
@@ -11,7 +12,10 @@ import (
 	"github.com/tdewolff/minify/v2"
 )
 
-func Run(configPath *string) {
+func Run() {
+	configPath := flag.String("config", "config.json", "path to config.json file")
+	flag.Parse()
+
 	common.Global = common.GetConfig(*configPath)
 
 	// setup static resources
