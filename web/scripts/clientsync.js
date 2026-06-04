@@ -2,8 +2,10 @@ import { getSyncSettings, requestAPI } from "./utils.js";
 
 export async function setupClientSync (callback) {
 	const { scheme, rate } = getSyncSettings();
-
-	if (scheme === "always") {
+	if (scheme === "never") {
+		return
+	}
+	else if (scheme === "always") {
 		window.setInterval(callback, rate * 1000);
 	}
 	else if (scheme === "hash") {

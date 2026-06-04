@@ -1,11 +1,27 @@
+{{/*
+	Select: generic data driven <select> element template 
+	.ID 		= (string)		select element id & name attribute
+	.Required 	= (bool)		select element required attribute
+	.Options	= ([]Options)	array of Options
+*/}}
 {{define "select"}}
 <select class="w3-select w3-border" id="{{.ID}}" name="{{.ID}}" {{if .Required}}required{{end}}>
-{{range .Options}}
+	{{range .Options}}
+		{{template "option" .}}
+	{{end}}
+</select>
+{{end}}
+
+{{/*
+	Options: generic data driven <option> element template
+	.Selected	= (bool)		option element selected attribute
+	.Value		= (string)		option element value attribute
+	.Display	= (string)		option element innerText
+*/}}
+{{define "option"}}
 	{{if .Selected}}
 		<option value="{{.Value}}" selected>{{.Display}}</option>
 	{{else}}
 		<option value="{{.Value}}">{{.Display}}</option>
 	{{end}}
-{{end}}
-</select>
 {{end}}

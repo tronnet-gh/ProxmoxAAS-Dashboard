@@ -1,3 +1,4 @@
+{{/* <head> common across all pages*/}}
 {{define "head"}}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,18 +15,21 @@
 <link rel="stylesheet" href="css/form.css">
 {{end}}
 
+{{/* <header> common across all pages*/}}
 {{define "header"}}
-<h1>{{.global.Organization}}</h1>
-<label for="navtoggle">&#9776;</label>
-<input type="checkbox" id="navtoggle">
-<nav id="navigation">
-	{{if eq .page "login"}}
-		<a href="login" aria-current="page">Login</a>
-	{{else}}
-		<a href="index" {{if eq .page "index"}} aria-current="page" {{end}}>Instances</a>
-		<a href="account" {{if eq .page "account"}} aria-current="page" {{end}}>Account</a>
-		<a href="settings" {{if eq .page "settings"}} aria-current="page" {{end}}>Settings</a>
-		<a href="login">Logout</a>
-	{{end}}
-</nav>	
+<header>
+	<h1>{{.global.Organization}}</h1>
+	<label for="navtoggle">&#9776;</label>
+	<input type="checkbox" id="navtoggle">
+	<nav id="navigation">
+		{{if eq .page "login"}}
+			<a href="login" aria-current="page">Login</a>
+		{{else}}
+			<a href="index" {{if eq .page "index"}} aria-current="page" {{end}}>Instances</a>
+			<a href="account" {{if eq .page "account"}} aria-current="page" {{end}}>Account</a>
+			<a href="settings" {{if eq .page "settings"}} aria-current="page" {{end}}>Settings</a>
+			<a href="login">Logout</a>
+		{{end}}
+	</nav>	
+</header>
 {{end}}

@@ -4,6 +4,7 @@ window.addEventListener("DOMContentLoaded", init);
 
 function init () {
 	setAppearance();
+
 	const { scheme, rate } = getSyncSettings();
 	if (scheme) {
 		document.querySelector(`#sync-${scheme}`).checked = true;

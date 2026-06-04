@@ -244,7 +244,7 @@ func ExtractVMPath(c *gin.Context) (VMPath, error) {
 	return vm_path, nil
 }
 
-func FormatNumber(val int64, base int64) (float64, string) {
+func FormatNumber(val int64, base int64) (string, string) {
 	valf := float64(val)
 	basef := float64(base)
 	steps := 0
@@ -255,13 +255,19 @@ func FormatNumber(val int64, base int64) (float64, string) {
 
 	switch base {
 	case 1000:
+		s := fmt.Sprintf("%.4f", valf)
+		s = strings.TrimRight(s, "0")
+		s = strings.TrimRight(s, ".")
 		prefixes := []string{"", "K", "M", "G", "T"}
-		return valf, prefixes[steps]
+		return s, prefixes[steps]
 	case 1024:
+		s := fmt.Sprintf("%.4f", valf)
+		s = strings.TrimRight(s, "0")
+		s = strings.TrimRight(s, ".")
 		prefixes := []string{"", "Ki", "Mi", "Gi", "Ti"}
-		return valf, prefixes[steps]
+		return s, prefixes[steps]
 	default:
-		return 0, ""
+		return "0", ""
 	}
 }
 

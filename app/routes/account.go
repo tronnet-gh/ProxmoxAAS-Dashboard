@@ -77,7 +77,7 @@ type ResourceChart struct {
 	Name     string
 	Used     int64
 	Max      int64
-	Avail    float64
+	Avail    string
 	Prefix   string
 	Unit     string
 	ColorHex string
@@ -149,13 +149,14 @@ func HandleGETAccount(c *gin.Context) {
 						}
 
 						for _, r := range t.Total {
+							avail := fmt.Sprintf("%d", r.Avail)
 							l.Resources = append(l.Resources, ResourceChart{
 								Type:     t.Type,
 								Display:  t.Display,
 								Name:     r.Name,
 								Used:     r.Used,
 								Max:      r.Max,
-								Avail:    float64(r.Avail), // usually an int
+								Avail:    avail, // usually an int
 								Unit:     "",
 								ColorHex: InterpolateColorHSV(Green, Red, float64(r.Used)/float64(r.Max)).ToHTML(),
 							})

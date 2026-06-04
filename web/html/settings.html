@@ -26,9 +26,7 @@
 		</style>
 	</head>
 	<body>
-		<header>
-			{{template "header" .}}
-		</header>
+		{{template "header" .}}
 		<main>
 			<h2>Settings</h2>
 			<form id="settings">
@@ -42,6 +40,8 @@
 						<p>App will periodically check for updates and synchronize only if needed. Medium resource usage.</p>
 						<label><input class="w3-radio" type="radio" id="sync-interrupt" name="sync-scheme" value="interrupt" required>Sync When Needed</label>
 						<p>App will react to changes and synchronize when changes are made. Low resource usage.</p>
+						<label><input class="w3-radio" type="radio" id="sync-never" name="sync-scheme" value="never" required>Never Sync</label>
+						<p>App will never automatically sync. Reload the page to sync the latest cluster state.</p>
 					</fieldset>
 					<fieldset>
 						<legend>App Sync Frequency</legend>
