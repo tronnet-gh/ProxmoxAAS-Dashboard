@@ -53,7 +53,6 @@ header {
 }
 
 header h1 {
-	font-size: 18px;
 	margin: 0;
 	background-color: var(--nav-header-bg-color);
 	color: var(--nav-header-text-color);
@@ -61,8 +60,8 @@ header h1 {
 }
 
 nav {
+	font-size: var(--small-font-size);
 	overflow: hidden;
-	font-size: larger;
 	width: fit-content;
 }
 

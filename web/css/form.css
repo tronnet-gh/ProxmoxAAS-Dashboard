@@ -41,6 +41,7 @@ legend {
 
 fieldset {
 	border: 0;
+	padding: 0;
 }
 
 fieldset > *:last-child {

@@ -39,13 +39,9 @@
 			<h2>Account</h2>
 			<section class="w3-card w3-padding">
 				<h3>Account Details</h3>
-				<p id="username">Username: {{.account.Username}}</p>
-			</section>
-			<section class="w3-card w3-padding">
-				<div class="flex row nowrap">
-					<h3>Password</h3>
-					<button class="w3-button w3-margin" id="change-password" type="button">Change Password</button>
-				</div>
+				<p id="username">Username: {{.account.Username.UserID}}@{{.account.Username.Realm}}</p>
+				<p id="email">Email: {{.account.Mail}}</p>
+				<p>Password: <button class="w3-button" id="change-password" type="button" style="padding: 0em; height: 1.5em; line-height: 1.5em;">Change Password</button></p>
 			</section>
 			{{range $poolname, $pool := .account.Pools}}
 				{{template "pool-resources" $pool}}

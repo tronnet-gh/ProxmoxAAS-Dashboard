@@ -3,7 +3,7 @@ import { getSyncSettings, requestAPI } from "./utils.js";
 export async function setupClientSync (callback) {
 	const { scheme, rate } = getSyncSettings();
 	if (scheme === "never") {
-		return
+		return;
 	}
 	else if (scheme === "always") {
 		window.setInterval(callback, rate * 1000);

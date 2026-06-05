@@ -12,8 +12,8 @@ import (
 )
 
 type Account struct {
-	Username string
-	Pools    map[string]paas.Pool
+	paas.User
+	Pools map[string]paas.Pool
 }
 
 // numerical constraint
@@ -98,6 +98,13 @@ var Green = color.RGB{
 func HandleGETAccount(c *gin.Context) {
 	auth, err := common.GetAuth(c)
 	if err == nil {
+
+		account, err := GetUser(auth)
+		if err != nil {
+			common.HandleNonFatalError(c, err)
+			return
+		}
+
 		pools, err := GetUserPools(auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
@@ -167,17 +174,31 @@ func HandleGETAccount(c *gin.Context) {
 			}
 		}
 
+		account.Pools = pools
+
 		c.HTML(http.StatusOK, "html/account.html", gin.H{
-			"global": common.Global,
-			"page":   "account",
-			"account": map[string]any{
-				"Username": auth.Username,
-				"Pools":    pools,
-			},
+			"global":  common.Global,
+			"page":    "account",
+			"account": account,
 		})
 	} else {
 		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
 	}
+}
+
+func GetUser(auth common.Auth) (Account, error) {
+	account := Account{}
+	ctx := common.GetRequestContextFromCookies(auth)
+	body := map[string]any{}
+	res, code, err := common.RequestGetAPI(fmt.Sprintf("/access/users/%s", auth.Username), ctx, &body)
+	if err != nil {
+		return account, err
+	}
+	if code != 200 {
+		return account, fmt.Errorf("request to /access/pools resulted in %+v", res)
+	}
+	err = mapstructure.Decode(body, &account)
+	return account, err
 }
 
 func GetUserPools(auth common.Auth) (map[string]paas.Pool, error) {

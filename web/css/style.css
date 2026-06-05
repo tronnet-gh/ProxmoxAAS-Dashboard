@@ -3,6 +3,9 @@
 	--positive-color: #0f0;
 	--highlight-color: yellow;
 	--lightbg-text-color: black;
+	--large-font-size: 32px;
+	--medium-font-size: 24px;
+	--small-font-size: 16px;
 }
 
 @media screen and (prefers-color-scheme: dark) {
@@ -41,9 +44,22 @@
 	}
 }
 
-* {
+*, h1, h2, h3, p {
 	box-sizing: border-box;
 	font-family: monospace;
+	
+}
+
+h1, p {
+	font-size: var(--small-font-size);
+}
+
+h2 {
+	font-size: var(--large-font-size);
+}
+
+h3 {
+	font-size: var(--medium-font-size);
 }
 
 html {
