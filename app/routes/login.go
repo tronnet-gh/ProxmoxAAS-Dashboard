@@ -24,11 +24,8 @@ type Realm struct {
 func GetLoginRealms() ([]Realm, error) {
 	realms := []Realm{}
 
-	ctx := common.RequestContext{
-		Cookies: nil,
-	}
 	body := []any{}
-	res, code, err := common.RequestGetAPI("/proxmox/access/domains", ctx, &body)
+	res, code, err := common.RequestGetAPI("/proxmox/access/domains", nil, &body)
 	if err != nil {
 		return realms, err
 	}

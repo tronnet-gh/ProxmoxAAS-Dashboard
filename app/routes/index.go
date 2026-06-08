@@ -3,6 +3,7 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
 	"strconv"
 
@@ -45,7 +46,7 @@ type InstanceStatus struct {
 }
 
 func HandleGETIndex(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil { // user should be authed, try to return index with population
 		instances, _, err := GetClusterResources(auth)
 		if err != nil {
@@ -64,7 +65,7 @@ func HandleGETIndex(c *gin.Context) {
 }
 
 func HandleGETInstancesFragment(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil { // user should be authed, try to return index with population
 		instances, _, err := GetClusterResources(auth)
 		if err != nil {
@@ -86,10 +87,9 @@ func HandleGETInstancesFragment(c *gin.Context) {
 
 }
 
-func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]Node, error) {
-	ctx := common.GetRequestContextFromCookies(auth)
+func GetClusterResources(auth paas.Auth) (map[uint]InstanceCard, map[string]Node, error) {
 	body := []any{}
-	res, code, err := common.RequestGetAPI("/proxmox/cluster/resources", ctx, &body)
+	res, code, err := common.RequestGetAPI("/proxmox/cluster/resources", &auth, &body)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -140,7 +140,7 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 	}
 
 	body = []any{}
-	res, code, err = common.RequestGetAPI("/proxmox/cluster/tasks", ctx, &body)
+	res, code, err = common.RequestGetAPI("/proxmox/cluster/tasks", &auth, &body)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -198,7 +198,7 @@ func GetClusterResources(auth common.Auth) (map[uint]InstanceCard, map[string]No
 			instance := instances[vmid]
 			path := fmt.Sprintf("/proxmox/nodes/%s/%s/%d/status/current", instance.Node, instance.Type, instance.VMID)
 			body := map[string]any{}
-			res, code, err := common.RequestGetAPI(path, ctx, &body)
+			res, code, err := common.RequestGetAPI(path, &auth, &body)
 			if err != nil {
 				return nil, nil, err
 			}

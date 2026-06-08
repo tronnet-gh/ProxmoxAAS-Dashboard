@@ -34,9 +34,9 @@ type PoolConfig struct {
 }
 
 func HandleGETConfig(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -70,9 +70,9 @@ func HandleGETConfig(c *gin.Context) {
 }
 
 func HandleGETConfigVolumesFragment(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -98,9 +98,9 @@ func HandleGETConfigVolumesFragment(c *gin.Context) {
 }
 
 func HandleGETConfigNetsFragment(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -126,9 +126,9 @@ func HandleGETConfigNetsFragment(c *gin.Context) {
 }
 
 func HandleGETConfigDevicesFragment(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -154,9 +154,9 @@ func HandleGETConfigDevicesFragment(c *gin.Context) {
 }
 
 func HandleGETConfigBootFragment(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -181,12 +181,11 @@ func HandleGETConfigBootFragment(c *gin.Context) {
 	}
 }
 
-func GetInstanceConfig(vm common.VMPath, auth common.Auth) (InstanceConfig, error) {
+func GetInstanceConfig(vm paas.InstancePath, auth paas.Auth) (InstanceConfig, error) {
 	config := InstanceConfig{}
-	path := fmt.Sprintf("/cluster/%s/%s/%s", vm.Node, vm.Type, vm.VMID)
-	ctx := common.GetRequestContextFromCookies(auth)
+	path := fmt.Sprintf("/cluster/%s/%s/%d/", vm.NodeName, string(vm.InstanceType), uint64(vm.InstanceID))
 	body := map[string]any{}
-	res, code, err := common.RequestGetAPI(path, ctx, &body)
+	res, code, err := common.RequestGetAPI(path, &auth, &body)
 	if err != nil {
 		return config, err
 	}
@@ -205,17 +204,16 @@ func GetInstanceConfig(vm common.VMPath, auth common.Auth) (InstanceConfig, erro
 	return config, nil
 }
 
-func GetCPUTypes(vm common.VMPath, pool string, auth common.Auth) (common.Select, error) {
+func GetCPUTypes(vm paas.InstancePath, pool string, auth paas.Auth) (common.Select, error) {
 	cputypes := common.Select{
 		ID:       "proctype",
 		Required: true,
 	}
 
 	// get global resource config
-	ctx := common.GetRequestContextFromCookies(auth)
 	body := map[string]any{}
 	path := "/global/config/resources"
-	res, code, err := common.RequestGetAPI(path, ctx, &body)
+	res, code, err := common.RequestGetAPI(path, &auth, &body)
 	if err != nil {
 		return cputypes, err
 	}
@@ -231,7 +229,7 @@ func GetCPUTypes(vm common.VMPath, pool string, auth common.Auth) (common.Select
 	// get pool resource config
 	body = map[string]any{}
 	path = fmt.Sprintf("/access/pools/%s", pool)
-	res, code, err = common.RequestGetAPI(path, ctx, &body)
+	res, code, err = common.RequestGetAPI(path, &auth, &body)
 	if err != nil {
 		return cputypes, err
 	}
@@ -246,8 +244,8 @@ func GetCPUTypes(vm common.VMPath, pool string, auth common.Auth) (common.Select
 
 	// use node specific rules if present, otherwise use global rules
 	var userCPU []paas.MatchLimit
-	if _, ok := poolCPUConfig.CPU.Nodes[vm.Node]; ok {
-		userCPU = poolCPUConfig.CPU.Nodes[vm.Node]
+	if _, ok := poolCPUConfig.CPU.Nodes[vm.NodeName]; ok {
+		userCPU = poolCPUConfig.CPU.Nodes[vm.NodeName]
 	} else {
 		userCPU = poolCPUConfig.CPU.Global
 	}
@@ -262,8 +260,8 @@ func GetCPUTypes(vm common.VMPath, pool string, auth common.Auth) (common.Select
 	} else { // cpu is a blacklist
 		// get the supported cpu types from the node
 		body = map[string]any{}
-		path = fmt.Sprintf("/proxmox/nodes/%s/capabilities/qemu/cpu", vm.Node)
-		res, code, err = common.RequestGetAPI(path, ctx, &body)
+		path = fmt.Sprintf("/proxmox/nodes/%s/capabilities/qemu/cpu", vm.NodeName)
+		res, code, err = common.RequestGetAPI(path, &auth, &body)
 		if err != nil {
 			return cputypes, err
 		}

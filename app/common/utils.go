@@ -14,10 +14,13 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tdewolff/minify/v2"
+
+	paas "proxmoxaas-common-lib"
 )
 
 // get config file from configPath
@@ -173,13 +176,16 @@ func HandleNonFatalError(c *gin.Context, err error) {
 	c.Status(http.StatusInternalServerError)
 }
 
-func RequestGetAPI(path string, context RequestContext, body any) (*http.Response, int, error) {
+func RequestGetAPI(path string, auth *paas.Auth, body any) (*http.Response, int, error) {
 	req, err := http.NewRequest("GET", Global.API+path, nil)
 	if err != nil {
 		return nil, 0, err
 	}
-	for k, v := range context.Cookies {
-		req.AddCookie(&http.Cookie{Name: k, Value: v, Secure: true})
+
+	if auth != nil {
+		for k, v := range GetRequestContextFromCookies(*auth) {
+			req.AddCookie(&http.Cookie{Name: k, Value: v, Secure: true})
+		}
 	}
 
 	client := &http.Client{}
@@ -216,30 +222,36 @@ func RequestGetAPI(path string, context RequestContext, body any) (*http.Respons
 	return response, response.StatusCode, nil
 }
 
-func GetAuth(c *gin.Context) (Auth, error) {
+func GetAuthFromRequest(c *gin.Context) (paas.Auth, error) {
 	_, errAuth := c.Cookie("auth")
 	username, errUsername := c.Cookie("username")
 	token, errToken := c.Cookie("PVEAuthCookie")
 	csrf, errCSRF := c.Cookie("CSRFPreventionToken")
 	access, errAccess := c.Cookie("PAASAccessManagerTicket")
 	if errUsername != nil || errAuth != nil || errToken != nil || errCSRF != nil || errAccess != nil {
-		return Auth{}, fmt.Errorf("error occured getting user cookies: (auth: %s, token: %s, csrf: %s)", errAuth, errToken, errCSRF)
+		return paas.Auth{}, fmt.Errorf("error occured getting user cookies: (auth: %s, token: %s, csrf: %s)", errAuth, errToken, errCSRF)
 	} else {
-		return Auth{username, token, csrf, access}, nil
+		return paas.Auth{Username: username, Token: token, CSRF: csrf, AccessManagerTicket: access}, nil
 	}
 }
 
-func ExtractVMPath(c *gin.Context) (VMPath, error) {
+func GetInstancePathFromRequest(c *gin.Context) (paas.InstancePath, error) {
 	req_node := c.Query("node")
 	req_type := c.Query("type")
 	req_vmid := c.Query("vmid")
 	if req_node == "" || req_type == "" || req_vmid == "" {
-		return VMPath{}, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid)
+		return paas.InstancePath{}, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid)
 	}
-	vm_path := VMPath{
-		Node: req_node,
-		Type: req_type,
-		VMID: req_vmid,
+
+	vmid_int, err := strconv.ParseUint(req_vmid, 10, 64)
+	if err != nil {
+		return paas.InstancePath{}, err
+	}
+
+	vm_path := paas.InstancePath{
+		NodeName:     req_node,
+		InstanceType: paas.InstanceType(req_type),
+		InstanceID:   paas.InstanceID(vmid_int),
 	}
 	return vm_path, nil
 }
@@ -271,13 +283,11 @@ func FormatNumber(val int64, base int64) (string, string) {
 	}
 }
 
-func GetRequestContextFromCookies(auth Auth) RequestContext {
-	return RequestContext{
-		Cookies: map[string]string{
-			"username":                auth.Username,
-			"PVEAuthCookie":           auth.Token,
-			"CSRFPreventionToken":     auth.CSRF,
-			"PAASAccessManagerTicket": auth.AccessManagerTicket,
-		},
+func GetRequestContextFromCookies(auth paas.Auth) map[string]string {
+	return map[string]string{
+		"username":                auth.Username,
+		"PVEAuthCookie":           auth.Token,
+		"CSRFPreventionToken":     auth.CSRF,
+		"PAASAccessManagerTicket": auth.AccessManagerTicket,
 	}
 }

@@ -96,7 +96,7 @@ var Green = color.RGB{
 }
 
 func HandleGETAccount(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
 
 		account, err := GetUser(auth)
@@ -186,11 +186,10 @@ func HandleGETAccount(c *gin.Context) {
 	}
 }
 
-func GetUser(auth common.Auth) (Account, error) {
+func GetUser(auth paas.Auth) (Account, error) {
 	account := Account{}
-	ctx := common.GetRequestContextFromCookies(auth)
 	body := map[string]any{}
-	res, code, err := common.RequestGetAPI(fmt.Sprintf("/access/users/%s", auth.Username), ctx, &body)
+	res, code, err := common.RequestGetAPI(fmt.Sprintf("/access/users/%s", auth.Username), &auth, &body)
 	if err != nil {
 		return account, err
 	}
@@ -201,13 +200,12 @@ func GetUser(auth common.Auth) (Account, error) {
 	return account, err
 }
 
-func GetUserPools(auth common.Auth) (map[string]paas.Pool, error) {
+func GetUserPools(auth paas.Auth) (map[string]paas.Pool, error) {
 	pools := map[string]paas.Pool{}
 
 	// get all pools
-	ctx := common.GetRequestContextFromCookies(auth)
 	body := map[string]any{}
-	res, code, err := common.RequestGetAPI("/access/pools", ctx, &body)
+	res, code, err := common.RequestGetAPI("/access/pools", &auth, &body)
 	if err != nil {
 		return pools, err
 	}
@@ -222,7 +220,7 @@ func GetUserPools(auth common.Auth) (map[string]paas.Pool, error) {
 	// get global config for resource type metadata
 	body = map[string]any{}
 	// get resource meta data
-	res, code, err = common.RequestGetAPI("/global/config/resources", ctx, &body)
+	res, code, err = common.RequestGetAPI("/global/config/resources", &auth, &body)
 	if err != nil {
 		return pools, err
 	}

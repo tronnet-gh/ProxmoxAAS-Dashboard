@@ -22,13 +22,6 @@ type StaticFile struct {
 	MimeType MimeType
 }
 
-// parsed vmpath data (ie node/type/vmid)
-type VMPath struct {
-	Node string
-	Type string
-	VMID string
-}
-
 // type used for templated <select>
 type Select struct {
 	ID       string
@@ -41,17 +34,6 @@ type Option struct {
 	Selected bool
 	Value    string
 	Display  string
-}
-
-type RequestContext struct {
-	Cookies map[string]string
-}
-
-type Auth struct {
-	Username            string
-	Token               string
-	CSRF                string
-	AccessManagerTicket string
 }
 
 type Icon struct {
