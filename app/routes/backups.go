@@ -97,7 +97,7 @@ func GetInstanceBackups(vm common.VMPath, auth common.Auth) ([]InstanceBackup, e
 
 	for i := range backups {
 		size, prefix := common.FormatNumber(backups[i].Size, 1024)
-		backups[i].SizeFormatted = fmt.Sprintf("%.3g %sB", size, prefix)
+		backups[i].SizeFormatted = fmt.Sprintf("%s %sB", size, prefix)
 
 		t := time.Unix(backups[i].CTime, 0)
 		backups[i].TimeFormatted = t.Format("02-01-06 15:04:05")
