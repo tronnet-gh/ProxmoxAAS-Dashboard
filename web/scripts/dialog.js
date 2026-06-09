@@ -48,7 +48,7 @@ export function alert (message) {
 		dialog.id = "alert-dialog";
 		dialog.innerHTML = `
 			<form method="dialog">
-				<p class="w3-center" style="margin-bottom: 0px;">${message}</p>
+				<p class="w3-center" style="margin-bottom: 0;">${message}</p>
 				<div class="w3-center">
 					<button class="w3-button w3-margin" id="submit">OK</button>
 				</div>
@@ -82,18 +82,18 @@ class ErrorDialog extends HTMLElement {
 			<link rel="stylesheet" href="css/form.css">
 			<style>
 				#errors {
-					margin-bottom: 0px; 
+					margin-bottom: 0; 
 					max-height: 20lh; 
 					min-height: 20lh; 
 					overflow-y: scroll;
 				}
 				#errors * {
-					margin: 0px;
+					margin: 0;
 				}
 			</style>
 			<dialog class="w3-container w3-card w3-border-0">
 				<form method="dialog">
-					<p class="w3-large" id="prompt" style="text-align: center;">Error</p>
+					<p class="w3-large" id="prompt">Error</p>
 					<div id="errors" class="flex column-reverse"></div>
 					<div class="w3-center" id="controls">
 						<button class="w3-button w3-margin" type="submit" value="ok">OK</button>

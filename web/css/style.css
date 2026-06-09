@@ -44,22 +44,35 @@
 	}
 }
 
-*, h1, h2, h3, p {
+*, h1, h2, h3, h4, h5, h6, p {
 	box-sizing: border-box;
 	font-family: monospace;
-	
-}
-
-h1, p {
-	font-size: var(--small-font-size);
+	line-height: normal;
+	margin: 0;
+	padding: 0;
 }
 
 h2 {
 	font-size: var(--large-font-size);
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
 }
 
 h3 {
 	font-size: var(--medium-font-size);
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+h4, legend {
+	font-size: var(--small-font-size);
+	text-decoration: underline;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+p {
+	font-size: var(--small-font-size);
 }
 
 html {

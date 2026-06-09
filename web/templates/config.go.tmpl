@@ -50,7 +50,7 @@
 </button>
 <template id="add-disk-dialog">
 	<dialog class="w3-container w3-card w3-border-0">
-		<p class="w3-large" id="prompt" style="text-align: center;">
+		<p class="w3-large" id="prompt">
 			Create New Disk
 		</p>
 		<div id="body">
@@ -65,8 +65,8 @@
 			</form>
 		</div>
 		<div id="controls" class="w3-center w3-container">
-			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 		</div>
 	</dialog>
 </template>
@@ -79,7 +79,7 @@
 </button>
 <template id="add-cd-dialog">
 	<dialog class="w3-container w3-card w3-border-0">
-		<p class="w3-large" id="prompt" style="text-align: center;">
+		<p class="w3-large" id="prompt">
 			Mount a CDROM
 		</p>
 		<div id="body">
@@ -89,8 +89,8 @@
 			</form>
 		</div>
 		<div id="controls" class="w3-center w3-container">
-			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 		</div>
 	</dialog>
 </template>
@@ -163,7 +163,7 @@
 		<img class="clickable" alt="Move {{.Name}}" src="images/actions/disk/move-active.svg#symb">
 		<template id="dialog-template">
 			<dialog class="w3-container w3-card w3-border-0">
-				<p class="w3-large" id="prompt" style="text-align: center;">
+				<p class="w3-large" id="prompt">
 					Move {{.Name}}
 				</p>
 				<div id="body">
@@ -173,8 +173,8 @@
 					</form>
 				</div>
 				<div id="controls" class="w3-center w3-container">
-					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 				</div>
 			</dialog>
 		</template>
@@ -198,7 +198,7 @@
 		<img class="clickable" alt="Resize {{.Name}}" src="images/actions/disk/resize-active.svg#symb">
 		<template id="dialog-template">
 			<dialog class="w3-container w3-card w3-border-0">
-				<p class="w3-large" id="prompt" style="text-align: center;">
+				<p class="w3-large" id="prompt">
 					Resize {{.Name}}
 				</p>
 				<div id="body">
@@ -208,8 +208,8 @@
 					</form>
 				</div>
 				<div id="controls" class="w3-center w3-container">
-					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 				</div>
 			</dialog>
 		</template>
@@ -233,7 +233,7 @@
 		<img class="clickable" alt="Delete {{.Name}}" src="images/actions/disk/delete-active.svg#symb">
 		<template id="dialog-template">
 			<dialog class="w3-container w3-card w3-border-0">
-				<p class="w3-large" id="prompt" style="text-align: center;">
+				<p class="w3-large" id="prompt">
 					Delete {{.Name}}
 				</p>
 				<div id="body">
@@ -242,8 +242,8 @@
 					</form>
 				</div>
 				<div id="controls" class="w3-center w3-container">
-					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 				</div>
 			</dialog>
 		</template>
@@ -267,7 +267,7 @@
 		<img class="clickable" alt="Attach {{.Name}}" src="images/actions/disk/attach.svg#symb">
 		<template id="dialog-template">
 			<dialog class="w3-container w3-card w3-border-0">
-				<p class="w3-large" id="prompt" style="text-align: center;">
+				<p class="w3-large" id="prompt">
 					Attach {{.Name}}
 				</p>
 				<div id="body">
@@ -284,8 +284,8 @@
 					</form>
 				</div>
 				<div id="controls" class="w3-center w3-container">
-					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 				</div>
 			</dialog>
 		</template>
@@ -300,7 +300,7 @@
 		<img class="clickable" alt="Detach {{.Name}}" src="images/actions/disk/detach.svg#symb">
 		<template id="dialog-template">
 			<dialog class="w3-container w3-card w3-border-0">
-				<p class="w3-large" id="prompt" style="text-align: center;">
+				<p class="w3-large" id="prompt">
 					Detach {{.Name}}
 				</p>
 				<div id="body">
@@ -309,8 +309,8 @@
 					</form>
 				</div>
 				<div id="controls" class="w3-center w3-container">
-					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 				</div>
 			</dialog>
 		</template>
@@ -340,7 +340,7 @@
 </button>
 <template id="add-net-dialog">
 	<dialog class="w3-container w3-card w3-border-0">
-		<p class="w3-large" id="prompt" style="text-align: center;">
+		<p class="w3-large" id="prompt">
 			Create Network Interface
 		</p>
 		<div id="body">
@@ -353,8 +353,8 @@
 			</form>
 		</div>
 		<div id="controls" class="w3-center w3-container">
-			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 		</div>
 	</dialog>
 </template>
@@ -371,7 +371,7 @@
 			<img class="clickable" alt="Configure Net {{.Net_ID}}" src="images/actions/network/config.svg#symb">
 			<template id="dialog-template">
 				<dialog class="w3-container w3-card w3-border-0">
-					<p class="w3-large" id="prompt" style="text-align: center;">
+					<p class="w3-large" id="prompt">
 						Edit {{.Net_ID}}
 					</p>
 					<div id="body">
@@ -380,8 +380,8 @@
 						</form>
 					</div>
 					<div id="controls" class="w3-center w3-container">
-						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 					</div>
 				</dialog>
 			</template>
@@ -393,7 +393,7 @@
 			<img class="clickable" alt="Delete Net {{.Net_ID}}" src="images/actions/network/delete-active.svg#symb">
 			<template id="dialog-template">
 				<dialog class="w3-container w3-card w3-border-0">
-					<p class="w3-large" id="prompt" style="text-align: center;">
+					<p class="w3-large" id="prompt">
 						Delete {{.Net_ID}}
 					</p>
 					<div id="body">
@@ -402,8 +402,8 @@
 						</form>
 					</div>
 					<div id="controls" class="w3-center w3-container">
-						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 					</div>
 				</dialog>
 			</template>
@@ -425,7 +425,7 @@
 </button>
 <template id="add-device-dialog">
 	<dialog class="w3-container w3-card w3-border-0">
-		<p class="w3-large" id="prompt" style="text-align: center;">
+		<p class="w3-large" id="prompt">
 			Add Expansion Card
 		</p>
 		<div id="body">
@@ -436,8 +436,8 @@
 			</form>
 		</div>
 		<div id="controls" class="w3-center w3-container">
-			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+			<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+			<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 		</div>
 	</dialog>
 </template>
@@ -454,7 +454,7 @@
 			<img class="clickable" alt="Configure Device {{.Device_ID}}" src="images/actions/device/config.svg#symb">
 			<template id="dialog-template">
 				<dialog class="w3-container w3-card w3-border-0">
-					<p class="w3-large" id="prompt" style="text-align: center;">
+					<p class="w3-large" id="prompt">
 						Edit Expansion Card {{.Device_ID}}
 					</p>
 					<div id="body">
@@ -463,8 +463,8 @@
 						</form>
 					</div>
 					<div id="controls" class="w3-center w3-container">
-						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 					</div>
 				</dialog>
 			</template>
@@ -476,7 +476,7 @@
 			<img class="clickable" alt="Delete Device {{.Device_ID}}" src="images/actions/device/delete-active.svg#symb">
 			<template id="dialog-template">
 				<dialog class="w3-container w3-card w3-border-0">
-					<p class="w3-large" id="prompt" style="text-align: center;">
+					<p class="w3-large" id="prompt">
 						remove Expansion Card {{.Device_ID}}
 					</p>
 					<div id="body">
@@ -485,8 +485,8 @@
 						</form>
 					</div>
 					<div id="controls" class="w3-center w3-container">
-						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+						<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+						<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 					</div>
 				</dialog>
 			</template>
@@ -516,9 +516,16 @@
 			div.draggable-item {
 				cursor: grab;
 			}
-			div.draggable-item svg {
+			div.draggable-item img {
 				height: 1em;
 				width: 1em;
+			}
+			div.draggable-item p {
+				margin: 0;
+			}
+			div.draggable-item p.volume-file {
+				overflow: hidden; 
+				white-space: nowrap;
 			}
 			#wrapper {
 				padding-bottom: 1em;
@@ -536,18 +543,18 @@
 
 {{define "boot-target"}}
 {{if .volume_id}}
-<div class="draggable-item" data-value="{{.volume_id}}" style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
-	<img style="height: 1em; width: 1em" alt="Drag" src="images/actions/drag.svg#symb">
-	<img style="height: 1em; width: 1em" alt="Volume" src="images/resources/drive.svg#symb">
-	<p style="margin: 0px;">{{.volume_id}}</p>
-	<p style="margin: 0px; overflow: hidden; white-space: nowrap;">{{.file}}</p>
+<div class="draggable-item" data-value="{{.volume_id}}" style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 0.5em; align-items: center;">
+	<img alt="Drag" src="images/actions/drag.svg#symb">
+	<img alt="Volume" src="images/resources/drive.svg#symb">
+	<p class="volume-id">{{.volume_id}}</p>
+	<p class="volume-file">{{.file}}</p>
 </div>
 {{else if .net_id}}
-<div class="draggable-item" data-value="{{.net_id}}" style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 10px; align-items: center;">
-	<img style="height: 1em; width: 1em" alt="Drag" src="images/actions/drag.svg#symb">
-	<img style="height: 1em; width: 1em" alt="Net" src="images/resources/network.svg#symb">
-	<p style="margin: 0px;">{{.net_id}}</p>
-	<p style="margin: 0px; overflow: hidden; white-space: nowrap;">{{.value}}</p>
+<div class="draggable-item" data-value="{{.net_id}}" style="display: grid; grid-template-columns: auto auto 8ch 1fr; column-gap: 0.5em; align-items: center;">
+	<img alt="Drag" src="images/actions/drag.svg#symb">
+	<img alt="Net" src="images/resources/network.svg#symb">
+	<p class="volume-id">{{.net_id}}</p>
+	<p class="volume-file">{{.value}}</p>
 </div>
 {{else}}
 {{end}}
