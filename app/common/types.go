@@ -35,10 +35,3 @@ type Option struct {
 	Value    string
 	Display  string
 }
-
-type Icon struct {
-	ID        string
-	Src       string
-	Alt       string
-	Clickable bool
-}
