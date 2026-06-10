@@ -27,19 +27,19 @@ import (
 func GetConfig(configPath string) Config {
 	root, err := os.OpenRoot(".")
 	if err != nil {
-		log.Fatal("Error when opening root dir: ", err)
+		log.Fatal("[ERR ] error opening root dir: ", err)
 	}
 	defer root.Close()
 
 	content, err := root.ReadFile(configPath)
 	if err != nil {
-		log.Fatal("Error when opening config file: ", err)
+		log.Fatal("[ERR ] error opening config file: ", err)
 	}
 
 	var config Config
 	err = json.Unmarshal(content, &config)
 	if err != nil {
-		log.Fatal("Error during parsing config file: ", err)
+		log.Fatal("[ERR ] error parsing config file: ", err)
 	}
 
 	return config
@@ -65,7 +65,7 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 		if !entry.IsDir() {
 			v, err := files.ReadFile(path)
 			if err != nil {
-				log.Fatalf("[Error] parsing template file %s: %s", path, err.Error())
+				log.Fatalf("[ERR ] error parsing template file %s: %s", path, err.Error())
 			}
 			x := strings.Split(entry.Name(), ".")
 			if len(x) >= 2 { // file has extension
@@ -73,7 +73,7 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 				if ok && mimetype.Minifier != nil { // if the extension is mapped in MimeTypes and has a minifier
 					min, err := m.String(mimetype.Type, string(v)) // try to minify
 					if err != nil {
-						log.Fatalf("[Error] minifying file %s: %s", path, err.Error())
+						log.Fatalf("[ERR ] error minifying file %s: %s", path, err.Error())
 					}
 					minified[path] = StaticFile{
 						Data:     min,
@@ -97,7 +97,7 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 	})
 
 	if err != nil {
-		log.Printf("[Error] MinifyStatic: %s", err)
+		log.Printf("[ERR ] error in MinifyStatic: %s", err)
 		return nil
 	} else {
 		return minified
@@ -172,7 +172,7 @@ func TemplateMinifier(m *minify.M, w io.Writer, r io.Reader, _ map[string]string
 }
 
 func HandleNonFatalError(c *gin.Context, err error) {
-	log.Printf("[Error] encountered an error: %s", err.Error())
+	log.Printf("[WARN] encountered a non-fatal error: %s", err.Error())
 	c.Status(http.StatusInternalServerError)
 }
 
