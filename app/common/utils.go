@@ -110,20 +110,20 @@ func LoadHTMLToGin(engine *gin.Engine, html map[string]StaticFile) *template.Tem
 		"MapKeys": func(x any, sep string) string {
 			v := reflect.ValueOf(x)
 			keys := v.MapKeys()
-			s := ""
-			for i := 0; i < len(keys); i++ {
+			var s strings.Builder
+			for i := range keys {
 				if i != 0 {
-					s += sep
+					s.WriteString(sep)
 				}
-				s += keys[i].String()
+				s.WriteString(keys[i].String())
 			}
-			return s
+			return s.String()
 		},
 		"Map": func(values ...any) (map[string]any, error) {
 			if len(values)%2 != 0 {
 				return nil, errors.New("invalid dict call")
 			}
-			dict := make(map[string]interface{}, len(values)/2)
+			dict := make(map[string]any, len(values)/2)
 			for i := 0; i < len(values); i += 2 {
 				key, ok := values[i].(string)
 				if !ok {
