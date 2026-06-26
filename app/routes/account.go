@@ -36,7 +36,7 @@ type NumericResource struct {
 	Type       string
 	Name       string
 	Multiplier int64
-	Base       int64
+	Base       uint64
 	Compact    bool
 	Unit       string
 	Display    bool
@@ -50,7 +50,7 @@ type StorageResource struct {
 	Type       string
 	Name       string
 	Multiplier int64
-	Base       int64
+	Base       uint64
 	Compact    bool
 	Unit       string
 	Display    bool
@@ -119,7 +119,7 @@ func HandleGETAccount(c *gin.Context) {
 					// create a resource chart for resource depending on resource type
 					switch t := v.(type) {
 					case NumericResource:
-						avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+						avail, prefix := paas.FormatNumber(paas.SafeUint64(t.Total.Avail*t.Multiplier), t.Base)
 						pools[poolname].Resources[category].(map[string]any)[resource] = ResourceChart{
 							Type:     t.Type,
 							Display:  t.Display,
@@ -132,7 +132,7 @@ func HandleGETAccount(c *gin.Context) {
 							ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
 						}
 					case StorageResource:
-						avail, prefix := common.FormatNumber(t.Total.Avail*t.Multiplier, t.Base)
+						avail, prefix := paas.FormatNumber(paas.SafeUint64(t.Total.Avail*t.Multiplier), t.Base)
 						pools[poolname].Resources[category].(map[string]any)[resource] = ResourceChart{
 							Type:     t.Type,
 							Display:  t.Display,

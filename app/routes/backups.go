@@ -96,7 +96,7 @@ func GetInstanceBackups(vm paas.InstancePath, auth paas.Auth) ([]InstanceBackup,
 	}
 
 	for i := range backups {
-		size, prefix := common.FormatNumber(backups[i].Size, 1024)
+		size, prefix := paas.FormatNumber(paas.SafeUint64(backups[i].Size), paas.Base1024)
 		backups[i].SizeFormatted = fmt.Sprintf("%s %sB", size, prefix)
 
 		t := time.Unix(backups[i].CTime, 0)

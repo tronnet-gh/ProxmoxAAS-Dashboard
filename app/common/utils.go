@@ -10,7 +10,6 @@ import (
 	"io"
 	"io/fs"
 	"log"
-	"math"
 	"net/http"
 	"os"
 	"reflect"
@@ -254,33 +253,6 @@ func GetInstancePathFromRequest(c *gin.Context) (paas.InstancePath, error) {
 		InstanceID:   paas.InstanceID(vmid_int),
 	}
 	return vm_path, nil
-}
-
-func FormatNumber(val int64, base int64) (string, string) {
-	valf := float64(val)
-	basef := float64(base)
-	steps := 0
-	for math.Abs(valf) > basef && steps < 4 {
-		valf /= basef
-		steps++
-	}
-
-	switch base {
-	case 1000:
-		s := fmt.Sprintf("%.4f", valf)
-		s = strings.TrimRight(s, "0")
-		s = strings.TrimRight(s, ".")
-		prefixes := []string{"", "K", "M", "G", "T"}
-		return s, prefixes[steps]
-	case 1024:
-		s := fmt.Sprintf("%.4f", valf)
-		s = strings.TrimRight(s, "0")
-		s = strings.TrimRight(s, ".")
-		prefixes := []string{"", "Ki", "Mi", "Gi", "Ti"}
-		return s, prefixes[steps]
-	default:
-		return "0", ""
-	}
 }
 
 func GetRequestContextFromCookies(auth paas.Auth) map[string]string {
