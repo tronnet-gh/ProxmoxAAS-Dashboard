@@ -48,6 +48,7 @@ export function alert (message) {
 		dialog.id = "alert-dialog";
 		dialog.innerHTML = `
 			<form method="dialog">
+				<p class="w3-large" id="prompt">Alert</p>
 				<p class="w3-center" style="margin-bottom: 0;">${message}</p>
 				<div class="w3-center">
 					<button class="w3-button w3-margin" id="submit">OK</button>
