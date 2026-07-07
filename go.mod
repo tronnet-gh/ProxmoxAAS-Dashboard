@@ -1,6 +1,6 @@
 module proxmoxaas-dashboard
 
-go 1.26.4
+go 1.26.5
 
 require (
 	github.com/gerow/go-color v0.0.0-20140219113758-125d37f527f1
