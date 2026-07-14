@@ -1,7 +1,8 @@
-import { getSyncSettings, requestAPI } from "./utils.js";
+import { getSetting, requestAPI } from "./utils.js";
 
 export async function setupClientSync (callback) {
-	const { scheme, rate } = getSyncSettings();
+	const scheme = getSetting("sync-scheme");
+	const rate = getSetting("sync-rate");
 	if (scheme === "never") {
 		return;
 	}

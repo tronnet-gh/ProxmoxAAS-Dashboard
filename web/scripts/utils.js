@@ -125,60 +125,30 @@ export function getURIData () {
 	return Object.fromEntries(url.searchParams);
 }
 
-const settingsDefault = {
-	"sync-scheme": "always",
-	"sync-rate": 5,
-	"search-criteria": "fuzzy",
-	"appearance-theme": "auto"
+const settings = {
+	"sync-scheme": {"type": String, "default": "always"},
+	"sync-rate": {"type": Number, "default": 5},
+	"search-criteria": {"type": String, "default": "fuzzy"},
+	"appearance-theme": {"type": String, "default": "auto"}
 };
 
-export function getSyncSettings () {
-	let scheme = localStorage.getItem("sync-scheme");
-	let rate = Number(localStorage.getItem("sync-rate"));
-	if (!scheme) {
-		scheme = settingsDefault["sync-scheme"];
-		localStorage.setItem("sync-scheme", scheme);
+export function getSetting (key) {
+	const meta = settings[key];
+	let value = localStorage.getItem(key);
+	if (value === null || meta === null) {
+		value = meta.default;
+		localStorage.setItem(key, meta.default);
 	}
-	if (!rate) {
-		rate = settingsDefault["sync-rate"];
-		localStorage.setItem("sync-rate", rate);
-	}
-	return { scheme, rate };
+
+	return meta.type(value);
 }
 
-export function getSearchSettings () {
-	let searchCriteria = localStorage.getItem("search-criteria");
-	if (!searchCriteria) {
-		searchCriteria = settingsDefault["search-criteria"];
-		localStorage.setItem("search-criteria", searchCriteria);
-	}
-	return searchCriteria;
-}
-
-export function getThemeSettings () {
-	let theme = localStorage.getItem("appearance-theme");
-	if (!theme) {
-		theme = settingsDefault["appearance-theme"];
-		localStorage.setItem("appearance-theme", theme);
-	}
-	return theme;
-}
-
-export function setSyncSettings (scheme, rate) {
-	localStorage.setItem("sync-scheme", scheme);
-	localStorage.setItem("sync-rate", rate);
-}
-
-export function setSearchSettings (criteria) {
-	localStorage.setItem("search-criteria", criteria);
-}
-
-export function setThemeSettings (theme) {
-	localStorage.setItem("appearance-theme", theme);
+export function setSetting (key, value) {
+	localStorage.setItem(key, value);
 }
 
 export function setAppearance () {
-	const theme = getThemeSettings();
+	const theme = getSetting("appearance-theme");
 	if (theme === "auto") {
 		document.querySelector(":root").classList.remove("dark-theme", "light-theme");
 	}
@@ -192,7 +162,6 @@ export function setAppearance () {
 	}
 }
 
-// assumes href is path to svg, and id to grab is #symb
 export function setIconSrc (icon, path) {
 	icon.setAttribute("src", path);
 }

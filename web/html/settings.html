@@ -20,6 +20,12 @@
 			p:last-child {
 				margin-bottom: 0;
 			}
+			#save.disabled {
+				display: none;
+			}
+			#save.enabled {
+				display: unset;
+			}
 		</style>
 	</head>
 	<body>
@@ -70,7 +76,7 @@
 					</fieldset>
 				</section>
 				<div class="w3-container w3-center" id="form-actions">
-					<button class="w3-button w3-margin" id="save" type="submit">SAVE</button>
+					<button class="w3-button w3-margin disabled" id="save" type="submit">SAVE</button>
 				</div>
 			</form>
 		</main>

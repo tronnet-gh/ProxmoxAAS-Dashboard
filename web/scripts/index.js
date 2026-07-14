@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, setAppearance, getSearchSettings, requestDash, setIconSrc, setIconAlt } from "./utils.js";
+import { requestPVE, requestAPI, setAppearance, getSetting, requestDash, setIconSrc, setIconAlt } from "./utils.js";
 import { alert, dialog, error } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
@@ -243,7 +243,7 @@ function initInstances () {
 }
 
 function sortInstances () {
-	const searchCriteria = getSearchSettings();
+	const searchCriteria = getSetting("search-criteria");
 	const searchQuery = document.querySelector("#search").value || null;
 	let criteria;
 	if (!searchQuery) {
