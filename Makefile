@@ -11,11 +11,6 @@ build-wfa-js:
 	$(MAKE) -C WFA-JS
 	cp -f WFA-JS/dist/* web/modules
 
-test: clean test-wfa-js
-
-test-wfa-js:
-	$(MAKE) test -C WFA-JS
-
 clean: clean-wfa-js
 	@echo "======================== Cleaning Project ======================"
 	go clean
