@@ -12,8 +12,13 @@ import (
 )
 
 type Account struct {
-	paas.User
-	Pools map[string]paas.Pool
+	User  paas.User
+	Pools map[string]Pool
+}
+
+type Pool struct {
+	paas.Pool      `mapstructure:",squash"`
+	ResourceCharts map[string]map[string]any
 }
 
 // numerical constraint
@@ -98,83 +103,23 @@ var Green = color.RGB{
 func HandleGETAccount(c *gin.Context) {
 	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
+		account := Account{}
 
-		account, err := GetUser(auth)
+		user, err := GetUserBasic(auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
 		}
+		account.User = user
 
 		pools, err := GetUserPools(auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
 		}
-
-		for poolname, pool := range pools {
-			// for each resource category
-			for category := range pool.Resources {
-				// for each resource in each category
-				for resource, v := range pool.Resources[category].(map[string]any) {
-					// create a resource chart for resource depending on resource type
-					switch t := v.(type) {
-					case NumericResource:
-						avail, prefix := paas.FormatNumber(paas.SafeUint64(t.Total.Avail*t.Multiplier), t.Base)
-						pools[poolname].Resources[category].(map[string]any)[resource] = ResourceChart{
-							Type:     t.Type,
-							Display:  t.Display,
-							Name:     t.Name,
-							Used:     t.Total.Used,
-							Max:      t.Total.Max,
-							Avail:    avail,
-							Prefix:   prefix,
-							Unit:     t.Unit,
-							ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
-						}
-					case StorageResource:
-						avail, prefix := paas.FormatNumber(paas.SafeUint64(t.Total.Avail*t.Multiplier), t.Base)
-						pools[poolname].Resources[category].(map[string]any)[resource] = ResourceChart{
-							Type:     t.Type,
-							Display:  t.Display,
-							Name:     t.Name,
-							Used:     t.Total.Used,
-							Max:      t.Total.Max,
-							Avail:    avail,
-							Prefix:   prefix,
-							Unit:     t.Unit,
-							ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
-						}
-					case ListResource:
-						l := struct {
-							Type      string
-							Display   bool
-							Resources []ResourceChart
-						}{
-							Type:      t.Type,
-							Display:   t.Display,
-							Resources: []ResourceChart{},
-						}
-
-						for _, r := range t.Total {
-							avail := fmt.Sprintf("%d", r.Avail)
-							l.Resources = append(l.Resources, ResourceChart{
-								Type:     t.Type,
-								Display:  t.Display,
-								Name:     r.Name,
-								Used:     r.Used,
-								Max:      r.Max,
-								Avail:    avail, // usually an int
-								Unit:     "",
-								ColorHex: InterpolateColorHSV(Green, Red, float64(r.Used)/float64(r.Max)).ToHTML(),
-							})
-						}
-						pools[poolname].Resources[category].(map[string]any)[resource] = l
-					}
-				}
-			}
-		}
-
 		account.Pools = pools
+
+		account.FormatPoolResourceCharts()
 
 		c.HTML(http.StatusOK, "html/account.html", gin.H{
 			"global":  common.Global,
@@ -186,22 +131,22 @@ func HandleGETAccount(c *gin.Context) {
 	}
 }
 
-func GetUser(auth paas.Auth) (Account, error) {
-	account := Account{}
+func GetUserBasic(auth paas.Auth) (paas.User, error) {
+	user := paas.User{}
 	body := map[string]any{}
 	res, code, err := common.RequestGetAPI(fmt.Sprintf("/access/users/%s", auth.Username), &auth, &body)
 	if err != nil {
-		return account, err
+		return user, err
 	}
 	if code != 200 {
-		return account, fmt.Errorf("request to /access/pools resulted in %+v", res)
+		return user, fmt.Errorf("request to /access/pools resulted in %+v", res)
 	}
-	err = mapstructure.Decode(body, &account)
-	return account, err
+	err = mapstructure.Decode(body["user"], &user)
+	return user, err
 }
 
-func GetUserPools(auth paas.Auth) (map[string]paas.Pool, error) {
-	pools := map[string]paas.Pool{}
+func GetUserPools(auth paas.Auth) (map[string]Pool, error) {
+	pools := map[string]Pool{}
 
 	// get all pools
 	body := map[string]any{}
@@ -232,6 +177,10 @@ func GetUserPools(auth paas.Auth) (map[string]paas.Pool, error) {
 	// for each pool
 	for poolname, pool := range pools {
 		// for each resource in pool data
+
+		// create pool charts map
+		pool.ResourceCharts = make(map[string]map[string]any)
+
 		for k, v := range pool.Resources {
 			m := meta[k].(map[string]any)
 			t := m["type"].(string)
@@ -239,11 +188,11 @@ func GetUserPools(auth paas.Auth) (map[string]paas.Pool, error) {
 			category := m["category"].(string)
 
 			// create a category if it does not already exist
-			if _, ok := pool.Resources[category]; !ok {
-				pool.Resources[category] = map[string]any{}
+			if _, ok := pool.ResourceCharts[category]; !ok {
+				pool.ResourceCharts[category] = map[string]any{}
 			}
 
-			// depending on type, decode the pool data into the corresponding resource type
+			// depending on type, decode the apool data into the corresponding resource type
 			switch t {
 			case "numeric":
 				n := NumericResource{}
@@ -253,7 +202,7 @@ func GetUserPools(auth paas.Auth) (map[string]paas.Pool, error) {
 				if err_m != nil || err_r != nil {
 					return pools, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
 				}
-				pools[poolname].Resources[category].(map[string]any)[k] = n
+				pool.ResourceCharts[category][k] = n
 			case "storage":
 				n := StorageResource{}
 				n.Type = t
@@ -262,7 +211,7 @@ func GetUserPools(auth paas.Auth) (map[string]paas.Pool, error) {
 				if err_m != nil || err_r != nil {
 					return pools, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
 				}
-				pools[poolname].Resources[category].(map[string]any)[k] = n
+				pool.ResourceCharts[category][k] = n
 			case "list":
 				n := ListResource{}
 				n.Type = t
@@ -271,15 +220,84 @@ func GetUserPools(auth paas.Auth) (map[string]paas.Pool, error) {
 				if err_m != nil || err_r != nil {
 					return pools, fmt.Errorf("%s\n%s", err_m.Error(), err_r.Error())
 				}
-				pools[poolname].Resources[category].(map[string]any)[k] = n
+				pool.ResourceCharts[category][k] = n
 			}
 
 			// delete the old entry, only categories should be left at the end of the loop
-			delete(pools[poolname].Resources, k)
+			//delete(pools[poolname].Resources, k)
 		}
+		pools[poolname] = pool
 	}
 
 	return pools, nil
+}
+
+func (account *Account) FormatPoolResourceCharts() error {
+	pools := account.Pools
+	for poolname, pool := range pools {
+		// for each resource category
+		for categoryname, category := range pool.ResourceCharts {
+			// for each resource in each category
+			for resourcename, resource := range category {
+				// create a resource chart for resource depending on resource type
+				switch t := resource.(type) {
+				case NumericResource:
+					avail, prefix := paas.FormatNumber(paas.SafeUint64(t.Total.Avail*t.Multiplier), t.Base)
+					pools[poolname].ResourceCharts[categoryname][resourcename] = ResourceChart{
+						Type:     t.Type,
+						Display:  t.Display,
+						Name:     t.Name,
+						Used:     t.Total.Used,
+						Max:      t.Total.Max,
+						Avail:    avail,
+						Prefix:   prefix,
+						Unit:     t.Unit,
+						ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
+					}
+				case StorageResource:
+					avail, prefix := paas.FormatNumber(paas.SafeUint64(t.Total.Avail*t.Multiplier), t.Base)
+					pools[poolname].ResourceCharts[categoryname][resourcename] = ResourceChart{
+						Type:     t.Type,
+						Display:  t.Display,
+						Name:     t.Name,
+						Used:     t.Total.Used,
+						Max:      t.Total.Max,
+						Avail:    avail,
+						Prefix:   prefix,
+						Unit:     t.Unit,
+						ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
+					}
+				case ListResource:
+					l := struct {
+						Type      string
+						Display   bool
+						Resources []ResourceChart
+					}{
+						Type:      t.Type,
+						Display:   t.Display,
+						Resources: []ResourceChart{},
+					}
+
+					for _, r := range t.Total {
+						avail := fmt.Sprintf("%d", r.Avail)
+						l.Resources = append(l.Resources, ResourceChart{
+							Type:     t.Type,
+							Display:  t.Display,
+							Name:     r.Name,
+							Used:     r.Used,
+							Max:      r.Max,
+							Avail:    avail, // usually an int
+							Unit:     "",
+							ColorHex: InterpolateColorHSV(Green, Red, float64(r.Used)/float64(r.Max)).ToHTML(),
+						})
+					}
+					pools[poolname].ResourceCharts[categoryname][resourcename] = l
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 // interpolate between min and max by normalized (0 - 1) val

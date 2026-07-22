@@ -5,7 +5,7 @@
     <p id="nodes">Nodes: {{MapKeys .AllowedNodes ", "}}</p>
     <p id="backups">Max Backups Per Instance: {{.AllowedBackups.MaxPerInstance}} Max Backups Total: {{.AllowedBackups.MaxTotal}}</p>
     <div>
-        {{range $category, $v := .Resources}}
+        {{range $category, $v := .ResourceCharts}}
             {{if eq $category ""}}
                 <h4>Generic</h4>
             {{else}}
