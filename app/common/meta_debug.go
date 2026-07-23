@@ -36,10 +36,6 @@ var MimeTypes = map[string]MimeType{
 		Type:     "image/svg+xml",
 		Minifier: nil,
 	},
-	"png": {
-		Type:     "image/png",
-		Minifier: nil,
-	},
 	"js": {
 		Type:     "application/javascript",
 		Minifier: nil,

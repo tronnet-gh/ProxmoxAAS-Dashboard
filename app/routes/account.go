@@ -11,69 +11,9 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
-type Account struct {
-	User  paas.User
-	Pools map[string]Pool
-}
-
 type Pool struct {
 	paas.Pool      `mapstructure:",squash"`
 	ResourceCharts map[string]map[string]any
-}
-
-// numerical constraint
-type Constraint struct {
-	Max   int64
-	Used  int64
-	Avail int64
-}
-
-// match constraint
-type Match struct {
-	Name  string
-	Match string
-	Max   int64
-	Used  int64
-	Avail int64
-}
-
-type NumericResource struct {
-	Type       string
-	Name       string
-	Multiplier int64
-	Base       uint64
-	Compact    bool
-	Unit       string
-	Display    bool
-	Global     Constraint
-	Nodes      map[string]Constraint
-	Total      Constraint
-	Category   string
-}
-
-type StorageResource struct {
-	Type       string
-	Name       string
-	Multiplier int64
-	Base       uint64
-	Compact    bool
-	Unit       string
-	Display    bool
-	Disks      []string
-	Global     Constraint
-	Nodes      map[string]Constraint
-	Total      Constraint
-	Category   string
-}
-
-type ListResource struct {
-	Type      string
-	Whitelist bool
-	Display   bool
-	Global    []Match
-	Nodes     map[string][]Match
-	Total     []Match
-	Category  string
 }
 
 type ResourceChart struct {
@@ -103,28 +43,23 @@ var Green = color.RGB{
 func HandleGETAccount(c *gin.Context) {
 	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		account := Account{}
-
 		user, err := GetUserBasic(auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
 		}
-		account.User = user
 
 		pools, err := GetUserPools(auth)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
 		}
-		account.Pools = pools
-
-		account.FormatPoolResourceCharts()
 
 		c.HTML(http.StatusOK, "html/account.html", gin.H{
-			"global":  common.Global,
-			"page":    "account",
-			"account": account,
+			"global": common.Global,
+			"page":   "account",
+			"user":   user,
+			"pools":  pools,
 		})
 	} else {
 		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
@@ -195,7 +130,7 @@ func GetUserPools(auth paas.Auth) (map[string]Pool, error) {
 			// depending on type, decode the apool data into the corresponding resource type
 			switch t {
 			case "numeric":
-				n := NumericResource{}
+				n := paas.NumericResource{}
 				n.Type = t
 				err_m := mapstructure.Decode(m, &n)
 				err_r := mapstructure.Decode(r, &n)
@@ -204,7 +139,7 @@ func GetUserPools(auth paas.Auth) (map[string]Pool, error) {
 				}
 				pool.ResourceCharts[category][k] = n
 			case "storage":
-				n := StorageResource{}
+				n := paas.StorageResource{}
 				n.Type = t
 				err_m := mapstructure.Decode(m, &n)
 				err_r := mapstructure.Decode(r, &n)
@@ -213,7 +148,7 @@ func GetUserPools(auth paas.Auth) (map[string]Pool, error) {
 				}
 				pool.ResourceCharts[category][k] = n
 			case "list":
-				n := ListResource{}
+				n := paas.ListResource{}
 				n.Type = t
 				err_m := mapstructure.Decode(m, &n)
 				err_r := mapstructure.Decode(r, &n)
@@ -229,21 +164,25 @@ func GetUserPools(auth paas.Auth) (map[string]Pool, error) {
 		pools[poolname] = pool
 	}
 
+	err = FormatPoolResourceCharts(&pools)
+	if err != nil {
+		return pools, err
+	}
+
 	return pools, nil
 }
 
-func (account *Account) FormatPoolResourceCharts() error {
-	pools := account.Pools
-	for poolname, pool := range pools {
+func FormatPoolResourceCharts(pools *map[string]Pool) error {
+	for poolname, pool := range *pools {
 		// for each resource category
 		for categoryname, category := range pool.ResourceCharts {
 			// for each resource in each category
 			for resourcename, resource := range category {
 				// create a resource chart for resource depending on resource type
 				switch t := resource.(type) {
-				case NumericResource:
+				case paas.NumericResource:
 					avail, prefix := paas.FormatNumber(paas.SafeUint64(t.Total.Avail*t.Multiplier), t.Base)
-					pools[poolname].ResourceCharts[categoryname][resourcename] = ResourceChart{
+					(*pools)[poolname].ResourceCharts[categoryname][resourcename] = ResourceChart{
 						Type:     t.Type,
 						Display:  t.Display,
 						Name:     t.Name,
@@ -254,9 +193,9 @@ func (account *Account) FormatPoolResourceCharts() error {
 						Unit:     t.Unit,
 						ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
 					}
-				case StorageResource:
+				case paas.StorageResource:
 					avail, prefix := paas.FormatNumber(paas.SafeUint64(t.Total.Avail*t.Multiplier), t.Base)
-					pools[poolname].ResourceCharts[categoryname][resourcename] = ResourceChart{
+					(*pools)[poolname].ResourceCharts[categoryname][resourcename] = ResourceChart{
 						Type:     t.Type,
 						Display:  t.Display,
 						Name:     t.Name,
@@ -267,7 +206,7 @@ func (account *Account) FormatPoolResourceCharts() error {
 						Unit:     t.Unit,
 						ColorHex: InterpolateColorHSV(Green, Red, float64(t.Total.Used)/float64(t.Total.Max)).ToHTML(),
 					}
-				case ListResource:
+				case paas.ListResource:
 					l := struct {
 						Type      string
 						Display   bool
@@ -291,7 +230,7 @@ func (account *Account) FormatPoolResourceCharts() error {
 							ColorHex: InterpolateColorHSV(Green, Red, float64(r.Used)/float64(r.Max)).ToHTML(),
 						})
 					}
-					pools[poolname].ResourceCharts[categoryname][resourcename] = l
+					(*pools)[poolname].ResourceCharts[categoryname][resourcename] = l
 				}
 			}
 		}

@@ -12,8 +12,6 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
-// imported types from fabric
-
 type InstanceConfig struct {
 	paas.Instance `mapstructure:",squash"`
 	// overrides
@@ -28,8 +26,8 @@ type GlobalConfig struct {
 
 type PoolConfig struct {
 	CPU struct {
-		Global []paas.MatchLimit
-		Nodes  map[string][]paas.MatchLimit
+		Global []paas.Match
+		Nodes  map[string][]paas.Match
 	}
 }
 
@@ -243,7 +241,7 @@ func GetCPUTypes(vm paas.InstancePath, pool string, auth paas.Auth) (common.Sele
 	}
 
 	// use node specific rules if present, otherwise use global rules
-	var userCPU []paas.MatchLimit
+	var userCPU []paas.Match
 	if _, ok := poolCPUConfig.CPU.Nodes[vm.NodeName]; ok {
 		userCPU = poolCPUConfig.CPU.Nodes[vm.NodeName]
 	} else {
@@ -269,7 +267,7 @@ func GetCPUTypes(vm paas.InstancePath, pool string, auth paas.Auth) (common.Sele
 			return cputypes, fmt.Errorf("request to %s resulted in %+v", path, res)
 		}
 		supported := struct {
-			data []paas.MatchLimit
+			data []paas.Match
 		}{}
 		err = mapstructure.Decode(body, supported)
 		if err != nil {
@@ -278,7 +276,7 @@ func GetCPUTypes(vm paas.InstancePath, pool string, auth paas.Auth) (common.Sele
 
 		// for each node supported cpu type, if it is NOT in the user's config (aka is not blacklisted) then add it to the options
 		for _, cpu := range supported.data {
-			contains := slices.ContainsFunc(userCPU, func(c paas.MatchLimit) bool {
+			contains := slices.ContainsFunc(userCPU, func(c paas.Match) bool {
 				return c.Name == cpu.Name
 			})
 			if !contains {

@@ -39,11 +39,11 @@
 			<h2>Account</h2>
 			<section class="w3-card w3-padding">
 				<h3>Account Details</h3>
-				<p id="username">Username: {{.account.User.Username.UserID}}@{{.account.User.Username.Realm}}</p>
-				<p id="email">Email: {{.account.User.Mail}}</p>
+				<p id="username">Username: {{.user.Username.UserID}}@{{.user.Username.Realm}}</p>
+				<p id="email">Email: {{.user.Mail}}</p>
 				<p>Password: <button class="w3-button" id="change-password" type="button" style="padding: 0em; height: 1.5em; line-height: 1.5em;">Change Password</button></p>
 			</section>
-			{{range $poolname, $pool := .account.Pools}}
+			{{range $poolname, $pool := .pools}}
 				{{template "pool-resources" $pool}}
 			{{end}}
 		</main>
