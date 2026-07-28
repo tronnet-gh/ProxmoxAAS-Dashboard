@@ -1,5 +1,5 @@
 import { requestAPI, getURIData, setAppearance, requestDash } from "./utils.js";
-import { alert, dialog } from "./dialog.js";
+import { error, dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -74,7 +74,7 @@ class BackupCard extends HTMLElement {
 				};
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/backup/notes`, "POST", body);
 				if (result.status !== 200) {
-					alert(`Attempted to edit backup but got: ${result.error}`);
+					error(`Attempted to edit backup but got: ${result.error}`);
 				}
 				refreshBackups();
 			}
@@ -90,7 +90,7 @@ class BackupCard extends HTMLElement {
 				};
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/backup`, "DELETE", body);
 				if (result.status !== 200) {
-					alert(`Attempted to delete backup but got: ${result.error}`);
+					error(`Attempted to delete backup but got: ${result.error}`);
 				}
 				refreshBackups();
 			}
@@ -106,7 +106,7 @@ class BackupCard extends HTMLElement {
 				};
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/backup/restore`, "POST", body);
 				if (result.status !== 200) {
-					alert(`Attempted to delete backup but got: ${result.error}`);
+					error(`Attempted to delete backup but got: ${result.error}`);
 				}
 				refreshBackups();
 			}
@@ -116,14 +116,10 @@ class BackupCard extends HTMLElement {
 
 customElements.define("backup-card", BackupCard);
 
-async function getBackupsFragment () {
-	return await requestDash(`/backups/backups?node=${node}&type=${type}&vmid=${vmid}`, "GET");
-}
-
 async function refreshBackups () {
-	let backups = await getBackupsFragment();
+	let backups = await requestDash(`/backups/backups?node=${node}&type=${type}&vmid=${vmid}`, "GET");
 	if (backups.status !== 200) {
-		alert("Error fetching backups.");
+		error("Error fetching backups.");
 	}
 	else {
 		backups = backups.data;
@@ -141,7 +137,7 @@ async function handleBackupAddButton () {
 			};
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/backup`, "POST", body);
 			if (result.status !== 200) {
-				alert(`Attempted to create backup but got: ${result.error}`);
+				error(`Attempted to create backup but got: ${result.error}`);
 			}
 			refreshBackups();
 		}

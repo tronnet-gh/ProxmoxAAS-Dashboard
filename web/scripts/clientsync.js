@@ -1,4 +1,5 @@
 import { getSetting, requestAPI } from "./utils.js";
+import { error } from "./dialog.js";
 
 export async function setupClientSync (callback) {
 	const scheme = getSetting("sync-scheme");
@@ -31,12 +32,12 @@ export async function setupClientSync (callback) {
 				callback();
 			}
 			else {
-				console.error("clientsync: recieved unexpected message from server, closing socket.");
+				error("clientsync: recieved unexpected message from server, closing socket.");
 				socket.close();
 			}
 		});
 	}
 	else {
-		console.error(`clientsync: unsupported scheme ${scheme} selected.`);
+		error(`clientsync: unsupported scheme ${scheme} selected.`);
 	}
 }

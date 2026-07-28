@@ -1,5 +1,5 @@
 import { requestPVE, requestAPI, setAppearance, getSetting, requestDash, setIconSrc, setIconAlt } from "./utils.js";
-import { alert, dialog, error } from "./dialog.js";
+import { dialog, error } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
 
@@ -175,7 +175,7 @@ class InstanceCard extends HTMLElement {
 							break;
 						}
 						else if (taskStatus.data.status === "stopped") { // task stopped but was not successful
-							alert(`Attempted to ${targetAction} ${this.vmid} but got: ${taskStatus.data.exitstatus}`);
+							error(`Attempted to ${targetAction} ${this.vmid} but got: ${taskStatus.data.exitstatus}`);
 							break;
 						}
 						else { // task has not stopped
@@ -203,7 +203,7 @@ class InstanceCard extends HTMLElement {
 
 					const result = await requestAPI(`/cluster/${this.node.name}/${this.type}/${this.vmid}/delete`, "DELETE");
 					if (result.status !== 200) {
-						alert(`Attempted to delete ${this.vmid} but got: ${result.error}`);
+						error(`Attempted to delete ${this.vmid} but got: ${result.error}`);
 					}
 
 					this.actionLock = false;
@@ -216,12 +216,8 @@ class InstanceCard extends HTMLElement {
 
 customElements.define("instance-card", InstanceCard);
 
-async function getInstancesFragment () {
-	return await requestDash("/index/instances", "GET");
-}
-
 async function refreshInstances () {
-	let instances = await getInstancesFragment();
+	let instances = await requestDash("/index/instances", "GET");
 	if (instances.status !== 200) {
 		error(`Error fetching instances: ${instances.status} ${instances.error !== undefined ? instances.error : ""}`);
 	}
@@ -337,7 +333,7 @@ async function handleInstanceAddButton () {
 				refreshInstances();
 			}
 			else {
-				alert(`Attempted to create new instance ${vmid} but got: ${result.error}`);
+				error(`Attempted to create new instance ${vmid} but got: ${result.error}`);
 				refreshInstances();
 			}
 		}

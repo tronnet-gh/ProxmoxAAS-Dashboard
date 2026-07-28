@@ -1,5 +1,5 @@
 import { requestAPI, setAppearance } from "./utils.js";
-import { dialog } from "./dialog.js";
+import { dialog, error } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -15,7 +15,7 @@ function handlePasswordChangeButton () {
 		if (result === "confirm") {
 			const result = await requestAPI("/access/password", "POST", { password: form.get("new-password") });
 			if (result.status !== 200) {
-				alert(`Attempted to change password but got: ${result.error}`);
+				error(`Attempted to change password but got: ${result.error}`);
 			}
 		}
 	});

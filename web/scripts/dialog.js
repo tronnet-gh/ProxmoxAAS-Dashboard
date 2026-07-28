@@ -41,34 +41,6 @@ export function dialog (template, onclose = async (_result, _form) => { }) {
 	return dialog;
 }
 
-export function alert (message) {
-	const dialog = document.querySelector("#alert-dialog");
-	if (dialog == null) {
-		const dialog = document.createElement("dialog");
-		dialog.id = "alert-dialog";
-		dialog.innerHTML = `
-			<form method="dialog">
-				<p class="w3-large" id="prompt">Alert</p>
-				<p class="w3-center" style="margin-bottom: 0;">${message}</p>
-				<div class="w3-center">
-					<button class="w3-button w3-margin" id="submit">OK</button>
-				</div>
-			</form>
-		`;
-		dialog.className = "w3-container w3-card w3-border-0";
-		document.body.append(dialog);
-		dialog.showModal();
-		dialog.addEventListener("close", () => {
-			dialog.parentElement.removeChild(dialog);
-		});
-		return dialog;
-	}
-	else {
-		console.error("Attempted to create a new alert while one already exists!");
-		return null;
-	}
-}
-
 class ErrorDialog extends HTMLElement {
 	shadowRoot = null;
 	dialog = null;
@@ -141,7 +113,7 @@ customElements.define("error-dialog", ErrorDialog);
 
 export function error (message) {
 	let dialog = document.querySelector("error-dialog");
-	if (dialog == null) {
+	if (dialog === null) {
 		dialog = document.createElement("error-dialog");
 		document.body.append(dialog);
 		dialog.appendError(message);
