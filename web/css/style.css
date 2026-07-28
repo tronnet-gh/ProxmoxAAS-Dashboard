@@ -130,6 +130,19 @@ hr {
 	align-items: center;
 }
 
+.row-reverse {
+	flex-direction: row-reverse;
+	row-gap: 10px;
+	align-items: center;
+}
+
+
+.column {
+	flex-direction: column;
+	row-gap: 10px;
+	align-items: center;
+}
+
 .column-reverse {
 	flex-direction: column-reverse;
 	row-gap: 10px;

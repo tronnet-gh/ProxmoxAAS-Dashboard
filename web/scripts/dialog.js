@@ -59,15 +59,18 @@ class ErrorDialog extends HTMLElement {
 					max-height: 20lh; 
 					min-height: 20lh; 
 					overflow-y: scroll;
+					padding-left: 12px;
+					padding-right: 12px;
 				}
 				#errors * {
 					margin: 0;
+					width: 100%;
 				}
 			</style>
 			<dialog class="w3-container w3-card w3-border-0">
 				<form method="dialog">
 					<p class="w3-large" id="prompt">Error</p>
-					<div id="errors" class="flex column-reverse"></div>
+					<div id="errors" class="flex column"></div>
 					<div class="w3-center" id="controls">
 						<button class="w3-button w3-margin" type="submit" value="ok">OK</button>
 						<button class="w3-button w3-margin" type="submit" value="copy">Copy</button>
