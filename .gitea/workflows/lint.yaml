@@ -1,0 +1,69 @@
+name: ProxmoxAAS-Dashboard Code Style Check
+run-name: Code style check on ${{ gitea.repository }} ${{ gitea.ref_name }} ${{ gitea.sha }}
+on: 
+  push:
+    branches:
+    - "*"
+
+jobs: 
+  lint-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v4
+        
+      - name: Initialize Runner
+        uses: actions/setup-node@v4
+
+      - name: Install Linters
+        run: |
+          npm install --no-save \
+            @eslint/eslintrc \
+            @eslint/js \
+            eslint \
+            globals \
+            html-validate \
+            stylelint \
+            stylelint-config-standard
+
+      - name: Verify Linters
+        run: |
+          npx html-validate --version
+          npx stylelint --version
+          npx eslint --version
+
+      - name: Run HTMLValidate
+        id: html_lint
+        run: npx html-validate --config dev_config/.htmlvalidate.json "web/html/**/*"
+
+      - name: Run Stylelint
+        id: style_lint
+        if: always()
+        run: npx stylelint --config dev_config/.stylelintrc.json --formatter verbose --fix "web/css/**/*.css"
+
+      - name: Run ESLint
+        id: js_lint
+        if: always()
+        env:
+          DEBUG: eslint:cli-engine
+        run: npx eslint --config dev_config/eslint.config.mjs --fix web/scripts/
+
+      - name: Verify Linters
+        if: always()
+        run: |
+          FAILED=0
+          if [ "${{ steps.html_lint.outcome }}" != "success" ]; then
+            echo "HTML Linter failed"
+            FAILED=1
+          fi
+          if [ "${{ steps.style_lint.outcome }}" != "success" ]; then
+            echo "Style Linter failed"
+            FAILED=1
+          fi
+          if [ "${{ steps.js_lint.outcome }}" != "success" ]; then
+            echo "JS Linter failed"
+            FAILED=1
+          fi
+          if [ $FAILED -eq 1 ]; then
+            exit 1
+          fi
