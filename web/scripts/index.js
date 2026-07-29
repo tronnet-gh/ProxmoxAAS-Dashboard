@@ -5,10 +5,12 @@ import wfaInit from "../modules/wfa.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
+var wfa;
+
 async function init () {
 	setAppearance();
 
-	wfaInit("modules/wfa.wasm");
+	wfa = await wfaInit("modules/wfa.wasm");
 	initInstances();
 
 	document.querySelector("#instance-add").addEventListener("click", handleInstanceAddButton);
@@ -272,8 +274,8 @@ function sortInstances () {
 		};
 		criteria = (item, query) => {
 			// lower is better
-			const { score, CIGAR } = global.wfa.wfAlign(query, item, penalties, true);
-			const alignment = global.wfa.DecodeCIGAR(CIGAR);
+			const { score, CIGAR } = wfa.wfAlign(query, item, penalties, true);
+			const alignment = wfa.DecodeCIGAR(CIGAR);
 			return { score: score / item.length, alignment };
 		};
 	}

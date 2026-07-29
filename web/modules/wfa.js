@@ -560,7 +560,7 @@ export default function init (path) {
 			const wasm = obj.instance;
 			global.wfa = wasm
 			go.run(wasm);
-			res()
+			res(wasm)
 		}
 		if ('instantiateStreaming' in WebAssembly) {
 			WebAssembly.instantiateStreaming(fetch(path), go.importObject).then(function (obj) {
