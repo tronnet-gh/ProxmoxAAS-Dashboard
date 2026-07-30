@@ -5,9 +5,6 @@ build: clean ensure-dist build-web build-wfa-js
 # resolve symbolic links in web by copying it into dist/web/
 	CGO_ENABLED=0 go build -tags release -ldflags="-s -w" -v -o dist/ .
 
-ensure-dist:
-	mkdir -p dist
-
 build-web: ensure-dist
 	cp -rL web/ dist/web/
 
@@ -22,3 +19,8 @@ clean: clean-wfa-js
 
 clean-wfa-js:
 	$(MAKE) clean -C WFA-JS
+
+ensure-dist:
+	mkdir -p dist
+
+workflow-init: ensure-dist build-web

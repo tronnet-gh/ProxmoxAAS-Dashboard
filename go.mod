@@ -8,9 +8,11 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/tdewolff/minify/v2 v2.24.13
 	proxmoxaas-common-lib v0.0.0
+	web v0.0.0
 )
 
 replace proxmoxaas-common-lib => ./proxmoxaas-common-lib
+replace web => ./dist/web
 
 require (
 	github.com/bytedance/gopkg v0.1.4 // indirect
