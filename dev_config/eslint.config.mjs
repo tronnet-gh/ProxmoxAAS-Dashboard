@@ -1,9 +1,10 @@
-import { defineConfig } from "eslint/config";
+import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 import js from "@eslint/js";
 
 export default defineConfig([
     js.configs.recommended,
+    globalIgnores(["dist/", "web/modules", "WFA-JS"]),
     {
         languageOptions: {
             globals: {
