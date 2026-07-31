@@ -6,6 +6,7 @@ window.addEventListener("DOMContentLoaded", init);
 async function init () {
 	await deleteAllCookies();
 	setAppearance();
+
 	const formSubmitButton = document.querySelector("#submit");
 	formSubmitButton.addEventListener("click", async (e) => {
 		e.preventDefault();

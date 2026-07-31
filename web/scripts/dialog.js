@@ -96,7 +96,7 @@ class ErrorDialog extends HTMLElement {
 				}
 				navigator.clipboard.writeText(errors);
 			}
-			this.parentElement.removeChild(this);
+			this.dialog.close();
 		});
 	}
 
