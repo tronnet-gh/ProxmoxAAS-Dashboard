@@ -1,4 +1,4 @@
-.PHONY: build test clean wfa-js
+.PHONY: build build-web build-wfa-js clean clean-wfa-js ensure-dist workflow-init
 
 build: clean ensure-dist build-web build-wfa-js
 	@echo "======================== Building Binary ======================="
