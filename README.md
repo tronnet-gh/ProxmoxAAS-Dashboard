@@ -13,7 +13,7 @@ ProxmoxAAS Dashboard provides users of a proxmox based compute on demand service
 
 ## ProxmoxAAS System Installation Overview
 
-The ProxmoxAAS project is large and is split into multiple components. There are four required components, the Dashboard, API, Fabric, and access-manager-api. The instalation order should start with the Dashboard and then proceed to the other backend components. This will require some foresight into the setup process.
+The ProxmoxAAS project is large and is split into multiple components. There are four required components, the Dashboard, API, Fabric, and access-manager-api. The installation order should start with the Dashboard and then proceed to the other backend components. This will require some foresight into the setup process.
 
 The supported setup is to use a reverse proxy to serve both the original Proxmox web interface and ProxmoxAAS components. It is possible other setups can work. Rather than provide specific steps to duplicate a certain setup, the steps included are intended as a guideline of steps required for proper function in most setups. Consequently, the examples provided are only to highlight key settings and do not represent complete working configurations. The instructions also assume you have your own domain name which will substitute `domain.net` in some of the configs. 
 
