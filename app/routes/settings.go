@@ -8,7 +8,7 @@ import (
 )
 
 func HandleGETSettings(c *gin.Context) {
-	_, err := common.GetAuth(c)
+	_, err := common.GetAuthFromRequest(c)
 	if err == nil {
 		c.HTML(http.StatusOK, "html/settings.html", gin.H{
 			"global": common.Global,

@@ -65,16 +65,14 @@
 		</style>
 	</head>
 	<body>
-		<header>
-			{{template "header" .}}
-		</header>
+		{{template "header" .}}
 		<main>
 			<section>
 				<h2>Instances</h2>
 				<div class="w3-card w3-padding">
 					<div class="flex row nowrap" style="margin-top: 1em; justify-content: space-between;">
 						<form id="vm-search" role="search" class="flex row nowrap" tabindex="0">
-							<img alt="Search Instances" aria-label="Search Instances" src="images/common/search.svg#symb">
+							<button type="submit" id="submit" class="w3-button" style="padding: 0; width: 1em; height: 1em; line-height: 1em;"><img alt="Search Instances" aria-label="Search Instances" src="images/common/search.svg#symb"></button>
 							<input type="search" id="search" class="w3-input w3-border" style="height: 1lh; max-width: fit-content;" aria-label="search instances by name">
 						</form>
 						<!--Add Instance Button & Dialog Template-->
@@ -84,7 +82,7 @@
 						</button>
 						<template id="create-instance-dialog">
 							<dialog class="w3-container w3-card w3-border-0">
-								<p class="w3-large" id="prompt" style="text-align: center;">
+								<p class="w3-large" id="prompt">
 									Create New Instance
 								</p>
 								<div id="body">
@@ -94,14 +92,14 @@
 											<option value="lxc">Container</option>
 											<option value="qemu">Virtual Machine</option>
 										</select>
+										<label for="pool">Pool</label>
+										<select class="w3-select w3-border" name="pool" id="pool" required></select>
 										<label for="node">Node</label>
 										<select class="w3-select w3-border" name="node" id="node" required></select>
 										<label for="name">Name</label>
 										<input class="w3-input w3-border" name="name" id="name" type="text" required>
 										<label for="vmid">ID</label>
 										<input class="w3-input w3-border" name="vmid" id="vmid" type="number" required>
-										<label for="pool">Pool</label>
-										<select class="w3-select w3-border" name="pool" id="pool" required></select>
 										<label for="cores">Cores (Threads)</label>
 										<input class="w3-input w3-border" name="cores" id="cores" type="number" min="1" max="8192" required>
 										<label for="memory">Memory (MiB)</label>
@@ -116,14 +114,14 @@
 										<label class="container-specific none" for="rootfs-size">ROOTFS Size (GiB)</label>
 										<input class="w3-input w3-border container-specific none" name="rootfs-size" id="rootfs-size" type="number" min="0" max="131072" required disabled>
 										<label class="container-specific none" for="password">Password</label>
-										<input class="w3-input w3-border container-specific none" name="password" id="password" type="password" required disabled>
+										<input class="w3-input w3-border container-specific none" name="password" id="password" type="password" autocomplete="new-password" required disabled>
 										<label class="container-specific none" for="confirm-password">Confirm Password</label>
-										<input class="w3-input w3-border container-specific none" name="confirm-password" id="confirm-password" type="password" required disabled>
+										<input class="w3-input w3-border container-specific none" name="confirm-password" id="confirm-password" type="password" autocomplete="new-password" required disabled>
 									</form>
 								</div>
 								<div id="controls" class="w3-center w3-container">
-									<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-									<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+									<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+									<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 								</div>
 							</dialog>
 						</template>

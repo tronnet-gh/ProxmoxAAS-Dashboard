@@ -13,7 +13,7 @@ class DraggableContainer extends HTMLElement {
 		window.Sortable.create(this.content, {
 			group: this.dataset.group,
 			ghostClass: "ghost",
-			setData: function (dataTransfer, dragEl) {
+			setData: function (dataTransfer, _dragEl) {
 				dataTransfer.setDragImage(blank, 0, 0);
 			}
 		});

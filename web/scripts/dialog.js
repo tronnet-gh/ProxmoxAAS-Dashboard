@@ -17,7 +17,7 @@
  * body contains an optional form or other information,
  * and controls contains a series of buttons which controls the form
  */
-export function dialog (template, onclose = async (result, form) => { }) {
+export function dialog (template, onclose = async (_result, _form) => { }) {
 	const dialog = template.content.querySelector("dialog").cloneNode(true);
 	document.body.append(dialog);
 	dialog.addEventListener("close", async () => {
@@ -41,33 +41,6 @@ export function dialog (template, onclose = async (result, form) => { }) {
 	return dialog;
 }
 
-export function alert (message) {
-	const dialog = document.querySelector("#alert-dialog");
-	if (dialog == null) {
-		const dialog = document.createElement("dialog");
-		dialog.id = "alert-dialog";
-		dialog.innerHTML = `
-			<form method="dialog">
-				<p class="w3-center" style="margin-bottom: 0px;">${message}</p>
-				<div class="w3-center">
-					<button class="w3-button w3-margin" id="submit">OK</button>
-				</div>
-			</form>
-		`;
-		dialog.className = "w3-container w3-card w3-border-0";
-		document.body.append(dialog);
-		dialog.showModal();
-		dialog.addEventListener("close", () => {
-			dialog.parentElement.removeChild(dialog);
-		});
-		return dialog;
-	}
-	else {
-		console.error("Attempted to create a new alert while one already exists!");
-		return null;
-	}
-}
-
 class ErrorDialog extends HTMLElement {
 	shadowRoot = null;
 	dialog = null;
@@ -82,19 +55,22 @@ class ErrorDialog extends HTMLElement {
 			<link rel="stylesheet" href="css/form.css">
 			<style>
 				#errors {
-					margin-bottom: 0px; 
+					margin-bottom: 0; 
 					max-height: 20lh; 
 					min-height: 20lh; 
 					overflow-y: scroll;
+					padding-left: 12px;
+					padding-right: 12px;
 				}
 				#errors * {
-					margin: 0px;
+					margin: 0;
+					width: 100%;
 				}
 			</style>
 			<dialog class="w3-container w3-card w3-border-0">
 				<form method="dialog">
-					<p class="w3-large" id="prompt" style="text-align: center;">Error</p>
-					<div id="errors" class="flex column-reverse"></div>
+					<p class="w3-large" id="prompt">Error</p>
+					<div id="errors" class="flex column"></div>
 					<div class="w3-center" id="controls">
 						<button class="w3-button w3-margin" type="submit" value="ok">OK</button>
 						<button class="w3-button w3-margin" type="submit" value="copy">Copy</button>
@@ -120,7 +96,7 @@ class ErrorDialog extends HTMLElement {
 				}
 				navigator.clipboard.writeText(errors);
 			}
-			this.parentElement.removeChild(this);
+			this.dialog.close();
 		});
 	}
 
@@ -140,7 +116,7 @@ customElements.define("error-dialog", ErrorDialog);
 
 export function error (message) {
 	let dialog = document.querySelector("error-dialog");
-	if (dialog == null) {
+	if (dialog === null) {
 		dialog = document.createElement("error-dialog");
 		document.body.append(dialog);
 		dialog.appendError(message);

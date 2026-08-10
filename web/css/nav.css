@@ -53,7 +53,7 @@ header {
 }
 
 header h1 {
-	font-size: 18px;
+	font-size: var(--small-font-size);
 	margin: 0;
 	background-color: var(--nav-header-bg-color);
 	color: var(--nav-header-text-color);
@@ -61,15 +61,15 @@ header h1 {
 }
 
 nav {
+	font-size: var(--small-font-size);
 	overflow: hidden;
-	font-size: larger;
 	width: fit-content;
 }
 
 nav a, header h1, label[for="navtoggle"] {
 	text-align: left;
-	padding-left: 8px;
-	padding-right: 8px;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
 	text-decoration: none;
 	vertical-align: middle;
 	height: 2em;
@@ -80,7 +80,7 @@ label[for="navtoggle"], #navtoggle {
 	display: none;
 }
 
-@media screen and (width >= 600px){
+@media screen and (width >= 601px){
 	header {
 		grid-template-columns: auto 1fr;
 	}
@@ -106,7 +106,7 @@ label[for="navtoggle"], #navtoggle {
 	}
 }
 
-@media screen and (width <= 600px){
+@media screen and (width <= 601px){
 	header {
 		grid-template-columns: 1fr auto;
 	}

@@ -1,3 +1,6 @@
 [submodule "proxmoxaas-common-lib"]
 	path = proxmoxaas-common-lib
 	url = https://git.tronnet.net/tronnet/proxmoxaas-common-lib
+[submodule "WFA-JS"]
+	path = WFA-JS
+	url = https://git.tronnet.net/alu/WFA-JS

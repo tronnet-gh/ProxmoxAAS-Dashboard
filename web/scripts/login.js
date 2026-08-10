@@ -1,11 +1,12 @@
 import { goToPage, setAppearance, requestAPI } from "./utils.js";
-import { alert } from "./dialog.js";
+import { error } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
 async function init () {
 	await deleteAllCookies();
 	setAppearance();
+
 	const formSubmitButton = document.querySelector("#submit");
 	formSubmitButton.addEventListener("click", async (e) => {
 		e.preventDefault();
@@ -19,18 +20,16 @@ async function init () {
 			goToPage("index");
 		}
 		else if (ticket.status === 401) {
-			alert("Authenticaton failed.");
+			error("Authenticaton failed.");
 			formSubmitButton.innerText = "LOGIN";
 		}
 		else if (ticket.status === 408) {
-			alert("Network error.");
+			error("Network error.");
 			formSubmitButton.innerText = "LOGIN";
 		}
 		else {
-			alert("An error occured.");
-			console.error(ticket);
+			error(`An error occured: ${JSON.stringify(ticket)}`);
 			formSubmitButton.innerText = "LOGIN";
-			console.error(ticket.error);
 		}
 	});
 }

@@ -3,6 +3,9 @@
 	--positive-color: #0f0;
 	--highlight-color: yellow;
 	--lightbg-text-color: black;
+	--large-font-size: 32px;
+	--medium-font-size: 24px;
+	--small-font-size: 16px;
 }
 
 @media screen and (prefers-color-scheme: dark) {
@@ -41,9 +44,35 @@
 	}
 }
 
-* {
+*, h1, h2, h3, h4, h5, h6, p {
 	box-sizing: border-box;
 	font-family: monospace;
+	line-height: normal;
+	margin: 0;
+	padding: 0;
+}
+
+h2 {
+	font-size: var(--large-font-size);
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+h3 {
+	font-size: var(--medium-font-size);
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+h4, legend {
+	font-size: var(--small-font-size);
+	text-decoration: underline;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+p {
+	font-size: var(--small-font-size);
 }
 
 html {
@@ -98,6 +127,19 @@ hr {
 .row {
 	flex-direction: row;
 	column-gap: 10px;
+	align-items: center;
+}
+
+.row-reverse {
+	flex-direction: row-reverse;
+	row-gap: 10px;
+	align-items: center;
+}
+
+
+.column {
+	flex-direction: column;
+	row-gap: 10px;
 	align-items: center;
 }
 

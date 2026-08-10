@@ -1,0 +1,34 @@
+{{define "pool-resources"}}
+<section class="w3-card w3-padding">
+    <h3>Pool: {{.PoolID}}</h3>
+    <p id="vmid">VMID Range: {{.AllowedVMIDRange.Min}} - {{.AllowedVMIDRange.Max}}</p>
+    <p id="nodes">Nodes: {{MapKeys .AllowedNodes ", "}}</p>
+    <p id="backups">Max Backups Per Instance: {{.AllowedBackups.MaxPerInstance}} Max Backups Total: {{.AllowedBackups.MaxTotal}}</p>
+    <div>
+        {{range $category, $v := .ResourceCharts}}
+            {{if eq $category ""}}
+                <h4>Generic</h4>
+            {{else}}
+                <h4>{{$category}}</h4>
+            {{end}}
+            <div class="resource-container">
+            {{range $v}}
+                {{if .Display}}
+                    {{if eq .Type "numeric"}}
+                        {{template "resource-chart" .}}
+                    {{end}}
+                    {{if eq .Type "storage"}}
+                        {{template "resource-chart" .}}
+                    {{end}}
+                    {{if eq .Type "list"}}
+                        {{range .Resources}}
+                            {{template "resource-chart" .}}
+                        {{end}}
+                    {{end}}
+                {{end}}
+            {{end}}
+            </div>
+        {{end}}
+    </div>
+</section>
+{{end}}

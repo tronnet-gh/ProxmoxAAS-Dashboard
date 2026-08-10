@@ -13,8 +13,8 @@
 				line-height: 1em;
 				height: 1em;
 				width: 1em;
-				margin: 0px;
-				padding: 0px;
+				margin: 0;
+				padding: 0;
 			}
 			a img {
 				vertical-align: unset;
@@ -30,7 +30,7 @@
 			}
 			.row { /* needed for some reason to avoid a flickering issue on chrome ONLY */
 				flex-direction: row;
-				column-gap: 10px;
+				column-gap: 0.5em;
 				align-items: center;
 			}
 			.nowrap { /* needed for some reason to avoid a flickering issue on chrome ONLY */
@@ -43,7 +43,7 @@
 				.hide-large {display: none !important;}
 				.hide-medium {display:none !important}
 			}
-			@media screen and (width <=601px) {
+			@media screen and (width <=601px) and (width >=440px){
 				.hide-large {display: none !important;}
 				.hide-medium {display:none !important}
 				.hide-small {display:none !important}
@@ -82,7 +82,7 @@
 			{{end}}
 			<p>{{.NodeStatus}}</p>
 		</div>
-		<div class="flex row nowrap" style="height: 1lh;">
+		<div class="flex row nowrap">
 			{{if and (eq .NodeStatus "online") (eq .Status "running")}}
 				<img id="power-btn" class="clickable" alt="shutdown instance" role="button" tabindex=0 src="images/actions/instance/stop.svg#symb">
 				<img id="configure-btn" alt="" aria-disabled="true" role="none" src="images/actions/instance/config-inactive.svg#symb">
@@ -115,7 +115,7 @@
 			<link rel="stylesheet" href="css/style.css">
 			<link rel="stylesheet" href="css/form.css">
 			<dialog class="w3-container w3-card w3-border-0">
-				<p class="w3-large" id="prompt" style="text-align: center;">
+				<p class="w3-large" id="prompt">
 					{{if eq .Status "running"}}
 						Stop {{.VMID}}
 					{{else if eq .Status "stopped"}}
@@ -134,8 +134,8 @@
 					</form>
 				</div>
 				<div id="controls" class="w3-center w3-container">
-					<button id="cancel" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-					<button id="confirm" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					<button id="cancel" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+					<button id="confirm" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 				</div>
 			</dialog>
 		</template>
@@ -144,7 +144,7 @@
 			<link rel="stylesheet" href="css/style.css">
 			<link rel="stylesheet" href="css/form.css">
 			<dialog class="w3-container w3-card w3-border-0">
-				<p class="w3-large" id="prompt" style="text-align: center;">
+				<p class="w3-large" id="prompt">
 					Delete {{.VMID}}
 				</p>
 				<div id="body">
@@ -153,8 +153,8 @@
 					</form>
 				</div>
 				<div id="controls" class="w3-center w3-container">
-					<button id="cancel" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-					<button id="confirm" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					<button id="cancel" value="cancel" form="form" class="w3-button w3-margin" formnovalidate>CANCEL</button>
+					<button id="confirm" value="confirm" form="form" class="w3-button w3-margin">CONFIRM</button>
 				</div>
 			</dialog>
 		</template>

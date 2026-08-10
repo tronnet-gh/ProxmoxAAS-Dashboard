@@ -1,15 +1,27 @@
-.PHONY: build test clean
+.PHONY: build build-web build-wfa-js clean clean-wfa-js ensure-dist workflow-init
 
-build: clean
+build: clean ensure-dist build-web build-wfa-js
 	@echo "======================== Building Binary ======================="
 # resolve symbolic links in web by copying it into dist/web/
+	CGO_ENABLED=0 go build -tags release -ldflags="-s -w" -v -o dist/ .
+
+build-web: ensure-dist
 	cp -rL web/ dist/web/
-	CGO_ENABLED=0 go build -ldflags="-s -w" -v -o dist/ .
 
-test: clean
-	go run .
+build-wfa-js: ensure-dist
+	$(MAKE) -C WFA-JS
+	cp -f WFA-JS/dist/* web/modules
 
-clean:
+clean: clean-wfa-js
 	@echo "======================== Cleaning Project ======================"
 	go clean
 	rm -rf dist/*
+
+clean-wfa-js:
+	$(MAKE) clean -C WFA-JS
+
+ensure-dist:
+	mkdir -p dist
+
+workflow-init: ensure-dist build-web
+	cp -r dev_config/. .

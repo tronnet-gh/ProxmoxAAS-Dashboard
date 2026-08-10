@@ -9,11 +9,6 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
-// used when requesting GET /access/domains
-type GetRealmsBody struct {
-	Data []Realm `json:"data"`
-}
-
 // stores each realm's data
 type Realm struct {
 	Default int    `json:"default"`
@@ -24,11 +19,8 @@ type Realm struct {
 func GetLoginRealms() ([]Realm, error) {
 	realms := []Realm{}
 
-	ctx := common.RequestContext{
-		Cookies: nil,
-	}
-	body := map[string]any{}
-	res, code, err := common.RequestGetAPI("/proxmox/access/domains", ctx, &body)
+	body := []any{}
+	res, code, err := common.RequestGetAPI("/proxmox/access/domains", nil, &body)
 	if err != nil {
 		return realms, err
 	}
@@ -36,7 +28,7 @@ func GetLoginRealms() ([]Realm, error) {
 		return realms, fmt.Errorf("request to /proxmox/access/domains resulted in %+v", res)
 	}
 
-	for _, v := range body["data"].([]any) {
+	for _, v := range body {
 		v = v.(map[string]any)
 		realm := Realm{}
 		err := mapstructure.Decode(v, &realm)

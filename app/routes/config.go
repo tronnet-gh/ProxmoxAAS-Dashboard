@@ -12,19 +12,8 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
-// imported types from fabric
-
 type InstanceConfig struct {
-	Type    paas.InstanceType       `json:"type"`
-	Name    string                  `json:"name"`
-	CPU     string                  `json:"cpu"`
-	Cores   uint64                  `json:"cores"`
-	Memory  uint64                  `json:"memory"`
-	Swap    uint64                  `json:"swap"`
-	Volumes map[string]*paas.Volume `json:"volumes"`
-	Nets    map[string]*paas.Net    `json:"nets"`
-	Devices map[string]*paas.Device `json:"devices"`
-	Boot    paas.BootOrder          `json:"boot"`
+	paas.Instance `mapstructure:",squash"`
 	// overrides
 	ProctypeSelect common.Select
 }
@@ -35,21 +24,17 @@ type GlobalConfig struct {
 	}
 }
 
-type UserConfigResources struct {
+type PoolConfig struct {
 	CPU struct {
-		Global []CPUConfig
-		Nodes  map[string][]CPUConfig
+		Global []paas.Match
+		Nodes  map[string][]paas.Match
 	}
 }
 
-type CPUConfig struct {
-	Name string
-}
-
 func HandleGETConfig(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -61,13 +46,13 @@ func HandleGETConfig(c *gin.Context) {
 		}
 
 		if config.Type == "VM" { // if VM, fetch CPU types from node
-			config.ProctypeSelect, err = GetCPUTypes(vm_path, auth)
+			config.ProctypeSelect, err = GetCPUTypes(vm_path, config.Pool, auth)
 			if err != nil {
 				common.HandleNonFatalError(c, fmt.Errorf("error encountered getting proctypes: %s", err.Error()))
 			}
 		}
 		for i, cpu := range config.ProctypeSelect.Options {
-			if cpu.Value == config.CPU {
+			if cpu.Value == config.Proctype {
 				config.ProctypeSelect.Options[i].Selected = true
 			}
 		}
@@ -83,9 +68,9 @@ func HandleGETConfig(c *gin.Context) {
 }
 
 func HandleGETConfigVolumesFragment(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -97,19 +82,23 @@ func HandleGETConfigVolumesFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-volumes.go.tmpl", gin.H{
+		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-volumes.go.tmpl", gin.H{
 			"config": config,
 		})
-		c.Status(http.StatusOK)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		} else {
+			c.Status(http.StatusOK)
+		}
 	} else {
 		c.Status(http.StatusUnauthorized)
 	}
 }
 
 func HandleGETConfigNetsFragment(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -121,19 +110,23 @@ func HandleGETConfigNetsFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-nets.go.tmpl", gin.H{
+		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-nets.go.tmpl", gin.H{
 			"config": config,
 		})
-		c.Status(http.StatusOK)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		} else {
+			c.Status(http.StatusOK)
+		}
 	} else {
 		c.Status(http.StatusUnauthorized)
 	}
 }
 
 func HandleGETConfigDevicesFragment(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -145,19 +138,23 @@ func HandleGETConfigDevicesFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-devices.go.tmpl", gin.H{
+		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-devices.go.tmpl", gin.H{
 			"config": config,
 		})
-		c.Status(http.StatusOK)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		} else {
+			c.Status(http.StatusOK)
+		}
 	} else {
 		c.Status(http.StatusUnauthorized)
 	}
 }
 
 func HandleGETConfigBootFragment(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -169,27 +166,24 @@ func HandleGETConfigBootFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/config-boot.go.tmpl", gin.H{
+		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-boot.go.tmpl", gin.H{
 			"config": config,
 		})
-		c.Status(http.StatusOK)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		} else {
+			c.Status(http.StatusOK)
+		}
 	} else {
 		c.Status(http.StatusUnauthorized)
 	}
 }
 
-func GetInstanceConfig(vm common.VMPath, auth common.Auth) (InstanceConfig, error) {
+func GetInstanceConfig(vm paas.InstancePath, auth paas.Auth) (InstanceConfig, error) {
 	config := InstanceConfig{}
-	path := fmt.Sprintf("/cluster/%s/%s/%s", vm.Node, vm.Type, vm.VMID)
-	ctx := common.RequestContext{
-		Cookies: map[string]string{
-			"username":            auth.Username,
-			"PVEAuthCookie":       auth.Token,
-			"CSRFPreventionToken": auth.CSRF,
-		},
-	}
+	path := fmt.Sprintf("/cluster/%s/%s/%d/", vm.NodeName, string(vm.InstanceType), uint64(vm.InstanceID))
 	body := map[string]any{}
-	res, code, err := common.RequestGetAPI(path, ctx, &body)
+	res, code, err := common.RequestGetAPI(path, &auth, &body)
 	if err != nil {
 		return config, err
 	}
@@ -208,60 +202,53 @@ func GetInstanceConfig(vm common.VMPath, auth common.Auth) (InstanceConfig, erro
 	return config, nil
 }
 
-func GetCPUTypes(vm common.VMPath, auth common.Auth) (common.Select, error) {
+func GetCPUTypes(vm paas.InstancePath, pool string, auth paas.Auth) (common.Select, error) {
 	cputypes := common.Select{
 		ID:       "proctype",
 		Required: true,
 	}
 
 	// get global resource config
-	ctx := common.RequestContext{
-		Cookies: map[string]string{
-			"username":            auth.Username,
-			"PVEAuthCookie":       auth.Token,
-			"CSRFPreventionToken": auth.CSRF,
-		},
-	}
 	body := map[string]any{}
 	path := "/global/config/resources"
-	res, code, err := common.RequestGetAPI(path, ctx, &body)
+	res, code, err := common.RequestGetAPI(path, &auth, &body)
 	if err != nil {
 		return cputypes, err
 	}
 	if code != 200 {
 		return cputypes, fmt.Errorf("request to %s resulted in %+v", path, res)
 	}
-	global := GlobalConfig{}
-	err = mapstructure.Decode(body["resources"], &global)
+	globalConfig := GlobalConfig{}
+	err = mapstructure.Decode(body["resources"], &globalConfig)
 	if err != nil {
 		return cputypes, err
 	}
 
-	// get user resource config
+	// get pool resource config
 	body = map[string]any{}
-	path = "/user/config/resources"
-	res, code, err = common.RequestGetAPI(path, ctx, &body)
+	path = fmt.Sprintf("/access/pools/%s", pool)
+	res, code, err = common.RequestGetAPI(path, &auth, &body)
 	if err != nil {
 		return cputypes, err
 	}
 	if code != 200 {
 		return cputypes, fmt.Errorf("request to %s resulted in %+v", path, res)
 	}
-	user := UserConfigResources{}
-	err = mapstructure.Decode(body, &user)
+	poolCPUConfig := PoolConfig{}
+	err = mapstructure.Decode(body["pool"].(map[string]any)["resources"], &poolCPUConfig)
 	if err != nil {
 		return cputypes, err
 	}
 
 	// use node specific rules if present, otherwise use global rules
-	var userCPU []CPUConfig
-	if _, ok := user.CPU.Nodes[vm.Node]; ok {
-		userCPU = user.CPU.Nodes[vm.Node]
+	var userCPU []paas.Match
+	if _, ok := poolCPUConfig.CPU.Nodes[vm.NodeName]; ok {
+		userCPU = poolCPUConfig.CPU.Nodes[vm.NodeName]
 	} else {
-		userCPU = user.CPU.Global
+		userCPU = poolCPUConfig.CPU.Global
 	}
 
-	if global.CPU.Whitelist { // cpu is a whitelist
+	if globalConfig.CPU.Whitelist { // cpu is a whitelist
 		for _, cpu := range userCPU { // for each cpu type in user config add it to the options
 			cputypes.Options = append(cputypes.Options, common.Option{
 				Display: cpu.Name,
@@ -271,8 +258,8 @@ func GetCPUTypes(vm common.VMPath, auth common.Auth) (common.Select, error) {
 	} else { // cpu is a blacklist
 		// get the supported cpu types from the node
 		body = map[string]any{}
-		path = fmt.Sprintf("/proxmox/nodes/%s/capabilities/qemu/cpu", vm.Node)
-		res, code, err = common.RequestGetAPI(path, ctx, &body)
+		path = fmt.Sprintf("/proxmox/nodes/%s/capabilities/qemu/cpu", vm.NodeName)
+		res, code, err = common.RequestGetAPI(path, &auth, &body)
 		if err != nil {
 			return cputypes, err
 		}
@@ -280,7 +267,7 @@ func GetCPUTypes(vm common.VMPath, auth common.Auth) (common.Select, error) {
 			return cputypes, fmt.Errorf("request to %s resulted in %+v", path, res)
 		}
 		supported := struct {
-			data []CPUConfig
+			data []paas.Match
 		}{}
 		err = mapstructure.Decode(body, supported)
 		if err != nil {
@@ -289,7 +276,7 @@ func GetCPUTypes(vm common.VMPath, auth common.Auth) (common.Select, error) {
 
 		// for each node supported cpu type, if it is NOT in the user's config (aka is not blacklisted) then add it to the options
 		for _, cpu := range supported.data {
-			contains := slices.ContainsFunc(userCPU, func(c CPUConfig) bool {
+			contains := slices.ContainsFunc(userCPU, func(c paas.Match) bool {
 				return c.Name == cpu.Name
 			})
 			if !contains {

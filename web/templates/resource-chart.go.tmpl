@@ -8,8 +8,7 @@
 				margin: 0;
 				width: 100%;
 				height: fit-content;
-				padding: 10px;
-				border-radius: 5px;
+				padding: 0.5em;
 			}
 			progress {
 				width: 100%;
@@ -19,7 +18,7 @@
 			}
 			#caption {
 				text-align: center;
-				margin-top: 10px;
+				margin-top: 0.5em;
 				display: flex;
 				flex-direction: column;
 			}
@@ -37,7 +36,7 @@
 			<progress value="{{.Used}}" max="{{.Max}}" id="resource"></progress>
 			<label id="caption" for="resource">
 				<span>{{.Name}}</span>
-				<span>{{printf "%g" .Avail}} {{.Prefix}}{{.Unit}} Avaliable</span>
+				<span>{{.Avail}} {{.Prefix}}{{.Unit}} Avaliable</span>
 			</label>
 		</div>
 	</template>

@@ -1,9 +1,13 @@
-import { getSyncSettings, requestAPI } from "./utils.js";
+import { getSetting, requestAPI } from "./utils.js";
+import { error } from "./dialog.js";
 
 export async function setupClientSync (callback) {
-	const { scheme, rate } = getSyncSettings();
-
-	if (scheme === "always") {
+	const scheme = getSetting("sync-scheme");
+	const rate = getSetting("sync-rate");
+	if (scheme === "never") {
+		return;
+	}
+	else if (scheme === "always") {
 		window.setInterval(callback, rate * 1000);
 	}
 	else if (scheme === "hash") {
@@ -19,7 +23,7 @@ export async function setupClientSync (callback) {
 	}
 	else if (scheme === "interrupt") {
 		const socket = new WebSocket(`wss://${window.API.replace("https://", "")}/sync/interrupt`);
-		socket.addEventListener("open", (event) => {
+		socket.addEventListener("open", (_event) => {
 			socket.send(`rate ${rate}`);
 		});
 		socket.addEventListener("message", (event) => {
@@ -28,12 +32,12 @@ export async function setupClientSync (callback) {
 				callback();
 			}
 			else {
-				console.error("clientsync: recieved unexpected message from server, closing socket.");
+				error("clientsync: recieved unexpected message from server, closing socket.");
 				socket.close();
 			}
 		});
 	}
 	else {
-		console.error(`clientsync: unsupported scheme ${scheme} selected.`);
+		error(`clientsync: unsupported scheme ${scheme} selected.`);
 	}
 }

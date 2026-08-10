@@ -10,27 +10,37 @@ import (
 	"io"
 	"io/fs"
 	"log"
-	"math"
 	"net/http"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tdewolff/minify/v2"
+
+	paas "proxmoxaas-common-lib"
 )
 
 // get config file from configPath
 func GetConfig(configPath string) Config {
-	content, err := os.ReadFile(configPath)
+	root, err := os.OpenRoot(".")
 	if err != nil {
-		log.Fatal("Error when opening config file: ", err)
+		log.Fatal("[ERR ] error opening root dir: ", err)
 	}
+	defer root.Close()
+
+	content, err := root.ReadFile(configPath)
+	if err != nil {
+		log.Fatal("[ERR ] error opening config file: ", err)
+	}
+
 	var config Config
 	err = json.Unmarshal(content, &config)
 	if err != nil {
-		log.Fatal("Error during parsing config file: ", err)
+		log.Fatal("[ERR ] error parsing config file: ", err)
 	}
+
 	return config
 }
 
@@ -47,14 +57,14 @@ func InitMinify() *minify.M {
 
 func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 	minified := make(map[string]StaticFile)
-	fs.WalkDir(files, ".", func(path string, entry fs.DirEntry, err error) error {
+	err := fs.WalkDir(files, ".", func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 		if !entry.IsDir() {
 			v, err := files.ReadFile(path)
 			if err != nil {
-				log.Fatalf("error parsing template file %s: %s", path, err.Error())
+				log.Fatalf("[ERR ] error parsing template file %s: %s", path, err.Error())
 			}
 			x := strings.Split(entry.Name(), ".")
 			if len(x) >= 2 { // file has extension
@@ -62,7 +72,7 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 				if ok && mimetype.Minifier != nil { // if the extension is mapped in MimeTypes and has a minifier
 					min, err := m.String(mimetype.Type, string(v)) // try to minify
 					if err != nil {
-						log.Fatalf("error minifying file %s: %s", path, err.Error())
+						log.Fatalf("[ERR ] error minifying file %s: %s", path, err.Error())
 					}
 					minified[path] = StaticFile{
 						Data:     min,
@@ -84,7 +94,13 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 		}
 		return nil
 	})
-	return minified
+
+	if err != nil {
+		log.Printf("[ERR ] error in MinifyStatic: %s", err)
+		return nil
+	} else {
+		return minified
+	}
 }
 
 func LoadHTMLToGin(engine *gin.Engine, html map[string]StaticFile) *template.Template {
@@ -93,20 +109,20 @@ func LoadHTMLToGin(engine *gin.Engine, html map[string]StaticFile) *template.Tem
 		"MapKeys": func(x any, sep string) string {
 			v := reflect.ValueOf(x)
 			keys := v.MapKeys()
-			s := ""
-			for i := 0; i < len(keys); i++ {
+			var s strings.Builder
+			for i := range keys {
 				if i != 0 {
-					s += sep
+					s.WriteString(sep)
 				}
-				s += keys[i].String()
+				s.WriteString(keys[i].String())
 			}
-			return s
+			return s.String()
 		},
 		"Map": func(values ...any) (map[string]any, error) {
 			if len(values)%2 != 0 {
 				return nil, errors.New("invalid dict call")
 			}
-			dict := make(map[string]interface{}, len(values)/2)
+			dict := make(map[string]any, len(values)/2)
 			for i := 0; i < len(values); i += 2 {
 				key, ok := values[i].(string)
 				if !ok {
@@ -155,17 +171,20 @@ func TemplateMinifier(m *minify.M, w io.Writer, r io.Reader, _ map[string]string
 }
 
 func HandleNonFatalError(c *gin.Context, err error) {
-	log.Printf("[Error] encountered an error: %s", err.Error())
+	log.Printf("[WARN] encountered a non-fatal error: %s", err.Error())
 	c.Status(http.StatusInternalServerError)
 }
 
-func RequestGetAPI(path string, context RequestContext, body any) (*http.Response, int, error) {
+func RequestGetAPI(path string, auth *paas.Auth, body any) (*http.Response, int, error) {
 	req, err := http.NewRequest("GET", Global.API+path, nil)
 	if err != nil {
 		return nil, 0, err
 	}
-	for k, v := range context.Cookies {
-		req.AddCookie(&http.Cookie{Name: k, Value: v})
+
+	if auth != nil {
+		for k, v := range GetRequestContextFromCookies(*auth) {
+			req.AddCookie(&http.Cookie{Name: k, Value: v, Secure: true})
+		}
 	}
 
 	client := &http.Client{}
@@ -185,7 +204,6 @@ func RequestGetAPI(path string, context RequestContext, body any) (*http.Respons
 	if err != nil {
 		return nil, response.StatusCode, err
 	}
-
 	switch body.(type) { // write json to body object depending on type, currently supports map[string]any (ie json) or []any (ie array of json)
 	case *map[string]any:
 		err = json.Unmarshal(data, &body)
@@ -203,49 +221,45 @@ func RequestGetAPI(path string, context RequestContext, body any) (*http.Respons
 	return response, response.StatusCode, nil
 }
 
-func GetAuth(c *gin.Context) (Auth, error) {
+func GetAuthFromRequest(c *gin.Context) (paas.Auth, error) {
 	_, errAuth := c.Cookie("auth")
 	username, errUsername := c.Cookie("username")
 	token, errToken := c.Cookie("PVEAuthCookie")
 	csrf, errCSRF := c.Cookie("CSRFPreventionToken")
-	if errUsername != nil || errAuth != nil || errToken != nil || errCSRF != nil {
-		return Auth{}, fmt.Errorf("error occured getting user cookies: (auth: %s, token: %s, csrf: %s)", errAuth, errToken, errCSRF)
+	access, errAccess := c.Cookie("PAASAccessManagerTicket")
+	if errUsername != nil || errAuth != nil || errToken != nil || errCSRF != nil || errAccess != nil {
+		return paas.Auth{}, fmt.Errorf("error occured getting user cookies: (auth: %s, token: %s, csrf: %s)", errAuth, errToken, errCSRF)
 	} else {
-		return Auth{username, token, csrf}, nil
+		return paas.Auth{Username: username, Token: token, CSRF: csrf, AccessManagerTicket: access}, nil
 	}
 }
 
-func ExtractVMPath(c *gin.Context) (VMPath, error) {
+func GetInstancePathFromRequest(c *gin.Context) (paas.InstancePath, error) {
 	req_node := c.Query("node")
 	req_type := c.Query("type")
 	req_vmid := c.Query("vmid")
 	if req_node == "" || req_type == "" || req_vmid == "" {
-		return VMPath{}, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid)
+		return paas.InstancePath{}, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid)
 	}
-	vm_path := VMPath{
-		Node: req_node,
-		Type: req_type,
-		VMID: req_vmid,
+
+	vmid_int, err := strconv.ParseUint(req_vmid, 10, 64)
+	if err != nil {
+		return paas.InstancePath{}, err
+	}
+
+	vm_path := paas.InstancePath{
+		NodeName:     req_node,
+		InstanceType: paas.InstanceType(req_type),
+		InstanceID:   paas.InstanceID(vmid_int),
 	}
 	return vm_path, nil
 }
 
-func FormatNumber(val int64, base int64) (float64, string) {
-	valf := float64(val)
-	basef := float64(base)
-	steps := 0
-	for math.Abs(valf) > basef && steps < 4 {
-		valf /= basef
-		steps++
-	}
-
-	if base == 1000 {
-		prefixes := []string{"", "K", "M", "G", "T"}
-		return valf, prefixes[steps]
-	} else if base == 1024 {
-		prefixes := []string{"", "Ki", "Mi", "Gi", "Ti"}
-		return valf, prefixes[steps]
-	} else {
-		return 0, ""
+func GetRequestContextFromCookies(auth paas.Auth) map[string]string {
+	return map[string]string{
+		"username":                auth.Username,
+		"PVEAuthCookie":           auth.Token,
+		"CSRFPreventionToken":     auth.CSRF,
+		"PAASAccessManagerTicket": auth.AccessManagerTicket,
 	}
 }

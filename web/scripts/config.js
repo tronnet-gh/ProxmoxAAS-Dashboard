@@ -1,5 +1,5 @@
 import { requestPVE, requestAPI, goToPage, getURIData, setAppearance, setIconSrc, requestDash } from "./utils.js";
-import { alert, dialog } from "./dialog.js";
+import { error, dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
 
@@ -54,12 +54,12 @@ class VolumeAction extends HTMLElement {
 
 	async handleDiskDetach () {
 		const disk = this.dataset.volume;
-		dialog(this.template, async (result, form) => {
+		dialog(this.template, async (result, _form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/detach`, "POST");
 				if (result.status !== 200) {
-					alert(`Attempted to detach ${disk} but got: ${result.error}`);
+					error(`Attempted to detach ${disk} but got: ${result.error}`);
 				}
 				refreshVolumes();
 				refreshBoot();
@@ -80,7 +80,7 @@ class VolumeAction extends HTMLElement {
 				const disk = `${prefix}${device}`;
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/attach`, "POST", body);
 				if (result.status !== 200) {
-					alert(`Attempted to attach ${this.dataset.volume} to ${disk} but got: ${result.error}`);
+					error(`Attempted to attach ${this.dataset.volume} to ${disk} but got: ${result.error}`);
 				}
 				refreshVolumes();
 				refreshBoot();
@@ -98,7 +98,7 @@ class VolumeAction extends HTMLElement {
 				};
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/resize`, "POST", body);
 				if (result.status !== 200) {
-					alert(`Attempted to resize ${disk} but got: ${result.error}`);
+					error(`Attempted to resize ${disk} but got: ${result.error}`);
 				}
 				refreshVolumes();
 				refreshBoot();
@@ -117,7 +117,7 @@ class VolumeAction extends HTMLElement {
 				};
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/move`, "POST", body);
 				if (result.status !== 200) {
-					alert(`Attempted to move ${disk} to ${body.storage} but got: ${result.error}`);
+					error(`Attempted to move ${disk} to ${body.storage} but got: ${result.error}`);
 				}
 				refreshVolumes();
 				refreshBoot();
@@ -136,12 +136,12 @@ class VolumeAction extends HTMLElement {
 
 	async handleDiskDelete () {
 		const disk = this.dataset.volume;
-		dialog(this.template, async (result, form) => {
+		dialog(this.template, async (result, _form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/delete`, "DELETE");
 				if (result.status !== 200) {
-					alert(`Attempted to delete ${disk} but got: ${result.error}`);
+					error(`Attempted to delete ${disk} but got: ${result.error}`);
 				}
 				refreshVolumes();
 				refreshBoot();
@@ -162,7 +162,7 @@ async function initVolumes () {
 async function refreshVolumes () {
 	let volumes = await requestDash(`/config/volumes?node=${node}&type=${type}&vmid=${vmid}`, "GET");
 	if (volumes.status !== 200) {
-		alert("Error fetching instance volumes.");
+		error("Error fetching instance volumes.");
 	}
 	else {
 		volumes = volumes.data;
@@ -186,7 +186,7 @@ async function handleDiskAdd () {
 			const disk = `${prefix}${id}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/create`, "POST", body);
 			if (result.status !== 200) {
-				alert(`Attempted to create ${disk} but got: ${result.error}`);
+				error(`Attempted to create ${disk} but got: ${result.error}`);
 			}
 			refreshVolumes();
 			refreshBoot();
@@ -214,7 +214,7 @@ async function handleCDAdd () {
 			const disk = `ide${form.get("device")}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/disk/${disk}/create`, "POST", body);
 			if (result.status !== 200) {
-				alert(`Attempted to mount ${body.iso} to ${disk} but got: result.error`);
+				error(`Attempted to mount ${body.iso} to ${disk} but got: result.error`);
 			}
 			refreshVolumes();
 			refreshBoot();
@@ -224,7 +224,7 @@ async function handleCDAdd () {
 	const isos = await requestAPI("/user/vm-isos", "GET");
 	const select = d.querySelector("#iso-select");
 
-	for (const iso of isos) {
+	for (const iso of isos.data) {
 		select.add(new Option(iso.name, iso.volid));
 	}
 	select.selectedIndex = -1;
@@ -263,7 +263,7 @@ class NetworkAction extends HTMLElement {
 				const net = `${netID}`;
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/modify`, "POST", body);
 				if (result.status !== 200) {
-					alert(`Attempted to change ${net} but got: ${result.error}`);
+					error(`Attempted to change ${net} but got: ${result.error}`);
 				}
 				refreshNetworks();
 				refreshBoot();
@@ -275,13 +275,13 @@ class NetworkAction extends HTMLElement {
 
 	async handleNetworkDelete () {
 		const netID = this.dataset.network;
-		dialog(this.template, async (result, form) => {
+		dialog(this.template, async (result, _form) => {
 			if (result === "confirm") {
 				setIconSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
 				const net = `${netID}`;
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/delete`, "DELETE");
 				if (result.status !== 200) {
-					alert(`Attempted to delete ${net} but got: ${result.error}`);
+					error(`Attempted to delete ${net} but got: ${result.error}`);
 				}
 				refreshNetworks();
 				refreshBoot();
@@ -299,7 +299,7 @@ async function initNetworks () {
 async function refreshNetworks () {
 	let nets = await requestDash(`/config/nets?node=${node}&type=${type}&vmid=${vmid}`, "GET");
 	if (nets.status !== 200) {
-		alert("Error fetching instance nets.");
+		error("Error fetching instance nets.");
 	}
 	else {
 		nets = nets.data;
@@ -324,7 +324,7 @@ async function handleNetworkAdd () {
 			const net = `net${id}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/create`, "POST", body);
 			if (result.status !== 200) {
-				alert(`Attempted to create ${net} but got: ${result.error}`);
+				error(`Attempted to create ${net} but got: ${result.error}`);
 			}
 			refreshNetworks();
 			refreshBoot();
@@ -367,7 +367,7 @@ class DeviceAction extends HTMLElement {
 				const device = `${deviceID}`;
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/${device}/modify`, "POST", body);
 				if (result.status !== 200) {
-					alert(`Attempted to add ${device} but got: ${result.error}`);
+					error(`Attempted to add ${device} but got: ${result.error}`);
 				}
 				refreshDevices();
 			}
@@ -375,7 +375,7 @@ class DeviceAction extends HTMLElement {
 
 		const availDevices = await requestAPI(`/cluster/${node}/pci`, "GET");
 		d.querySelector("#device").append(new Option(deviceName, deviceDetails.split(",")[0]));
-		for (const availDevice of availDevices) {
+		for (const availDevice of availDevices.data) {
 			d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.device_bus));
 		}
 		d.querySelector("#pcie").checked = deviceDetails.includes("pcie=1");
@@ -383,13 +383,13 @@ class DeviceAction extends HTMLElement {
 
 	async handleDeviceDelete () {
 		const deviceID = this.dataset.device;
-		dialog(this.template, async (result, form) => {
+		dialog(this.template, async (result, _form) => {
 			if (result === "confirm") {
 				this.setStatusLoading();
 				const device = `${deviceID}`;
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/${device}/delete`, "DELETE");
 				if (result.status !== 200) {
-					alert(`Attempted to delete ${device} but got: ${result.error}`);
+					error(`Attempted to delete ${device} but got: ${result.error}`);
 				}
 				refreshDevices();
 			}
@@ -408,7 +408,7 @@ async function initDevices () {
 async function refreshDevices () {
 	let devices = await requestDash(`/config/devices?node=${node}&type=${type}&vmid=${vmid}`, "GET");
 	if (devices.status !== 200) {
-		alert("Error fetching instance devices.");
+		error("Error fetching instance devices.");
 	}
 	else {
 		devices = devices.data;
@@ -431,14 +431,14 @@ async function handleDeviceAdd () {
 			const deviceID = `hostpci${hostpci}`;
 			const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci/${deviceID}/create`, "POST", body);
 			if (result.status !== 200) {
-				alert(`Attempted to add ${body.device} but got: ${result.error}`);
+				error(`Attempted to add ${body.device} but got: ${result.error}`);
 			}
 			refreshDevices();
 		}
 	});
 
-	const availDevices = await requestAPI(`/cluster/${node}/pci`, "GET");
-	for (const availDevice of availDevices) {
+	const availDevices = await requestAPI(`/cluster/${node}/${type}/${vmid}/pci`, "GET");
+	for (const availDevice of availDevices.data) {
 		d.querySelector("#device").append(new Option(availDevice.device_name, availDevice.device_bus));
 	}
 	d.querySelector("#pcie").checked = true;
@@ -447,12 +447,12 @@ async function handleDeviceAdd () {
 async function refreshBoot () {
 	let boot = await requestDash(`/config/boot?node=${node}&type=${type}&vmid=${vmid}`, "GET");
 	if (boot.status !== 200) {
-		alert("Error fetching instance boot order.");
+		error("Error fetching instance boot order.");
 	}
 	else if (type === "qemu") {
 		boot = boot.data;
-		const order = document.querySelector("#boot-order");
-		order.setHTMLUnsafe(boot);
+		const container = document.querySelector("#boot-order");
+		container.setHTMLUnsafe(boot);
 	}
 }
 
@@ -474,6 +474,6 @@ async function handleFormExit (event) {
 		goToPage("index");
 	}
 	else {
-		alert(`Attempted to set basic resources but got: ${result.error}`);
+		error(`Attempted to set basic resources but got: ${result.error}`);
 	}
 }

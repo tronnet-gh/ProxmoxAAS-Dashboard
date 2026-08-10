@@ -5,30 +5,31 @@
 		<script src="scripts/settings.js" type="module"></script>
 		<link rel="modulepreload" href="scripts/utils.js">
 		<style>
-			legend {
-				margin-bottom: 25px;
-			}
 			label {
 				display: flex;
 				height: fit-content;
 				width: 100%;
 				align-items: center;
 				justify-content: left;
-				column-gap: 10px;
+				column-gap: 0.5em;
 			}
 			label + p {
-				margin-top: 5px;
-				margin-bottom: 25px;
+				margin-top: 0.5em;
+				margin-bottom: 1em;
 			}
 			p:last-child {
-				margin-bottom: 0px;
+				margin-bottom: 0;
+			}
+			#save.disabled {
+				display: none;
+			}
+			#save.enabled {
+				display: unset;
 			}
 		</style>
 	</head>
 	<body>
-		<header>
-			{{template "header" .}}
-		</header>
+		{{template "header" .}}
 		<main>
 			<h2>Settings</h2>
 			<form id="settings">
@@ -42,6 +43,8 @@
 						<p>App will periodically check for updates and synchronize only if needed. Medium resource usage.</p>
 						<label><input class="w3-radio" type="radio" id="sync-interrupt" name="sync-scheme" value="interrupt" required>Sync When Needed</label>
 						<p>App will react to changes and synchronize when changes are made. Low resource usage.</p>
+						<label><input class="w3-radio" type="radio" id="sync-never" name="sync-scheme" value="never" required>Never Sync</label>
+						<p>App will never automatically sync. Reload the page to sync the latest cluster state.</p>
 					</fieldset>
 					<fieldset>
 						<legend>App Sync Frequency</legend>
@@ -73,7 +76,7 @@
 					</fieldset>
 				</section>
 				<div class="w3-container w3-center" id="form-actions">
-					<button class="w3-button w3-margin" id="save" type="submit">SAVE</button>
+					<button class="w3-button w3-margin disabled" id="save" type="submit">SAVE</button>
 				</div>
 			</form>
 		</main>

@@ -1,17 +1,21 @@
 package app
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"proxmoxaas-dashboard/app/common"
 	"proxmoxaas-dashboard/app/routes"
-	"proxmoxaas-dashboard/dist/web" // go will complain here until the first build
+	"web" // go will complain here until the first build
 
 	"github.com/gin-gonic/gin"
 	"github.com/tdewolff/minify/v2"
 )
 
-func Run(configPath *string) {
+func Run() {
+	configPath := flag.String("config", "config.json", "path to config.json file")
+	flag.Parse()
+
 	common.Global = common.GetConfig(*configPath)
 
 	// setup static resources
@@ -38,7 +42,7 @@ func Run(configPath *string) {
 	router.GET("/settings", routes.HandleGETSettings)
 
 	// run on all interfaces with port
-	log.Fatal(router.Run(fmt.Sprintf("0.0.0.0:%d", common.Global.Port)))
+	log.Fatal("[ERR ] starting gin router: ", router.Run(fmt.Sprintf("0.0.0.0:%d", common.Global.Port)))
 }
 
 // setup static resources under web (css, images, modules, scripts)

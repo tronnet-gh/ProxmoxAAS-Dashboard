@@ -34,71 +34,38 @@
 		</style>
 	</head>
 	<body>
-		<header>
-			{{template "header" .}}
-		</header>
+		{{template "header" .}}
 		<main>
 			<h2>Account</h2>
 			<section class="w3-card w3-padding">
 				<h3>Account Details</h3>
-				<p id="username">Username: {{.account.Username}}</p>
-				<p id="pool">Pools: {{MapKeys .account.Pools ", "}}</p>
-				<p id="vmid">VMID Range: {{.account.VMID.Min}} - {{.account.VMID.Max}}</p>
-				<p id="nodes">Nodes: {{MapKeys .account.Nodes ", "}}</p>
+				<p id="username">Username: {{.user.Username.UserID}}@{{.user.Username.Realm}}</p>
+				<p id="email">Email: {{.user.Mail}}</p>
+				<p>Password: <button class="w3-button" id="change-password" type="button" style="padding: 0em; height: 1.5em; line-height: 1.5em;">Change Password</button></p>
 			</section>
-			<section class="w3-card w3-padding">
-				<div class="flex row nowrap">
-					<h3>Password</h3>
-					<button class="w3-button w3-margin" id="change-password" type="button">Change Password</button>
-				</div>
-			</section>
-			<section class="w3-card w3-padding">
-				<h3>Cluster Resources</h3>
-				<div>
-					{{range $category, $v := .account.Resources}}
-						{{if ne $category ""}}
-							<h4>{{$category}}</h4>
-						{{end}}
-						<div class="resource-container">
-						{{range $v}}
-							{{if .Display}}
-								{{if eq .Type "numeric"}}
-									{{template "resource-chart" .}}
-								{{end}}
-								{{if eq .Type "storage"}}
-									{{template "resource-chart" .}}
-								{{end}}
-								{{if eq .Type "list"}}
-									{{range .Resources}}
-										{{template "resource-chart" .}}
-									{{end}}
-								{{end}}
-							{{end}}
-						{{end}}
-						</div>
-					{{end}}
-				</div>
-			</section>
+			{{range $poolname, $pool := .pools}}
+				{{template "pool-resources" $pool}}
+			{{end}}
 		</main>
 		<template id="change-password-dialog">
 			<link rel="stylesheet" href="modules/w3.css">
 			<link rel="stylesheet" href="css/style.css">
 			<link rel="stylesheet" href="css/form.css">
 			<dialog class="w3-container w3-card w3-border-0">
-				<p class="w3-large" id="prompt" style="text-align: center;">
+				<p class="w3-large" id="prompt">
 					Change Password
 				</p>
 				<div id="body">
 					<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
 						<label for="new-password">New Password</label>
-						<input class="w3-input w3-border" id="new-password" name="new-password" type="password" required>
+						<input class="w3-input w3-border" id="new-password" name="new-password" type="password" autocomplete="new-password" required>
 						<label for="confirm-password">Confirm Password</label>
-						<input class="w3-input w3-border" id="confirm-password" name="confirm-password" type="password" required>
+						<input class="w3-input w3-border" id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required>
 					</form>
 				</div>
 				<div id="controls" class="w3-center w3-container">
-					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin" style="background-color: var(--negative-color, #f00); color: var(--lightbg-text-color, black);" formnovalidate>CANCEL</button>
-					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" style="background-color: var(--positive-color, #0f0); color: var(--lightbg-text-color, black);">CONFIRM</button>
+					<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+					<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
 				</div>
 			</dialog>
 		</template>

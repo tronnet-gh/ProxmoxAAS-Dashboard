@@ -2,8 +2,8 @@ package routes
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
 	"time"
 
@@ -21,9 +21,9 @@ type InstanceBackup struct {
 }
 
 func HandleGETBackups(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil {
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -39,8 +39,6 @@ func HandleGETBackups(c *gin.Context) {
 			common.HandleNonFatalError(c, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
 		}
 
-		log.Printf("%+v", backups)
-
 		c.HTML(http.StatusOK, "html/backups.html", gin.H{
 			"global":  common.Global,
 			"page":    "backups",
@@ -53,9 +51,9 @@ func HandleGETBackups(c *gin.Context) {
 }
 
 func HandleGETBackupsFragment(c *gin.Context) {
-	auth, err := common.GetAuth(c)
+	auth, err := common.GetAuthFromRequest(c)
 	if err == nil { // user should be authed, try to return index with population
-		vm_path, err := common.ExtractVMPath(c)
+		vm_path, err := common.GetInstancePathFromRequest(c)
 		if err != nil {
 			common.HandleNonFatalError(c, err)
 			return
@@ -67,27 +65,24 @@ func HandleGETBackupsFragment(c *gin.Context) {
 		}
 
 		c.Header("Content-Type", "text/plain")
-		common.TMPL.ExecuteTemplate(c.Writer, "html/backups-backups.go.tmpl", gin.H{
+		err = common.TMPL.ExecuteTemplate(c.Writer, "html/backups-backups.go.tmpl", gin.H{
 			"backups": backups,
 		})
-		c.Status(http.StatusOK)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		} else {
+			c.Status(http.StatusOK)
+		}
 	} else { // return 401
 		c.Status(http.StatusUnauthorized)
 	}
 }
 
-func GetInstanceBackups(vm common.VMPath, auth common.Auth) ([]InstanceBackup, error) {
+func GetInstanceBackups(vm paas.InstancePath, auth paas.Auth) ([]InstanceBackup, error) {
 	backups := []InstanceBackup{}
-	path := fmt.Sprintf("/cluster/%s/%s/%s/backup", vm.Node, vm.Type, vm.VMID)
-	ctx := common.RequestContext{
-		Cookies: map[string]string{
-			"username":            auth.Username,
-			"PVEAuthCookie":       auth.Token,
-			"CSRFPreventionToken": auth.CSRF,
-		},
-	}
+	path := fmt.Sprintf("/cluster/%s/%s/%d/backup", vm.NodeName, string(vm.InstanceType), uint64(vm.InstanceID))
 	body := []any{}
-	res, code, err := common.RequestGetAPI(path, ctx, &body)
+	res, code, err := common.RequestGetAPI(path, &auth, &body)
 	if err != nil {
 		return backups, err
 	}
@@ -101,8 +96,8 @@ func GetInstanceBackups(vm common.VMPath, auth common.Auth) ([]InstanceBackup, e
 	}
 
 	for i := range backups {
-		size, prefix := common.FormatNumber(backups[i].Size, 1024)
-		backups[i].SizeFormatted = fmt.Sprintf("%.3g %sB", size, prefix)
+		size, prefix := paas.FormatNumber(paas.SafeUint64(backups[i].Size), paas.Base1024)
+		backups[i].SizeFormatted = fmt.Sprintf("%s %sB", size, prefix)
 
 		t := time.Unix(backups[i].CTime, 0)
 		backups[i].TimeFormatted = t.Format("02-01-06 15:04:05")
