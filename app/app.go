@@ -18,9 +18,11 @@ func Run() {
 
 	common.Global = common.GetConfig(*configPath)
 
-	// setup static resources
+	// setup gin
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
+
+	// setup static resources
 	m := common.InitMinify()
 	ServeStatic(router, m)
 	html := common.MinifyStatic(m, web.Templates)
