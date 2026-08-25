@@ -1,6 +1,6 @@
 module proxmoxaas-dashboard
 
-go 1.26.6
+go 1.27.0
 
 require (
 	github.com/gerow/go-color v0.0.0-20140219113758-125d37f527f1
@@ -39,7 +39,7 @@ require (
 	github.com/tdewolff/parse/v2 v2.8.16 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.2 // indirect
-	go.mongodb.org/mongo-driver/v2 v2.8.0 // indirect
+	go.mongodb.org/mongo-driver/v2 v2.8.1 // indirect
 	golang.org/x/arch v0.30.0 // indirect
 	golang.org/x/crypto v0.55.0 // indirect
 	golang.org/x/net v0.58.0 // indirect
