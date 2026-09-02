@@ -22,6 +22,3 @@ clean-wfa-js:
 
 ensure-dist:
 	mkdir -p dist
-
-workflow-init: ensure-dist build-web
-	cp -r dev_config/. .
