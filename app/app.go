@@ -53,24 +53,28 @@ func ServeStatic(router *gin.Engine, m *minify.M) {
 	router.GET("/css/*css", func(c *gin.Context) {
 		path, _ := c.Params.Get("css")
 		data := css[fmt.Sprintf("css%s", path)]
+		c.Header("Content-Encoding", data.MimeType.Encoding)
 		c.Data(200, data.MimeType.Type, []byte(data.Data))
 	})
 	images := common.MinifyStatic(m, web.Images_fs)
 	router.GET("/images/*image", func(c *gin.Context) {
 		path, _ := c.Params.Get("image")
 		data := images[fmt.Sprintf("images%s", path)]
+		c.Header("Content-Encoding", data.MimeType.Encoding)
 		c.Data(200, data.MimeType.Type, []byte(data.Data))
 	})
 	modules := common.MinifyStatic(m, web.Modules_fs)
 	router.GET("/modules/*module", func(c *gin.Context) {
 		path, _ := c.Params.Get("module")
 		data := modules[fmt.Sprintf("modules%s", path)]
+		c.Header("Content-Encoding", data.MimeType.Encoding)
 		c.Data(200, data.MimeType.Type, []byte(data.Data))
 	})
 	scripts := common.MinifyStatic(m, web.Scripts_fs)
 	router.GET("/scripts/*script", func(c *gin.Context) {
 		path, _ := c.Params.Get("script")
 		data := scripts[fmt.Sprintf("scripts%s", path)]
+		c.Header("Content-Encoding", data.MimeType.Encoding)
 		c.Data(200, data.MimeType.Type, []byte(data.Data))
 	})
 }

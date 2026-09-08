@@ -10,7 +10,7 @@ var wfa;
 async function init () {
 	setAppearance();
 
-	wfa = await wfaInit("modules/wfa.wasm");
+	wfa = await wfaInit("modules/wfa.wasm.gz");
 	initInstances();
 
 	document.querySelector("#instance-add").addEventListener("click", handleInstanceAddButton);

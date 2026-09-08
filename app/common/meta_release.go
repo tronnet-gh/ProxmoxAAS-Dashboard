@@ -15,6 +15,7 @@ import (
 // defines mime type and associated minifier
 type MimeType struct {
 	Type     string
+	Encoding string
 	Minifier func(m *minify.M, w io.Writer, r io.Reader, params map[string]string) error
 }
 
@@ -46,6 +47,11 @@ var MimeTypes = map[string]MimeType{
 	},
 	"wasm": {
 		Type:     "application/wasm",
+		Minifier: nil,
+	},
+	"gz": {
+		Type:     "application/wasm",
+		Encoding: "gzip",
 		Minifier: nil,
 	},
 	"*": {
