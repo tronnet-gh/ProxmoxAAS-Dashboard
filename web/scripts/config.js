@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, goToPage, getURIData, setAppearance, setIconSrc, requestDash } from "./utils.js";
+import { requestPVE, requestAPI, goToPage, getURIData, setAppearance, setIconSrc, requestDash, getCookie } from "./utils.js";
 import { error, dialog } from "./dialog.js";
 
 window.addEventListener("DOMContentLoaded", init);
@@ -221,7 +221,7 @@ async function handleCDAdd () {
 		}
 	});
 
-	const isos = await requestAPI("/user/vm-isos", "GET");
+	const isos = await requestAPI(`/access/users/${getCookie("username")}/vm-isos`, "GET");
 	const select = d.querySelector("#iso-select");
 
 	for (const iso of isos.data) {

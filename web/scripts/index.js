@@ -1,4 +1,4 @@
-import { requestPVE, requestAPI, setAppearance, getSetting, requestDash, setIconSrc, setIconAlt } from "./utils.js";
+import { requestPVE, requestAPI, setAppearance, getSetting, requestDash, setIconSrc, setIconAlt, getCookie } from "./utils.js";
 import { dialog, error } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
 import wfaInit from "../modules/wfa.js";
@@ -418,7 +418,7 @@ async function handleInstanceAddButton () {
 	// setup templateImage depending on selected image storage
 	const templateImage = d.querySelector("#template-image"); 
 	// add template images to selector
-	const templates = await requestAPI("/user/ct-templates", "GET");
+	const templates = await requestAPI(`/access/users/${getCookie("username")}/ct-templates`, "GET");
 	for (const template of templates.data) {
 		templateImage.append(new Option(template.name, template.volid));
 	}
