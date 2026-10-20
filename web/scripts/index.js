@@ -268,15 +268,16 @@ function sortInstances () {
 	else if (searchCriteria === "fuzzy") {
 		const penalties = {
 			m: 0,
-			x: 1,
-			o: 0,
+			x: 2,
+			o: 3,
 			e: 1
 		};
 		criteria = (item, query) => {
 			// lower is better
 			const { score, CIGAR } = wfa.wfAlign(query, item, penalties, true);
 			const alignment = wfa.DecodeCIGAR(CIGAR);
-			return { score: score / item.length, alignment };
+			const maxlength = Math.max(item.length, query.length);
+			return { score: score / maxlength, alignment };
 		};
 	}
 
