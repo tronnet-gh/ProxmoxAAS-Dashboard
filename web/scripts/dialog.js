@@ -50,9 +50,9 @@ class ErrorDialog extends HTMLElement {
 		super();
 		this.shadowRoot = this.attachShadow({ mode: "open" });
 		this.shadowRoot.innerHTML = `
-			<link rel="stylesheet" href="modules/w3.css">
-			<link rel="stylesheet" href="css/style.css">
-			<link rel="stylesheet" href="css/form.css">
+			<link rel="stylesheet" href="websrc/modules/w3.css">
+			<link rel="stylesheet" href="websrc/css/style.css">
+			<link rel="stylesheet" href="websrc/css/form.css">
 			<style>
 				#errors {
 					margin-bottom: 0; 

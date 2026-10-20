@@ -6,6 +6,7 @@ import (
 	"log"
 	"proxmoxaas-dashboard/app/common"
 	"proxmoxaas-dashboard/app/routes"
+	"strings"
 	"web" // go will complain here until the first build
 
 	"github.com/gin-gonic/gin"
@@ -49,31 +50,12 @@ func Run() {
 
 // setup static resources under web (css, images, modules, scripts)
 func ServeStatic(router *gin.Engine, m *minify.M) {
-	css := common.MinifyStatic(m, web.CSS_fs)
-	router.GET("/css/*css", func(c *gin.Context) {
-		path, _ := c.Params.Get("css")
-		data := css[fmt.Sprintf("css%s", path)]
-		c.Header("Content-Encoding", data.MimeType.Encoding)
-		c.Data(200, data.MimeType.Type, []byte(data.Data))
-	})
-	images := common.MinifyStatic(m, web.Images_fs)
-	router.GET("/images/*image", func(c *gin.Context) {
-		path, _ := c.Params.Get("image")
-		data := images[fmt.Sprintf("images%s", path)]
-		c.Header("Content-Encoding", data.MimeType.Encoding)
-		c.Data(200, data.MimeType.Type, []byte(data.Data))
-	})
-	modules := common.MinifyStatic(m, web.Modules_fs)
-	router.GET("/modules/*module", func(c *gin.Context) {
-		path, _ := c.Params.Get("module")
-		data := modules[fmt.Sprintf("modules%s", path)]
-		c.Header("Content-Encoding", data.MimeType.Encoding)
-		c.Data(200, data.MimeType.Type, []byte(data.Data))
-	})
-	scripts := common.MinifyStatic(m, web.Scripts_fs)
-	router.GET("/scripts/*script", func(c *gin.Context) {
-		path, _ := c.Params.Get("script")
-		data := scripts[fmt.Sprintf("scripts%s", path)]
+	static := common.MinifyStatic(m, web.Static)
+	router.GET("/websrc/*path", func(c *gin.Context) {
+		path, _ := c.Params.Get("path")
+		trimed_path := strings.Replace(path, "/", "", 1) // replace leading "/" captured by *path
+		data := static[trimed_path]
+		fmt.Println(path)
 		c.Header("Content-Encoding", data.MimeType.Encoding)
 		c.Data(200, data.MimeType.Type, []byte(data.Data))
 	})

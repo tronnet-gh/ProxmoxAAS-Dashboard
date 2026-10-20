@@ -2,11 +2,11 @@
 <html lang="en">
 	<head>
 		{{template "head" .}}
-		<script src="scripts/index.js" type="module"></script>
-		<script src="modules/wfa.js" type="module"></script>
-		<link rel="modulepreload" href="scripts/utils.js">
-		<link rel="modulepreload" href="scripts/dialog.js">
-		<link rel="modulepreload" href="scripts/clientsync.js">
+		<script src="websrc/scripts/index.js" type="module"></script>
+		<script src="websrc/modules/wfa.js" type="module"></script>
+		<link rel="modulepreload" href="websrc/scripts/utils.js">
+		<link rel="modulepreload" href="websrc/scripts/dialog.js">
+		<link rel="modulepreload" href="websrc/scripts/clientsync.js">
 		<style>
 			@media screen and (width >= 440px) {
 				#vm-search {
@@ -72,13 +72,13 @@
 				<div class="w3-card w3-padding">
 					<div class="flex row nowrap" style="margin-top: 1em; justify-content: space-between;">
 						<form id="vm-search" role="search" class="flex row nowrap" tabindex="0">
-							<button type="submit" id="submit" class="w3-button" style="padding: 0; width: 1em; height: 1em; line-height: 1em;"><img alt="Search Instances" aria-label="Search Instances" src="images/common/search.svg#symb"></button>
+							<button type="submit" id="submit" class="w3-button" style="padding: 0; width: 1em; height: 1em; line-height: 1em;"><img alt="Search Instances" aria-label="Search Instances" src="websrc/images/common/search.svg#symb"></button>
 							<input type="search" id="search" class="w3-input w3-border" style="height: 1lh; max-width: fit-content;" aria-label="search instances by name">
 						</form>
 						<!--Add Instance Button & Dialog Template-->
 						<button type="button" id="instance-add" class="w3-button" aria-label="create new instance">
 							<span class="large" style="margin: 0;">Create Instance</span>
-							<img class="small" style="height: 1lh; width: 1lh;" alt="Create Instance" aria-label="Create Instance" src="images/actions/instance/add.svg#symb">
+							<img class="small" style="height: 1lh; width: 1lh;" alt="Create Instance" aria-label="Create Instance" src="websrc/images/actions/instance/add.svg#symb">
 						</button>
 						<template id="create-instance-dialog">
 							<dialog class="w3-container w3-card w3-border-0">

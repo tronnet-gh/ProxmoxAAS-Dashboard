@@ -1,8 +1,8 @@
 {{define "backup-card"}}
 <backup-card data-volid="{{.Volid}}">
 	<template shadowrootmode="open">
-		<link rel="stylesheet" href="modules/w3.css">
-		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="websrc/modules/w3.css">
+		<link rel="stylesheet" href="websrc/css/style.css">
 		<style>
 			* {
 				margin: 0;
@@ -19,15 +19,15 @@
 			<p class="w3-col l6 m6 hide-small">{{.Notes}}</p>
 			<p class="w3-col l2 hide-medium">{{.SizeFormatted}}</p>
 			<div class="w3-col l2 m2 s4 flex row nowrap" style="height: 1lh;">
-				<img id="edit-btn" class="clickable" alt="change notes" src="images/actions/backups/config.svg#symb">
-				<img id="delete-btn" class="clickable" alt="delete backup" role="button" tabindex=0 src="images/actions/backups/delete-active.svg#symb">
-				<img id="restore-btn" class="clickable" alt="restore from backup" role="button" tabindex=0 src="images/actions/backups/restore.svg#symb">
+				<img id="edit-btn" class="clickable" alt="change notes" src="websrc/images/actions/backups/config.svg#symb">
+				<img id="delete-btn" class="clickable" alt="delete backup" role="button" tabindex=0 src="websrc/images/actions/backups/delete-active.svg#symb">
+				<img id="restore-btn" class="clickable" alt="restore from backup" role="button" tabindex=0 src="websrc/images/actions/backups/restore.svg#symb">
 			</div>
 		</div>
 		<template id="edit-dialog">
-			<link rel="stylesheet" href="modules/w3.css">
-			<link rel="stylesheet" href="css/style.css">
-			<link rel="stylesheet" href="css/form.css">
+			<link rel="stylesheet" href="websrc/modules/w3.css">
+			<link rel="stylesheet" href="websrc/css/style.css">
+			<link rel="stylesheet" href="websrc/css/form.css">
 			<dialog class="w3-container w3-card w3-border-0">
 				<p class="w3-large" id="prompt">
 					Edit Backup
@@ -45,9 +45,9 @@
 			</dialog>
 		</template>
 		<template id="delete-dialog">
-			<link rel="stylesheet" href="modules/w3.css">
-			<link rel="stylesheet" href="css/style.css">
-			<link rel="stylesheet" href="css/form.css">
+			<link rel="stylesheet" href="websrc/modules/w3.css">
+			<link rel="stylesheet" href="websrc/css/style.css">
+			<link rel="stylesheet" href="websrc/css/form.css">
 			<dialog class="w3-container w3-card w3-border-0">
 				<p class="w3-large" id="prompt">
 					Delete Backup
@@ -66,9 +66,9 @@
 			</dialog>
 		</template>
 		<template id="restore-dialog">
-			<link rel="stylesheet" href="modules/w3.css">
-			<link rel="stylesheet" href="css/style.css">
-			<link rel="stylesheet" href="css/form.css">
+			<link rel="stylesheet" href="websrc/modules/w3.css">
+			<link rel="stylesheet" href="websrc/css/style.css">
+			<link rel="stylesheet" href="websrc/css/form.css">
 			<dialog class="w3-container w3-card w3-border-0">
 				<p class="w3-large" id="prompt">
 					Restore From Backup?
@@ -96,12 +96,12 @@
 {{define "backups-add-backup"}}
 <button type="button" id="backup-add" class="w3-button" aria-label="Create Backup">
 	<span class="large" style="margin: 0;">Create Backup</span>
-	<img class="small" role="img" style="height: 1lh; width: 1lh;" alt="Create Backup" src="images/actions/network/add.svg#symb">
+	<img class="small" role="img" style="height: 1lh; width: 1lh;" alt="Create Backup" src="websrc/images/actions/network/add.svg#symb">
 </button>
 <template id="create-backup-dialog">
-	<link rel="stylesheet" href="modules/w3.css">
-	<link rel="stylesheet" href="css/style.css">
-	<link rel="stylesheet" href="css/form.css">
+	<link rel="stylesheet" href="websrc/modules/w3.css">
+	<link rel="stylesheet" href="websrc/css/style.css">
+	<link rel="stylesheet" href="websrc/css/form.css">
 	<dialog class="w3-container w3-card w3-border-0">
 		<p class="w3-large" id="prompt">
 			Create Backup

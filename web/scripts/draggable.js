@@ -1,5 +1,5 @@
 const blank = document.createElement("img");
-blank.src = "images/common/blank.png"; // for whatever reason an svg does NOT work here
+blank.src = "websrc/images/common/blank.png"; // for whatever reason an svg does NOT work here
 
 class DraggableContainer extends HTMLElement {
 	shadowRoot = null;

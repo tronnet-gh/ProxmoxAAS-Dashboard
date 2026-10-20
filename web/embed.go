@@ -5,16 +5,10 @@ import (
 )
 
 //go:embed css/*
-var CSS_fs embed.FS
-
 //go:embed images/*
-var Images_fs embed.FS
-
 //go:embed modules/*
-var Modules_fs embed.FS
-
 //go:embed scripts/*
-var Scripts_fs embed.FS
+var Static embed.FS
 
 //go:embed html/*
 //go:embed templates/*
