@@ -4,7 +4,7 @@ import js from "@eslint/js";
 
 export default defineConfig([
     js.configs.recommended,
-    globalIgnores(["dist/", "web/modules", "WFA-JS"]),
+    globalIgnores(["dist/", "app/web/modules", "WFA-JS"]),
     {
         languageOptions: {
             globals: {
