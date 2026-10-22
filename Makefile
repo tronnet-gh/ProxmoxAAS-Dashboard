@@ -1,9 +1,12 @@
-.PHONY: build build-web build-wfa clean clean-wfa clean-web
+.PHONY: test build build-wfa clean clean-wfa clean-web
 
-build: clean ensure-dist build-wfa build-web
+build: clean ensure-dist build-wfa
 	@echo "======================== Building Binary ======================="
 # resolve symbolic links in web by copying it into dist/web/
-	CGO_ENABLED=0 go build -tags release -ldflags="-s -w" -v -o dist/ .
+	GODEBUG=embedfollowsymlinks=1 CGO_ENABLED=0 go build -tags release -ldflags="-s -w" -v -o dist/ .
+
+test:
+	GODEBUG=embedfollowsymlinks=1 CGO_ENABLED=0 go run .
 
 clean: clean-wfa clean-web
 	@echo "======================== Cleaning Project ======================"
@@ -13,14 +16,11 @@ clean: clean-wfa clean-web
 ensure-dist:
 	mkdir -p dist
 
-build-web: ensure-dist
-	cp -rL web/ dist/web/
-
 clean-web:
 
 build-wfa:
 	$(MAKE) -C WFA-JS
-	cp -f WFA-JS/dist/* web/modules
+	cp -f WFA-JS/dist/* app/web/modules
 
 clean-wfa:
 	$(MAKE) clean -C WFA-JS

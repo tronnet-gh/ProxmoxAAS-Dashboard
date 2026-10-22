@@ -6,6 +6,7 @@ import (
 
 //go:embed css/*
 //go:embed images/*
+//go:embed images/*/*/*
 //go:embed modules/*
 //go:embed scripts/*
 var Static embed.FS

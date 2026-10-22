@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"proxmoxaas-dashboard/app/common"
 	"proxmoxaas-dashboard/app/routes"
-	"web" // go will complain here until the first build
+	"proxmoxaas-dashboard/app/web"
+
+	//"web" // go will complain here until the first build
 
 	"github.com/tdewolff/minify/v2"
 )
