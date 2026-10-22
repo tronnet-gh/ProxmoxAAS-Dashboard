@@ -1,13 +1,13 @@
 package routes
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-viper/mapstructure/v2"
 )
 
@@ -45,46 +45,61 @@ type InstanceStatus struct {
 	Status string
 }
 
-func HandleGETIndex(c *gin.Context) {
-	auth, err := common.GetAuthFromRequest(c)
+func HandleGETIndex(w http.ResponseWriter, r *http.Request) {
+	auth, err := common.GetAuthFromRequest(r)
 	if err == nil { // user should be authed, try to return index with population
 		instances, _, err := GetClusterResources(auth)
 		if err != nil {
-			common.HandleNonFatalError(c, err)
+			common.HandleNonFatalError(w, err)
 			return
 		}
-		page := gin.H{
+		page := map[string]any{
 			"global":    common.Global,
 			"page":      "index",
 			"instances": instances,
 		}
-		c.HTML(http.StatusOK, "html/index.html", page)
+
+		w.Header().Set("Content-Type", "text/html")
+		body := bytes.Buffer{}
+		err = common.TMPL.ExecuteTemplate(&body, "html/index.html", page)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		} else {
+			w.Write(body.Bytes())
+			return
+		}
 	} else { // return index without populating
-		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
 	}
 }
 
-func HandleGETInstancesFragment(c *gin.Context) {
-	auth, err := common.GetAuthFromRequest(c)
+func HandleGETInstancesFragment(w http.ResponseWriter, r *http.Request) {
+	auth, err := common.GetAuthFromRequest(r)
 	if err == nil { // user should be authed, try to return index with population
 		instances, _, err := GetClusterResources(auth)
 		if err != nil {
-			common.HandleNonFatalError(c, err)
+			common.HandleNonFatalError(w, err)
 			return
 		}
-		c.Header("Content-Type", "text/plain")
-		err = common.TMPL.ExecuteTemplate(c.Writer, "html/index-instances.go.tmpl", gin.H{
+
+		w.Header().Set("Content-Type", "text/plain")
+		body := bytes.Buffer{}
+		err = common.TMPL.ExecuteTemplate(&body, "html/index-instances.go.tmpl", map[string]any{
 			"instances": instances,
 		})
 		if err != nil {
-			c.Status(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		} else {
-			c.Status(http.StatusOK)
+			w.Write(body.Bytes())
+			return
 		}
 	} else { // return 401
-		c.Status(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
-
 }
 
 func GetClusterResources(auth paas.Auth) (map[uint]InstanceCard, map[string]Node, error) {

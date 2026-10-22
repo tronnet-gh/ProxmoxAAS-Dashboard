@@ -1,11 +1,11 @@
 package routes
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"proxmoxaas-dashboard/app/common"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-viper/mapstructure/v2"
 )
 
@@ -41,10 +41,11 @@ func GetLoginRealms() ([]Realm, error) {
 	return realms, nil
 }
 
-func HandleGETLogin(c *gin.Context) {
+func HandleGETLogin(w http.ResponseWriter, r *http.Request) {
 	realms, err := GetLoginRealms()
 	if err != nil {
-		common.HandleNonFatalError(c, err)
+		common.HandleNonFatalError(w, err)
+		return
 	}
 
 	sel := common.Select{
@@ -60,9 +61,18 @@ func HandleGETLogin(c *gin.Context) {
 		})
 	}
 
-	c.HTML(http.StatusOK, "html/login.html", gin.H{
+	w.Header().Set("Content-Type", "text/html")
+	body := bytes.Buffer{}
+	err = common.TMPL.ExecuteTemplate(&body, "html/login.html", map[string]any{
 		"global": common.Global,
 		"page":   "login",
 		"realms": sel,
 	})
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	} else {
+		w.Write(body.Bytes())
+		return
+	}
 }

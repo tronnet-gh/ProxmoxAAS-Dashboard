@@ -1,13 +1,13 @@
 package routes
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
 
 	"github.com/gerow/go-color"
-	"github.com/gin-gonic/gin"
 	"github.com/go-viper/mapstructure/v2"
 )
 
@@ -40,29 +40,39 @@ var Green = color.RGB{
 	B: 0,
 }
 
-func HandleGETAccount(c *gin.Context) {
-	auth, err := common.GetAuthFromRequest(c)
+func HandleGETAccount(w http.ResponseWriter, r *http.Request) {
+	auth, err := common.GetAuthFromRequest(r)
 	if err == nil {
 		user, err := GetUserBasic(auth)
 		if err != nil {
-			common.HandleNonFatalError(c, err)
+			common.HandleNonFatalError(w, err)
 			return
 		}
 
 		pools, err := GetUserPools(auth)
 		if err != nil {
-			common.HandleNonFatalError(c, err)
+			common.HandleNonFatalError(w, err)
 			return
 		}
 
-		c.HTML(http.StatusOK, "html/account.html", gin.H{
+		w.Header().Set("Content-Type", "text/html")
+		body := bytes.Buffer{}
+		err = common.TMPL.ExecuteTemplate(&body, "html/account.html", map[string]any{
 			"global": common.Global,
 			"page":   "account",
 			"user":   user,
 			"pools":  pools,
 		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		} else {
+			w.Write(body.Bytes())
+			return
+		}
 	} else {
-		c.Redirect(http.StatusFound, "/login") // if user is not authed, redirect user to login page
+		http.Redirect(w, r, "/login", http.StatusFound) // if user is not authed, redirect user to login page
+		return
 	}
 }
 

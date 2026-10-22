@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	paas "proxmoxaas-common-lib"
@@ -8,7 +9,6 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-viper/mapstructure/v2"
 )
 
@@ -31,24 +31,26 @@ type PoolConfig struct {
 	}
 }
 
-func HandleGETConfig(c *gin.Context) {
-	auth, err := common.GetAuthFromRequest(c)
+func HandleGETConfig(w http.ResponseWriter, r *http.Request) {
+	auth, err := common.GetAuthFromRequest(r)
 	if err == nil {
-		vm_path, err := common.GetInstancePathFromRequest(c)
+		vm_path, err := common.GetInstancePathFromRequest(r)
 		if err != nil {
-			common.HandleNonFatalError(c, err)
+			common.HandleNonFatalError(w, err)
 			return
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
 		if err != nil {
-			common.HandleNonFatalError(c, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			common.HandleNonFatalError(w, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			return
 		}
 
 		if config.Type == "VM" { // if VM, fetch CPU types from node
 			config.ProctypeSelect, err = GetCPUTypes(vm_path, config.Pool, auth)
 			if err != nil {
-				common.HandleNonFatalError(c, fmt.Errorf("error encountered getting proctypes: %s", err.Error()))
+				common.HandleNonFatalError(w, fmt.Errorf("error encountered getting proctypes: %s", err.Error()))
+				return
 			}
 		}
 		for i, cpu := range config.ProctypeSelect.Options {
@@ -57,125 +59,155 @@ func HandleGETConfig(c *gin.Context) {
 			}
 		}
 
-		c.HTML(http.StatusOK, "html/config.html", gin.H{
+		w.Header().Set("Content-Type", "text/html")
+		body := bytes.Buffer{}
+		err = common.TMPL.ExecuteTemplate(&body, "html/config.html", map[string]any{
 			"global": common.Global,
 			"page":   "config",
 			"config": config,
 		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		} else {
+			w.Write(body.Bytes())
+			return
+		}
 	} else {
-		c.Redirect(http.StatusFound, "/login")
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
 	}
 }
 
-func HandleGETConfigVolumesFragment(c *gin.Context) {
-	auth, err := common.GetAuthFromRequest(c)
+func HandleGETConfigVolumesFragment(w http.ResponseWriter, r *http.Request) {
+	auth, err := common.GetAuthFromRequest(r)
 	if err == nil {
-		vm_path, err := common.GetInstancePathFromRequest(c)
+		vm_path, err := common.GetInstancePathFromRequest(r)
 		if err != nil {
-			common.HandleNonFatalError(c, err)
+			common.HandleNonFatalError(w, err)
 			return
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
 		if err != nil {
-			common.HandleNonFatalError(c, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			common.HandleNonFatalError(w, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			return
 		}
 
-		c.Header("Content-Type", "text/plain")
-		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-volumes.go.tmpl", gin.H{
+		w.Header().Set("Content-Type", "text/plain")
+		body := bytes.Buffer{}
+		err = common.TMPL.ExecuteTemplate(&body, "html/config-volumes.go.tmpl", map[string]any{
 			"config": config,
 		})
 		if err != nil {
-			c.Status(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		} else {
-			c.Status(http.StatusOK)
+			w.Write(body.Bytes())
+			return
 		}
 	} else {
-		c.Status(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 }
 
-func HandleGETConfigNetsFragment(c *gin.Context) {
-	auth, err := common.GetAuthFromRequest(c)
+func HandleGETConfigNetsFragment(w http.ResponseWriter, r *http.Request) {
+	auth, err := common.GetAuthFromRequest(r)
 	if err == nil {
-		vm_path, err := common.GetInstancePathFromRequest(c)
+		vm_path, err := common.GetInstancePathFromRequest(r)
 		if err != nil {
-			common.HandleNonFatalError(c, err)
+			common.HandleNonFatalError(w, err)
 			return
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
 		if err != nil {
-			common.HandleNonFatalError(c, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			common.HandleNonFatalError(w, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			return
 		}
 
-		c.Header("Content-Type", "text/plain")
-		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-nets.go.tmpl", gin.H{
+		w.Header().Set("Content-Type", "text/plain")
+		body := bytes.Buffer{}
+		err = common.TMPL.ExecuteTemplate(&body, "html/config-nets.go.tmpl", map[string]any{
 			"config": config,
 		})
 		if err != nil {
-			c.Status(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		} else {
-			c.Status(http.StatusOK)
+			w.Write(body.Bytes())
+			return
 		}
-	} else {
-		c.Status(http.StatusUnauthorized)
+	} else { // return 401
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 }
 
-func HandleGETConfigDevicesFragment(c *gin.Context) {
-	auth, err := common.GetAuthFromRequest(c)
+func HandleGETConfigDevicesFragment(w http.ResponseWriter, r *http.Request) {
+	auth, err := common.GetAuthFromRequest(r)
 	if err == nil {
-		vm_path, err := common.GetInstancePathFromRequest(c)
+		vm_path, err := common.GetInstancePathFromRequest(r)
 		if err != nil {
-			common.HandleNonFatalError(c, err)
+			common.HandleNonFatalError(w, err)
 			return
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
 		if err != nil {
-			common.HandleNonFatalError(c, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			common.HandleNonFatalError(w, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			return
 		}
 
-		c.Header("Content-Type", "text/plain")
-		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-devices.go.tmpl", gin.H{
+		w.Header().Set("Content-Type", "text/plain")
+		body := bytes.Buffer{}
+		err = common.TMPL.ExecuteTemplate(&body, "html/config-devices.go.tmpl", map[string]any{
 			"config": config,
 		})
 		if err != nil {
-			c.Status(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		} else {
-			c.Status(http.StatusOK)
+			w.Write(body.Bytes())
+			return
 		}
-	} else {
-		c.Status(http.StatusUnauthorized)
+	} else { // return 401
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 }
 
-func HandleGETConfigBootFragment(c *gin.Context) {
-	auth, err := common.GetAuthFromRequest(c)
+func HandleGETConfigBootFragment(w http.ResponseWriter, r *http.Request) {
+	auth, err := common.GetAuthFromRequest(r)
 	if err == nil {
-		vm_path, err := common.GetInstancePathFromRequest(c)
+		vm_path, err := common.GetInstancePathFromRequest(r)
 		if err != nil {
-			common.HandleNonFatalError(c, err)
+			common.HandleNonFatalError(w, err)
 			return
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth)
 		if err != nil {
-			common.HandleNonFatalError(c, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			common.HandleNonFatalError(w, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			return
 		}
 
-		c.Header("Content-Type", "text/plain")
-		err = common.TMPL.ExecuteTemplate(c.Writer, "html/config-boot.go.tmpl", gin.H{
+		w.Header().Set("Content-Type", "text/plain")
+		body := bytes.Buffer{}
+		err = common.TMPL.ExecuteTemplate(&body, "html/config-boot.go.tmpl", map[string]any{
 			"config": config,
 		})
 		if err != nil {
-			c.Status(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		} else {
-			c.Status(http.StatusOK)
+			w.Write(body.Bytes())
+			return
 		}
-	} else {
-		c.Status(http.StatusUnauthorized)
+	} else { // return 401
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 }
 

@@ -16,7 +16,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"github.com/tdewolff/minify/v2"
 
 	paas "proxmoxaas-common-lib"
@@ -103,9 +102,8 @@ func MinifyStatic(m *minify.M, files embed.FS) map[string]StaticFile {
 	}
 }
 
-func LoadHTMLToGin(engine *gin.Engine, html map[string]StaticFile) *template.Template {
-	root := template.New("")
-	engine.FuncMap = template.FuncMap{
+func LoadHTML(html map[string]StaticFile) *template.Template {
+	funcMap := template.FuncMap{
 		"MapKeys": func(x any, sep string) string {
 			v := reflect.ValueOf(x)
 			keys := v.MapKeys()
@@ -133,9 +131,11 @@ func LoadHTMLToGin(engine *gin.Engine, html map[string]StaticFile) *template.Tem
 			return dict, nil
 		},
 	}
-	tmpl := template.Must(root, LoadAndAddToRoot(engine.FuncMap, root, html))
-	engine.SetHTMLTemplate(root)
-	return tmpl
+	root := template.New("").Funcs(funcMap)
+	if err := LoadAndAddToRoot(funcMap, root, html); err != nil {
+		log.Fatal(err)
+	}
+	return root
 }
 
 func LoadAndAddToRoot(FuncMap template.FuncMap, root *template.Template, html map[string]StaticFile) error {
@@ -170,9 +170,9 @@ func TemplateMinifier(m *minify.M, w io.Writer, r io.Reader, _ map[string]string
 	return nil
 }
 
-func HandleNonFatalError(c *gin.Context, err error) {
+func HandleNonFatalError(w http.ResponseWriter, err error) {
 	log.Printf("[WARN] encountered a non-fatal error: %s", err.Error())
-	c.Status(http.StatusInternalServerError)
+	w.WriteHeader(http.StatusInternalServerError)
 }
 
 func RequestGetAPI(path string, auth *paas.Auth, body any) (*http.Response, int, error) {
@@ -221,25 +221,41 @@ func RequestGetAPI(path string, auth *paas.Auth, body any) (*http.Response, int,
 	return response, response.StatusCode, nil
 }
 
-func GetAuthFromRequest(c *gin.Context) (paas.Auth, error) {
-	_, errAuth := c.Cookie("auth")
-	username, errUsername := c.Cookie("username")
-	token, errToken := c.Cookie("PVEAuthCookie")
-	csrf, errCSRF := c.Cookie("CSRFPreventionToken")
-	access, errAccess := c.Cookie("PAASAccessManagerTicket")
-	if errUsername != nil || errAuth != nil || errToken != nil || errCSRF != nil || errAccess != nil {
-		return paas.Auth{}, fmt.Errorf("error occured getting user cookies: (auth: %s, token: %s, csrf: %s)", errAuth, errToken, errCSRF)
-	} else {
-		return paas.Auth{Username: username, Token: token, CSRF: csrf, AccessManagerTicket: access}, nil
+func GetAuthFromRequest(r *http.Request) (paas.Auth, error) {
+	_, errAuth := r.Cookie("auth")
+	username, errUsername := r.Cookie("username")
+	token, errToken := r.Cookie("PVEAuthCookie")
+	csrf, errCSRF := r.Cookie("CSRFPreventionToken")
+	access, errAccess := r.Cookie("PAASAccessManagerTicket")
+
+	if errUsername != nil || errAuth != nil || errToken != nil ||
+		errCSRF != nil || errAccess != nil {
+		return paas.Auth{}, fmt.Errorf(
+			"error occurred getting user cookies: (auth: %v, token: %v, csrf: %v)",
+			errAuth, errToken, errCSRF,
+		)
 	}
+
+	return paas.Auth{
+		Username:            username.Value,
+		Token:               token.Value,
+		CSRF:                csrf.Value,
+		AccessManagerTicket: access.Value,
+	}, nil
 }
 
-func GetInstancePathFromRequest(c *gin.Context) (paas.InstancePath, error) {
-	req_node := c.Query("node")
-	req_type := c.Query("type")
-	req_vmid := c.Query("vmid")
+func GetInstancePathFromRequest(r *http.Request) (paas.InstancePath, error) {
+	query := r.URL.Query()
+
+	req_node := query.Get("node")
+	req_type := query.Get("type")
+	req_vmid := query.Get("vmid")
+
 	if req_node == "" || req_type == "" || req_vmid == "" {
-		return paas.InstancePath{}, fmt.Errorf("request missing required values: (node: %s, type: %s, vmid: %s)", req_node, req_type, req_vmid)
+		return paas.InstancePath{}, fmt.Errorf(
+			"request missing required values: (node: %s, type: %s, vmid: %s)",
+			req_node, req_type, req_vmid,
+		)
 	}
 
 	vmid_int, err := strconv.ParseUint(req_vmid, 10, 64)
@@ -252,6 +268,7 @@ func GetInstancePathFromRequest(c *gin.Context) (paas.InstancePath, error) {
 		InstanceType: paas.InstanceType(req_type),
 		InstanceID:   paas.InstanceID(vmid_int),
 	}
+
 	return vm_path, nil
 }
 

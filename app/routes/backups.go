@@ -1,13 +1,13 @@
 package routes
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-viper/mapstructure/v2"
 )
 
@@ -20,61 +20,78 @@ type InstanceBackup struct {
 	TimeFormatted string
 }
 
-func HandleGETBackups(c *gin.Context) {
-	auth, err := common.GetAuthFromRequest(c)
+func HandleGETBackups(w http.ResponseWriter, r *http.Request) {
+	auth, err := common.GetAuthFromRequest(r)
 	if err == nil {
-		vm_path, err := common.GetInstancePathFromRequest(c)
+		vm_path, err := common.GetInstancePathFromRequest(r)
 		if err != nil {
-			common.HandleNonFatalError(c, err)
+			common.HandleNonFatalError(w, err)
 			return
 		}
 
 		backups, err := GetInstanceBackups(vm_path, auth)
 		if err != nil {
-			common.HandleNonFatalError(c, fmt.Errorf("error encountered getting instance backups: %s", err.Error()))
+			common.HandleNonFatalError(w, fmt.Errorf("error encountered getting instance backups: %s", err.Error()))
+			return
 		}
 
 		config, err := GetInstanceConfig(vm_path, auth) // only used for the VM's name
 		if err != nil {
-			common.HandleNonFatalError(c, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			common.HandleNonFatalError(w, fmt.Errorf("error encountered getting instance config: %s", err.Error()))
+			return
 		}
 
-		c.HTML(http.StatusOK, "html/backups.html", gin.H{
+		w.Header().Set("Content-Type", "text/html")
+		body := bytes.Buffer{}
+		err = common.TMPL.ExecuteTemplate(&body, "html/index.html", map[string]any{
 			"global":  common.Global,
 			"page":    "backups",
 			"backups": backups,
 			"config":  config,
 		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		} else {
+			w.Write(body.Bytes())
+			return
+		}
 	} else {
-		c.Redirect(http.StatusFound, "/login")
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
 	}
 }
 
-func HandleGETBackupsFragment(c *gin.Context) {
-	auth, err := common.GetAuthFromRequest(c)
+func HandleGETBackupsFragment(w http.ResponseWriter, r *http.Request) {
+	auth, err := common.GetAuthFromRequest(r)
 	if err == nil { // user should be authed, try to return index with population
-		vm_path, err := common.GetInstancePathFromRequest(c)
+		vm_path, err := common.GetInstancePathFromRequest(r)
 		if err != nil {
-			common.HandleNonFatalError(c, err)
+			common.HandleNonFatalError(w, err)
 			return
 		}
 
 		backups, err := GetInstanceBackups(vm_path, auth)
 		if err != nil {
-			common.HandleNonFatalError(c, fmt.Errorf("error encountered getting instance backups: %s", err.Error()))
+			common.HandleNonFatalError(w, fmt.Errorf("error encountered getting instance backups: %s", err.Error()))
+			return
 		}
 
-		c.Header("Content-Type", "text/plain")
-		err = common.TMPL.ExecuteTemplate(c.Writer, "html/backups-backups.go.tmpl", gin.H{
+		w.Header().Set("Content-Type", "text/plain")
+		body := bytes.Buffer{}
+		err = common.TMPL.ExecuteTemplate(&body, "html/backups-backups.go.tmpl", map[string]any{
 			"backups": backups,
 		})
 		if err != nil {
-			c.Status(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		} else {
-			c.Status(http.StatusOK)
+			w.Write(body.Bytes())
+			return
 		}
 	} else { // return 401
-		c.Status(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	}
 }
 
