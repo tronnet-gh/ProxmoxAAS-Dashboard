@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	paas "proxmoxaas-common-lib"
@@ -59,16 +58,7 @@ func HandleGETIndex(w http.ResponseWriter, r *http.Request) {
 			"instances": instances,
 		}
 
-		w.Header().Set("Content-Type", "text/html")
-		body := bytes.Buffer{}
-		err = common.TMPL.ExecuteTemplate(&body, "html/index.html", page)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.Write(body.Bytes())
-			return
-		}
+		paas.HTTPExecuteHTMLTemplate(w, common.TMPL, "html/index.html", page)
 	} else { // return index without populating
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
@@ -84,18 +74,9 @@ func HandleGETInstancesFragment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Content-Type", "text/plain")
-		body := bytes.Buffer{}
-		err = common.TMPL.ExecuteTemplate(&body, "html/index-instances.go.tmpl", map[string]any{
+		paas.HTTPExecuteHTMLFragmentTemplate(w, common.TMPL, "html/index-instances.go.tmpl", map[string]any{
 			"instances": instances,
 		})
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.Write(body.Bytes())
-			return
-		}
 	} else { // return 401
 		w.WriteHeader(http.StatusUnauthorized)
 		return

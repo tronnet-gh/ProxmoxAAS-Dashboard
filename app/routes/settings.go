@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"bytes"
 	"net/http"
+	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
 )
 
@@ -15,19 +15,10 @@ func HandleGETSettings(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Content-Type", "text/html")
-		body := bytes.Buffer{}
-		err = common.TMPL.ExecuteTemplate(&body, "html/settings.html", map[string]any{
+		paas.HTTPExecuteHTMLTemplate(w, common.TMPL, "html/settings.html", map[string]any{
 			"global": common.Global,
 			"page":   "settings",
 		})
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.Write(body.Bytes())
-			return
-		}
 	} else {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return

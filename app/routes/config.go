@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	paas "proxmoxaas-common-lib"
@@ -59,20 +58,11 @@ func HandleGETConfig(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		w.Header().Set("Content-Type", "text/html")
-		body := bytes.Buffer{}
-		err = common.TMPL.ExecuteTemplate(&body, "html/config.html", map[string]any{
+		paas.HTTPExecuteHTMLTemplate(w, common.TMPL, "html/config.html", map[string]any{
 			"global": common.Global,
 			"page":   "config",
 			"config": config,
 		})
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.Write(body.Bytes())
-			return
-		}
 	} else {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
@@ -94,18 +84,9 @@ func HandleGETConfigVolumesFragment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Content-Type", "text/plain")
-		body := bytes.Buffer{}
-		err = common.TMPL.ExecuteTemplate(&body, "html/config-volumes.go.tmpl", map[string]any{
+		paas.HTTPExecuteHTMLFragmentTemplate(w, common.TMPL, "html/config-volumes.go.tmpl", map[string]any{
 			"config": config,
 		})
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.Write(body.Bytes())
-			return
-		}
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -127,18 +108,9 @@ func HandleGETConfigNetsFragment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Content-Type", "text/plain")
-		body := bytes.Buffer{}
-		err = common.TMPL.ExecuteTemplate(&body, "html/config-nets.go.tmpl", map[string]any{
+		paas.HTTPExecuteHTMLFragmentTemplate(w, common.TMPL, "html/config-nets.go.tmpl", map[string]any{
 			"config": config,
 		})
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.Write(body.Bytes())
-			return
-		}
 	} else { // return 401
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -160,18 +132,9 @@ func HandleGETConfigDevicesFragment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Content-Type", "text/plain")
-		body := bytes.Buffer{}
-		err = common.TMPL.ExecuteTemplate(&body, "html/config-devices.go.tmpl", map[string]any{
+		paas.HTTPExecuteHTMLFragmentTemplate(w, common.TMPL, "html/config-devices.go.tmpl", map[string]any{
 			"config": config,
 		})
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.Write(body.Bytes())
-			return
-		}
 	} else { // return 401
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -193,18 +156,9 @@ func HandleGETConfigBootFragment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Content-Type", "text/plain")
-		body := bytes.Buffer{}
-		err = common.TMPL.ExecuteTemplate(&body, "html/config-boot.go.tmpl", map[string]any{
+		paas.HTTPExecuteHTMLFragmentTemplate(w, common.TMPL, "html/config-boot.go.tmpl", map[string]any{
 			"config": config,
 		})
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.Write(body.Bytes())
-			return
-		}
 	} else { // return 401
 		w.WriteHeader(http.StatusUnauthorized)
 		return

@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	paas "proxmoxaas-common-lib"
@@ -41,21 +40,12 @@ func HandleGETBackups(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Content-Type", "text/html")
-		body := bytes.Buffer{}
-		err = common.TMPL.ExecuteTemplate(&body, "html/index.html", map[string]any{
+		paas.HTTPExecuteHTMLTemplate(w, common.TMPL, "html/backups.html", map[string]any{
 			"global":  common.Global,
 			"page":    "backups",
 			"backups": backups,
 			"config":  config,
 		})
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.Write(body.Bytes())
-			return
-		}
 	} else {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
@@ -77,18 +67,9 @@ func HandleGETBackupsFragment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Content-Type", "text/plain")
-		body := bytes.Buffer{}
-		err = common.TMPL.ExecuteTemplate(&body, "html/backups-backups.go.tmpl", map[string]any{
+		paas.HTTPExecuteHTMLFragmentTemplate(w, common.TMPL, "html/backups-backups.go.tmpl", map[string]any{
 			"backups": backups,
 		})
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.Write(body.Bytes())
-			return
-		}
 	} else { // return 401
 		w.WriteHeader(http.StatusUnauthorized)
 		return

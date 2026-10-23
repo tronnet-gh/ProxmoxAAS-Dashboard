@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	paas "proxmoxaas-common-lib"
@@ -55,21 +54,12 @@ func HandleGETAccount(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Set("Content-Type", "text/html")
-		body := bytes.Buffer{}
-		err = common.TMPL.ExecuteTemplate(&body, "html/account.html", map[string]any{
+		paas.HTTPExecuteHTMLTemplate(w, common.TMPL, "html/account.html", map[string]any{
 			"global": common.Global,
 			"page":   "account",
 			"user":   user,
 			"pools":  pools,
 		})
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		} else {
-			w.Write(body.Bytes())
-			return
-		}
 	} else {
 		http.Redirect(w, r, "/login", http.StatusFound) // if user is not authed, redirect user to login page
 		return

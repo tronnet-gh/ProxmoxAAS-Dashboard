@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
+	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
 
 	"github.com/go-viper/mapstructure/v2"
@@ -61,18 +61,9 @@ func HandleGETLogin(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	w.Header().Set("Content-Type", "text/html")
-	body := bytes.Buffer{}
-	err = common.TMPL.ExecuteTemplate(&body, "html/login.html", map[string]any{
+	paas.HTTPExecuteHTMLTemplate(w, common.TMPL, "html/login.html", map[string]any{
 		"global": common.Global,
 		"page":   "login",
 		"realms": sel,
 	})
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	} else {
-		w.Write(body.Bytes())
-		return
-	}
 }
