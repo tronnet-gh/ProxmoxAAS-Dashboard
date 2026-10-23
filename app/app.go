@@ -8,6 +8,7 @@ import (
 	"proxmoxaas-dashboard/app/common"
 	"proxmoxaas-dashboard/app/routes"
 	"proxmoxaas-dashboard/app/web"
+	"time"
 
 	//"web" // go will complain here until the first build
 
@@ -44,8 +45,10 @@ func Run() {
 	router.HandleFunc("GET /login", routes.HandleGETLogin)
 	router.HandleFunc("GET /settings", routes.HandleGETSettings)
 
+	server := LoggingMiddleware(router)
+
 	// run on all interfaces with port
-	log.Fatal("[ERR ] starting gin router: ", http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", common.Global.Port), router))
+	log.Fatal("[ERR ] starting gin router: ", http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", common.Global.Port), server))
 }
 
 // setup static resources under web (css, images, modules, scripts)
@@ -57,5 +60,13 @@ func ServeStatic(router *http.ServeMux, m *minify.M) {
 		w.Header().Set("Content-Encoding", data.MimeType.Encoding)
 		w.Header().Set("Content-Type", data.MimeType.Type)
 		w.Write([]byte(data.Data))
+	})
+}
+
+func LoggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next.ServeHTTP(w, r)
+		log.Printf("%s %s %s", r.Method, r.URL.Path, time.Since(start))
 	})
 }
