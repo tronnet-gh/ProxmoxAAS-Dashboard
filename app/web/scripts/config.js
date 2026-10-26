@@ -49,7 +49,7 @@ class VolumeAction extends HTMLElement {
 
 	async setStatusLoading () {
 		const icon = document.querySelector(`img[data-volume="${this.dataset.volume}"]`);
-		setIconSrc(icon, "images/status/loading.svg");
+		setIconSrc(icon, "websrc/images/status/loading.svg");
 	}
 
 	async handleDiskDetach () {
@@ -248,7 +248,7 @@ class NetworkAction extends HTMLElement {
 
 	async setStatusLoading () {
 		const icon = document.querySelector(`img[data-network="${this.dataset.network}"]`);
-		setIconSrc(icon, "images/status/loading.svg");
+		setIconSrc(icon, "websrc/images/status/loading.svg");
 	}
 
 	async handleNetworkConfig () {
@@ -277,7 +277,7 @@ class NetworkAction extends HTMLElement {
 		const netID = this.dataset.network;
 		dialog(this.template, async (result, _form) => {
 			if (result === "confirm") {
-				setIconSrc(document.querySelector(`svg[data-network="${netID}"]`), "images/status/loading.svg");
+				setIconSrc(document.querySelector(`svg[data-network="${netID}"]`), "websrc/images/status/loading.svg");
 				const net = `${netID}`;
 				const result = await requestAPI(`/cluster/${node}/${type}/${vmid}/net/${net}/delete`, "DELETE");
 				if (result.status !== 200) {
@@ -350,7 +350,7 @@ class DeviceAction extends HTMLElement {
 
 	async setStatusLoading () {
 		const icon = document.querySelector(`img[data-device="${this.dataset.device}"]`);
-		setIconSrc(icon, "images/status/loading.svg");
+		setIconSrc(icon, "websrc/images/status/loading.svg");
 	}
 
 	async handleDeviceConfig () {

@@ -152,9 +152,9 @@ class InstanceCard extends HTMLElement {
 		this.status = "loading";
 		const statusicon = this.shadowRoot.querySelector("#status");
 		const powerbtn = this.shadowRoot.querySelector("#power-btn");
-		setIconSrc(statusicon, "images/status/loading.svg");
-		setIconAlt(statusicon, "instance is loading");
-		setIconSrc(powerbtn, "images/status/loading.svg");
+		setIconSrc(statusicon, "websrc/images/status/loading.svg");
+		setIconAlt(statusicon, "websrc/instance is loading");
+		setIconSrc(powerbtn, "websrc/images/status/loading.svg");
 		setIconAlt(powerbtn, "");
 	}
 
