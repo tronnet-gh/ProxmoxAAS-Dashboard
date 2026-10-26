@@ -18,8 +18,8 @@ import (
 func Run() {
 	configPath := flag.String("config", "config.json", "path to config.json file")
 	flag.Parse()
-
 	common.Global = common.GetConfig(*configPath)
+	log.Printf("[INFO] Read in config from %s\n", *configPath)
 
 	// setup http router
 	router := http.NewServeMux()
@@ -47,8 +47,8 @@ func Run() {
 
 	server := LoggingMiddleware(router)
 
-	// run on all interfaces with port
-	log.Fatal("[ERR ] starting gin router: ", http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", common.Global.Port), server))
+	log.Printf("[INFO] starting server listening on 0.0.0.0:%d", common.Global.Port)
+	log.Fatalf("[ERR ] starting gin router: %s", http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", common.Global.Port), server))
 }
 
 // setup static resources under web (css, images, modules, scripts)
