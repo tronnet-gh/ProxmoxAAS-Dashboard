@@ -2,8 +2,8 @@ package routes
 
 import (
 	"net/http"
-	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
+	paas "proxmoxaas-dashboard/proxmoxaas-common-lib"
 )
 
 func HandleGETSettings(w http.ResponseWriter, r *http.Request) {

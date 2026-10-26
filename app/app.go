@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
 	"proxmoxaas-dashboard/app/routes"
 	"proxmoxaas-dashboard/app/web"
+	paas "proxmoxaas-dashboard/proxmoxaas-common-lib"
 )
 
 func Run() {

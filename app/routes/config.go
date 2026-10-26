@@ -3,8 +3,8 @@ package routes
 import (
 	"fmt"
 	"net/http"
-	paas "proxmoxaas-common-lib"
 	"proxmoxaas-dashboard/app/common"
+	paas "proxmoxaas-dashboard/proxmoxaas-common-lib"
 	"slices"
 	"sort"
 

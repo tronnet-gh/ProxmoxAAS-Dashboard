@@ -18,7 +18,7 @@ import (
 
 	"github.com/tdewolff/minify/v2"
 
-	paas "proxmoxaas-common-lib"
+	paas "proxmoxaas-dashboard/proxmoxaas-common-lib"
 )
 
 // get config file from configPath
