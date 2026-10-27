@@ -19,13 +19,13 @@ The supported setup is to use a reverse proxy to serve both the original Proxmox
 
 We will assume different hosts for each component which are accessible by unique host names and public URL addresses. Below is a table of references in the setup instructions across all components. You will need to substitute real addresses and hostnames for these in configurations.
 
-| component | internal address | external address | 
-| --- | --- | --- |
-| Proxmox VE API | pve.local | pve.domain.net |
-| ProxmoxAAS-Dashboard | dashboard.local | paas.domain.net |
-| ProxmoxAAS-API | api.local | paas.domain.net/api/ |
-| ProxmoxAAS-Fabric | fabric.local | N/A |
-| access-manager-api | access.local | N/A|
+| component | internal address | external address | default port |
+| --- | --- | --- | --- |
+| Proxmox VE API | pve.local | pve.domain.net | 8006 |
+| ProxmoxAAS-Dashboard | dashboard.local | paas.domain.net | 8080 |
+| ProxmoxAAS-API | api.local | paas.domain.net/api | 8081 |
+| ProxmoxAAS-Fabric | fabric.local | N/A | 8082 |
+| access-manager-api | access.local | N/A| 8083 |
 
 ## Prerequisites - Dashboard
 - Proxmox VE Cluster (v7.0+)
@@ -47,18 +47,18 @@ After this step, the Dashboard should be available on the `ProxmoxAAS-Dashboard`
 
 ## Installation - API
 
-To install the API component, go to [ProxmoxAAS-API](https://git.tronnet.net/tronnet/ProxmoxAAS-API). This is required for the app to function. The API installation will also have steps for setting up the reverse proxy server. 
+To install the API component, go to [ProxmoxAAS-API](https://git.tronnet.net/tronnet/ProxmoxAAS-API). This is required for the app to function.
 
 ## Installation - Fabric
 
-To install the Fabric component, go to [ProxmoxAAS-Fabric](https://git.tronnet.net/tronnet/ProxmoxAAS-Fabric). This is required for the app to function. The Fabric installation will also have steps for setting up the reverse proxy server. 
+To install the Fabric component, go to [ProxmoxAAS-Fabric](https://git.tronnet.net/tronnet/ProxmoxAAS-Fabric). This is required for the app to function.
 
 ## Installation - access-manager-api
 
-To install the access-manager-api component, go to [access-manager-api](https://git.tronnet.net/tronnet/access-manager-api). This is required for the app to function. The access-manager-api installation will also have steps for setting up the reverse proxy server.
+To install the access-manager-api component, go to [access-manager-api](https://git.tronnet.net/tronnet/access-manager-api). This is required for the app to function.
 
 ## Installation - Reverse Proxy
-1. Configure nginx or preferred reverse proxy to reverse proxy the dashboard. The configuration should include at least the following, ensuring that the configured ports are adjusted appropriately:
+1. Configure nginx or preferred reverse proxy to reverse proxy the dashboard. A snippet is show for the minimal configuration assuming the default ports.
 ```
 server {
 	listen 443 ssl;
@@ -75,4 +75,4 @@ server {
 ```
 2. Start nginx with the new configurations
 
-The dashboard, API, and Fabric should be avaliable and fully functional. 
+The PAAS suite should be avaliable and fully functional. 
