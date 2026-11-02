@@ -15,21 +15,18 @@
 </script>
 {{end}}
 
-{{/* <header> common across all pages */}}
+{{/* <header> for non-login pages */}}
 {{define "header"}}
 <header>
 	<h1>{{.global.Organization}}</h1>
 	<label for="navtoggle">&#9776;</label>
 	<input type="checkbox" id="navtoggle">
 	<nav id="navigation">
-		{{if eq .page "login"}}
-			<a href="login" aria-current="page">Login</a>
-		{{else}}
-			<a href="index" {{if eq .page "index"}} aria-current="page" {{end}}>Instances</a>
-			<a href="account" {{if eq .page "account"}} aria-current="page" {{end}}>Account</a>
-			<a href="settings" {{if eq .page "settings"}} aria-current="page" {{end}}>Settings</a>
-			<a href="login">Logout</a>
-		{{end}}
+		<a href="index" {{if eq .page "index"}} aria-current="page" {{end}}>Instances</a>
+		<a href="account" {{if eq .page "account"}} aria-current="page" {{end}}>Account</a>
+		<a href="admin" {{if eq .page "admin"}} aria-current="page" {{end}}>Admin</a>
+		<a href="settings" {{if eq .page "settings"}} aria-current="page" {{end}}>Settings</a>
+		<a href="login">Logout</a>
 	</nav>	
 </header>
 {{end}}
