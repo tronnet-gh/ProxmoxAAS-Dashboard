@@ -50,6 +50,8 @@ func Run() {
 	router.HandleFunc("GET /backups/backups", routes.HandleGETBackupsFragment)
 	router.HandleFunc("GET /login", routes.HandleGETLogin)
 	router.HandleFunc("GET /settings", routes.HandleGETSettings)
+	router.HandleFunc("GET /admin", routes.HandleGETAdmin)
+	router.HandleFunc("GET /admin/pools", routes.HandleGETAdminPoolsFragment)
 
 	server := paas.LoggingMiddleware(router)
 

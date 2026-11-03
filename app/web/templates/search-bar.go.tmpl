@@ -1,0 +1,34 @@
+{{/*
+	SearchBar: generic search bar which orders the linked items by how well they match the query
+	The page must await initSearch() from scripts/search.js, the element does nothing until then
+	.ID		= (string)	this element's id
+	.Label	= (string)	accessibility label for names of the items
+	.Items	= (string)	selector matching the items to search (ie "#container-id > item-element")
+	.Field	= (string)	data attribute on each item to search by without the (ie "name" for data-name)
+	.SortBy	= (string)	(optional) data attribute on each item to order by when scores tie (ie "vmid" for data-vmid)
+*/}}
+{{define "search-bar"}}
+<search-bar id="{{.ID}}" data-items="{{.Items}}" data-field="{{.Field}}" {{if .SortBy}}data-sortby="{{.SortBy}}"{{end}}>
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="websrc/modules/w3.css">
+		<link rel="stylesheet" href="websrc/css/style.css">
+		<link rel="stylesheet" href="websrc/css/form.css">
+		<style>
+			:host {
+				display: block;
+			}
+			form { /* set here instead of with the flex classes so the layout does not depend on the linked stylesheets loading */
+				display: flex;
+				flex-direction: row;
+				flex-wrap: nowrap;
+				column-gap: 10px;
+				align-items: center;
+			}
+		</style>
+		<form role="search" tabindex="0">
+			<button type="submit" class="w3-button" style="padding: 0; width: 1em; height: 1em; line-height: 1em;"><img alt="Search {{.Label}}" aria-label="Search {{.Label}}" src="websrc/images/common/search.svg#symb"></button>
+			<input type="search" class="w3-input w3-border" style="height: 1lh; max-width: fit-content;" aria-label="search {{.Label}} by {{.Field}}">
+		</form>
+	</template>
+</search-bar>
+{{end}}

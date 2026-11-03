@@ -1,0 +1,118 @@
+{{define "pool-card"}}
+<pool-card data-name="{{.PoolID}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="websrc/modules/w3.css">
+		<link rel="stylesheet" href="websrc/css/style.css">
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				width: fit-content;
+			}
+			a, svg, img {
+				line-height: 1em;
+				height: 1em;
+				width: 1em;
+				margin: 0;
+				padding: 0;
+			}
+			a img {
+				vertical-align: unset;
+			}
+			#pool-name, .pool-resource { /* the pool table scrolls instead of clipping or wrapping these */
+				white-space: nowrap;
+			}
+			#pool-actions { /* stay on the first line when the other cells in the row wrap */
+				align-self: start;
+				height: 1lh;
+			}
+			.flex { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				display: flex;
+			}
+			.row { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				flex-direction: row;
+				column-gap: 0.5em;
+				align-items: center;
+			}
+			.nowrap { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				flex-wrap: nowrap;
+			}
+			@media screen and (width >=993px) {
+				.hide-large {display: none !important;}
+			}
+			@media screen and (width <=993px) and (width >=601px){
+				.hide-large {display: none !important;}
+				.hide-medium {display:none !important}
+			}
+			@media screen and (width <=601px) and (width >=440px){
+				.hide-large {display: none !important;}
+				.hide-medium {display:none !important}
+				.hide-small {display:none !important}
+			}
+			@media screen and (width <= 440px) {
+				.hide-large {display: none !important;}
+				.hide-medium {display:none !important}
+				.hide-small {display:none !important}
+				.hide-tiny { display: none !important;}
+			}
+		</style>
+		<p id="pool-name" data-search-field="name">{{.PoolID}}</p>
+		<p id="pool-client-groups">{{.ClientGroups}}</p>
+		<p id="pool-admin-groups">{{.AdminGroups}}</p>
+		{{range .ResourceCells}}
+			<p class="pool-resource">{{.}}</p>
+		{{end}}
+		<div id="pool-actions" class="flex row nowrap">
+			<img id="configure-btn" class="clickable" alt="change pool configuration" role="button" tabindex=0 src="websrc/images/actions/access/config.svg#symb">
+			<img id="delete-btn" class="clickable" alt="delete pool" role="button" tabindex=0 src="websrc/images/actions/access/delete-active.svg#symb">
+		</div>
+	</template>
+</pool-card>
+{{end}}
+
+{{define "group-card"}}
+<group-card data-name="{{.Name}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="websrc/modules/w3.css">
+		<link rel="stylesheet" href="websrc/css/style.css">
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				width: fit-content;
+			}
+			svg, img {
+				line-height: 1em;
+				height: 1em;
+				width: 1em;
+				margin: 0;
+				padding: 0;
+			}
+			#group-name { /* the group table scrolls instead of clipping or wrapping these */
+				white-space: nowrap;
+			}
+			#group-actions { /* stay on the first line when the other cells in the row wrap */
+				align-self: start;
+				height: 1lh;
+			}
+			.flex { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				display: flex;
+			}
+			.row { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				flex-direction: row;
+				column-gap: 0.5em;
+				align-items: center;
+			}
+			.nowrap { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				flex-wrap: nowrap;
+			}
+		</style>
+		<p id="group-name" data-search-field="name">{{.Name}}</p>
+		<p id="group-members">{{.Members}}</p>
+		<div id="group-actions" class="flex row nowrap">
+			<img id="configure-btn" class="clickable" alt="change group configuration" role="button" tabindex=0 src="websrc/images/actions/access/config.svg#symb">
+			<img id="delete-btn" class="clickable" alt="delete group" role="button" tabindex=0 src="websrc/images/actions/access/delete-active.svg#symb">
+		</div>
+	</template>
+</group-card>
+{{end}}

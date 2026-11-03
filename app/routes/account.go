@@ -10,7 +10,7 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 )
 
-type Pool struct {
+type AccountPool struct {
 	paas.Pool      `mapstructure:",squash"`
 	ResourceCharts map[string]map[string]any
 }
@@ -80,12 +80,12 @@ func GetUserBasic(auth paas.Auth) (paas.User, error) {
 	return user, err
 }
 
-func GetUserPools(auth paas.Auth) (map[string]Pool, error) {
-	pools := map[string]Pool{}
+func GetUserPools(auth paas.Auth) (map[string]AccountPool, error) {
+	pools := map[string]AccountPool{}
 
 	// get all pools
 	body := map[string]any{}
-	res, code, err := common.RequestGetAPI("/access/pools", &auth, &body)
+	res, code, err := common.RequestGetAPI("/access/pools?role=client", &auth, &body)
 	if err != nil {
 		return pools, err
 	}
@@ -172,7 +172,7 @@ func GetUserPools(auth paas.Auth) (map[string]Pool, error) {
 	return pools, nil
 }
 
-func FormatPoolResourceCharts(pools *map[string]Pool) error {
+func FormatPoolResourceCharts(pools *map[string]AccountPool) error {
 	for poolname, pool := range *pools {
 		// for each resource category
 		for categoryname, category := range pool.ResourceCharts {

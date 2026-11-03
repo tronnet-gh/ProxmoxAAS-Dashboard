@@ -32,3 +32,48 @@
     </div>
 </section>
 {{end}}
+
+{{define "resource-chart"}}
+<resource-chart>
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="websrc/modules/w3.css">
+		<link rel="stylesheet" href="websrc/css/style.css">
+		<style>
+			#container{
+				margin: 0;
+				width: 100%;
+				height: fit-content;
+				padding: 0.5em;
+			}
+			progress {
+				width: 100%;
+				border: 0;
+				height: 1em;
+				appearance: none;
+			}
+			#caption {
+				text-align: center;
+				margin-top: 0.5em;
+				display: flex;
+				flex-direction: column;
+			}
+			progress::-moz-progress-bar { 
+				background: #{{.ColorHex}}; 
+			}
+			progress::-webkit-progress-bar { 
+				background: var(--main-text-color); 
+			}
+			progress::-webkit-progress-value { 
+				background: #{{.ColorHex}}; 
+			}
+		</style>
+		<div id="container">
+			<progress value="{{.Used}}" max="{{.Max}}" id="resource"></progress>
+			<label id="caption" for="resource">
+				<span>{{.Name}}</span>
+				<span>{{.Avail}} {{.Prefix}}{{.Unit}} Avaliable</span>
+			</label>
+		</div>
+	</template>
+</resource-chart>
+{{end}}

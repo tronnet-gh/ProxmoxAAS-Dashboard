@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{{template "head" .}}
+		<script src="websrc/scripts/admin.js" type="module"></script>
+		<link rel="modulepreload" href="websrc/scripts/utils.js">
+		<link rel="modulepreload" href="websrc/scripts/dialog.js">
+		<link rel="modulepreload" href="websrc/scripts/search.js">
+        <style>
+            #pool-table {
+                display: grid;
+                grid-template-columns: repeat(calc(3 + {{len .headers}} + 1), auto);
+                grid-column-gap: 1em;
+                grid-row-gap: 0.25em;
+                overflow-x: auto;
+            }
+            #pool-table-header, #pool-container, #pool-table pool-card {
+                display: contents;
+            }
+            #group-table {
+                display: grid;
+                grid-template-columns: repeat(3, auto);
+                grid-column-gap: 1em;
+                grid-row-gap: 0.25em;
+                overflow-x: auto;
+            }
+            #group-table-header, #group-container, #group-table group-card {
+                display: contents;
+            }
+        </style>
+	</head>
+    <body>
+        {{template "header" .}}
+        <main>
+            <section>
+				<h2>Pools</h2>
+				<div class="w3-card w3-padding">
+					<div class="flex row nowrap" style="margin-top: 1em; justify-content: space-between;">
+						{{template "search-bar" Map "ID" "pool-search" "Label" "pools" "Items" "#pool-container > pool-card" "Field" "name" "SortBy" "name"}}
+						<!--Add Pool Button & Dialog Template-->
+						<button type="button" id="pool-add" class="w3-button" aria-label="create new pool">
+							<span class="large" style="margin: 0;">Create Pool</span>
+							<img class="small" style="height: 1lh; width: 1lh;" alt="Create Pool" aria-label="Create Pool" src="websrc/images/actions/access/add.svg#symb">
+						</button>
+						<template id="create-pool-dialog">
+							<dialog class="w3-container w3-card w3-border-0">
+								<p class="w3-large" id="prompt">Create New Pool</p>
+								<div id="body">
+									<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
+										<label for="poolname">Pool Name</label>
+										<input class="w3-input w3-border" name="poolname" id="poolname" type="text" required>
+									</form>
+								</div>
+								<div id="controls" class="w3-center w3-container">
+									<button id="cancel" type="submit" value="cancel" form="form" class="w3-button w3-margin"  formnovalidate>CANCEL</button>
+									<button id="confirm" type="submit" value="confirm" form="form" class="w3-button w3-margin" >CONFIRM</button>
+								</div>
+							</dialog>
+						</template>
+					</div>
+					<div id="pool-table">
+						<div id="pool-table-header">
+							<p>Name</p>
+							<p>Client Groups</p>
+							<p>Admin Groups</p>
+							{{range .headers}}
+								<p>{{.Name}}</p>
+							{{end}}
+							<p>Actions</p>
+						</div>
+						<hr style="grid-column: 1 / -1; padding: 0; margin: 0;">
+						<div id="pool-container">
+							{{range .pools}}
+								{{template "pool-card" .}}
+							{{end}}
+						</div>
+					</div>
+				</div>
+			</section>
+			<section>
+				<h2>Groups</h2>
+				<div class="w3-card w3-padding">
+					<div class="flex row nowrap" style="margin-top: 1em; padding: 8px 0;">
+						{{template "search-bar" Map "ID" "group-search" "Label" "groups" "Items" "#group-container > group-card" "Field" "name" "SortBy" "name"}}
+					</div>
+					<div id="group-table">
+						<div id="group-table-header">
+							<p>Name</p>
+							<p>Members</p>
+							<p>Actions</p>
+						</div>
+						<hr style="grid-column: 1 / -1; padding: 0; margin: 0;">
+						<div id="group-container">
+							{{range .groups}}
+								{{template "group-card" .}}
+							{{end}}
+						</div>
+					</div>
+				</div>
+			</section>
+        </main>
+    </body>
+</html>

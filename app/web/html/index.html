@@ -6,17 +6,8 @@
 		<link rel="modulepreload" href="websrc/scripts/utils.js">
 		<link rel="modulepreload" href="websrc/scripts/dialog.js">
 		<link rel="modulepreload" href="websrc/scripts/clientsync.js">
+		<link rel="modulepreload" href="websrc/scripts/search.js">
 		<style>
-			@media screen and (width >= 440px) {
-				#vm-search {
-					max-width: calc(100% - 10px - 152px);
-				}
-			}
-			@media screen and (width <= 440px) {
-				#vm-search {
-					max-width: calc(100% - 10px - 47px);
-				}
-			}
 			@media screen and (width >= 993px) {
 				#instance-table {
 					display: grid;
@@ -70,10 +61,7 @@
 				<h2>Instances</h2>
 				<div class="w3-card w3-padding">
 					<div class="flex row nowrap" style="margin-top: 1em; justify-content: space-between;">
-						<form id="vm-search" role="search" class="flex row nowrap" tabindex="0">
-							<button type="submit" id="submit" class="w3-button" style="padding: 0; width: 1em; height: 1em; line-height: 1em;"><img alt="Search Instances" aria-label="Search Instances" src="websrc/images/common/search.svg#symb"></button>
-							<input type="search" id="search" class="w3-input w3-border" style="height: 1lh; max-width: fit-content;" aria-label="search instances by name">
-						</form>
+						{{template "search-bar" Map "ID" "instance-search" "Label" "instances" "Items" "#instance-container > instance-card" "Field" "name" "SortBy" "vmid"}}
 						<!--Add Instance Button & Dialog Template-->
 						<button type="button" id="instance-add" class="w3-button" aria-label="create new instance">
 							<span class="large" style="margin: 0;">Create Instance</span>
@@ -81,9 +69,7 @@
 						</button>
 						<template id="create-instance-dialog">
 							<dialog class="w3-container w3-card w3-border-0">
-								<p class="w3-large" id="prompt">
-									Create New Instance
-								</p>
+								<p class="w3-large" id="prompt">Create New Instance</p>
 								<div id="body">
 									<form method="dialog" class="input-grid" style="grid-template-columns: auto 1fr;" id="form">
 										<label for="type">Instance Type</label>

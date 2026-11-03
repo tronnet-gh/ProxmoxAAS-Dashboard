@@ -214,3 +214,15 @@ hr {
 	.hide-small {display:none !important}
 	.hide-tiny { display: none !important;}
 }
+
+@media screen and (width >= 440px) {
+	search-bar {
+		max-width: calc(100% - 10px - 120px);
+	}
+}
+
+@media screen and (width <= 440px) {
+	search-bar {
+		max-width: calc(100% - 10px - 50px);
+	}
+}

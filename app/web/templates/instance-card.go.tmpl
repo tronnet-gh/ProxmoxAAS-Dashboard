@@ -56,7 +56,7 @@
 			}
 		</style>
 		<p>{{.VMID}}</p>
-		<p id="instance-name">{{.Name}}</p>
+		<p id="instance-name" data-search-field="name">{{.Name}}</p>
 		<p class="hide-small">{{.Type}}</p>
 		<div class="flex row nowrap hide-tiny">
 			{{if eq .Status "running"}}

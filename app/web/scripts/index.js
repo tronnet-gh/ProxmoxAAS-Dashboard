@@ -1,20 +1,18 @@
-import { requestPVE, requestAPI, setAppearance, getSetting, requestDash, setIconSrc, setIconAlt, getCookie } from "./utils.js";
+import { requestPVE, requestAPI, setAppearance, requestDash, setIconSrc, setIconAlt, getCookie } from "./utils.js";
 import { dialog, error } from "./dialog.js";
 import { setupClientSync } from "./clientsync.js";
-import wfaInit from "../modules/wfa.js";
+import { initSearch } from "./search.js";
 
 window.addEventListener("DOMContentLoaded", init);
-
-var wfa;
 
 async function init () {
 	setAppearance();
 
-	wfa = await wfaInit("websrc/modules/wfa.wasm.gz");
 	initInstances();
 
 	document.querySelector("#instance-add").addEventListener("click", handleInstanceAddButton);
-	document.querySelector("#vm-search").addEventListener("input", sortInstances);
+
+	await initSearch();
 
 	setupClientSync(refreshInstances);
 }
@@ -74,53 +72,7 @@ class InstanceCard extends HTMLElement {
 		this.dataset.nodetsatus = node.status;
 	}
 
-	set searchQueryResult (result) {
-		this.dataset.searchqueryresult = JSON.stringify(result);
-	}
-
-	get searchQueryResult () {
-		return JSON.parse(!this.dataset.searchqueryresult ? "{}" : this.dataset.searchqueryresult);
-	}
-
 	update () {
-		const nameParagraph = this.shadowRoot.querySelector("#instance-name");
-		nameParagraph.innerText = "";
-		if (this.searchQueryResult.alignment) {
-			let i = 0; // name index
-			let c = 0; // alignment index
-			const alignment = this.searchQueryResult.alignment;
-			while (i < this.name.length && c < alignment.length) {
-				if (alignment[c] === "M") {
-					const part = document.createElement("span");
-					part.innerText = this.name[i];
-					part.style = "color: var(--lightbg-text-color); background-color: var(--highlight-color);";
-					nameParagraph.append(part);
-					i++;
-					c++;
-				}
-				else if (alignment[c] === "I") {
-					const part = document.createElement("span");
-					part.innerText = this.name[i];
-					nameParagraph.append(part);
-					i++;
-					c++;
-				}
-				else if (alignment[c] === "D") {
-					c++;
-				}
-				else if (alignment[c] === "X") {
-					const part = document.createElement("span");
-					part.innerText = this.name[i];
-					nameParagraph.append(part);
-					i++;
-					c++;
-				}
-			}
-		}
-		else {
-			nameParagraph.innerHTML = this.name ? this.name : "&nbsp;";
-		}
-
 		const powerButton = this.shadowRoot.querySelector("#power-btn");
 		if (powerButton !== null) {
 			if (powerButton.classList.contains("clickable")) {
@@ -218,19 +170,6 @@ class InstanceCard extends HTMLElement {
 
 customElements.define("instance-card", InstanceCard);
 
-async function refreshInstances () {
-	let instances = await requestDash("/index/instances", "GET");
-	if (instances.status !== 200) {
-		error(`Error fetching instances: ${instances.status} ${instances.error !== undefined ? instances.error : ""}`);
-	}
-	else {
-		instances = instances.data;
-		const container = document.querySelector("#instance-container");
-		container.setHTMLUnsafe(instances);
-		sortInstances();
-	}
-}
-
 function initInstances () {
 	const container = document.querySelector("#instance-container");
 	let instances = container.children;
@@ -240,74 +179,17 @@ function initInstances () {
 	}
 }
 
-function sortInstances () {
-	const searchCriteria = getSetting("search-criteria");
-	const searchQuery = document.querySelector("#search").value || null;
-	let criteria;
-	if (!searchQuery) {
-		criteria = (item, _query = null) => {
-			return { score: item.vmid, alignment: null };
-		};
+async function refreshInstances () {
+	let instances = await requestDash("/index/instances", "GET");
+	if (instances.status !== 200) {
+		error(`Error fetching instances: ${instances.status} ${instances.error !== undefined ? instances.error : ""}`);
 	}
-	else if (searchCriteria === "exact") {
-		criteria = (item, query) => {
-			const substrInc = item.includes(query);
-			if (substrInc) {
-				const substrStartIndex = item.indexOf(query);
-				const queryLength = query.length;
-				const remaining = item.length - substrInc - queryLength + 1;
-				const alignment = `${"X".repeat(substrStartIndex)}${"M".repeat(queryLength)}${"X".repeat(remaining)}`;
-				return { score: -1, alignment };
-			}
-			else {
-				const alignment = `${"X".repeat(item.length)}`;
-				return { score: 0, alignment };
-			}
-		};
-	}
-	else if (searchCriteria === "fuzzy") {
-		const penalties = {
-			m: 0,
-			x: 2,
-			o: 3,
-			e: 1
-		};
-		criteria = (item, query) => {
-			// lower is better
-			const { score, CIGAR } = wfa.wfAlign(query, item, penalties, true);
-			const alignment = wfa.DecodeCIGAR(CIGAR);
-			const maxlength = Math.max(item.length, query.length);
-			return { score: score / maxlength, alignment };
-		};
-	}
-
-	const container = document.querySelector("#instance-container");
-	let instances = container.children;
-	instances = [].slice.call(instances);
-
-	for (let i = 0; i < instances.length; i++) {
-		if (!instances[i].dataset.name) { // if the instance has no name, assume its just empty string
-			instances[i].dataset.name = "";
-		}
-		const { score, alignment } = criteria(instances[i].dataset.name.toLowerCase(), searchQuery ? searchQuery.toLowerCase() : "");
-		instances[i].searchQueryResult = { score, alignment };
-	}
-	const sortCriteria = (a, b) => {
-		const aScore = a.searchQueryResult.score;
-		const bScore = b.searchQueryResult.score;
-		if (aScore === bScore) {
-			return a.vmid > b.vmid ? 1 : -1;
-		}
-		else {
-			return aScore - bScore;
-		}
-	};
-
-	instances.sort(sortCriteria);
-
-	for (let i = 0; i < instances.length; i++) {
-		container.appendChild(instances[i]);
-		instances[i].update();
+	else {
+		instances = instances.data;
+		const container = document.querySelector("#instance-container");
+		container.setHTMLUnsafe(instances);
+		initInstances();
+		document.querySelector("#instance-search").search();
 	}
 }
 

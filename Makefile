@@ -5,7 +5,7 @@ build: clean ensure-dist build-wfa
 # resolve symbolic links in web by copying it into dist/web/
 	GODEBUG=embedfollowsymlinks=1 CGO_ENABLED=0 go build -tags release -ldflags="-s -w" -v -o dist/ .
 
-test:
+test: clean ensure-dist build-wfa
 	GODEBUG=embedfollowsymlinks=1 CGO_ENABLED=0 go run .
 
 clean: clean-wfa clean-web
