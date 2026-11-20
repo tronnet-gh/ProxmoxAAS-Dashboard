@@ -5,7 +5,7 @@ go 1.27.4
 require (
 	github.com/gerow/go-color v0.0.0-20140219113758-125d37f527f1
 	github.com/go-viper/mapstructure/v2 v2.5.0
-	github.com/tdewolff/minify/v2 v2.24.25
+	github.com/tdewolff/minify/v2 v2.25.0
 )
 
-require github.com/tdewolff/parse/v2 v2.8.20 // indirect
+require github.com/tdewolff/parse/v2 v2.25.0 // indirect
