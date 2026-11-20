@@ -57,8 +57,8 @@
 			}
 		</style>
 		<p id="pool-name" data-search-field="name">{{.PoolID}}</p>
-		<p id="pool-client-groups">{{.ClientGroups}}</p>
-		<p id="pool-admin-groups">{{.AdminGroups}}</p>
+		<p id="pool-client-groups">{{SliceToString .ClientGroups ", "}}</p>
+		<p id="pool-admin-groups">{{SliceToString .AdminGroups ", "}}</p>
 		{{range .ResourceCells}}
 			<p class="pool-resource">{{.}}</p>
 		{{end}}
@@ -71,7 +71,7 @@
 {{end}}
 
 {{define "group-card"}}
-<group-card data-name="{{.Name}}">
+<group-card data-name="{{ToString .Groupname}}">
 	<template shadowrootmode="open">
 		<link rel="stylesheet" href="websrc/modules/w3.css">
 		<link rel="stylesheet" href="websrc/css/style.css">
@@ -107,12 +107,59 @@
 				flex-wrap: nowrap;
 			}
 		</style>
-		<p id="group-name" data-search-field="name">{{.Name}}</p>
-		<p id="group-members">{{.Members}}</p>
+		<p id="group-name" data-search-field="name">{{ToString .Groupname}}</p>
+		<p id="group-members">{{SliceToString .Users ", "}}</p>
 		<div id="group-actions" class="flex row nowrap">
 			<img id="configure-btn" class="clickable" alt="change group configuration" role="button" tabindex=0 src="websrc/images/actions/access/config.svg#symb">
 			<img id="delete-btn" class="clickable" alt="delete group" role="button" tabindex=0 src="websrc/images/actions/access/delete-active.svg#symb">
 		</div>
 	</template>
 </group-card>
+{{end}}
+
+{{define "user-card"}}
+<user-card data-name="{{ToString .Username}}">
+	<template shadowrootmode="open">
+		<link rel="stylesheet" href="websrc/modules/w3.css">
+		<link rel="stylesheet" href="websrc/css/style.css">
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				width: fit-content;
+			}
+			svg, img {
+				line-height: 1em;
+				height: 1em;
+				width: 1em;
+				margin: 0;
+				padding: 0;
+			}
+			#user-name { /* the user table scrolls instead of clipping or wrapping these */
+				white-space: nowrap;
+			}
+			#user-actions { /* stay on the first line when the other cells in the row wrap */
+				align-self: start;
+				height: 1lh;
+			}
+			.flex { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				display: flex;
+			}
+			.row { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				flex-direction: row;
+				column-gap: 0.5em;
+				align-items: center;
+			}
+			.nowrap { /* needed for some reason to avoid a flickering issue on chrome ONLY */
+				flex-wrap: nowrap;
+			}
+		</style>
+		<p id="user-name" data-search-field="name">{{ToString .Username}}</p>
+		<p id="user-fullname">{{.CN}} {{.SN}}</p>
+		<div id="user-actions" class="flex row nowrap">
+			<img id="configure-btn" class="clickable" alt="change user configuration" role="button" tabindex=0 src="websrc/images/actions/access/config.svg#symb">
+			<img id="delete-btn" class="clickable" alt="delete user" role="button" tabindex=0 src="websrc/images/actions/access/delete-active.svg#symb">
+		</div>
+	</template>
+</user-card>
 {{end}}

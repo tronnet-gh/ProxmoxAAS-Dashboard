@@ -188,6 +188,7 @@ async function refreshInstances () {
 		instances = instances.data;
 		const container = document.querySelector("#instance-container");
 		container.setHTMLUnsafe(instances);
+		customElements.upgrade(container);
 		initInstances();
 		document.querySelector("#instance-search").search();
 	}

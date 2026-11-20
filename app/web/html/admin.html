@@ -27,6 +27,16 @@
             #group-table-header, #group-container, #group-table group-card {
                 display: contents;
             }
+            #user-table {
+                display: grid;
+                grid-template-columns: repeat(3, auto);
+                grid-column-gap: 1em;
+                grid-row-gap: 0.25em;
+                overflow-x: auto;
+            }
+            #user-table-header, #user-container, #user-table user-card {
+                display: contents;
+            }
         </style>
 	</head>
     <body>
@@ -93,6 +103,27 @@
 						<div id="group-container">
 							{{range .groups}}
 								{{template "group-card" .}}
+							{{end}}
+						</div>
+					</div>
+				</div>
+			</section>
+			<section>
+				<h2>Users</h2>
+				<div class="w3-card w3-padding">
+					<div class="flex row nowrap" style="margin-top: 1em; padding: 8px 0;">
+						{{template "search-bar" Map "ID" "user-search" "Label" "users" "Items" "#user-container > user-card" "Field" "name" "SortBy" "name"}}
+					</div>
+					<div id="user-table">
+						<div id="user-table-header">
+							<p>Username</p>
+							<p>Full Name</p>
+							<p>Actions</p>
+						</div>
+						<hr style="grid-column: 1 / -1; padding: 0; margin: 0;">
+						<div id="user-container">
+							{{range .users}}
+								{{template "user-card" .}}
 							{{end}}
 						</div>
 					</div>

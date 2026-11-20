@@ -26,8 +26,15 @@ func Run() {
 	static := common.MinifyStatic(m, web.Static)
 	router.HandleFunc("GET /websrc/{path...}", func(w http.ResponseWriter, r *http.Request) {
 		path := r.PathValue("path")
-		data := static[path]
-		w.Header().Set("Content-Encoding", data.MimeType.Encoding)
+		data, ok := static[path]
+		if !ok {
+			common.HandleNonFatalError(w, fmt.Errorf("failed to fetch static file %s", path))
+			return
+		}
+		// only set encoding when encoding is defined, otherwise chrome breaks
+		if data.MimeType.Encoding != "" {
+			w.Header().Set("Content-Encoding", data.MimeType.Encoding)
+		}
 		w.Header().Set("Content-Type", data.MimeType.Type)
 		w.Write([]byte(data.Data))
 	})

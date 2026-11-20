@@ -130,6 +130,32 @@ func LoadHTML(html map[string]StaticFile) *template.Template {
 			}
 			return dict, nil
 		},
+		"ToString": func(item any) (string, error) {
+			p, ok := item.(paas.Printable)
+			if !ok {
+				return "", fmt.Errorf("ToString: %T does not implement Printable", item)
+			}
+			return p.ToString(), nil
+		},
+		// templates do not convert []T to []any, so accept any slice and walk it with reflection
+		"SliceToString": func(slice any, sep string) (string, error) {
+			v := reflect.ValueOf(slice)
+			if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
+				return "", fmt.Errorf("SliceToString: expected a slice, got %T", slice)
+			}
+			var s strings.Builder
+			for i := range v.Len() {
+				p, ok := v.Index(i).Interface().(paas.Printable)
+				if !ok {
+					return "", fmt.Errorf("SliceToString: %s does not implement Printable", v.Index(i).Type())
+				}
+				if i != 0 {
+					s.WriteString(sep)
+				}
+				s.WriteString(p.ToString())
+			}
+			return s.String(), nil
+		},
 	}
 	root := template.New("").Funcs(funcMap)
 	if err := LoadAndAddToRoot(funcMap, root, html); err != nil {
@@ -171,7 +197,7 @@ func TemplateMinifier(m *minify.M, w io.Writer, r io.Reader, _ map[string]string
 }
 
 func HandleNonFatalError(w http.ResponseWriter, err error) {
-	log.Printf("[WARN] encountered a non-fatal error: %s", err.Error())
+	log.Printf("[WARN] encountered a non-fatal server error: %s", err.Error())
 	w.WriteHeader(http.StatusInternalServerError)
 }
 

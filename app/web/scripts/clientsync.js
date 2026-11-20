@@ -31,6 +31,17 @@ export async function setupClientSync (callback) {
 			if (message === "sync") {
 				callback();
 			}
+			else if (message.startsWith("ack")) {
+				const x = message.split(" ")
+				if (x.length !== 2) {
+					error("clientsync: recieved malformed ack message from server, closing socket.");
+					socket.close();
+				}
+				else if (Number(x[1]) !== rate) {
+					error("clientsync: recieved incorrect ack message from server, closing socket.");
+					socket.close();
+				}
+			}
 			else {
 				error("clientsync: recieved unexpected message from server, closing socket.");
 				socket.close();

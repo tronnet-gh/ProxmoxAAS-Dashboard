@@ -7,21 +7,28 @@ import (
 	"proxmoxaas-dashboard/app/common"
 	paas "proxmoxaas-dashboard/proxmoxaas-common-lib"
 	"slices"
-	"strings"
 
 	"github.com/go-viper/mapstructure/v2"
 )
 
 type AdminPool struct {
 	paas.Pool     `mapstructure:",squash"`
-	ClientGroups  string
-	AdminGroups   string
+	ClientGroups  []paas.Group
+	AdminGroups   []paas.Group
 	ResourceCells []string // one cell per AdminResourceHeader, in the same order
 }
 
 type AdminGroup struct {
-	Name    string
-	Members string
+	paas.Group `mapstructure:",squash"`
+}
+
+type UserCard struct {
+	Username paas.Username
+	CN       string
+	SN       string
+	Mail     string
+	Enable   bool
+	Realm    string
 }
 
 type AdminResourceHeader struct {
@@ -50,12 +57,19 @@ func HandleGETAdmin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		users, err := GetAdminUsers(auth)
+		if err != nil {
+			common.HandleNonFatalError(w, err)
+			return
+		}
+
 		paas.HTTPExecuteHTMLTemplate(w, common.TMPL, "html/admin.html", map[string]any{
 			"global":  common.Global,
 			"page":    "admin",
 			"pools":   pools,
 			"headers": headers,
 			"groups":  groups,
+			"users":   users,
 		})
 	} else { // if user is not authed, redirect user to login page
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -114,8 +128,15 @@ func GetAdminPools(auth paas.Auth) (map[string]AdminPool, []AdminResourceHeader,
 
 	// fill in the display values of each pool
 	for poolname, pool := range pools {
-		pool.ClientGroups = FormatPoolGroups(pool.Groups, false)
-		pool.AdminGroups = FormatPoolGroups(pool.Groups, true)
+		pool.ClientGroups = []paas.Group{}
+		pool.AdminGroups = []paas.Group{}
+		for _, group := range pool.Groups {
+			if group.IsAdmin == true {
+				pool.AdminGroups = append(pool.AdminGroups, group)
+			} else {
+				pool.ClientGroups = append(pool.ClientGroups, group)
+			}
+		}
 		pool.ResourceCells, err = FormatPoolResourceCells(pool.Resources, headers)
 		if err != nil {
 			return nil, nil, err
@@ -128,7 +149,7 @@ func GetAdminPools(auth paas.Auth) (map[string]AdminPool, []AdminResourceHeader,
 
 // get all groups the user is permitted to see, including groups which are not assigned to any pool
 func GetAdminGroups(auth paas.Auth) (map[string]AdminGroup, error) {
-	groups := map[string]paas.Group{}
+	groups := map[string]AdminGroup{}
 
 	body := map[string]any{}
 	res, code, err := common.RequestGetAPI("/access/groups", &auth, &body)
@@ -143,20 +164,40 @@ func GetAdminGroups(auth paas.Auth) (map[string]AdminGroup, error) {
 		return nil, err
 	}
 
-	adminGroups := map[string]AdminGroup{}
-	for name, group := range groups { // the key is the exact proxmox group id, unlike Groupname.ToString() which appends -pve to groups without a realm
-		adminGroups[name] = AdminGroup{Name: name, Members: FormatGroupMembers(group.Users)}
-	}
-	return adminGroups, nil
+	return groups, nil
 }
 
-func FormatGroupMembers(users []paas.User) string {
-	names := []string{}
-	for _, user := range users {
-		names = append(names, user.Username.ToString())
+func GetAdminUsers(auth paas.Auth) (map[string]UserCard, error) {
+	users := map[string]paas.User{}
+
+	body := map[string]any{}
+	res, code, err := common.RequestGetAPI("/access/users", &auth, &body)
+	if err != nil {
+		return nil, err
 	}
-	slices.Sort(names)
-	return strings.Join(names, ", ")
+	if code != 200 {
+		return nil, fmt.Errorf("request to /access/users resulted in %+v", res)
+	}
+
+	err = mapstructure.Decode(body["users"].(map[string]any), &users)
+	if err != nil {
+		return nil, err
+	}
+
+	userCards := map[string]UserCard{}
+	for _, user := range users {
+		username := user.Username.ToString()
+		userCards[username] = UserCard{
+			CN:       user.CN,
+			SN:       user.SN,
+			Mail:     user.Mail,
+			Enable:   true, // todo whether to handle enable/disable users
+			Realm:    user.Username.Realm,
+			Username: user.Username,
+		}
+	}
+
+	return userCards, nil
 }
 
 // get the displayed numeric and storage resources, ordered the same way as the account page (category then key)
@@ -178,17 +219,6 @@ func GetAdminResourceHeaders(meta map[string]any) ([]AdminResourceHeader, error)
 	})
 
 	return headers, nil
-}
-
-func FormatPoolGroups(groups []paas.Group, isAdmin bool) string {
-	names := []string{}
-	for _, group := range groups {
-		if group.IsAdmin == isAdmin {
-			names = append(names, group.Groupname.ToString())
-		}
-	}
-	slices.Sort(names)
-	return strings.Join(slices.Compact(names), ", ")
 }
 
 // get the maximum allowed by the pool for each resource column, resources the pool has no quota for are shown as "-"
